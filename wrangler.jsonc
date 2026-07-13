@@ -1,0 +1,88 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Custom worker adds Cloudflare Cron support for Payload scheduled publishing.
+  // Replace placeholders below with your real Cloudflare resource IDs before deploy.
+  "main": "./worker.ts",
+  "name": "tmcs",
+  "compatibility_date": "2025-08-15",
+  "compatibility_flags": [
+    // Enable Node.js API
+    // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#nodejs-compatibility-flag
+    "nodejs_compat",
+    // Allow to fetch URLs in your app
+    // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#global-fetch-strictly-public
+    "global_fetch_strictly_public",
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  // Run Payload jobs frequently so scheduled publish/unpublish stays timely.
+  // The handler calls /api/cron/jobs with CRON_SECRET (Worker secret).
+  "triggers": {
+    "crons": ["*/5 * * * *"],
+  },
+  "d1_databases": [
+    {
+      "binding": "D1",
+      // Replace with your real D1 database ID from `wrangler d1 create tmcs` before production deploy.
+      "database_id": "local-tmcs-dev",
+      "database_name": "tmcs",
+      // Use local D1 during development. Set remote:true only with a real Cloudflare database_id.
+      "remote": false,
+    },
+  ],
+  "services": [
+    // Self-reference so the scheduled handler can call /api/cron/jobs on-Worker.
+    // The service name must match this Worker's "name".
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "tmcs",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      // Replace with your real R2 bucket name from `wrangler r2 bucket create tmcs-media`
+      "bucket_name": "tmcs-media",
+    },
+    // Optional OpenNext incremental cache bucket:
+    // {
+    //   "binding": "NEXT_INC_CACHE_R2_BUCKET",
+    //   "bucket_name": "tmcs-cache",
+    // },
+  ],
+
+  // Secrets (set via dashboard or `wrangler secret put`):
+  // - PAYLOAD_SECRET
+  // - CRON_SECRET
+  // - CONTACT_HASH_SECRET
+  //
+  // Optional vars (non-secret):
+  // "vars": {
+  //   "NEXT_PUBLIC_SERVER_URL": "https://example.com"
+  // }
+
+  // Staging environment example:
+  // Deploy with: CLOUDFLARE_ENV=staging bun run deploy
+  // "env": {
+  //   "staging": {
+  //     "name": "tmcs-staging",
+  //     "triggers": { "crons": ["*/5 * * * *"] },
+  //     "d1_databases": [
+  //       {
+  //         "binding": "D1",
+  //         "database_id": "STAGING_DATABASE_ID",
+  //         "database_name": "tmcs-staging",
+  //         "remote": true
+  //       }
+  //     ],
+  //     "services": [
+  //       { "binding": "WORKER_SELF_REFERENCE", "service": "tmcs-staging" }
+  //     ],
+  //     "r2_buckets": [
+  //       { "binding": "R2", "bucket_name": "tmcs-media-staging" }
+  //     ]
+  //   }
+  // }
+}

@@ -1,0 +1,28 @@
+# Dependencies and caches
+node_modules
+.next
+.open-next
+.wrangler
+out
+build
+coverage
+
+# Test reports
+test-results
+playwright-report
+blob-report
+playwright/.cache
+
+# Generated / lockfiles
+bun.lock
+cloudflare-env.d.ts
+src/payload-types.ts
+src/app/(payload)/admin/importMap.js
+src/migrations
+
+# Local env / media / plans / agent skill reference dumps
+.env
+.env*.local
+media
+plans
+.agents
