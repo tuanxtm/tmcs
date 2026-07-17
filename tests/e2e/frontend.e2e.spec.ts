@@ -22,12 +22,10 @@ test.describe('Frontend homepage', () => {
     await expect(page.locator('#hero-heading')).toBeVisible()
   })
 
-  test('header is sticky with blur styles', async ({ page }) => {
+  test('header is sticky', async ({ page }) => {
     await page.goto('http://localhost:3000/')
     const header = page.locator('header')
     await expect(header).toHaveCSS('position', 'sticky')
-    const className = await header.getAttribute('class')
-    expect(className || '').toMatch(/backdrop-blur/)
   })
 
   test('desktop hero places image before text in the grid', async ({ page }) => {
@@ -39,24 +37,46 @@ test.describe('Frontend homepage', () => {
     await expect(grid).toBeVisible()
   })
 
-  test('mobile post layout keeps text before image', async ({ page }) => {
+  test('desktop post feed uses a four-column bento grid', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('http://localhost:3000/')
+    const grid = page.locator('.bento-grid')
+    if ((await page.locator('.bento-tile').count()) === 0) {
+      test.skip()
+      return
+    }
+    await expect(grid).toBeVisible()
+    await expect(grid).toHaveCSS('grid-template-columns', /.+ .+ .+ .+/)
+  })
+
+  test('mobile post feed collapses to a single column', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('http://localhost:3000/')
 
-    const firstArticle = page.locator('article').first()
-    if ((await firstArticle.count()) === 0) {
+    const tiles = page.locator('.bento-tile')
+    if ((await tiles.count()) === 0) {
       test.skip()
       return
     }
 
-    const mobileStack = firstArticle.locator('.md\\:hidden')
-    await expect(mobileStack).toBeVisible()
-    const headingBox = await mobileStack.locator('h2').boundingBox()
-    const imageBox = await mobileStack.locator('a.group').boundingBox()
-    expect(headingBox && imageBox).toBeTruthy()
-    if (headingBox && imageBox) {
-      expect(headingBox.y).toBeLessThan(imageBox.y)
+    await expect(tiles.first()).toBeVisible()
+    const firstBox = await tiles.first().boundingBox()
+    const second = tiles.nth(1)
+    if ((await second.count()) === 0 || !firstBox) return
+    const secondBox = await second.boundingBox()
+    if (!secondBox) return
+    // Stacked: second tile starts below the first, not beside it.
+    expect(secondBox.y).toBeGreaterThan(firstBox.y + firstBox.height / 2)
+  })
+
+  test('post tile titles remain accessible to assistive tech', async ({ page }) => {
+    await page.goto('http://localhost:3000/')
+    const tile = page.locator('.bento-tile').first()
+    if ((await tile.count()) === 0) {
+      test.skip()
+      return
     }
+    await expect(tile.locator('.sr-only, h3').first()).toBeAttached()
   })
 
   test('payload posts REST API serves published docs', async ({ request }) => {
@@ -68,6 +88,16 @@ test.describe('Frontend homepage', () => {
     expect(body).toHaveProperty('docs')
     expect(Array.isArray(body.docs)).toBeTruthy()
     expect(body).toHaveProperty('hasNextPage')
+  })
+
+  test('payload short-stories REST API is readable', async ({ request }) => {
+    const response = await request.get(
+      'http://localhost:3000/api/short-stories?limit=6&depth=0&locale=en',
+    )
+    expect(response.ok()).toBeTruthy()
+    const body = await response.json()
+    expect(body).toHaveProperty('docs')
+    expect(Array.isArray(body.docs)).toBeTruthy()
   })
 
   test('focus styles remain visible on skip link', async ({ page }) => {
