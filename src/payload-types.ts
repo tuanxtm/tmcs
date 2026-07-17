@@ -73,6 +73,8 @@ export interface Config {
     categories: Category;
     tags: Tag;
     posts: Post;
+    'short-stories': ShortStory;
+    'feed-decorations': FeedDecoration;
     projects: Project;
     pages: Page;
     'contact-submissions': ContactSubmission;
@@ -90,6 +92,8 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    'short-stories': ShortStoriesSelect<false> | ShortStoriesSelect<true>;
+    'feed-decorations': FeedDecorationsSelect<false> | FeedDecorationsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
@@ -338,6 +342,10 @@ export interface Post {
   relatedPosts?: (number | Post)[] | null;
   featured?: boolean | null;
   /**
+   * Homepage bento footprint. Auto derives size from featured status, image aspect ratio, and a stable ID hash.
+   */
+  cardSize?: ('auto' | 'small' | 'wide' | 'tall' | 'large') | null;
+  /**
    * Estimated minutes; calculated from content.
    */
   readingTime?: number | null;
@@ -410,22 +418,18 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Compact feed fillers used to pack empty regions in the homepage bento grid.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects".
+ * via the `definition` "short-stories".
  */
-export interface Project {
+export interface ShortStory {
   id: number;
   title: string;
   /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   * Keep this short — it appears inside a compact feed tile.
    */
-  generateSlug?: boolean | null;
-  slug: string;
-  summary: string;
-  challenge?: string | null;
-  solution?: string | null;
-  outcome?: string | null;
-  content?: {
+  content: {
     root: {
       type: string;
       children: {
@@ -439,40 +443,27 @@ export interface Project {
       version: number;
     };
     [k: string]: unknown;
-  } | null;
-  coverImage?: (number | null) | Media;
-  gallery?:
-    | {
-        image: number | Media;
-        caption?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  demoUrl?: string | null;
+  };
+  variant: 'note' | 'quote' | 'image';
   /**
-   * Hide or omit if the repository is private/confidential.
+   * Required for image-variant stories in practice; optional for others.
    */
-  repositoryUrl?: string | null;
-  documentationUrl?: string | null;
-  repositoryPrivate?: boolean | null;
-  client?: string | null;
-  clientConfidential?: boolean | null;
-  projectType?: ('web' | 'mobile' | 'library' | 'infra' | 'design' | 'other') | null;
-  projectStatus?: ('in-progress' | 'completed' | 'archived' | 'concept') | null;
-  startDate?: string | null;
-  endDate?: string | null;
-  relatedProjects?: (number | Project)[] | null;
-  results?:
-    | {
-        label: string;
-        value: string;
-        id?: string | null;
-      }[]
-    | null;
-  author?: (number | null) | Author;
-  contributors?: (number | Author)[] | null;
-  featured?: boolean | null;
-  order?: number | null;
+  image?: (number | null) | Media;
+  /**
+   * Optional. Leave empty to allow every footprint. Restrict when content only works in certain orientations.
+   */
+  allowedShapes?: ('1x1' | '2x1' | '3x1' | '1x2' | '2x2')[] | null;
+  /**
+   * Optional destination when the story tile is clicked.
+   */
+  link?: {
+    enabled?: boolean | null;
+    label?: string | null;
+    linkType?: ('external' | 'internal') | null;
+    page?: (number | null) | Page;
+    url?: string | null;
+    newTab?: boolean | null;
+  };
   /**
    * Set automatically on first publish. Managers may override.
    */
@@ -486,41 +477,6 @@ export interface Project {
    */
   translationReady?: {
     vi?: boolean | null;
-  };
-  /**
-   * Search and social metadata. Frontend rendering (meta tags, sitemap, hreflang) comes later.
-   */
-  seo?: {
-    /**
-     * Recommended 50–60 characters. Falls back to document title.
-     */
-    metaTitle?: string | null;
-    /**
-     * Recommended 140–160 characters. Falls back to excerpt/summary.
-     */
-    metaDescription?: string | null;
-    /**
-     * Optional absolute canonical URL override.
-     */
-    canonicalUrl?: string | null;
-    /**
-     * Open Graph title override. Falls back to meta title / title.
-     */
-    ogTitle?: string | null;
-    /**
-     * Open Graph description override.
-     */
-    ogDescription?: string | null;
-    /**
-     * Open Graph image override. Falls back to featured/cover image.
-     */
-    ogImage?: (number | null) | Media;
-    twitterCard?: ('summary' | 'summary_large_image') | null;
-    /**
-     * Prevent search engines from indexing this document.
-     */
-    noIndex?: boolean | null;
-    noFollow?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -648,6 +604,151 @@ export interface Page {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  summary: string;
+  challenge?: string | null;
+  solution?: string | null;
+  outcome?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  coverImage?: (number | null) | Media;
+  gallery?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  demoUrl?: string | null;
+  /**
+   * Hide or omit if the repository is private/confidential.
+   */
+  repositoryUrl?: string | null;
+  documentationUrl?: string | null;
+  repositoryPrivate?: boolean | null;
+  client?: string | null;
+  clientConfidential?: boolean | null;
+  projectType?: ('web' | 'mobile' | 'library' | 'infra' | 'design' | 'other') | null;
+  projectStatus?: ('in-progress' | 'completed' | 'archived' | 'concept') | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  relatedProjects?: (number | Project)[] | null;
+  results?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  author?: (number | null) | Author;
+  contributors?: (number | Author)[] | null;
+  featured?: boolean | null;
+  order?: number | null;
+  /**
+   * Set automatically on first publish. Managers may override.
+   */
+  publishedAt?: string | null;
+  /**
+   * Internal ownership for Creator access control. Hidden from public APIs via select.
+   */
+  owner?: (number | null) | User;
+  /**
+   * Editorial signal only. Payload `_status` is document-level; locales are field-level.
+   */
+  translationReady?: {
+    vi?: boolean | null;
+  };
+  /**
+   * Search and social metadata. Frontend rendering (meta tags, sitemap, hreflang) comes later.
+   */
+  seo?: {
+    /**
+     * Recommended 50–60 characters. Falls back to document title.
+     */
+    metaTitle?: string | null;
+    /**
+     * Recommended 140–160 characters. Falls back to excerpt/summary.
+     */
+    metaDescription?: string | null;
+    /**
+     * Optional absolute canonical URL override.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * Open Graph title override. Falls back to meta title / title.
+     */
+    ogTitle?: string | null;
+    /**
+     * Open Graph description override.
+     */
+    ogDescription?: string | null;
+    /**
+     * Open Graph image override. Falls back to featured/cover image.
+     */
+    ogImage?: (number | null) | Media;
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Prevent search engines from indexing this document.
+     */
+    noIndex?: boolean | null;
+    noFollow?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Seasonal SVG ornaments used to fill leftover bento gaps. Swap packs from Homepage settings.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "feed-decorations".
+ */
+export interface FeedDecoration {
+  id: number;
+  /**
+   * Admin label only (e.g. Monstera leaf).
+   */
+  title: string;
+  pack: 'plant' | 'new-year' | 'christmas';
+  /**
+   * Inline SVG markup (root <svg>…</svg>). Scripts and event handlers are stripped on render.
+   */
+  svgMarkup: string;
+  /**
+   * Leave empty to allow 1×1 only. Prefer 1×1 for plant ornaments.
+   */
+  allowedShapes?: ('1x1' | '2x1' | '1x2' | '2x2')[] | null;
+  /**
+   * Higher weight = more likely to be picked.
+   */
+  weight?: number | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Visitor contact form submissions. Email notification is a later enhancement.
@@ -826,6 +927,14 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null)
     | ({
+        relationTo: 'short-stories';
+        value: number | ShortStory;
+      } | null)
+    | ({
+        relationTo: 'feed-decorations';
+        value: number | FeedDecoration;
+      } | null)
+    | ({
         relationTo: 'projects';
         value: number | Project;
       } | null)
@@ -1000,6 +1109,7 @@ export interface PostsSelect<T extends boolean = true> {
   tags?: T;
   relatedPosts?: T;
   featured?: T;
+  cardSize?: T;
   readingTime?: T;
   publishedAt?: T;
   originalPublishedAt?: T;
@@ -1032,6 +1142,50 @@ export interface PostsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "short-stories_select".
+ */
+export interface ShortStoriesSelect<T extends boolean = true> {
+  title?: T;
+  content?: T;
+  variant?: T;
+  image?: T;
+  allowedShapes?: T;
+  link?:
+    | T
+    | {
+        enabled?: T;
+        label?: T;
+        linkType?: T;
+        page?: T;
+        url?: T;
+        newTab?: T;
+      };
+  publishedAt?: T;
+  owner?: T;
+  translationReady?:
+    | T
+    | {
+        vi?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "feed-decorations_select".
+ */
+export interface FeedDecorationsSelect<T extends boolean = true> {
+  title?: T;
+  pack?: T;
+  svgMarkup?: T;
+  allowedShapes?: T;
+  weight?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1447,6 +1601,26 @@ export interface Homepage {
   heroImage?: (number | null) | Media;
   featuredPosts?: (number | Post)[] | null;
   featuredProjects?: (number | Project)[] | null;
+  /**
+   * Which Feed decorations pack fills leftover bento gaps. Add items under Content → Feed decorations.
+   */
+  activeDecorationPack?: ('plant' | 'new-year' | 'christmas') | null;
+  /**
+   * Single closing tile shown once at the end of the homepage feed. Not packed from Short stories.
+   */
+  endOfFeed?: {
+    enabled?: boolean | null;
+    eyebrow?: string | null;
+    title?: string | null;
+    /**
+     * Short note — keep it compact for a feed tile.
+     */
+    message?: string | null;
+    /**
+     * Preferred footprint. Falls back to the largest shape that fits the last gap.
+     */
+    preferredShape?: ('1x1' | '2x1' | '3x1' | '1x2' | '2x2') | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1585,6 +1759,16 @@ export interface HomepageSelect<T extends boolean = true> {
   heroImage?: T;
   featuredPosts?: T;
   featuredProjects?: T;
+  activeDecorationPack?: T;
+  endOfFeed?:
+    | T
+    | {
+        enabled?: T;
+        eyebrow?: T;
+        title?: T;
+        message?: T;
+        preferredShape?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1611,6 +1795,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'posts';
           value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'short-stories';
+          value: number | ShortStory;
         } | null)
       | ({
           relationTo: 'projects';
