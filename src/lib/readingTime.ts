@@ -27,12 +27,15 @@ const collectText = (node: LexicalNode | undefined, parts: string[]): void => {
   }
 }
 
-export const estimateReadingMinutes = (content: unknown): number => {
+export const lexicalToPlainText = (content: unknown): string => {
   const parts: string[] = []
   const lexical = content as LexicalRoot | null | undefined
   collectText(lexical?.root, parts)
+  return parts.join(' ').replace(/\s+/g, ' ').trim()
+}
 
-  const text = parts.join(' ').trim()
+export const estimateReadingMinutes = (content: unknown): number => {
+  const text = lexicalToPlainText(content)
   if (!text) return 1
 
   const words = text.split(/\s+/).filter(Boolean).length
