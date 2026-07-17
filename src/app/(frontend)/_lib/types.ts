@@ -69,6 +69,23 @@ export type HeroView = {
   image: MediaView | null
 }
 
+export type StoryShape = '1x1' | '2x1' | '3x1' | '1x2' | '2x2'
+
+export type DecorationPack = 'plant' | 'new-year' | 'christmas'
+
+export type EndOfFeedView = {
+  enabled: boolean
+  eyebrow: string | null
+  title: string
+  message: string | null
+  preferredShape: StoryShape
+}
+
+export type HomepageView = HeroView & {
+  endOfFeed: EndOfFeedView | null
+  activeDecorationPack: DecorationPack
+}
+
 export type PostCardView = {
   id: number
   title: string
@@ -81,6 +98,38 @@ export type PostCardView = {
   authorName: string | null
   categories: { id: number; title: string; slug: string }[]
   image: MediaView | null
+  featured: boolean
+  cardSize: 'small' | 'wide' | 'tall' | 'large'
+}
+
+export type ShortStoryCardView = {
+  id: number
+  title: string
+  /** Plain text extracted from Lexical for compact tile rendering. */
+  text: string
+  variant: 'note' | 'quote' | 'image'
+  image: MediaView | null
+  allowedShapes: StoryShape[] | null
+  href: string | null
+  newTab: boolean
+  publishedAt: string | null
+}
+
+export type FeedDecorationView = {
+  id: number
+  title: string
+  pack: DecorationPack
+  /** Sanitized SVG markup ready for inline render. */
+  svgMarkup: string
+  allowedShapes: StoryShape[]
+  weight: number
+}
+
+export type FeedTilePlacement = {
+  column: number
+  row: number
+  columnSpan: number
+  rowSpan: number
 }
 
 export type PostsPageView = {

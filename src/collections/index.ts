@@ -3,10 +3,12 @@ import type { CollectionConfig } from 'payload'
 import { Authors } from './Authors'
 import { Categories } from './Categories'
 import { ContactSubmissions } from './ContactSubmissions'
+import { FeedDecorations } from './FeedDecorations'
 import { Media } from './Media'
 import { Pages } from './Pages'
 import { Posts } from './Posts'
 import { Projects } from './Projects'
+import { ShortStories } from './ShortStories'
 import { Tags } from './Tags'
 import { Users } from './Users'
 
@@ -21,6 +23,8 @@ export const collections: CollectionConfig[] = [
   Categories,
   Tags,
   Posts,
+  ShortStories,
+  FeedDecorations,
   Projects,
   Pages,
   ContactSubmissions,

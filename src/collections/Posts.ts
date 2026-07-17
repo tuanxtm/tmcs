@@ -142,6 +142,24 @@ export const Posts: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     {
+      name: 'cardSize',
+      type: 'select',
+      defaultValue: 'auto',
+      options: [
+        { label: 'Auto', value: 'auto' },
+        { label: 'Small (1 × 1)', value: 'small' },
+        { label: 'Wide (2 × 1)', value: 'wide' },
+        { label: 'Tall (1 × 2)', value: 'tall' },
+        { label: 'Large (2 × 2)', value: 'large' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description:
+          'Homepage bento footprint. Auto derives size from featured status, image aspect ratio, and a stable ID hash.',
+      },
+    },
+
+    {
       name: 'readingTime',
       type: 'number',
       admin: {

@@ -5,7 +5,7 @@
 
 :root {
   --background: oklch(0.985 0.002 95);
-  --foreground: oklch(0.18 0.01 95);
+  --foreground: oklch(0.9236 0.0453 115.42);
   --card: oklch(0.995 0.001 95);
   --card-foreground: oklch(0.18 0.01 95);
   --popover: oklch(0.995 0.001 95);
@@ -24,12 +24,18 @@
   --input: oklch(0.82 0.01 95);
   --ring: oklch(0.35 0.02 95);
   --radius: 0.25rem;
-
   --panel: oklch(0.992 0.001 95 / 0.86);
   --header-height: 4rem;
-  --content-max: 72rem;
+  --content-max: 80rem;
   --page-gutter: clamp(1rem, 3vw, 2rem);
-  --rail: color-mix(in oklch, var(--border) 80%, transparent);
+  /* Pencil sketch lines — mostly straight, more graphite grit. Tune these */
+  --sketch-color: color-mix(in oklch, var(--foreground) 52%, transparent);
+  --sketch-weight: 6px;
+  --sketch-tile: 64px;
+  --rail: var(--sketch-color);
+  /* Straight strokes + soft parallels + grain dash for pencil texture */
+  --sketch-h: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='6' viewBox='0 0 64 6' fill='none'%3E%3Cline x1='0' y1='3' x2='64' y2='3' stroke='%23000' stroke-width='1.3' stroke-opacity='.72'/%3E%3Cline x1='0' y1='2.45' x2='64' y2='2.45' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='0' y1='3.55' x2='64' y2='3.55' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='0' y1='3' x2='64' y2='3' stroke='%23000' stroke-width='2' stroke-opacity='.18' stroke-dasharray='1.1 1.4 .5 1.9 .8 1.2 .4 1.6 1.3 1'/%3E%3C/svg%3E");
+  --sketch-v: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='64' viewBox='0 0 6 64' fill='none'%3E%3Cline x1='3' y1='0' x2='3' y2='64' stroke='%23000' stroke-width='1.3' stroke-opacity='.72'/%3E%3Cline x1='2.45' y1='0' x2='2.45' y2='64' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='3.55' y1='0' x2='3.55' y2='64' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='3' y1='0' x2='3' y2='64' stroke='%23000' stroke-width='2' stroke-opacity='.18' stroke-dasharray='1.1 1.4 .5 1.9 .8 1.2 .4 1.6 1.3 1'/%3E%3C/svg%3E");
 }
 
 @theme inline {
@@ -69,7 +75,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply text-foreground font-sans;
+    background: transparent;
     font-feature-settings:
       'ss01' on,
       'cv11' on;
@@ -87,37 +94,14 @@
 }
 
 @layer utilities {
+  .bg-mesh-gradient {
+    background-color: #000000; /* Deep forest green base */
+  }
+
   .page-frame {
     @apply relative mx-auto w-full;
     max-width: var(--content-max);
     padding-inline: var(--page-gutter);
-  }
-
-  .page-frame::before,
-  .page-frame::after {
-    content: '';
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: var(--rail);
-  }
-
-  .page-frame::before {
-    left: var(--page-gutter);
-  }
-
-  .page-frame::after {
-    right: var(--page-gutter);
-  }
-
-  .page-rule {
-    border-top: 1px dashed var(--border-dashed);
-  }
-
-  .page-rule-solid {
-    border-top: 1px solid var(--border);
   }
 
   .page-label {
@@ -134,5 +118,173 @@
   .panel-surface {
     background: var(--panel);
     backdrop-filter: blur(12px);
+  }
+
+  .bento-tile {
+    position: relative;
+    height: 100%;
+    min-height: 0;
+  }
+}
+
+.bento-grid {
+  --bento-cols: 1;
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  /* Snap width so equal fr columns land on whole pixels (avoids zoom stagger). */
+  width: round(down, 100%, 1px * var(--bento-cols));
+  grid-template-columns: repeat(var(--bento-cols), minmax(0, 1fr));
+  /* Row track = column track → 1×1 is square, 2×1 / 1×2 / 2×2 stay exact ratios. */
+  grid-auto-rows: round(nearest, calc(100cqw / var(--bento-cols)), 1px);
+}
+
+.bento-grid-sep {
+  pointer-events: none;
+  position: absolute;
+  z-index: 20;
+  background-color: var(--sketch-color);
+}
+
+.bento-grid-sep-v {
+  width: var(--sketch-weight);
+  transform: translateX(-50%);
+  -webkit-mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
+  mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
+}
+
+.bento-grid-sep-h {
+  height: var(--sketch-weight);
+  transform: translateY(-50%);
+  -webkit-mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
+  mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
+}
+
+/* Flow layouts (uneven row heights): separators stay on tiles. */
+.bento-separator-r::before,
+.bento-separator-b::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  z-index: 20;
+  background-color: var(--sketch-color);
+}
+
+.bento-separator-r::before {
+  top: 0;
+  right: 0;
+  width: var(--sketch-weight);
+  height: 100%;
+  transform: translateX(50%);
+  -webkit-mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
+  mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
+}
+
+.bento-separator-b::after {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--sketch-weight);
+  transform: translateY(50%);
+  -webkit-mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
+  mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
+}
+
+/*
+  Pencil sketch lines — straight geometry, graphite texture (layered + grain).
+  Tune: --sketch-color, --sketch-weight, --sketch-tile
+*/
+
+/* Don't force position on .dash-b — sticky headers need position: sticky. */
+.dash-b:not(.sticky) {
+  position: relative;
+}
+
+.dash-b::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--sketch-weight);
+  transform: translateY(50%);
+  background-color: var(--sketch-color);
+  -webkit-mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
+  mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
+}
+
+.dash-box {
+  position: relative;
+}
+
+.dash-box::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background-color: var(--sketch-color);
+  -webkit-mask-image: var(--sketch-h), var(--sketch-h), var(--sketch-v), var(--sketch-v);
+  mask-image: var(--sketch-h), var(--sketch-h), var(--sketch-v), var(--sketch-v);
+  -webkit-mask-size:
+    var(--sketch-tile) var(--sketch-weight),
+    var(--sketch-tile) var(--sketch-weight),
+    var(--sketch-weight) var(--sketch-tile),
+    var(--sketch-weight) var(--sketch-tile);
+  mask-size:
+    var(--sketch-tile) var(--sketch-weight),
+    var(--sketch-tile) var(--sketch-weight),
+    var(--sketch-weight) var(--sketch-tile),
+    var(--sketch-weight) var(--sketch-tile);
+  -webkit-mask-position:
+    top left,
+    bottom left,
+    top left,
+    top right;
+  mask-position:
+    top left,
+    bottom left,
+    top left,
+    top right;
+  -webkit-mask-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  mask-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+}
+
+.dash-rail {
+  width: var(--sketch-weight);
+  background-color: var(--rail);
+  -webkit-mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
+  mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
+}
+
+.dash-rail-left {
+  transform: translateX(-50%);
+}
+
+.dash-rail-right {
+  transform: translateX(50%);
+}
+
+.deco-tile--motion .deco-svg {
+  animation: deco-sway 7s ease-in-out infinite;
+  transform-origin: 50% 85%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deco-tile--motion .deco-svg {
+    animation: none;
+  }
+}
+
+@keyframes deco-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg) translateY(0);
+  }
+  50% {
+    transform: rotate(2.5deg) translateY(-2%);
   }
 }

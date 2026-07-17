@@ -2,23 +2,32 @@ import { getPayload } from 'payload'
 
 import { getServerURL } from '@/lib/env'
 import type { LocaleCode } from '@/lib/locales'
-import type { Author, Category, Media, Page, Post } from '@/payload-types'
+import { lexicalToPlainText } from '@/lib/readingTime'
+import type { Author, Category, FeedDecoration, Media, Page, Post, ShortStory } from '@/payload-types'
 import config from '@payload-config'
 
 import { resolveCmsLink } from './links'
+import { resolvePostCardSize } from './post-card-layout'
 import type {
+  DecorationPack,
+  FeedDecorationView,
   FooterGroupView,
-  HeroView,
+  HomepageView,
   MediaView,
   NavChildView,
   NavItemView,
   PostCardView,
   PostsPageView,
+  ShortStoryCardView,
   SiteShellView,
   SocialLinkView,
+  StoryShape,
 } from './types'
+import { sanitizeSvgMarkup } from '@/lib/sanitizeSvg'
 
 export const POSTS_PAGE_SIZE = 6
+export const SHORT_STORIES_POOL_LIMIT = 48
+export const FEED_DECORATIONS_POOL_LIMIT = 48
 
 function isMedia(value: unknown): value is Media {
   return Boolean(value && typeof value === 'object' && 'url' in value)
@@ -167,7 +176,7 @@ export async function getSiteShell(locale: LocaleCode): Promise<SiteShellView> {
   }
 }
 
-export async function getHomepage(locale: LocaleCode): Promise<HeroView> {
+export async function getHomepage(locale: LocaleCode): Promise<HomepageView> {
   const payload = await getPayloadClient()
   const homepage = await payload.findGlobal({
     slug: 'homepage',
@@ -176,11 +185,28 @@ export async function getHomepage(locale: LocaleCode): Promise<HeroView> {
     overrideAccess: false,
   })
 
+  const preferredShape = homepage.endOfFeed?.preferredShape
+  const endOfFeedEnabled = homepage.endOfFeed?.enabled !== false
+  const endOfFeed = endOfFeedEnabled
+    ? {
+        enabled: true as const,
+        eyebrow: homepage.endOfFeed?.eyebrow ?? null,
+        title: homepage.endOfFeed?.title || 'Thanks for reading',
+        message: homepage.endOfFeed?.message ?? null,
+        preferredShape: (preferredShape as StoryShape | undefined) || '2x1',
+      }
+    : null
+
+  const activeDecorationPack =
+    (homepage.activeDecorationPack as DecorationPack | null | undefined) || 'plant'
+
   return {
     heading: homepage.heroHeading || '',
     subheading: homepage.heroSubheading ?? null,
     profileSummary: homepage.profileSummary ?? null,
     image: toMediaView(homepage.heroImage),
+    endOfFeed,
+    activeDecorationPack,
   }
 }
 
@@ -190,6 +216,14 @@ function toPostCard(post: Post, _locale: LocaleCode): PostCardView {
     title: category.title,
     slug: category.slug,
   }))
+  const image = toMediaView(post.featuredImage)
+  const featured = Boolean(post.featured)
+  const cardSize = resolvePostCardSize({
+    id: post.id,
+    cardSize: post.cardSize,
+    featured,
+    image,
+  })
 
   return {
     id: post.id,
@@ -202,7 +236,47 @@ function toPostCard(post: Post, _locale: LocaleCode): PostCardView {
     readingTime: post.readingTime ?? null,
     authorName: isAuthor(post.author) ? post.author.displayName : null,
     categories,
-    image: toMediaView(post.featuredImage),
+    image,
+    featured,
+    cardSize,
+  }
+}
+
+function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCardView {
+  const allowedShapes =
+    story.allowedShapes && story.allowedShapes.length > 0
+      ? (story.allowedShapes as StoryShape[])
+      : null
+
+  let href: string | null = null
+  let newTab = false
+  if (story.link?.enabled) {
+    const resolved = resolveCmsLink(
+      {
+        label: story.link.label || story.title,
+        linkType: story.link.linkType,
+        page: isPage(story.link.page) ? story.link.page : null,
+        url: story.link.url,
+        newTab: story.link.newTab,
+      },
+      locale,
+    )
+    if (resolved) {
+      href = resolved.href
+      newTab = resolved.newTab
+    }
+  }
+
+  return {
+    id: story.id,
+    title: story.title,
+    text: lexicalToPlainText(story.content),
+    variant: story.variant,
+    image: toMediaView(story.image),
+    allowedShapes,
+    href,
+    newTab,
+    publishedAt: story.publishedAt ?? null,
   }
 }
 
@@ -232,6 +306,8 @@ export async function getPostsPage(locale: LocaleCode, page = 1): Promise<PostsP
       readingTime: true,
       author: true,
       categories: true,
+      featured: true,
+      cardSize: true,
     },
   })
 
@@ -241,4 +317,80 @@ export async function getPostsPage(locale: LocaleCode, page = 1): Promise<PostsP
     nextPage: result.nextPage ?? null,
     hasNextPage: Boolean(result.hasNextPage),
   }
+}
+
+export async function getShortStories(locale: LocaleCode): Promise<ShortStoryCardView[]> {
+  const payload = await getPayloadClient()
+
+  const result = await payload.find({
+    collection: 'short-stories',
+    locale,
+    where: {
+      _status: {
+        equals: 'published',
+      },
+    },
+    sort: '-publishedAt',
+    limit: SHORT_STORIES_POOL_LIMIT,
+    depth: 1,
+    overrideAccess: false,
+    select: {
+      title: true,
+      content: true,
+      variant: true,
+      image: true,
+      allowedShapes: true,
+      link: true,
+      publishedAt: true,
+    },
+  })
+
+  return result.docs.map((story) => toShortStoryCard(story as ShortStory, locale))
+}
+
+function toFeedDecoration(doc: FeedDecoration): FeedDecorationView | null {
+  const svgMarkup = sanitizeSvgMarkup(doc.svgMarkup || '')
+  if (!svgMarkup) return null
+
+  const allowedShapes =
+    doc.allowedShapes && doc.allowedShapes.length > 0
+      ? (doc.allowedShapes as StoryShape[])
+      : (['1x1'] as StoryShape[])
+
+  return {
+    id: doc.id,
+    title: doc.title,
+    pack: doc.pack as DecorationPack,
+    svgMarkup,
+    allowedShapes,
+    weight: typeof doc.weight === 'number' && doc.weight > 0 ? doc.weight : 1,
+  }
+}
+
+export async function getFeedDecorations(pack: DecorationPack): Promise<FeedDecorationView[]> {
+  const payload = await getPayloadClient()
+
+  const result = await payload.find({
+    collection: 'feed-decorations',
+    where: {
+      pack: {
+        equals: pack,
+      },
+    },
+    sort: 'title',
+    limit: FEED_DECORATIONS_POOL_LIMIT,
+    depth: 0,
+    overrideAccess: false,
+    select: {
+      title: true,
+      pack: true,
+      svgMarkup: true,
+      allowedShapes: true,
+      weight: true,
+    },
+  })
+
+  return result.docs
+    .map((doc) => toFeedDecoration(doc as FeedDecoration))
+    .filter((doc): doc is FeedDecorationView => Boolean(doc))
 }
