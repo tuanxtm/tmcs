@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 
 import { getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { parseLocale, SITE_LOCALE_HEADER } from '@/app/(frontend)/_lib/locale'
+import { Background } from '@/app/(frontend)/_components/layout/background'
 import { SiteFooter } from '@/app/(frontend)/_components/layout/site-footer'
 import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
 import { MotionProvider } from '@/app/(frontend)/_components/providers/motion-provider'
@@ -48,7 +49,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="min-h-dvh bg-background text-foreground">
+      <body className="relative min-h-dvh text-foreground">
+        <Background />
         <MotionProvider>
           <a
             href="#main-content"
@@ -57,8 +59,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             Skip to content
           </a>
           <SiteHeader locale={locale} siteName={shell.siteName} navigation={shell.navigation} />
-          <main id="main-content">{children}</main>
-          <SiteFooter shell={shell} />
+          <div className="page-frame">
+            <main id="main-content">{children}</main>
+            <SiteFooter shell={shell} />
+          </div>
         </MotionProvider>
       </body>
     </html>

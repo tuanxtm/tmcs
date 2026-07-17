@@ -19,7 +19,7 @@ export function LocaleSwitcher({ locale, className }: LocaleSwitcherProps) {
   return (
     <div
       className={cn(
-        'inline-flex items-center gap-1 rounded-md border border-border px-1 py-1 font-mono text-[0.6875rem] uppercase tracking-[0.16em]',
+        'dash-box inline-flex items-center gap-1 rounded-md px-1 py-1 font-mono text-[0.6875rem] uppercase tracking-[0.16em]',
         className,
       )}
       role="group"

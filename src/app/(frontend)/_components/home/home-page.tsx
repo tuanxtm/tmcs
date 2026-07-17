@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { getHomepage, getPostsPage, getSiteShell } from '@/app/(frontend)/_lib/cms'
+import { getFeedDecorations, getHomepage, getPostsPage, getShortStories, getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { homeHref } from '@/app/(frontend)/_lib/locale'
 import type { LocaleCode } from '@/lib/locales'
 import { Hero } from '@/app/(frontend)/_components/home/hero'
@@ -63,7 +63,12 @@ export async function generateHomeMetadata(locale: LocaleCode): Promise<Metadata
 }
 
 export async function HomePage({ locale }: HomePageProps) {
-  const [hero, posts] = await Promise.all([getHomepage(locale), getPostsPage(locale, 1)])
+  const [hero, posts, shortStories] = await Promise.all([
+    getHomepage(locale),
+    getPostsPage(locale, 1),
+    getShortStories(locale),
+  ])
+  const decorations = await getFeedDecorations(hero.activeDecorationPack)
 
   return (
     <div className="min-h-[50vh]">
@@ -71,6 +76,9 @@ export async function HomePage({ locale }: HomePageProps) {
       <PostFeed
         locale={locale}
         initialDocs={posts.docs}
+        initialShortStories={shortStories}
+        initialDecorations={decorations}
+        endOfFeed={hero.endOfFeed}
         initialHasNextPage={posts.hasNextPage}
         initialNextPage={posts.nextPage}
       />

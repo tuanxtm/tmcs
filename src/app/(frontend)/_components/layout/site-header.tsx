@@ -10,7 +10,6 @@ import { homeHref } from '@/app/(frontend)/_lib/locale'
 import type { NavItemView } from '@/app/(frontend)/_lib/types'
 
 import { DesktopNav } from './desktop-nav'
-import { LocaleSwitcher } from './locale-switcher'
 import { MobileNav } from './mobile-nav'
 
 type SiteHeaderProps = {
@@ -30,32 +29,26 @@ export function SiteHeader({ locale, siteName, navigation }: SiteHeaderProps) {
   }, [])
 
   return (
-    <header
-      className={cn(
-        'sticky top-0 z-40 border-b border-dashed border-[color:var(--border-dashed)] transition-[background-color,backdrop-filter,box-shadow]',
-        scrolled
-          ? 'bg-background/75 shadow-[0_1px_0_0_var(--border)] backdrop-blur-md'
-          : 'bg-background/55 backdrop-blur-sm',
-      )}
-    >
-      <div className="page-frame">
+    <header className="dash-b sticky top-0 z-40 bg-transparent">
+      {/* Gutter wrapper — no blur here, so outside the rails stays clear */}
+      <div className="mx-auto w-full max-w-[var(--content-max)] px-[var(--page-gutter)]">
         <div
-          className="flex items-center justify-between gap-4"
+          className={cn(
+            'flex items-center justify-between gap-4 transition-[background-color,backdrop-filter]',
+            scrolled ? 'backdrop-blur-md' : 'bg-transparent',
+          )}
           style={{ minHeight: 'var(--header-height)' }}
         >
           <Link
             href={homeHref(locale)}
-            className="font-mono text-sm uppercase tracking-[0.18em] transition-opacity hover:opacity-70"
+            className="p-2 font-mono font-bold text-sm uppercase tracking-[0.18em] transition-opacity hover:opacity-70"
           >
             {siteName}
           </Link>
 
           <div className="flex items-center gap-3">
             <DesktopNav items={navigation} />
-            <div className="hidden lg:block">
-              <LocaleSwitcher locale={locale} />
-            </div>
-            <MobileNav items={navigation} locale={locale} siteName={siteName} />
+            <MobileNav items={navigation} siteName={siteName} />
           </div>
         </div>
       </div>

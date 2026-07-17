@@ -13,19 +13,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import type { LocaleCode } from '@/lib/locales'
 
 import type { NavItemView } from '@/app/(frontend)/_lib/types'
 
-import { LocaleSwitcher } from './locale-switcher'
-
 type MobileNavProps = {
   items: NavItemView[]
-  locale: LocaleCode
   siteName: string
 }
 
-export function MobileNav({ items, locale, siteName }: MobileNavProps) {
+export function MobileNav({ items, siteName }: MobileNavProps) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -52,10 +48,7 @@ export function MobileNav({ items, locale, siteName }: MobileNavProps) {
             <p className="text-sm text-muted-foreground">Navigation coming soon.</p>
           ) : (
             items.map((item) => (
-              <div
-                key={item.id}
-                className="border-b border-dashed border-[color:var(--border-dashed)] py-2"
-              >
+              <div key={item.id} className="dash-b py-2">
                 <SheetClose asChild>
                   <Link
                     href={item.href}
@@ -75,7 +68,9 @@ export function MobileNav({ items, locale, siteName }: MobileNavProps) {
                           <Link
                             href={child.href}
                             target={child.newTab ? '_blank' : undefined}
-                            rel={child.external || child.newTab ? 'noopener noreferrer' : undefined}
+                            rel={
+                              child.external || child.newTab ? 'noopener noreferrer' : undefined
+                            }
                             className="inline-flex min-h-11 items-center text-sm text-muted-foreground"
                             onClick={() => setOpen(false)}
                           >
@@ -90,8 +85,6 @@ export function MobileNav({ items, locale, siteName }: MobileNavProps) {
             ))
           )}
         </nav>
-
-        <LocaleSwitcher locale={locale} />
       </SheetContent>
     </Sheet>
   )
