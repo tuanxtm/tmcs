@@ -369,7 +369,6 @@ export function PostFeed({
   if (docs.length === 0) {
     return (
       <section className="dash-b min-h-[var(--header-height)]" aria-labelledby="posts-heading">
-        <p className="page-label">02 / Posts</p>
         <h2 id="posts-heading" className="mt-3 text-2xl font-medium">
           No published posts yet
         </h2>
@@ -383,7 +382,6 @@ export function PostFeed({
   return (
     <section aria-labelledby="posts-heading">
       <div className="dash-b min-h-[var(--header-height)] px-2">
-        <p className="page-label">02 / Posts</p>
         <h2 id="posts-heading" className="mt-2 text-xl font-medium tracking-tight">
           Latest writing
         </h2>

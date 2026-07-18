@@ -26,6 +26,7 @@ function formatDate(value: string | null, locale: LocaleCode): string | null {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
+      timeZone: 'UTC',
     }).format(new Date(value))
   } catch {
     return null

@@ -14,9 +14,7 @@ function HeroPlaceholder({ className }: { className?: string }) {
     <div
       className={`flex items-center justify-center bg-muted/40 ${className || ''}`}
       aria-hidden="true"
-    >
-      <span className="page-label">01 / Hero</span>
-    </div>
+    />
   )
 }
 
@@ -53,17 +51,16 @@ export function Hero({ hero }: HeroProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
         >
-          <p className="page-label">01 / Intro</p>
-          <h1 id="hero-heading" className="display-title mt-4 max-w-xl">
+          <h1 id="hero-heading" className="display-title max-w-xl">
             {hero.heading}
           </h1>
           {hero.subheading ? (
-            <p className="mt-4 max-w-lg text-base leading-relaxed text-foreground/90 lg:text-lg lg:text-muted-foreground">
+            <p className="mt-4 max-w-lg text-base leading-relaxed text-secondary-foreground lg:text-lg">
               {hero.subheading}
             </p>
           ) : null}
           {hero.profileSummary ? (
-            <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-secondary-foreground">
               {hero.profileSummary}
             </p>
           ) : null}
