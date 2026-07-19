@@ -22,12 +22,11 @@ type PostFeedItemProps = {
 function formatDate(value: string | null, locale: LocaleCode): string | null {
   if (!value) return null
   try {
-    return new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      timeZone: 'UTC',
-    }).format(new Date(value))
+    const date = new Date(value)
+    const dd = String(date.getUTCDate()).padStart(2, '0')
+    const mm = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const yy = String(date.getUTCFullYear()).slice(-2)
+    return locale === 'vi' ? `${dd}/${mm}/${yy}` : `${mm}/${dd}/${yy}`
   } catch {
     return null
   }
@@ -57,14 +56,24 @@ export function PostFeedItem({
 
   const body = (
     <div className="relative h-full p-2">
-      <div className="relative h-full overflow-hidden">
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-3">
-          <span className="font-mono text-[0.625rem] uppercase tracking-[0.16em] text-foreground/80">
-            {dateLabel || 'Draft'}
-          </span>
-          <span className="font-mono text-[0.625rem] uppercase tracking-[0.16em] text-foreground/80">
-            ID {idLabel}
-          </span>
+      <div className="relative h-full overflow-hidden rounded-xl">
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 overflow-hidden rounded-t-xl">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'absolute inset-0 bg-gradient-to-b from-black/10 to-transparent backdrop-blur-md',
+              '[mask-image:linear-gradient(to_bottom,black_40%,transparent)]',
+              '[-webkit-mask-image:linear-gradient(to_bottom,black_40%,transparent)]',
+            )}
+          />
+          <div className="relative flex items-start justify-between gap-3 p-2">
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.03em] text-foreground/90 transition-colors group-hover:text-primary group-hover:font-semibold group-focus-within:text-primary group-focus-within:font-semibold">
+              {dateLabel || 'Draft'}
+            </span>
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.03em] text-foreground/90 transition-colors group-hover:text-primary group-hover:font-semibold group-focus-within:text-primary group-focus-within:font-semibold">
+              ID {idLabel}
+            </span>
+          </div>
         </div>
 
         {post.image ? (
@@ -79,30 +88,33 @@ export function PostFeedItem({
             )}
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl">
             <span className="page-label">No cover</span>
           </div>
         )}
 
-        <div
-          className={cn(
-            'absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background/50 via-background/20 to-transparent pt-8',
-            'opacity-100 md:opacity-0 md:transition-opacity md:duration-200',
-            'md:group-hover:opacity-100 md:group-focus-within:opacity-100',
-          )}
-        >
-          <h3 className="text-sm font-medium leading-snug tracking-tight text-foreground md:text-base">
-            {post.title}
-          </h3>
-          <p className="mt-1 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-muted-foreground">
-            {[
-              post.authorName,
-              post.readingTime ? `${post.readingTime} min` : null,
-              post.categories[0]?.title,
-            ]
-              .filter(Boolean)
-              .join(' · ')}
-          </p>
+        <div className="absolute inset-x-0 bottom-0 z-10 overflow-hidden rounded-b-xl">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent backdrop-blur-md',
+              '[mask-image:linear-gradient(to_top,black_45%,transparent)]',
+              '[-webkit-mask-image:linear-gradient(to_top,black_45%,transparent)]',
+            )}
+          />
+          <div className="relative px-2 pb-2 pt-8">
+            <h3 className="text-sm font-medium leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary group-focus-within:text-primary md:text-base">
+              {post.title}
+            </h3>
+            <p className="mt-1 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-foreground/70 transition-colors group-hover:text-primary/70 group-focus-within:text-primary/70">
+              {[
+                post.readingTime ? `${post.readingTime} min` : null,
+                post.categories[0]?.title,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -111,7 +123,8 @@ export function PostFeedItem({
   )
 
   const shellClass = cn(
-    'bento-tile group relative bg-transparent outline-none',
+    'bento-tile group relative bg-transparent outline-none transition-colors duration-200',
+    'hover:bg-foreground focus-within:bg-foreground',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
     className,
   )
@@ -148,7 +161,7 @@ export function PostFeedItem({
       initial={reduceMotion ? false : { opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
     >
       {body}
     </motion.article>

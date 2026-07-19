@@ -203,10 +203,12 @@ function FeedTileView({
   tile,
   locale,
   postIndex,
+  columns,
 }: {
   tile: PlacedFeedTile
   locale: LocaleCode
   postIndex: number
+  columns: number
 }) {
   if (tile.kind === 'post') {
     return (
@@ -239,6 +241,7 @@ function FeedTileView({
         decoration={tile.decoration}
         shape={tile.shape}
         placement={tile.placement}
+        columns={columns}
         explicitPlacement
       />
     )
@@ -249,6 +252,7 @@ function FeedTileView({
       story={tile.story}
       shape={tile.shape}
       placement={tile.placement}
+      columns={columns}
       explicitPlacement
     />
   )
@@ -273,16 +277,19 @@ function BentoGrid({
   const rows = useMemo(() => rowCount(packer.tiles), [packer.tiles])
 
   return (
-    <div className={className} style={{ ['--bento-cols' as string]: columns }}>
-      <BentoSeparators cells={cells} columns={columns} rows={rows} />
-      {packer.tiles.map((tile) => (
-        <FeedTileView
-          key={`${keyPrefix}-${tile.key}`}
-          tile={tile}
-          locale={locale}
-          postIndex={tile.kind === 'post' ? (postIndexById.get(tile.post.id) ?? 0) : 0}
-        />
-      ))}
+    <div className="bento-grid-host">
+      <div className={className} style={{ ['--bento-cols' as string]: columns }}>
+        <BentoSeparators cells={cells} columns={columns} rows={rows} />
+        {packer.tiles.map((tile) => (
+          <FeedTileView
+            key={`${keyPrefix}-${tile.key}`}
+            tile={tile}
+            locale={locale}
+            columns={columns}
+            postIndex={tile.kind === 'post' ? (postIndexById.get(tile.post.id) ?? 0) : 0}
+          />
+        ))}
+      </div>
     </div>
   )
 }

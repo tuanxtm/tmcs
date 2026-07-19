@@ -6,12 +6,14 @@ import { motion, useReducedMotion } from 'motion/react'
 import { cn } from '@/lib/utils'
 
 import type { GridPlacement } from '@/app/(frontend)/_lib/feed-packer'
+import { resolveAlignment } from '@/app/(frontend)/_lib/resolve-alignment'
 import type { ShortStoryCardView, StoryShape } from '@/app/(frontend)/_lib/types'
 
 type ShortStoryFeedItemProps = {
   story: ShortStoryCardView
   shape: StoryShape
   placement: GridPlacement
+  columns: number
   explicitPlacement?: boolean
   className?: string
 }
@@ -34,24 +36,25 @@ export function ShortStoryFeedItem({
   story,
   shape,
   placement,
+  columns,
   explicitPlacement = true,
   className,
 }: ShortStoryFeedItemProps) {
   const reduceMotion = useReducedMotion()
   const layout = shapeLayout(shape)
+  const align = resolveAlignment(placement, columns)
+  const isRight = align === 'right'
 
   const content = (
     <div
       className={cn(
-        'flex h-full w-full flex-col justify-center gap-2 p-2',
-        layout === 'horizontal' && 'md:justify-center',
-        layout === 'vertical' && 'justify-center',
-        layout === 'expanded' && 'justify-center',
+        'flex h-full w-full flex-col justify-end gap-2 p-2',
+        isRight ? 'items-end text-right' : 'items-start text-left',
       )}
     >
       <h3
         className={cn(
-          'font-medium tracking-tight',
+          'font-medium tracking-tight hidden',
           layout === 'compact' ? 'text-sm' : 'text-base md:text-lg',
           story.variant === 'quote' && 'italic',
         )}
@@ -61,7 +64,7 @@ export function ShortStoryFeedItem({
       {story.text ? (
         <p
           className={cn(
-            'text-sm leading-relaxed text-muted-foreground',
+            'text-2xl font-bold leading-relaxed text-secondary-foreground',
             layout === 'compact' && 'line-clamp-5',
             layout === 'horizontal' && 'line-clamp-3',
             layout === 'vertical' && 'line-clamp-10',
@@ -91,7 +94,7 @@ export function ShortStoryFeedItem({
     initial: reduceMotion ? false : ({ opacity: 0, y: 10 } as const),
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, amount: 0.15 },
-    transition: { duration: 0.3, ease: 'easeOut' as const },
+    transition: { duration: 0.45, ease: 'easeOut' as const },
   }
 
   if (story.href) {

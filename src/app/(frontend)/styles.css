@@ -10,7 +10,7 @@
   --card-foreground: oklch(0.18 0.01 95);
   --popover: oklch(0.995 0.001 95);
   --popover-foreground: oklch(0.18 0.01 95);
-  --primary: oklch(0.2 0.01 95);
+  --primary: oklch(0.4342 0.0894 147.56);
   --primary-foreground: oklch(0.98 0.002 95);
   --secondary: oklch(0.95 0.004 95);
   --secondary-foreground: oklch(0.695 0.0497 115.63);
@@ -123,20 +123,25 @@
   .bento-tile {
     position: relative;
     height: 100%;
+    min-width: 0;
     min-height: 0;
+    overflow: hidden;
   }
+}
+
+.bento-grid-host {
+  container-type: inline-size;
+  width: 100%;
 }
 
 .bento-grid {
   --bento-cols: 1;
-  container-type: inline-size;
   position: relative;
   isolation: isolate;
-  /* Snap width so equal fr columns land on whole pixels (avoids zoom stagger). */
-  width: round(down, 100%, 1px * var(--bento-cols));
+  width: 100%;
   grid-template-columns: repeat(var(--bento-cols), minmax(0, 1fr));
-  /* Row track = column track → 1×1 is square, 2×1 / 1×2 / 2×2 stay exact ratios. */
-  grid-auto-rows: round(nearest, calc(100cqw / var(--bento-cols)), 1px);
+  /* Row track = column track. cqw comes from .bento-grid-host (not self). */
+  grid-auto-rows: calc(100cqw / var(--bento-cols));
 }
 
 .bento-grid-sep {

@@ -5,7 +5,7 @@ export function Background() {
   return (
     <>
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[linear-gradient(267deg,#2c6035_4.2%,#2a422f_98.63%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(267deg,#2a5e33_4.22%,#28402d_97.98%)]" />
         <div
           className="absolute inset-0 opacity-20 mix-blend-soft-light"
           style={{

@@ -21,13 +21,11 @@ export function ClosingFeedItem({
   eyebrow,
   title,
   message,
-  shape,
   placement,
   explicitPlacement = true,
   className,
 }: ClosingFeedItemProps) {
   const reduceMotion = useReducedMotion()
-  const wide = shape === '2x1' || shape === '3x1' || shape === '2x2'
 
   const style = explicitPlacement
     ? ({
@@ -44,15 +42,10 @@ export function ClosingFeedItem({
       initial={reduceMotion ? false : { opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
     >
-      <div
-        className={cn(
-          'flex h-full w-full flex-col justify-center gap-2 p-2',
-          wide && 'md:flex-row md:items-center md:gap-6',
-        )}
-      >
-        <div className="min-w-0 flex-1">
+      <div className="flex h-full w-full flex-col items-end justify-end gap-2 p-2 text-right">
+        <div className="min-w-0">
           {eyebrow ? <p className="page-label">{eyebrow}</p> : null}
           <h3
             className={cn(

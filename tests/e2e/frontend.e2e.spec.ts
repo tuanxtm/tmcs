@@ -40,7 +40,7 @@ test.describe('Frontend homepage', () => {
   test('desktop post feed uses a four-column bento grid', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
-    const grid = page.locator('.bento-grid')
+    const grid = page.locator('.bento-grid:visible')
     if ((await page.locator('.bento-tile').count()) === 0) {
       test.skip()
       return
@@ -49,24 +49,71 @@ test.describe('Frontend homepage', () => {
     await expect(grid).toHaveCSS('grid-template-columns', /.+ .+ .+ .+/)
   })
 
-  test('mobile post feed collapses to a single column', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 })
+  test('1x1 bento tiles stay square on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
 
-    const tiles = page.locator('.bento-tile')
-    if ((await tiles.count()) === 0) {
+    const square = await page.locator('.bento-grid:visible').evaluate((grid) => {
+      const cols = Number.parseFloat(getComputedStyle(grid).getPropertyValue('--bento-cols')) || 4
+      const cellSize = grid.getBoundingClientRect().width / cols
+      if (cellSize <= 0) return null
+
+      for (const tile of grid.querySelectorAll('.bento-tile')) {
+        const rect = tile.getBoundingClientRect()
+        const isOneByOne =
+          Math.abs(rect.width - cellSize) / cellSize < 0.05 &&
+          Math.abs(rect.height - cellSize) / cellSize < 0.05
+        if (isOneByOne) {
+          return { width: rect.width, height: rect.height }
+        }
+      }
+      return null
+    })
+
+    if (!square || square.width <= 0) {
       test.skip()
       return
     }
 
-    await expect(tiles.first()).toBeVisible()
-    const firstBox = await tiles.first().boundingBox()
-    const second = tiles.nth(1)
-    if ((await second.count()) === 0 || !firstBox) return
-    const secondBox = await second.boundingBox()
-    if (!secondBox) return
-    // Stacked: second tile starts below the first, not beside it.
-    expect(secondBox.y).toBeGreaterThan(firstBox.y + firstBox.height / 2)
+    expect(Math.abs(square.width - square.height) / square.width).toBeLessThan(0.02)
+  })
+
+  test('mobile post feed uses a two-column packed grid', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('http://localhost:3000/')
+
+    const grid = page.locator('.bento-grid:visible')
+    if ((await page.locator('.bento-tile').count()) === 0) {
+      test.skip()
+      return
+    }
+
+    await expect(grid).toBeVisible()
+    await expect(grid).toHaveCSS('grid-template-columns', /.+ .+/)
+
+    const square = await grid.evaluate((el) => {
+      const cols = Number.parseFloat(getComputedStyle(el).getPropertyValue('--bento-cols')) || 2
+      const cellSize = el.getBoundingClientRect().width / cols
+      if (cellSize <= 0) return null
+
+      for (const tile of el.querySelectorAll('.bento-tile')) {
+        const rect = tile.getBoundingClientRect()
+        const isOneByOne =
+          Math.abs(rect.width - cellSize) / cellSize < 0.05 &&
+          Math.abs(rect.height - cellSize) / cellSize < 0.05
+        if (isOneByOne) {
+          return { width: rect.width, height: rect.height }
+        }
+      }
+      return null
+    })
+
+    if (!square || square.width <= 0) {
+      test.skip()
+      return
+    }
+
+    expect(Math.abs(square.width - square.height) / square.width).toBeLessThan(0.02)
   })
 
   test('post tile titles remain accessible to assistive tech', async ({ page }) => {

@@ -26,11 +26,21 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    // Arch: Playwright's bundled Chromium/headless shell is unsupported; use pacman chromium.
+    launchOptions: {
+      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || '/usr/bin/chromium',
+      args: ['--no-sandbox', '--disable-dev-shm-usage'],
+    },
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'], channel: 'chromium' },
+      use: {
+        ...devices['Desktop Chrome'],
+        // Avoid Playwright's chrome-for-testing channel on Arch.
+        channel: undefined,
+      },
     },
   ],
   webServer: {
