@@ -57,7 +57,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     meta: {
-      titleSuffix: ' · TMCS',
+      titleSuffix: ' · tuantm\'s creative space',
     },
   },
   collections,
@@ -111,7 +111,10 @@ export default buildConfig({
   plugins: [
     r2Storage({
       bucket: cloudflare.env.R2,
-      collections: { media: true },
+      collections: {
+        media: true,
+        'feed-decorations': true,
+      },
     }),
   ],
 })

@@ -1,3 +1,8 @@
+---
+description: 
+alwaysApply: true
+---
+
 # Agents
 
 This project uses the Payload CMS skill at `.agents/skills/payload/`.
@@ -13,7 +18,7 @@ TMCS is a **single** Next.js + Payload app (not a multi-package monorepo) target
 | ---------------------------------- | ------------------------------------------------------------------------------ |
 | `src/payload.config.ts`            | Payload config: localization, jobs access, GraphQL disabled, D1/R2, migrations |
 | `src/collections/`                 | Content + auth collections                                                     |
-| `src/globals/`                     | Site settings, nav, footer, homepage                                           |
+| `src/globals/`                     | Site settings, nav, footer, frontpage                                           |
 | `src/access/`                      | RBAC helpers                                                                   |
 | `src/fields/`                      | Reusable SEO + common fields                                                   |
 | `src/hooks/`                       | Owner, publish date, last-admin protection                                     |

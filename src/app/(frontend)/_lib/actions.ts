@@ -1,26 +1,32 @@
 'use server'
 
 import { getPostsPage } from '@/app/(frontend)/_lib/cms'
-import { parseLocale } from '@/app/(frontend)/_lib/locale'
 import type { PostsPageView } from '@/app/(frontend)/_lib/types'
-import { isLocaleCode } from '@/lib/locales'
+import { decodePostsCursor } from '@/app/(frontend)/_lib/posts-cursor'
+import { isLocaleCode, type LocaleCode } from '@/lib/locales'
 
 /**
- * Paginated published posts via Payload Local API.
+ * Paginated published posts via Payload Local API (keyset cursor).
  * Prefer this over a custom REST route — public CRUD remains under `(payload)/api`.
  */
 export async function loadPostsPage(
   localeInput: string,
-  pageInput: number,
+  cursorInput: string | null = null,
 ): Promise<PostsPageView> {
   if (!isLocaleCode(localeInput)) {
     throw new Error('Invalid locale')
   }
 
-  const page = Number(pageInput)
-  if (!Number.isInteger(page) || page < 1 || page > 1000) {
-    throw new Error('Invalid page')
+  const locale: LocaleCode = localeInput
+
+  if (cursorInput != null) {
+    if (typeof cursorInput !== 'string' || cursorInput.length > 512) {
+      throw new Error('Invalid cursor')
+    }
+    if (!decodePostsCursor(cursorInput)) {
+      throw new Error('Invalid cursor')
+    }
   }
 
-  return getPostsPage(parseLocale(localeInput), page)
+  return getPostsPage(locale, cursorInput)
 }

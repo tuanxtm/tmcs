@@ -5,13 +5,9 @@ import { useInView } from 'motion/react'
 
 import { loadPostsPage } from '@/app/(frontend)/_lib/actions'
 import {
-  appendPostsAndFillStories,
-  createPackerState,
   DESKTOP_COLUMNS,
   MOBILE_COLUMNS,
-  sealWithClosingTile,
   TABLET_COLUMNS,
-  type PackerState,
   type PlacedFeedTile,
 } from '@/app/(frontend)/_lib/feed-packer'
 import type {
@@ -26,8 +22,11 @@ import type { LocaleCode } from '@/lib/locales'
 
 import { ClosingFeedItem } from './closing-feed-item'
 import { DecorationFeedItem } from './decoration-feed-item'
+import { ExploreFeedButton } from './explore-feed-button'
 import { PostFeedItem } from './post-feed-item'
+import { replayPackerBatches, type LoadedPostBatch } from './replay-packer'
 import { ShortStoryFeedItem } from './short-story-feed-item'
+import { useFeedColumns } from './use-feed-columns'
 
 type PostFeedProps = {
   locale: LocaleCode
@@ -36,89 +35,7 @@ type PostFeedProps = {
   initialDecorations: FeedDecorationView[]
   endOfFeed: EndOfFeedView | null
   initialHasNextPage: boolean
-  initialNextPage: number | null
-}
-
-type BreakpointPackers = {
-  mobile: PackerState
-  tablet: PackerState
-  desktop: PackerState
-}
-
-function packPage(options: {
-  state: PackerState
-  posts: PostCardView[]
-  stories: ShortStoryCardView[]
-  decorations: FeedDecorationView[]
-  locale: LocaleCode
-  isFinal: boolean
-  endOfFeed: EndOfFeedView | null
-}): PackerState {
-  if (!options.isFinal) {
-    return appendPostsAndFillStories({
-      state: options.state,
-      posts: options.posts,
-      stories: options.stories,
-      decorations: options.decorations,
-      locale: options.locale,
-      fillStories: true,
-    })
-  }
-
-  // Final page: posts only, then one closing tile, then decorations in leftovers.
-  const packed = appendPostsAndFillStories({
-    state: options.state,
-    posts: options.posts,
-    stories: options.stories,
-    decorations: [],
-    locale: options.locale,
-    fillStories: false,
-  })
-
-  return sealWithClosingTile({
-    state: packed,
-    closing: options.endOfFeed ?? {
-      enabled: false,
-      eyebrow: null,
-      title: '',
-      message: null,
-      preferredShape: '1x1',
-    },
-    decorations: options.decorations,
-    locale: options.locale,
-  })
-}
-
-function packAllBreakpoints(options: {
-  states: BreakpointPackers
-  posts: PostCardView[]
-  stories: ShortStoryCardView[]
-  decorations: FeedDecorationView[]
-  locale: LocaleCode
-  isFinal: boolean
-  endOfFeed: EndOfFeedView | null
-}): BreakpointPackers {
-  const shared = {
-    posts: options.posts,
-    stories: options.stories,
-    decorations: options.decorations,
-    locale: options.locale,
-    isFinal: options.isFinal,
-    endOfFeed: options.endOfFeed,
-  }
-  return {
-    mobile: packPage({ ...shared, state: options.states.mobile }),
-    tablet: packPage({ ...shared, state: options.states.tablet }),
-    desktop: packPage({ ...shared, state: options.states.desktop }),
-  }
-}
-
-function createInitialPackers(): BreakpointPackers {
-  return {
-    mobile: createPackerState(MOBILE_COLUMNS),
-    tablet: createPackerState(TABLET_COLUMNS),
-    desktop: createPackerState(DESKTOP_COLUMNS),
-  }
+  initialNextCursor: string | null
 }
 
 type GridCell = {
@@ -144,6 +61,12 @@ function rowCount(tiles: PlacedFeedTile[]): number {
     (count, tile) => Math.max(count, tile.placement.row + tile.placement.rowSpan),
     0,
   )
+}
+
+function gridClassName(columns: number): string {
+  if (columns === DESKTOP_COLUMNS) return 'bento-grid grid'
+  if (columns === TABLET_COLUMNS) return 'bento-grid grid'
+  return 'bento-grid grid'
 }
 
 /** Separators live on the grid container (not tiles) so zoom/subpixel rounding can't stagger them. */
@@ -212,27 +135,12 @@ function FeedTileView({
 }) {
   if (tile.kind === 'post') {
     return (
-      <PostFeedItem
-        post={tile.post}
-        locale={locale}
-        index={postIndex}
-        placement={tile.placement}
-        explicitPlacement
-      />
+      <PostFeedItem post={tile.post} locale={locale} index={postIndex} placement={tile.placement} />
     )
   }
 
   if (tile.kind === 'closing') {
-    return (
-      <ClosingFeedItem
-        eyebrow={tile.eyebrow}
-        title={tile.title}
-        message={tile.message}
-        shape={tile.shape}
-        placement={tile.placement}
-        explicitPlacement
-      />
-    )
+    return <ClosingFeedItem text={tile.text} shape={tile.shape} placement={tile.placement} />
   }
 
   if (tile.kind === 'decoration') {
@@ -242,7 +150,6 @@ function FeedTileView({
         shape={tile.shape}
         placement={tile.placement}
         columns={columns}
-        explicitPlacement
       />
     )
   }
@@ -253,36 +160,31 @@ function FeedTileView({
       shape={tile.shape}
       placement={tile.placement}
       columns={columns}
-      explicitPlacement
     />
   )
 }
 
 function BentoGrid({
   columns,
-  packer,
+  tiles,
   locale,
   postIndexById,
-  className,
-  keyPrefix,
 }: {
   columns: number
-  packer: PackerState
+  tiles: PlacedFeedTile[]
   locale: LocaleCode
   postIndexById: Map<number, number>
-  className: string
-  keyPrefix: string
 }) {
-  const cells = useMemo(() => tilesToCells(packer.tiles), [packer.tiles])
-  const rows = useMemo(() => rowCount(packer.tiles), [packer.tiles])
+  const cells = useMemo(() => tilesToCells(tiles), [tiles])
+  const rows = useMemo(() => rowCount(tiles), [tiles])
 
   return (
     <div className="bento-grid-host">
-      <div className={className} style={{ ['--bento-cols' as string]: columns }}>
+      <div className={gridClassName(columns)} style={{ ['--bento-cols' as string]: columns }}>
         <BentoSeparators cells={cells} columns={columns} rows={rows} />
-        {packer.tiles.map((tile) => (
+        {tiles.map((tile) => (
           <FeedTileView
-            key={`${keyPrefix}-${tile.key}`}
+            key={tile.key}
             tile={tile}
             locale={locale}
             columns={columns}
@@ -301,29 +203,48 @@ export function PostFeed({
   initialDecorations,
   endOfFeed,
   initialHasNextPage,
-  initialNextPage,
+  initialNextCursor,
 }: PostFeedProps) {
-  const [docs, setDocs] = useState(initialDocs)
+  const columns = useFeedColumns()
+  const [batches, setBatches] = useState<LoadedPostBatch[]>(() => [
+    { posts: initialDocs, isFinal: !initialHasNextPage },
+  ])
   const [stories] = useState(initialShortStories)
   const [decorations] = useState(initialDecorations)
-  const [packers, setPackers] = useState(() =>
-    packAllBreakpoints({
-      states: createInitialPackers(),
-      posts: initialDocs,
-      stories: initialShortStories,
-      decorations: initialDecorations,
-      locale,
-      isFinal: !initialHasNextPage,
-      endOfFeed,
-    }),
-  )
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage)
-  const [nextPage, setNextPage] = useState(initialNextPage)
+  const [nextCursor, setNextCursor] = useState(initialNextCursor)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const loadingRef = useRef(false)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const exploreBarRef = useRef<HTMLDivElement | null>(null)
   const inView = useInView(sentinelRef, { margin: '200px 0px' })
+
+  const packer = useMemo(
+    () =>
+      replayPackerBatches({
+        columns,
+        batches,
+        stories,
+        decorations,
+        locale,
+        endOfFeed,
+      }),
+    [batches, columns, decorations, endOfFeed, locale, stories],
+  )
+
+  const docs = useMemo(() => batches.flatMap((batch) => batch.posts), [batches])
+
+  const scrollPastExploreBar = useCallback(() => {
+    const bar = exploreBarRef.current
+    if (!bar) return
+
+    const header = document.querySelector('header')
+    const offset = header?.getBoundingClientRect().height ?? 64
+    // Sticky header covers the top of the viewport; land the grid flush beneath it.
+    const top = window.scrollY + bar.getBoundingClientRect().bottom - offset
+    window.scrollTo({ top, behavior: 'smooth' })
+  }, [])
 
   const postIndexById = useMemo(() => {
     const map = new Map<number, number>()
@@ -332,42 +253,30 @@ export function PostFeed({
   }, [docs])
 
   const loadMore = useCallback(() => {
-    if (!hasNextPage || !nextPage || loadingRef.current) return
+    if (!hasNextPage || !nextCursor || loadingRef.current) return
 
     loadingRef.current = true
     setError(null)
 
     startTransition(async () => {
       try {
-        const data = await loadPostsPage(locale, nextPage)
-        let incoming: PostCardView[] = []
+        const data = await loadPostsPage(locale, nextCursor)
         const isFinal = !data.hasNextPage
 
-        setDocs((current) => {
-          const seen = new Set(current.map((post) => post.id))
-          incoming = data.docs.filter((post) => !seen.has(post.id))
-          return [...current, ...incoming]
+        setBatches((current) => {
+          const seen = new Set(current.flatMap((batch) => batch.posts.map((post) => post.id)))
+          const incoming = data.docs.filter((post) => !seen.has(post.id))
+          return [...current, { posts: incoming, isFinal }]
         })
-        setPackers((current) =>
-          packAllBreakpoints({
-            states: current,
-            posts: incoming,
-            stories,
-            decorations,
-            locale,
-            isFinal,
-            endOfFeed,
-          }),
-        )
         setHasNextPage(Boolean(data.hasNextPage))
-        setNextPage(data.nextPage)
+        setNextCursor(data.nextCursor)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load posts')
       } finally {
         loadingRef.current = false
       }
     })
-  }, [decorations, endOfFeed, hasNextPage, locale, nextPage, stories])
+  }, [hasNextPage, locale, nextCursor])
 
   useEffect(() => {
     if (inView) loadMore()
@@ -386,47 +295,37 @@ export function PostFeed({
     )
   }
 
+  const liveMessage = error
+    ? error
+    : isPending
+      ? 'Loading more posts…'
+      : !hasNextPage
+        ? 'End of feed'
+        : null
+
   return (
     <section aria-labelledby="posts-heading">
-      <div className="dash-b min-h-[var(--header-height)] px-2">
-        <h2 id="posts-heading" className="mt-2 text-xl font-medium tracking-tight">
-          Latest writing
-        </h2>
+      <h2 id="posts-heading" className="sr-only">
+        Posts
+      </h2>
+      <div
+        ref={exploreBarRef}
+        className="dash-b flex min-h-[var(--header-height)] items-center justify-end px-2"
+      >
+        <ExploreFeedButton onClick={scrollPastExploreBar} />
       </div>
 
       <BentoGrid
-        columns={MOBILE_COLUMNS}
-        packer={packers.mobile}
+        columns={columns || MOBILE_COLUMNS}
+        tiles={packer.tiles}
         locale={locale}
         postIndexById={postIndexById}
-        className="bento-grid grid md:hidden"
-        keyPrefix="m"
-      />
-
-      <BentoGrid
-        columns={TABLET_COLUMNS}
-        packer={packers.tablet}
-        locale={locale}
-        postIndexById={postIndexById}
-        className="bento-grid hidden md:grid lg:hidden"
-        keyPrefix="t"
-      />
-
-      <BentoGrid
-        columns={DESKTOP_COLUMNS}
-        packer={packers.desktop}
-        locale={locale}
-        postIndexById={postIndexById}
-        className="bento-grid hidden lg:grid"
-        keyPrefix="d"
       />
 
       {!hasNextPage ? <div className="dash-b h-0" aria-hidden="true" /> : null}
 
       <div className="sr-only" aria-live="polite">
-        {isPending ? 'Loading more posts' : null}
-        {!hasNextPage ? 'End of posts' : null}
-        {error ? error : null}
+        {liveMessage}
       </div>
 
       {hasNextPage || isPending || error ? (

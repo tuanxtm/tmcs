@@ -65,17 +65,59 @@ export async function ensureTestUsers(payload: Payload): Promise<TestUsers> {
     name: 'Admin Test',
     role: 'admin',
   })
-  const manager = await upsertUser(payload, {
+
+  // Subsequent upserts may flip `active`; pass an admin so beforeChange hooks allow it.
+  async function upsertAsAdmin(
+    data: { email: string; name: string; role: 'admin' | 'manager' | 'creator' },
+  ): Promise<User> {
+    const existing = await payload.find({
+      collection: 'users',
+      where: { email: { equals: data.email } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+
+    if (existing.docs[0]) {
+      return payload.update({
+        collection: 'users',
+        id: existing.docs[0].id,
+        data: {
+          name: data.name,
+          role: data.role,
+          active: true,
+          password,
+        },
+        overrideAccess: true,
+        user: admin,
+      })
+    }
+
+    return payload.create({
+      collection: 'users',
+      data: {
+        email: data.email,
+        name: data.name,
+        role: data.role,
+        active: true,
+        password,
+      },
+      overrideAccess: true,
+      user: admin,
+    })
+  }
+
+  const manager = await upsertAsAdmin({
     email: 'manager-test@example.com',
     name: 'Manager Test',
     role: 'manager',
   })
-  const creatorA = await upsertUser(payload, {
+  const creatorA = await upsertAsAdmin({
     email: 'creator-a@example.com',
     name: 'Creator A',
     role: 'creator',
   })
-  const creatorB = await upsertUser(payload, {
+  const creatorB = await upsertAsAdmin({
     email: 'creator-b@example.com',
     name: 'Creator B',
     role: 'creator',

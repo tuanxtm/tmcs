@@ -75,6 +75,7 @@ export interface Config {
     posts: Post;
     'short-stories': ShortStory;
     'feed-decorations': FeedDecoration;
+    'decoration-packs': DecorationPack;
     projects: Project;
     pages: Page;
     'contact-submissions': ContactSubmission;
@@ -94,6 +95,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     'short-stories': ShortStoriesSelect<false> | ShortStoriesSelect<true>;
     'feed-decorations': FeedDecorationsSelect<false> | FeedDecorationsSelect<true>;
+    'decoration-packs': DecorationPacksSelect<false> | DecorationPacksSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
@@ -111,13 +113,13 @@ export interface Config {
     'site-settings': SiteSetting;
     navigation: Navigation;
     footer: Footer;
-    homepage: Homepage;
+    frontpage: Frontpage;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     navigation: NavigationSelect<false> | NavigationSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
-    homepage: HomepageSelect<false> | HomepageSelect<true>;
+    frontpage: FrontpageSelect<false> | FrontpageSelect<true>;
   };
   locale: 'en' | 'vi';
   widgets: {
@@ -172,7 +174,7 @@ export interface User {
   active?: boolean | null;
   avatar?: (number | null) | Media;
   /**
-   * Private notes visible to Admins only.
+   * Notes visible to Admins only.
    */
   internalNotes?: string | null;
   updatedAt: string;
@@ -336,37 +338,7 @@ export interface Post {
         id?: string | null;
       }[]
     | null;
-  author?: (number | null) | Author;
-  categories?: (number | Category)[] | null;
-  tags?: (number | Tag)[] | null;
   relatedPosts?: (number | Post)[] | null;
-  featured?: boolean | null;
-  /**
-   * Homepage bento footprint. Auto derives size from featured status, image aspect ratio, and a stable ID hash.
-   */
-  cardSize?: ('auto' | 'small' | 'wide' | 'tall' | 'large') | null;
-  /**
-   * Estimated minutes; calculated from content.
-   */
-  readingTime?: number | null;
-  /**
-   * Set automatically on first publish. Managers may override.
-   */
-  publishedAt?: string | null;
-  /**
-   * Optional original publication date if republishing older content.
-   */
-  originalPublishedAt?: string | null;
-  /**
-   * Internal ownership for Creator access control. Hidden from public APIs via select.
-   */
-  owner?: (number | null) | User;
-  /**
-   * Editorial signal only. Payload `_status` is document-level; locales are field-level.
-   */
-  translationReady?: {
-    vi?: boolean | null;
-  };
   /**
    * Search and social metadata. Frontend rendering (meta tags, sitemap, hreflang) comes later.
    */
@@ -412,6 +384,36 @@ export interface Post {
        */
       jsonLdOverride?: string | null;
     };
+  };
+  author?: (number | null) | Author;
+  categories?: (number | Category)[] | null;
+  tags?: (number | Tag)[] | null;
+  featured?: boolean | null;
+  /**
+   * Homepage bento footprint. Auto derives size from featured status, image aspect ratio, and a stable ID hash.
+   */
+  cardSize?: ('auto' | 'small' | 'wide' | 'tall' | 'large') | null;
+  /**
+   * Estimated minutes; calculated from content.
+   */
+  readingTime?: number | null;
+  /**
+   * Set automatically on first publish. Managers may override.
+   */
+  publishedAt?: string | null;
+  /**
+   * Optional original publication date if republishing older content.
+   */
+  originalPublishedAt?: string | null;
+  /**
+   * Internal ownership for Creator access control. Hidden from public APIs via select.
+   */
+  owner?: (number | null) | User;
+  /**
+   * Editorial signal only.
+   */
+  translationReady?: {
+    vi?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -473,7 +475,7 @@ export interface ShortStory {
    */
   owner?: (number | null) | User;
   /**
-   * Editorial signal only. Payload `_status` is document-level; locales are field-level.
+   * Editorial signal only.
    */
   translationReady?: {
     vi?: boolean | null;
@@ -495,10 +497,6 @@ export interface Page {
   generateSlug?: boolean | null;
   slug: string;
   summary?: string | null;
-  /**
-   * Stable template key for the future frontend. No styling encoded here.
-   */
-  template: 'home' | 'about' | 'contact' | 'generic';
   heroMedia?: (number | null) | Media;
   layout?:
     | (
@@ -557,16 +555,6 @@ export interface Page {
       )[]
     | null;
   /**
-   * Set automatically on first publish. Managers may override.
-   */
-  publishedAt?: string | null;
-  /**
-   * Editorial signal only. Payload `_status` is document-level; locales are field-level.
-   */
-  translationReady?: {
-    vi?: boolean | null;
-  };
-  /**
    * Search and social metadata. Frontend rendering (meta tags, sitemap, hreflang) comes later.
    */
   seo?: {
@@ -600,6 +588,20 @@ export interface Page {
      */
     noIndex?: boolean | null;
     noFollow?: boolean | null;
+  };
+  /**
+   * Stable template key for the future frontend. No styling encoded here.
+   */
+  template: 'home' | 'about' | 'contact' | 'generic';
+  /**
+   * Set automatically on first publish. Managers may override.
+   */
+  publishedAt?: string | null;
+  /**
+   * Editorial signal only.
+   */
+  translationReady?: {
+    vi?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -654,9 +656,6 @@ export interface Project {
   client?: string | null;
   clientConfidential?: boolean | null;
   projectType?: ('web' | 'mobile' | 'library' | 'infra' | 'design' | 'other') | null;
-  projectStatus?: ('in-progress' | 'completed' | 'archived' | 'concept') | null;
-  startDate?: string | null;
-  endDate?: string | null;
   relatedProjects?: (number | Project)[] | null;
   results?:
     | {
@@ -665,24 +664,6 @@ export interface Project {
         id?: string | null;
       }[]
     | null;
-  author?: (number | null) | Author;
-  contributors?: (number | Author)[] | null;
-  featured?: boolean | null;
-  order?: number | null;
-  /**
-   * Set automatically on first publish. Managers may override.
-   */
-  publishedAt?: string | null;
-  /**
-   * Internal ownership for Creator access control. Hidden from public APIs via select.
-   */
-  owner?: (number | null) | User;
-  /**
-   * Editorial signal only. Payload `_status` is document-level; locales are field-level.
-   */
-  translationReady?: {
-    vi?: boolean | null;
-  };
   /**
    * Search and social metadata. Frontend rendering (meta tags, sitemap, hreflang) comes later.
    */
@@ -718,35 +699,97 @@ export interface Project {
     noIndex?: boolean | null;
     noFollow?: boolean | null;
   };
+  projectStatus?: ('in-progress' | 'completed' | 'archived' | 'concept') | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  author?: (number | null) | Author;
+  contributors?: (number | Author)[] | null;
+  featured?: boolean | null;
+  order?: number | null;
+  /**
+   * Set automatically on first publish. Managers may override.
+   */
+  publishedAt?: string | null;
+  /**
+   * Internal ownership for Creator access control. Hidden from public APIs via select.
+   */
+  owner?: (number | null) | User;
+  /**
+   * Editorial signal only.
+   */
+  translationReady?: {
+    vi?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Seasonal SVG ornaments used to fill leftover bento gaps. Swap packs from Homepage settings.
- *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "feed-decorations".
  */
 export interface FeedDecoration {
   id: number;
   /**
-   * Admin label only (e.g. Monstera leaf).
+   * Optional label for admin (defaults from filename).
+   */
+  alt?: string | null;
+  uploadedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+}
+/**
+ * Themed SVG ornament sets for the feed and footer. Activate one from Frontpage settings.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "decoration-packs".
+ */
+export interface DecorationPack {
+  id: number;
+  /**
+   * Admin label (e.g. Plant, New Year).
    */
   title: string;
-  pack: 'plant' | 'new-year' | 'christmas';
   /**
-   * Inline SVG markup (root <svg>…</svg>). Scripts and event handlers are stripped on render.
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
-  svgMarkup: string;
+  generateSlug?: boolean | null;
+  slug: string;
   /**
-   * Leave empty to allow 1×1 only. Prefer 1×1 for plant ornaments.
+   * Ornaments in this pack. Upload WebP images; they are stored as Feed decorations.
    */
-  allowedShapes?: ('1x1' | '2x1' | '1x2' | '2x2')[] | null;
+  items?:
+    | {
+        /**
+         * Admin label only (e.g. Monstera leaf).
+         */
+        title: string;
+        /**
+         * SVG file stored in R2. Loaded on demand on the public site.
+         */
+        file: number | FeedDecoration;
+        /**
+         * Leave empty to allow 1×1 only. Prefer 1×1 for plant ornaments.
+         */
+        allowedShapes?: ('1x1' | '2x1' | '1x2' | '2x2')[] | null;
+        /**
+         * Higher weight = more likely to be picked.
+         */
+        weight?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
-   * Higher weight = more likely to be picked.
+   * Which ornament from Items appears in the site footer while this pack is active.
    */
-  weight?: number | null;
+  footerItem?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -935,6 +978,10 @@ export interface PayloadLockedDocument {
         value: number | FeedDecoration;
       } | null)
     | ({
+        relationTo: 'decoration-packs';
+        value: number | DecorationPack;
+      } | null)
+    | ({
         relationTo: 'projects';
         value: number | Project;
       } | null)
@@ -1104,21 +1151,7 @@ export interface PostsSelect<T extends boolean = true> {
         image?: T;
         id?: T;
       };
-  author?: T;
-  categories?: T;
-  tags?: T;
   relatedPosts?: T;
-  featured?: T;
-  cardSize?: T;
-  readingTime?: T;
-  publishedAt?: T;
-  originalPublishedAt?: T;
-  owner?: T;
-  translationReady?:
-    | T
-    | {
-        vi?: T;
-      };
   seo?:
     | T
     | {
@@ -1138,6 +1171,20 @@ export interface PostsSelect<T extends boolean = true> {
               description?: T;
               jsonLdOverride?: T;
             };
+      };
+  author?: T;
+  categories?: T;
+  tags?: T;
+  featured?: T;
+  cardSize?: T;
+  readingTime?: T;
+  publishedAt?: T;
+  originalPublishedAt?: T;
+  owner?: T;
+  translationReady?:
+    | T
+    | {
+        vi?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1179,11 +1226,36 @@ export interface ShortStoriesSelect<T extends boolean = true> {
  * via the `definition` "feed-decorations_select".
  */
 export interface FeedDecorationsSelect<T extends boolean = true> {
+  alt?: T;
+  uploadedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "decoration-packs_select".
+ */
+export interface DecorationPacksSelect<T extends boolean = true> {
   title?: T;
-  pack?: T;
-  svgMarkup?: T;
-  allowedShapes?: T;
-  weight?: T;
+  generateSlug?: T;
+  slug?: T;
+  items?:
+    | T
+    | {
+        title?: T;
+        file?: T;
+        allowedShapes?: T;
+        weight?: T;
+        id?: T;
+      };
+  footerItem?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1215,9 +1287,6 @@ export interface ProjectsSelect<T extends boolean = true> {
   client?: T;
   clientConfidential?: T;
   projectType?: T;
-  projectStatus?: T;
-  startDate?: T;
-  endDate?: T;
   relatedProjects?: T;
   results?:
     | T
@@ -1225,17 +1294,6 @@ export interface ProjectsSelect<T extends boolean = true> {
         label?: T;
         value?: T;
         id?: T;
-      };
-  author?: T;
-  contributors?: T;
-  featured?: T;
-  order?: T;
-  publishedAt?: T;
-  owner?: T;
-  translationReady?:
-    | T
-    | {
-        vi?: T;
       };
   seo?:
     | T
@@ -1250,6 +1308,20 @@ export interface ProjectsSelect<T extends boolean = true> {
         noIndex?: T;
         noFollow?: T;
       };
+  projectStatus?: T;
+  startDate?: T;
+  endDate?: T;
+  author?: T;
+  contributors?: T;
+  featured?: T;
+  order?: T;
+  publishedAt?: T;
+  owner?: T;
+  translationReady?:
+    | T
+    | {
+        vi?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1263,7 +1335,6 @@ export interface PagesSelect<T extends boolean = true> {
   generateSlug?: T;
   slug?: T;
   summary?: T;
-  template?: T;
   heroMedia?: T;
   layout?:
     | T
@@ -1311,12 +1382,6 @@ export interface PagesSelect<T extends boolean = true> {
               blockName?: T;
             };
       };
-  publishedAt?: T;
-  translationReady?:
-    | T
-    | {
-        vi?: T;
-      };
   seo?:
     | T
     | {
@@ -1329,6 +1394,13 @@ export interface PagesSelect<T extends boolean = true> {
         twitterCard?: T;
         noIndex?: T;
         noFollow?: T;
+      };
+  template?: T;
+  publishedAt?: T;
+  translationReady?:
+    | T
+    | {
+        vi?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1545,7 +1617,21 @@ export interface Navigation {
  */
 export interface Footer {
   id: number;
-  text?: string | null;
+  text?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   groups?:
     | {
         title: string;
@@ -1588,12 +1674,12 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
- * Curated homepage content. No frontend styling controls.
+ * Curated frontpage content. No frontend styling controls.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "homepage".
+ * via the `definition` "frontpage".
  */
-export interface Homepage {
+export interface Frontpage {
   id: number;
   heroHeading: string;
   heroSubheading?: string | null;
@@ -1602,20 +1688,29 @@ export interface Homepage {
   featuredPosts?: (number | Post)[] | null;
   featuredProjects?: (number | Project)[] | null;
   /**
-   * Which Feed decorations pack fills leftover bento gaps. Add items under Content → Feed decorations.
+   * Which decoration pack fills leftover bento gaps and supplies the footer SVG via its footer item.
    */
-  activeDecorationPack?: ('plant' | 'new-year' | 'christmas') | null;
+  activeDecorationPack: number | DecorationPack;
   /**
-   * Single closing tile shown once at the end of the homepage feed. Not packed from Short stories.
+   * Single closing tile shown once at the end of the frontpage feed. Not packed from Short stories.
    */
   endOfFeed?: {
     enabled?: boolean | null;
-    eyebrow?: string | null;
-    title?: string | null;
-    /**
-     * Short note — keep it compact for a feed tile.
-     */
-    message?: string | null;
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
     /**
      * Preferred footprint. Falls back to the largest shape that fits the last gap.
      */
@@ -1750,9 +1845,9 @@ export interface FooterSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "homepage_select".
+ * via the `definition` "frontpage_select".
  */
-export interface HomepageSelect<T extends boolean = true> {
+export interface FrontpageSelect<T extends boolean = true> {
   heroHeading?: T;
   heroSubheading?: T;
   profileSummary?: T;
@@ -1764,9 +1859,7 @@ export interface HomepageSelect<T extends boolean = true> {
     | T
     | {
         enabled?: T;
-        eyebrow?: T;
-        title?: T;
-        message?: T;
+        text?: T;
         preferredShape?: T;
       };
   updatedAt?: T;

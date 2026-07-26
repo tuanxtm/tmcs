@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { getFeedDecorations, getHomepage, getPostsPage, getShortStories, getSiteShell } from '@/app/(frontend)/_lib/cms'
+import { getFeedDecorations, getFrontpage, getPostsPage, getShortStories, getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { homeHref } from '@/app/(frontend)/_lib/locale'
 import type { LocaleCode } from '@/lib/locales'
 import { Hero } from '@/app/(frontend)/_components/home/hero'
@@ -13,11 +13,11 @@ type HomePageProps = {
 }
 
 export async function generateHomeMetadata(locale: LocaleCode): Promise<Metadata> {
-  const [shell, homepage] = await Promise.all([getSiteShell(locale), getHomepage(locale)])
-  const title = homepage.heading || shell.seo.metaTitle || shell.siteName
+  const [shell, frontpage] = await Promise.all([getSiteShell(locale), getFrontpage(locale)])
+  const title = shell.seo.metaTitle || shell.siteName
   const description =
-    homepage.subheading || shell.seo.metaDescription || shell.description || undefined
-  const image = homepage.image || shell.seo.ogImage || shell.defaultSocialImage
+    frontpage.subheading || shell.seo.metaDescription || shell.description || undefined
+  const image = frontpage.image || shell.seo.ogImage || shell.defaultSocialImage
   const canonical = `${shell.siteUrl}${homeHref(locale)}`
 
   return {
@@ -63,12 +63,19 @@ export async function generateHomeMetadata(locale: LocaleCode): Promise<Metadata
 }
 
 export async function HomePage({ locale }: HomePageProps) {
-  const [hero, posts, shortStories] = await Promise.all([
-    getHomepage(locale),
-    getPostsPage(locale, 1),
+  // Frontpage starts immediately so decorations can chain from its pack ID
+  // while posts/stories load in parallel.
+  const frontpagePromise = getFrontpage(locale)
+  const decorationsPromise = frontpagePromise.then((hero) =>
+    getFeedDecorations(hero.activeDecorationPackId),
+  )
+
+  const [hero, posts, shortStories, decorations] = await Promise.all([
+    frontpagePromise,
+    getPostsPage(locale, null),
     getShortStories(locale),
+    decorationsPromise,
   ])
-  const decorations = await getFeedDecorations(hero.activeDecorationPack)
 
   return (
     <div className="min-h-[50vh]">
@@ -80,7 +87,7 @@ export async function HomePage({ locale }: HomePageProps) {
         initialDecorations={decorations}
         endOfFeed={hero.endOfFeed}
         initialHasNextPage={posts.hasNextPage}
-        initialNextPage={posts.nextPage}
+        initialNextCursor={posts.nextCursor}
       />
     </div>
   )

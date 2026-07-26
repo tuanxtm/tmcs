@@ -12,11 +12,16 @@ describe('Localization', () => {
     payload = await initPayload()
     users = await ensureTestUsers(payload)
 
+    const stamp = Date.now()
+    const enSlug = `bilingual-${stamp}`
+    const viSlug = `bai-viet-${stamp}`
+    const viTitle = `Bài viết song ngữ ${stamp}`
+
     const post = await payload.create({
       collection: 'posts',
       data: {
         title: 'Bilingual Post',
-        slug: `bilingual-${Date.now()}`,
+        slug: enSlug,
         excerpt: 'English excerpt',
         content: richText('English body'),
         owner: users.admin.id,
@@ -29,6 +34,7 @@ describe('Localization', () => {
       },
       locale: 'en',
       overrideAccess: true,
+      context: { disableRevalidate: true },
     })
     postId = post.id
 
@@ -36,8 +42,8 @@ describe('Localization', () => {
       collection: 'posts',
       id: postId,
       data: {
-        title: 'Bài viết song ngữ',
-        slug: `bai-viet-song-ngu-${Date.now()}`,
+        title: viTitle,
+        slug: viSlug,
         excerpt: 'Tóm tắt tiếng Việt',
         content: richText('Nội dung tiếng Việt'),
         seo: {
@@ -47,6 +53,7 @@ describe('Localization', () => {
       },
       locale: 'vi',
       overrideAccess: true,
+      context: { disableRevalidate: true },
     })
   })
 
@@ -68,7 +75,7 @@ describe('Localization', () => {
       fallbackLocale: false,
       overrideAccess: true,
     })
-    expect(doc.title).toBe('Bài viết song ngữ')
+    expect(doc.title).toMatch(/^Bài viết song ngữ/)
   })
 
   it('falls back to English when Vietnamese missing and fallback enabled', async () => {

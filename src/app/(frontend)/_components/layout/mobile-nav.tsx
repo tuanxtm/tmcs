@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu } from 'lucide-react'
+import { IconMenu } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +14,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 
+import { externalLinkProps } from '@/app/(frontend)/_lib/link-props'
 import type { NavItemView } from '@/app/(frontend)/_lib/types'
 
 type MobileNavProps = {
@@ -33,12 +34,12 @@ export function MobileNav({ items, siteName }: MobileNavProps) {
           className="min-h-11 min-w-11 lg:hidden"
           aria-label="Open navigation"
         >
-          <Menu className="size-4" />
+          <IconMenu aria-hidden="true" className="size-4" stroke={2} />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="flex flex-col gap-6">
+      <SheetContent side="right" className="flex flex-col gap-6 overscroll-contain">
         <SheetHeader>
-          <SheetTitle className="font-mono text-sm uppercase tracking-[0.18em]">
+          <SheetTitle translate="no" className="font-mono text-sm uppercase tracking-[0.18em]">
             {siteName}
           </SheetTitle>
         </SheetHeader>
@@ -52,8 +53,7 @@ export function MobileNav({ items, siteName }: MobileNavProps) {
                 <SheetClose asChild>
                   <Link
                     href={item.href}
-                    target={item.newTab ? '_blank' : undefined}
-                    rel={item.external || item.newTab ? 'noopener noreferrer' : undefined}
+                    {...externalLinkProps(item)}
                     className="inline-flex min-h-11 items-center text-base font-medium"
                     onClick={() => setOpen(false)}
                   >
@@ -67,10 +67,7 @@ export function MobileNav({ items, siteName }: MobileNavProps) {
                         <SheetClose asChild>
                           <Link
                             href={child.href}
-                            target={child.newTab ? '_blank' : undefined}
-                            rel={
-                              child.external || child.newTab ? 'noopener noreferrer' : undefined
-                            }
+                            {...externalLinkProps(child)}
                             className="inline-flex min-h-11 items-center text-sm text-muted-foreground"
                             onClick={() => setOpen(false)}
                           >

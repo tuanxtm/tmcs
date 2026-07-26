@@ -97,7 +97,7 @@ export const Users: CollectionConfig = {
         update: fieldAdminOnly,
       },
       admin: {
-        description: 'Private notes visible to Admins only.',
+        description: 'Notes visible to Admins only.',
       },
     },
   ],

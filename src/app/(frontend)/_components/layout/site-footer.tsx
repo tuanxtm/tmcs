@@ -11,6 +11,9 @@ import {
   type Icon,
 } from '@tabler/icons-react'
 
+import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
+import { FooterDecoration } from '@/app/(frontend)/_components/layout/footer-decoration'
+import { externalLinkProps } from '@/app/(frontend)/_lib/link-props'
 import type { SiteShellView } from '@/app/(frontend)/_lib/types'
 
 type SiteFooterProps = {
@@ -39,51 +42,31 @@ export function SiteFooter({ shell }: SiteFooterProps) {
   const navLinks = [...footer.groups.flatMap((group) => group.links), ...footer.legalLinks]
 
   return (
-    <footer className="px-2 py-16">
-      <div className="flex min-h-64 flex-col justify-between gap-16">
-        {/* Top left: logo / name / text */}
+    <footer>
+      <div className="dash-b relative flex h-[calc(2*var(--bento-tile))] flex-col justify-between p-2">
         <div className="max-w-sm">
           {footer.text ? (
-            <p className="mt-3 text-sm leading-relaxed text-foreground">{footer.text}</p>
+            <CmsRichText
+              data={footer.text}
+              className="text-lg leading-relaxed text-foreground [&_a]:underline [&_a]:underline-offset-2 [&_p]:m-0"
+            />
           ) : null}
         </div>
 
-        {/* Bottom right: links + copyright */}
-        <div className="flex flex-col items-end self-end text-right">
-          {footer.socialLinks.length > 0 ? (
-            <div className="mb-6 flex flex-col items-end gap-3">
-              <p className="text-xs font-semibold text-secondary-foreground">
-                Follow me
-              </p>
-              <ul className="flex flex-row items-center gap-3">
-                {footer.socialLinks.map((link) => {
-                  const Icon = SOCIAL_ICONS[link.platform] ?? IconLink
-                  return (
-                    <li key={link.id}>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={link.label || link.platform}
-                        className="text-secondary-foreground transition-colors hover:text-foreground"
-                      >
-                        <Icon aria-hidden="true" className="size-5" stroke={1.5} />
-                      </a>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          ) : null}
-
+        <div
+          className={
+            footer.decorationImageUrl
+              ? 'flex items-end justify-end gap-6 self-end pr-[var(--bento-tile)]'
+              : 'flex items-end justify-end gap-6 self-end'
+          }
+        >
           {navLinks.length > 0 ? (
-            <ul className="space-y-2">
+            <ul className="space-y-2 text-right">
               {navLinks.map((link) => (
                 <li key={link.id}>
                   <Link
                     href={link.href}
-                    target={link.newTab ? '_blank' : undefined}
-                    rel={link.external || link.newTab ? 'noopener noreferrer' : undefined}
+                    {...externalLinkProps(link)}
                     className="text-sm transition-colors hover:text-muted-foreground"
                   >
                     {link.label}
@@ -92,11 +75,42 @@ export function SiteFooter({ shell }: SiteFooterProps) {
               ))}
             </ul>
           ) : null}
+        </div>
 
-          <p className="mt-10 text-sm text-secondary-foreground">
+        {footer.decorationImageUrl ? (
+          <FooterDecoration
+            imageUrl={footer.decorationImageUrl}
+            className="absolute bottom-0 right-0"
+          />
+        ) : null}
+      </div>
+      <div className="flex h-[var(--header-height)] items-center justify-between gap-4 p-2">
+        <div>
+          <p className="font-serif text-lg italic">Create with passion.</p>
+          <p className="text-xs text-secondary-foreground">
             {replaceYear(footer.copyright, siteName)}
           </p>
         </div>
+        {footer.socialLinks.length > 0 ? (
+          <ul className="flex flex-row items-center gap-3">
+            {footer.socialLinks.map((link) => {
+              const Icon = SOCIAL_ICONS[link.platform] ?? IconLink
+              return (
+                <li key={link.id}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.label || link.platform}
+                    className="text-secondary-foreground transition-colors hover:text-foreground"
+                  >
+                    <Icon aria-hidden="true" className="size-5" stroke={2} />
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
+        ) : null}
       </div>
     </footer>
   )

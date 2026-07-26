@@ -1,8 +1,8 @@
 import type { GlobalConfig } from 'payload'
 
 import { Footer } from './Footer'
-import { Homepage } from './Homepage'
+import { Frontpage } from './Frontpage'
 import { Navigation } from './Navigation'
 import { SiteSettings } from './SiteSettings'
 
-export const globals: GlobalConfig[] = [SiteSettings, Navigation, Footer, Homepage]
+export const globals: GlobalConfig[] = [SiteSettings, Navigation, Footer, Frontpage]

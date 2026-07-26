@@ -97,7 +97,7 @@ export const translationReadyField = (): Field => ({
   label: 'Translation readiness',
   admin: {
     description:
-      'Editorial signal only. Payload `_status` is document-level; locales are field-level.',
+      'Editorial signal only.',
     position: 'sidebar',
   },
   fields: [
@@ -116,6 +116,7 @@ export const translationReadyField = (): Field => ({
 export const publishedAtField = (): Field => ({
   name: 'publishedAt',
   type: 'date',
+  index: true,
   admin: {
     position: 'sidebar',
     date: {

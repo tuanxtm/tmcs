@@ -6,6 +6,8 @@ import { motion, useReducedMotion } from 'motion/react'
 import { cn } from '@/lib/utils'
 
 import type { GridPlacement } from '@/app/(frontend)/_lib/feed-packer'
+import { placementStyle } from '@/app/(frontend)/_lib/grid-placement'
+import { externalLinkProps } from '@/app/(frontend)/_lib/link-props'
 import { resolveAlignment } from '@/app/(frontend)/_lib/resolve-alignment'
 import type { ShortStoryCardView, StoryShape } from '@/app/(frontend)/_lib/types'
 
@@ -14,7 +16,6 @@ type ShortStoryFeedItemProps = {
   shape: StoryShape
   placement: GridPlacement
   columns: number
-  explicitPlacement?: boolean
   className?: string
 }
 
@@ -37,7 +38,6 @@ export function ShortStoryFeedItem({
   shape,
   placement,
   columns,
-  explicitPlacement = true,
   className,
 }: ShortStoryFeedItemProps) {
   const reduceMotion = useReducedMotion()
@@ -52,19 +52,10 @@ export function ShortStoryFeedItem({
         isRight ? 'items-end text-right' : 'items-start text-left',
       )}
     >
-      <h3
-        className={cn(
-          'font-medium tracking-tight hidden',
-          layout === 'compact' ? 'text-sm' : 'text-base md:text-lg',
-          story.variant === 'quote' && 'italic',
-        )}
-      >
-        {story.title}
-      </h3>
       {story.text ? (
         <p
           className={cn(
-            'text-2xl font-bold leading-relaxed text-secondary-foreground',
+            'text-xl leading-none text-foreground/52 font-serif italic',
             layout === 'compact' && 'line-clamp-5',
             layout === 'horizontal' && 'line-clamp-3',
             layout === 'vertical' && 'line-clamp-10',
@@ -83,12 +74,7 @@ export function ShortStoryFeedItem({
     className,
   )
 
-  const style = explicitPlacement
-    ? ({
-        gridColumn: `${placement.column + 1} / span ${placement.columnSpan}`,
-        gridRow: `${placement.row + 1} / span ${placement.rowSpan}`,
-      } as React.CSSProperties)
-    : undefined
+  const style = placementStyle(placement)
 
   const motionProps = {
     initial: reduceMotion ? false : ({ opacity: 0, y: 10 } as const),
@@ -107,8 +93,7 @@ export function ShortStoryFeedItem({
       >
         <Link
           href={story.href}
-          target={story.newTab ? '_blank' : undefined}
-          rel={story.newTab ? 'noopener noreferrer' : undefined}
+          {...externalLinkProps({ newTab: story.newTab })}
           className="block h-full focus:outline-none"
         >
           {content}
@@ -118,13 +103,7 @@ export function ShortStoryFeedItem({
   }
 
   return (
-    <motion.article
-      className={shellClass}
-      style={style}
-      aria-label={story.title}
-      tabIndex={0}
-      {...motionProps}
-    >
+    <motion.article className={shellClass} style={style} aria-label={story.title} {...motionProps}>
       {content}
     </motion.article>
   )

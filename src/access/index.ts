@@ -8,6 +8,7 @@ import {
   isStaff,
   type UserWithRole,
 } from '@/lib/roles'
+import { publishedStatusWhere } from '@/lib/payload-queries'
 
 type AccessUser = UserWithRole | null | undefined
 
@@ -24,11 +25,7 @@ export const publishedOrOwned: Access = ({ req: { user } }): boolean | Where => 
   const current = asUser(user)
 
   if (!current) {
-    return {
-      _status: {
-        equals: 'published',
-      },
-    }
+    return publishedStatusWhere
   }
 
   if (isAdminOrManager(current)) {
@@ -43,22 +40,14 @@ export const publishedOrOwned: Access = ({ req: { user } }): boolean | Where => 
     }
   }
 
-  return {
-    _status: {
-      equals: 'published',
-    },
-  }
+  return publishedStatusWhere
 }
 
 /** Public reads published docs; Admin/Manager read all; others get published only. */
 export const publishedOrStaff: Access = ({ req: { user } }) => {
   if (isAdminOrManager(asUser(user))) return true
 
-  return {
-    _status: {
-      equals: 'published',
-    },
-  }
+  return publishedStatusWhere
 }
 
 export const approvedOrStaff: Access = ({ req: { user } }) => {

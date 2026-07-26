@@ -6,7 +6,8 @@ import { pageBlocks } from '@/blocks'
 import { publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
 import { setPublishedAt } from '@/hooks'
-import { getServerURL } from '@/lib/env'
+import { revalidatePages, revalidatePagesDelete } from '@/hooks/revalidateFrontend'
+import { buildPreviewUrl } from '@/lib/preview'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -20,15 +21,12 @@ export const Pages: CollectionConfig = {
     group: 'Content',
     preview: (doc, { locale }) => {
       const slug = typeof doc?.slug === 'string' ? doc.slug : ''
-      const base = getServerURL()
-      return `${base}/preview/pages/${slug}?locale=${locale || 'en'}`
+      return buildPreviewUrl('pages', slug, locale)
     },
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 375,
-      },
+      // Autosave disabled — avoids D1 write storms while typing in Admin (Worker cost).
       schedulePublish: true,
       validate: false,
     },
@@ -43,24 +41,50 @@ export const Pages: CollectionConfig = {
   },
   hooks: {
     beforeChange: [setPublishedAt],
+    afterChange: [revalidatePages],
+    afterDelete: [revalidatePagesDelete],
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      localized: true,
-    },
-    slugField({
-      name: 'slug',
-      useAsSlug: 'title',
-      localized: true,
-      required: true,
-    }),
-    {
-      name: 'summary',
-      type: 'textarea',
-      localized: true,
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Content',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              localized: true,
+            },
+            slugField({
+              name: 'slug',
+              useAsSlug: 'title',
+              localized: true,
+              required: true,
+            }),
+            {
+              name: 'summary',
+              type: 'textarea',
+              localized: true,
+            },
+            {
+              name: 'heroMedia',
+              type: 'upload',
+              relationTo: 'media',
+            },
+            {
+              name: 'layout',
+              type: 'blocks',
+              blocks: pageBlocks,
+            },
+          ],
+        },
+        {
+          label: 'SEO',
+          fields: [seoFields({ includeArticleFields: false, embeddedInTab: true })],
+        },
+      ],
     },
     {
       name: 'template',
@@ -78,18 +102,7 @@ export const Pages: CollectionConfig = {
         description: 'Stable template key for the future frontend. No styling encoded here.',
       },
     },
-    {
-      name: 'heroMedia',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'layout',
-      type: 'blocks',
-      blocks: pageBlocks,
-    },
     publishedAtField(),
     translationReadyField(),
-    seoFields({ includeArticleFields: false }),
   ],
 }

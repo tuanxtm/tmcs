@@ -9,15 +9,12 @@ import {
 } from '@/access'
 import { ownerField, publishedAtField, translationReadyField } from '@/fields/common'
 import { assignOwner, preventCreatorPublish, setPublishedAt } from '@/hooks'
+import {
+  revalidateShortStories,
+  revalidateShortStoriesDelete,
+} from '@/hooks/revalidateFrontend'
+import { STORY_SHAPE_OPTIONS, type StoryShape } from '@/lib/story-shapes'
 import { validateAbsoluteHttpUrl } from '@/lib/url'
-
-const STORY_SHAPES = [
-  { label: '1 × 1', value: '1x1' },
-  { label: '2 × 1', value: '2x1' },
-  { label: '3 × 1', value: '3x1' },
-  { label: '1 × 2', value: '1x2' },
-  { label: '2 × 2', value: '2x2' },
-] as const
 
 export const ShortStories: CollectionConfig = {
   slug: 'short-stories',
@@ -33,9 +30,7 @@ export const ShortStories: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 375,
-      },
+      // Autosave disabled — avoids D1 write storms while typing in Admin (Worker cost).
       schedulePublish: true,
       validate: false,
     },
@@ -50,6 +45,8 @@ export const ShortStories: CollectionConfig = {
   },
   hooks: {
     beforeChange: [assignOwner, preventCreatorPublish, setPublishedAt],
+    afterChange: [revalidateShortStories],
+    afterDelete: [revalidateShortStoriesDelete],
   },
   fields: [
     {
@@ -94,7 +91,7 @@ export const ShortStories: CollectionConfig = {
       name: 'allowedShapes',
       type: 'select',
       hasMany: true,
-      options: [...STORY_SHAPES],
+      options: [...STORY_SHAPE_OPTIONS],
       admin: {
         position: 'sidebar',
         description:
@@ -169,4 +166,4 @@ export const ShortStories: CollectionConfig = {
   ],
 }
 
-export type StoryShape = (typeof STORY_SHAPES)[number]['value']
+export type { StoryShape }

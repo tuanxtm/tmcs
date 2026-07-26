@@ -6,6 +6,10 @@ import type {
   ShortStoryCardView,
   StoryShape,
 } from './types'
+import { STORY_SHAPE_SPANS, type StoryShapeSpan } from '@/lib/story-shapes'
+
+export { STORY_SHAPE_SPANS }
+export type { StoryShapeSpan }
 
 export const MOBILE_COLUMNS = 2
 export const TABLET_COLUMNS = 3
@@ -36,9 +40,7 @@ export type PlacedStoryTile = {
 export type PlacedClosingTile = {
   kind: 'closing'
   key: 'closing'
-  eyebrow: string | null
-  title: string
-  message: string | null
+  text: EndOfFeedView['text']
   shape: StoryShape
   placement: GridPlacement
 }
@@ -65,21 +67,6 @@ export type PackerState = {
   tiles: PlacedFeedTile[]
   generation: number
 }
-
-export type StoryShapeSpan = {
-  shape: StoryShape
-  columnSpan: number
-  rowSpan: number
-  weight: number
-}
-
-export const STORY_SHAPE_SPANS: StoryShapeSpan[] = [
-  { shape: '3x1', columnSpan: 3, rowSpan: 1, weight: 3 },
-  { shape: '2x2', columnSpan: 2, rowSpan: 2, weight: 5 },
-  { shape: '2x1', columnSpan: 2, rowSpan: 1, weight: 4 },
-  { shape: '1x2', columnSpan: 1, rowSpan: 2, weight: 3 },
-  { shape: '1x1', columnSpan: 1, rowSpan: 1, weight: 3 },
-]
 
 type Cell = { column: number; row: number }
 
@@ -673,7 +660,7 @@ export function appendPostsAndFillStories(options: {
 }
 
 /**
- * Place exactly one Homepage end-of-feed tile into the last gaps, then fill leftovers with decorations.
+ * Place exactly one Frontpage end-of-feed tile into the last gaps, then fill leftovers with decorations.
  */
 export function sealWithClosingTile(options: {
   state: PackerState
@@ -771,9 +758,7 @@ export function sealWithClosingTile(options: {
     tiles.push({
       kind: 'closing',
       key: 'closing',
-      eyebrow: options.closing.eyebrow,
-      title: options.closing.title,
-      message: options.closing.message,
+      text: options.closing.text,
       shape,
       placement,
     })

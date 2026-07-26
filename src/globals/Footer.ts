@@ -2,6 +2,8 @@ import type { GlobalConfig } from 'payload'
 
 import { adminOrManager, anyone } from '@/access'
 import { linkFields, socialLinkFields } from '@/fields/common'
+import { slimRichTextEditor } from '@/fields/slimRichText'
+import { revalidateSiteShellGlobal } from '@/hooks/revalidateFrontend'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
@@ -14,14 +16,18 @@ export const Footer: GlobalConfig = {
     update: adminOrManager,
     readVersions: adminOrManager,
   },
+  hooks: {
+    afterChange: [revalidateSiteShellGlobal],
+  },
   versions: {
-    max: 25,
+    max: 10,
   },
   fields: [
     {
       name: 'text',
-      type: 'textarea',
+      type: 'richText',
       localized: true,
+      editor: slimRichTextEditor,
     },
     {
       name: 'groups',

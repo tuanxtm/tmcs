@@ -8,6 +8,7 @@ import {
   staffOnly,
 } from '@/access'
 import { assignUploadedBy } from '@/hooks'
+import { revalidateMedia, revalidateMediaDelete } from '@/hooks/revalidateFrontend'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -30,6 +31,8 @@ export const Media: CollectionConfig = {
   },
   hooks: {
     beforeChange: [assignUploadedBy],
+    afterChange: [revalidateMedia],
+    afterDelete: [revalidateMediaDelete],
   },
   upload: {
     // Not supported on Workers yet due to lack of sharp

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/navigation-menu'
 import { cn } from '@/lib/utils'
 
+import { externalLinkProps } from '@/app/(frontend)/_lib/link-props'
 import type { NavItemView } from '@/app/(frontend)/_lib/types'
 
 type DesktopNavProps = {
@@ -38,8 +39,7 @@ export function DesktopNav({ items }: DesktopNavProps) {
                       <NavigationMenuLink asChild>
                         <Link
                           href={item.href}
-                          target={item.newTab ? '_blank' : undefined}
-                          rel={item.external || item.newTab ? 'noopener noreferrer' : undefined}
+                          {...externalLinkProps(item)}
                           className="block rounded-md px-3 py-2 text-sm hover:bg-accent"
                         >
                           {item.label}
@@ -51,8 +51,7 @@ export function DesktopNav({ items }: DesktopNavProps) {
                         <NavigationMenuLink asChild>
                           <Link
                             href={child.href}
-                            target={child.newTab ? '_blank' : undefined}
-                            rel={child.external || child.newTab ? 'noopener noreferrer' : undefined}
+                            {...externalLinkProps(child)}
                             className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
                           >
                             {child.label}
@@ -71,8 +70,7 @@ export function DesktopNav({ items }: DesktopNavProps) {
               <NavigationMenuLink asChild>
                 <Link
                   href={item.href}
-                  target={item.newTab ? '_blank' : undefined}
-                  rel={item.external || item.newTab ? 'noopener noreferrer' : undefined}
+                  {...externalLinkProps(item)}
                   className={cn(navigationMenuTriggerStyle, 'bg-transparent')}
                 >
                   {item.label}

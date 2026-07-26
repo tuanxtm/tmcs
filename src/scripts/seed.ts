@@ -14,6 +14,7 @@ import type { Payload } from 'payload'
 
 import config from '@payload-config'
 import { PLANT_DECORATION_SEEDS } from './plant-decorations'
+import { upsertFeedDecorationFile } from './decoration-upload'
 
 type Locale = 'en' | 'vi'
 
@@ -95,6 +96,37 @@ async function upsertUser(
     },
     overrideAccess: true,
   })
+}
+
+async function upsertPackBySlug(
+  payload: Payload,
+  slug: string,
+  data: { title: string },
+): Promise<{ id: number }> {
+  const existing = await payload.find({
+    collection: 'decoration-packs',
+    where: { slug: { equals: slug } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  if (existing.docs[0]) {
+    const updated = await payload.update({
+      collection: 'decoration-packs',
+      id: existing.docs[0].id,
+      data: { title: data.title },
+      overrideAccess: true,
+    })
+    return { id: updated.id }
+  }
+
+  const created = await payload.create({
+    collection: 'decoration-packs',
+    data: { slug, title: data.title },
+    overrideAccess: true,
+  })
+  return { id: created.id }
 }
 
 async function upsertBySlug(
@@ -770,77 +802,97 @@ async function seed() {
     overrideAccess: true,
   })
 
+  const plantPack = await upsertPackBySlug(payload, 'plant', { title: 'Plant' })
+  await upsertPackBySlug(payload, 'new-year', { title: 'New Year' })
+  await upsertPackBySlug(payload, 'christmas', { title: 'Christmas' })
+
   await payload.updateGlobal({
-    slug: 'homepage',
+    slug: 'frontpage',
     data: {
       heroHeading: 'Workshop notes from the bench',
       heroSubheading: 'DIY projects, desk setups, and electronics experiments.',
       profileSummary: 'Documenting builds, failures, and the tools that survive them.',
+      activeDecorationPack: plantPack.id,
       endOfFeed: {
         enabled: true,
-        eyebrow: 'End of feed',
-        title: 'Thanks for reading',
-        message: 'More notes land here as they leave the bench.',
+        text: richText(
+          'Thanks for reading',
+          'More notes land here as they leave the bench.',
+        ),
         preferredShape: '2x1',
       },
-      activeDecorationPack: 'plant',
     },
     locale: 'en',
     overrideAccess: true,
   })
 
   await payload.updateGlobal({
-    slug: 'homepage',
+    slug: 'frontpage',
     data: {
       heroHeading: 'Ghi chú từ bàn thợ',
       heroSubheading: 'Dự án DIY, setup bàn và thử nghiệm điện tử.',
       profileSummary: 'Ghi lại bản build, thất bại và dụng cụ còn sót lại.',
+      activeDecorationPack: plantPack.id,
       endOfFeed: {
         enabled: true,
-        eyebrow: 'Hết feed',
-        title: 'Cảm ơn đã đọc',
-        message: 'Thêm ghi chú sẽ xuất hiện khi chúng rời bàn thợ.',
+        text: richText('Cảm ơn đã đọc', 'Thêm ghi chú sẽ xuất hiện khi chúng rời bàn thợ.'),
         preferredShape: '2x1',
       },
-      activeDecorationPack: 'plant',
     },
     locale: 'vi',
     overrideAccess: true,
   })
 
-  for (const deco of PLANT_DECORATION_SEEDS) {
-    const existing = await payload.find({
-      collection: 'feed-decorations',
-      where: { title: { equals: deco.title } },
+  const plantItems: Array<{
+    id: string
+    title: string
+    file: number
+    allowedShapes: ('1x1' | '2x1' | '1x2' | '2x2')[]
+    weight: number
+  }> = []
+
+  for (const [index, deco] of PLANT_DECORATION_SEEDS.entries()) {
+    const fileId = await upsertFeedDecorationFile(payload, {
+      title: deco.title,
+      filename: deco.filename,
+    })
+
+    plantItems.push({
+      id: `plant-item-${index + 1}`,
+      title: deco.title,
+      file: fileId,
+      allowedShapes: [...deco.allowedShapes],
+      weight: deco.weight,
+    })
+  }
+
+  await payload.update({
+    collection: 'decoration-packs',
+    id: plantPack.id,
+    data: {
+      items: plantItems,
+      footerItem: plantItems[0]?.id ?? null,
+    },
+    overrideAccess: true,
+  })
+
+  for (const slug of ['new-year', 'christmas'] as const) {
+    const pack = await payload.find({
+      collection: 'decoration-packs',
+      where: { slug: { equals: slug } },
       limit: 1,
       depth: 0,
       overrideAccess: true,
     })
-
-    const data = {
-      title: deco.title,
-      pack: deco.pack,
-      svgMarkup: deco.svgMarkup,
-      allowedShapes: [...deco.allowedShapes],
-      weight: deco.weight,
-    }
-
-    if (existing.docs[0]) {
+    if (pack.docs[0]) {
       await payload.update({
-        collection: 'feed-decorations',
-        id: existing.docs[0].id,
-        data,
-        overrideAccess: true,
-      })
-    } else {
-      await payload.create({
-        collection: 'feed-decorations',
-        data,
+        collection: 'decoration-packs',
+        id: pack.docs[0].id,
+        data: { items: [], footerItem: null },
         overrideAccess: true,
       })
     }
   }
-
   const categoryIds = Object.values(categories).map((c) => c.id)
   const tagSlugs = TAG_SEEDS.map((t) => t.slug)
   const authorIds = Object.values(authors).map((a) => a.id)
@@ -964,7 +1016,7 @@ async function seed() {
   })
 
   await payload.updateGlobal({
-    slug: 'homepage',
+    slug: 'frontpage',
     data: {
       featuredProjects: projectIds.filter((_, i) => PROJECT_SEEDS[i]?.featured),
       featuredPosts: postIds.slice(0, 4),
@@ -1047,6 +1099,7 @@ async function seed() {
   console.log(`- Published projects: ${projectIds.length}`)
   if (managerEmail) console.log(`- Manager: ${managerEmail}`)
   if (creatorEmail) console.log(`- Creator: ${creatorEmail}`)
+  console.log('Seed complete. Run bun run migrate if schema migrations are pending.')
   process.exit(0)
 }
 

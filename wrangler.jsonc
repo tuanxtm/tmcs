@@ -11,16 +11,16 @@
     "nodejs_compat",
     // Allow to fetch URLs in your app
     // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#global-fetch-strictly-public
-    "global_fetch_strictly_public",
+    "global_fetch_strictly_public"
   ],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS",
+    "binding": "ASSETS"
   },
   // Run Payload jobs frequently so scheduled publish/unpublish stays timely.
   // The handler calls /api/cron/jobs with CRON_SECRET (Worker secret).
   "triggers": {
-    "crons": ["*/5 * * * *"],
+    "crons": ["*/5 * * * *"]
   },
   "d1_databases": [
     {
@@ -29,28 +29,42 @@
       "database_id": "local-tmcs-dev",
       "database_name": "tmcs",
       // Use local D1 during development. Set remote:true only with a real Cloudflare database_id.
-      "remote": false,
-    },
+      "remote": false
+    }
   ],
   "services": [
     // Self-reference so the scheduled handler can call /api/cron/jobs on-Worker.
     // The service name must match this Worker's "name".
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "tmcs",
-    },
+      "service": "tmcs"
+    }
   ],
   "r2_buckets": [
     {
       "binding": "R2",
       // Replace with your real R2 bucket name from `wrangler r2 bucket create tmcs-media`
-      "bucket_name": "tmcs-media",
+      "bucket_name": "tmcs-media"
     },
-    // Optional OpenNext incremental cache bucket:
-    // {
-    //   "binding": "NEXT_INC_CACHE_R2_BUCKET",
-    //   "bucket_name": "tmcs-cache",
-    // },
+    // OpenNext incremental / data cache (create once: wrangler r2 bucket create tmcs-cache)
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "tmcs-cache"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "NEXT_TAG_CACHE_DO_SHARDED",
+        "class_name": "DOShardedTagCache"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1-opennext-tag-cache",
+      "new_sqlite_classes": ["DOShardedTagCache"]
+    }
   ],
 
   // Secrets (set via dashboard or `wrangler secret put`):
@@ -81,7 +95,8 @@
   //       { "binding": "WORKER_SELF_REFERENCE", "service": "tmcs-staging" }
   //     ],
   //     "r2_buckets": [
-  //       { "binding": "R2", "bucket_name": "tmcs-media-staging" }
+  //       { "binding": "R2", "bucket_name": "tmcs-media-staging" },
+  //       { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "tmcs-cache-staging" }
   //     ]
   //   }
   // }

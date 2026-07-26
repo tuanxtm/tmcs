@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Fanwood_Text, Geist, Geist_Mono } from 'next/font/google'
 import { headers } from 'next/headers'
 import type { Metadata } from 'next'
 
@@ -19,6 +19,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
+})
+
+const fanwoodText = Fanwood_Text({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-fanwood',
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -48,7 +55,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const shell = await getSiteShell(locale)
 
   return (
-    <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang={locale}
+      className={`${geistSans.variable} ${geistMono.variable} ${fanwoodText.variable}`}
+    >
       <body className="relative min-h-dvh text-foreground">
         <Background />
         <MotionProvider>
@@ -58,7 +68,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           >
             Skip to content
           </a>
-          <SiteHeader locale={locale} siteName={shell.siteName} navigation={shell.navigation} />
+          <SiteHeader
+            locale={locale}
+            siteName={shell.siteName}
+            navigation={shell.navigation}
+            contactEmail={shell.contactEmail}
+          />
           <div className="page-frame">
             <main id="main-content">{children}</main>
             <SiteFooter shell={shell} />

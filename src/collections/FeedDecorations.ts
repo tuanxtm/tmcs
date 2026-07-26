@@ -1,25 +1,15 @@
 import type { CollectionConfig } from 'payload'
 
-import { adminOrManager, anyone } from '@/access'
-
-export const DECORATION_PACKS = [
-  { label: 'Plant', value: 'plant' },
-  { label: 'New Year', value: 'new-year' },
-  { label: 'Christmas', value: 'christmas' },
-] as const
-
-export type DecorationPack = (typeof DECORATION_PACKS)[number]['value']
-
-const DECORATION_SHAPES = [
-  { label: '1 × 1', value: '1x1' },
-  { label: '2 × 1', value: '2x1' },
-  { label: '1 × 2', value: '1x2' },
-  { label: '2 × 2', value: '2x2' },
-] as const
+import { anyone, fieldAdminOrManager, staffOnly } from '@/access'
+import { assignUploadedBy } from '@/hooks'
+import {
+  revalidateFeedDecorations,
+  revalidateFeedDecorationsDelete,
+} from '@/hooks/revalidateFrontend'
 
 /**
- * Ornamental feed fillers (SVG markup). Media uploads disallow SVG, so art lives inline.
- * Activate a pack via Homepage → activeDecorationPack.
+ * WebP uploads for feed ornaments (R2).
+ * Compose packs via Decoration packs → Items.
  */
 export const FeedDecorations: CollectionConfig = {
   slug: 'feed-decorations',
@@ -28,70 +18,47 @@ export const FeedDecorations: CollectionConfig = {
     plural: 'Feed decorations',
   },
   admin: {
-    useAsTitle: 'title',
-    defaultColumns: ['title', 'pack', 'weight', 'updatedAt'],
-    group: 'Content',
-    description:
-      'Seasonal SVG ornaments used to fill leftover bento gaps. Swap packs from Homepage settings.',
+    useAsTitle: 'filename',
+    defaultColumns: ['filename', 'alt', 'mimeType', 'updatedAt'],
+    group: 'Decorations',
+    hidden: true,
   },
   access: {
-    create: adminOrManager,
+    create: staffOnly,
     read: anyone,
-    update: adminOrManager,
-    delete: adminOrManager,
+    update: staffOnly,
+    delete: staffOnly,
+  },
+  hooks: {
+    beforeChange: [assignUploadedBy],
+    afterChange: [revalidateFeedDecorations],
+    afterDelete: [revalidateFeedDecorationsDelete],
+  },
+  upload: {
+    crop: false,
+    focalPoint: false,
+    mimeTypes: ['image/webp'],
   },
   fields: [
     {
-      name: 'title',
+      name: 'alt',
       type: 'text',
-      required: true,
       admin: {
-        description: 'Admin label only (e.g. Monstera leaf).',
+        description: 'Optional label for admin (defaults from filename).',
       },
     },
     {
-      name: 'pack',
-      type: 'select',
-      required: true,
-      defaultValue: 'plant',
-      options: [...DECORATION_PACKS],
+      name: 'uploadedBy',
+      type: 'relationship',
+      relationTo: 'users',
+      index: true,
+      access: {
+        update: fieldAdminOrManager,
+      },
       admin: {
         position: 'sidebar',
-      },
-    },
-    {
-      name: 'svgMarkup',
-      type: 'textarea',
-      required: true,
-      admin: {
-        description:
-          'Inline SVG markup (root <svg>…</svg>). Scripts and event handlers are stripped on render.',
-        rows: 12,
-      },
-    },
-    {
-      name: 'allowedShapes',
-      type: 'select',
-      hasMany: true,
-      defaultValue: ['1x1'],
-      options: [...DECORATION_SHAPES],
-      admin: {
-        position: 'sidebar',
-        description: 'Leave empty to allow 1×1 only. Prefer 1×1 for plant ornaments.',
-      },
-    },
-    {
-      name: 'weight',
-      type: 'number',
-      defaultValue: 1,
-      min: 1,
-      max: 100,
-      admin: {
-        position: 'sidebar',
-        description: 'Higher weight = more likely to be picked.',
+        readOnly: true,
       },
     },
   ],
 }
-
-export type DecorationShape = (typeof DECORATION_SHAPES)[number]['value']

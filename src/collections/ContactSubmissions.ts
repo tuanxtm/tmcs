@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { contactStaffOnly, fieldAdminOrManager } from '@/access'
+import { CONTACT_CATEGORIES } from '@/lib/contact'
 import { LOCALE_CODES } from '@/lib/locales'
 
 /**
@@ -51,12 +52,7 @@ export const ContactSubmissions: CollectionConfig = {
     {
       name: 'category',
       type: 'select',
-      options: [
-        { label: 'General', value: 'general' },
-        { label: 'Project inquiry', value: 'project' },
-        { label: 'Speaking', value: 'speaking' },
-        { label: 'Other', value: 'other' },
-      ],
+      options: [...CONTACT_CATEGORIES],
       defaultValue: 'general',
     },
     {

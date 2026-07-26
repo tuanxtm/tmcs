@@ -1,4 +1,9 @@
+import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
+
 import type { LocaleCode } from '@/lib/locales'
+import type { StoryShape } from '@/lib/story-shapes'
+
+export type { StoryShape }
 
 export type MediaView = {
   id: number
@@ -45,9 +50,11 @@ export type SiteShellView = {
   tagline: string | null
   description: string | null
   siteUrl: string
+  contactEmail: string | null
   navigation: NavItemView[]
   footer: {
-    text: string | null
+    text: DefaultTypedEditorState | null
+    decorationImageUrl: string | null
     groups: FooterGroupView[]
     socialLinks: SocialLinkView[]
     legalLinks: NavChildView[]
@@ -69,36 +76,25 @@ export type HeroView = {
   image: MediaView | null
 }
 
-export type StoryShape = '1x1' | '2x1' | '3x1' | '1x2' | '2x2'
-
-export type DecorationPack = 'plant' | 'new-year' | 'christmas'
-
 export type EndOfFeedView = {
   enabled: boolean
-  eyebrow: string | null
-  title: string
-  message: string | null
+  text: DefaultTypedEditorState
   preferredShape: StoryShape
 }
 
-export type HomepageView = HeroView & {
+export type FrontpageView = HeroView & {
   endOfFeed: EndOfFeedView | null
-  activeDecorationPack: DecorationPack
+  activeDecorationPackId: number
 }
 
+/** Slim DTO for homepage feed tiles — only fields the UI and packer consume. */
 export type PostCardView = {
   id: number
   title: string
-  slug: string
   /** Present only when a public post detail route exists. */
   href: string | null
-  excerpt: string | null
   publishedAt: string | null
-  readingTime: number | null
-  authorName: string | null
-  categories: { id: number; title: string; slug: string }[]
   image: MediaView | null
-  featured: boolean
   cardSize: 'small' | 'wide' | 'tall' | 'large'
 }
 
@@ -108,33 +104,23 @@ export type ShortStoryCardView = {
   /** Plain text extracted from Lexical for compact tile rendering. */
   text: string
   variant: 'note' | 'quote' | 'image'
-  image: MediaView | null
   allowedShapes: StoryShape[] | null
   href: string | null
   newTab: boolean
-  publishedAt: string | null
 }
 
 export type FeedDecorationView = {
-  id: number
-  title: string
-  pack: DecorationPack
-  /** Sanitized SVG markup ready for inline render. */
-  svgMarkup: string
+  /** Pack item row id (string) or legacy numeric id in tests. */
+  id: string | number
+  packId: number
+  imageUrl: string
   allowedShapes: StoryShape[]
   weight: number
 }
 
-export type FeedTilePlacement = {
-  column: number
-  row: number
-  columnSpan: number
-  rowSpan: number
-}
-
 export type PostsPageView = {
   docs: PostCardView[]
-  page: number
-  nextPage: number | null
+  /** Opaque keyset cursor for the next page; null when exhausted. */
+  nextCursor: string | null
   hasNextPage: boolean
 }

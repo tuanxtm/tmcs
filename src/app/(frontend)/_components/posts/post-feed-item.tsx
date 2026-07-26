@@ -7,6 +7,7 @@ import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
 import type { GridPlacement } from '@/app/(frontend)/_lib/feed-packer'
+import { placementStyle } from '@/app/(frontend)/_lib/grid-placement'
 import type { PostCardView } from '@/app/(frontend)/_lib/types'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 
@@ -15,18 +16,28 @@ type PostFeedItemProps = {
   locale: LocaleCode
   index: number
   placement: GridPlacement
-  explicitPlacement?: boolean
   className?: string
+}
+
+const dateFormatters: Record<LocaleCode, Intl.DateTimeFormat> = {
+  en: new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC',
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+  }),
+  vi: new Intl.DateTimeFormat('vi-VN', {
+    timeZone: 'UTC',
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+  }),
 }
 
 function formatDate(value: string | null, locale: LocaleCode): string | null {
   if (!value) return null
   try {
-    const date = new Date(value)
-    const dd = String(date.getUTCDate()).padStart(2, '0')
-    const mm = String(date.getUTCMonth() + 1).padStart(2, '0')
-    const yy = String(date.getUTCFullYear()).slice(-2)
-    return locale === 'vi' ? `${dd}/${mm}/${yy}` : `${mm}/${dd}/${yy}`
+    return dateFormatters[locale].format(new Date(value))
   } catch {
     return null
   }
@@ -47,7 +58,6 @@ export function PostFeedItem({
   locale,
   index,
   placement,
-  explicitPlacement = true,
   className,
 }: PostFeedItemProps) {
   const reduceMotion = useReducedMotion()
@@ -98,27 +108,17 @@ export function PostFeedItem({
             aria-hidden="true"
             className={cn(
               'absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent backdrop-blur-md',
-              '[mask-image:linear-gradient(to_top,black_45%,transparent)]',
-              '[-webkit-mask-image:linear-gradient(to_top,black_45%,transparent)]',
+              '[mask-image:linear-gradient(to_top,black_55%,transparent)]',
+              '[-webkit-mask-image:linear-gradient(to_top,black_55%,transparent)]',
             )}
           />
-          <div className="relative px-2 pb-2 pt-8">
+          <div className="relative px-2 pb-2 pt-5">
             <h3 className="text-sm font-medium leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary group-focus-within:text-primary md:text-base">
               {post.title}
             </h3>
-            <p className="mt-1 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-foreground/70 transition-colors group-hover:text-primary/70 group-focus-within:text-primary/70">
-              {[
-                post.readingTime ? `${post.readingTime} min` : null,
-                post.categories[0]?.title,
-              ]
-                .filter(Boolean)
-                .join(' · ')}
-            </p>
           </div>
         </div>
       </div>
-
-      <span className="sr-only">{post.title}</span>
     </div>
   )
 
@@ -129,12 +129,7 @@ export function PostFeedItem({
     className,
   )
 
-  const style = explicitPlacement
-    ? ({
-        gridColumn: `${placement.column + 1} / span ${placement.columnSpan}`,
-        gridRow: `${placement.row + 1} / span ${placement.rowSpan}`,
-      } as React.CSSProperties)
-    : undefined
+  const style = placementStyle(placement)
 
   if (post.href) {
     return (
@@ -157,7 +152,6 @@ export function PostFeedItem({
     <motion.article
       className={shellClass}
       style={style}
-      tabIndex={0}
       initial={reduceMotion ? false : { opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}

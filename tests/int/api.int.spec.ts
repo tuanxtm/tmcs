@@ -33,7 +33,7 @@ describe('API smoke', () => {
 
   it('has expected globals', async () => {
     expect(payload.config.globals.map((g) => g.slug)).toEqual(
-      expect.arrayContaining(['site-settings', 'navigation', 'footer', 'homepage']),
+      expect.arrayContaining(['site-settings', 'navigation', 'footer', 'frontpage']),
     )
   })
 

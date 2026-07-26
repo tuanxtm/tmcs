@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 
 import { adminOrManager, anyone } from '@/access'
 import { linkFields } from '@/fields/common'
+import { revalidateSiteShellGlobal } from '@/hooks/revalidateFrontend'
 
 export const Navigation: GlobalConfig = {
   slug: 'navigation',
@@ -13,6 +14,9 @@ export const Navigation: GlobalConfig = {
     read: anyone,
     update: adminOrManager,
     readVersions: adminOrManager,
+  },
+  hooks: {
+    afterChange: [revalidateSiteShellGlobal],
   },
   versions: {
     max: 25,

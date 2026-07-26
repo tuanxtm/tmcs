@@ -1,0 +1,13 @@
+/* Match frontend fonts in Admin (frontend loads these via next/font). */
+@import url('https://fonts.googleapis.com/css2?family=Fanwood+Text:ital@0;1&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
+
+:root {
+  /* Payload Admin UI */
+  --font-body: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+  --font-serif: 'Fanwood Text', ui-serif, Georgia, serif;
+
+  /* Lexical TextState (footer richText, etc.) */
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-fanwood: 'Fanwood Text', ui-serif, Georgia, serif;
+}

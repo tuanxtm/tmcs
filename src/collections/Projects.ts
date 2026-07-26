@@ -11,7 +11,7 @@ import {
 import { ownerField, publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
 import { assignOwner, preventCreatorPublish, setPublishedAt } from '@/hooks'
-import { getServerURL } from '@/lib/env'
+import { buildPreviewUrl } from '@/lib/preview'
 import { validateAbsoluteHttpUrl } from '@/lib/url'
 
 export const Projects: CollectionConfig = {
@@ -27,15 +27,12 @@ export const Projects: CollectionConfig = {
     // Preview URL prepared for future frontend; public preview page is deferred.
     preview: (doc, { locale }) => {
       const slug = typeof doc?.slug === 'string' ? doc.slug : ''
-      const base = getServerURL()
-      return `${base}/preview/projects/${slug}?locale=${locale || 'en'}`
+      return buildPreviewUrl('projects', slug, locale)
     },
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 375,
-      },
+      // Autosave disabled — avoids D1 write storms while typing in Admin (Worker cost).
       schedulePublish: true,
       validate: false,
     },
@@ -53,110 +50,153 @@ export const Projects: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      localized: true,
-    },
-    slugField({
-      name: 'slug',
-      useAsSlug: 'title',
-      localized: true,
-      required: true,
-    }),
-    {
-      name: 'summary',
-      type: 'textarea',
-      localized: true,
-      required: true,
-    },
-    {
-      name: 'challenge',
-      type: 'textarea',
-      localized: true,
-    },
-    {
-      name: 'solution',
-      type: 'textarea',
-      localized: true,
-    },
-    {
-      name: 'outcome',
-      type: 'textarea',
-      localized: true,
-    },
-    {
-      name: 'content',
-      type: 'richText',
-      localized: true,
-    },
-    {
-      name: 'coverImage',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'gallery',
-      type: 'array',
-      fields: [
+      type: 'tabs',
+      tabs: [
         {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          required: true,
+          label: 'Content',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              localized: true,
+            },
+            slugField({
+              name: 'slug',
+              useAsSlug: 'title',
+              localized: true,
+              required: true,
+            }),
+            {
+              name: 'summary',
+              type: 'textarea',
+              localized: true,
+              required: true,
+            },
+            {
+              name: 'challenge',
+              type: 'textarea',
+              localized: true,
+            },
+            {
+              name: 'solution',
+              type: 'textarea',
+              localized: true,
+            },
+            {
+              name: 'outcome',
+              type: 'textarea',
+              localized: true,
+            },
+            {
+              name: 'content',
+              type: 'richText',
+              localized: true,
+            },
+            {
+              name: 'coverImage',
+              type: 'upload',
+              relationTo: 'media',
+            },
+            {
+              name: 'gallery',
+              type: 'array',
+              fields: [
+                {
+                  name: 'image',
+                  type: 'upload',
+                  relationTo: 'media',
+                  required: true,
+                },
+                {
+                  name: 'caption',
+                  type: 'text',
+                  localized: true,
+                },
+              ],
+            },
+            {
+              name: 'demoUrl',
+              type: 'text',
+              validate: validateAbsoluteHttpUrl,
+            },
+            {
+              name: 'repositoryUrl',
+              type: 'text',
+              validate: validateAbsoluteHttpUrl,
+              admin: {
+                description: 'Hide or omit if the repository is private/confidential.',
+              },
+            },
+            {
+              name: 'documentationUrl',
+              type: 'text',
+              validate: validateAbsoluteHttpUrl,
+            },
+            {
+              name: 'repositoryPrivate',
+              type: 'checkbox',
+              defaultValue: false,
+              label: 'Repository is private (do not show link publicly)',
+            },
+            {
+              name: 'client',
+              type: 'text',
+              localized: true,
+            },
+            {
+              name: 'clientConfidential',
+              type: 'checkbox',
+              defaultValue: false,
+              label: 'Client name is confidential',
+            },
+            {
+              name: 'projectType',
+              type: 'select',
+              options: [
+                { label: 'Web app', value: 'web' },
+                { label: 'Mobile', value: 'mobile' },
+                { label: 'Library', value: 'library' },
+                { label: 'Infrastructure', value: 'infra' },
+                { label: 'Design', value: 'design' },
+                { label: 'Other', value: 'other' },
+              ],
+            },
+            {
+              name: 'relatedProjects',
+              type: 'relationship',
+              relationTo: 'projects',
+              hasMany: true,
+              filterOptions: ({ id }) => {
+                if (!id) return true
+                return { id: { not_equals: id } }
+              },
+            },
+            {
+              name: 'results',
+              type: 'array',
+              label: 'Measurable results',
+              fields: [
+                {
+                  name: 'label',
+                  type: 'text',
+                  required: true,
+                  localized: true,
+                },
+                {
+                  name: 'value',
+                  type: 'text',
+                  required: true,
+                  localized: true,
+                },
+              ],
+            },
+          ],
         },
         {
-          name: 'caption',
-          type: 'text',
-          localized: true,
+          label: 'SEO',
+          fields: [seoFields({ includeArticleFields: false, embeddedInTab: true })],
         },
-      ],
-    },
-    {
-      name: 'demoUrl',
-      type: 'text',
-      validate: validateAbsoluteHttpUrl,
-    },
-    {
-      name: 'repositoryUrl',
-      type: 'text',
-      validate: validateAbsoluteHttpUrl,
-      admin: {
-        description: 'Hide or omit if the repository is private/confidential.',
-      },
-    },
-    {
-      name: 'documentationUrl',
-      type: 'text',
-      validate: validateAbsoluteHttpUrl,
-    },
-    {
-      name: 'repositoryPrivate',
-      type: 'checkbox',
-      defaultValue: false,
-      label: 'Repository is private (do not show link publicly)',
-    },
-    {
-      name: 'client',
-      type: 'text',
-      localized: true,
-    },
-    {
-      name: 'clientConfidential',
-      type: 'checkbox',
-      defaultValue: false,
-      label: 'Client name is confidential',
-    },
-    {
-      name: 'projectType',
-      type: 'select',
-      options: [
-        { label: 'Web app', value: 'web' },
-        { label: 'Mobile', value: 'mobile' },
-        { label: 'Library', value: 'library' },
-        { label: 'Infrastructure', value: 'infra' },
-        { label: 'Design', value: 'design' },
-        { label: 'Other', value: 'other' },
       ],
     },
     {
@@ -188,35 +228,6 @@ export const Projects: CollectionConfig = {
       },
     },
     {
-      name: 'relatedProjects',
-      type: 'relationship',
-      relationTo: 'projects',
-      hasMany: true,
-      filterOptions: ({ id }) => {
-        if (!id) return true
-        return { id: { not_equals: id } }
-      },
-    },
-    {
-      name: 'results',
-      type: 'array',
-      label: 'Measurable results',
-      fields: [
-        {
-          name: 'label',
-          type: 'text',
-          required: true,
-          localized: true,
-        },
-        {
-          name: 'value',
-          type: 'text',
-          required: true,
-          localized: true,
-        },
-      ],
-    },
-    {
       name: 'author',
       type: 'relationship',
       relationTo: 'authors',
@@ -244,6 +255,5 @@ export const Projects: CollectionConfig = {
     publishedAtField(),
     ownerField(),
     translationReadyField(),
-    seoFields({ includeArticleFields: false }),
   ],
 }

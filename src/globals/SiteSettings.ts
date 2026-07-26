@@ -3,6 +3,7 @@ import type { GlobalConfig } from 'payload'
 import { adminOrManager, anyone, fieldAdminOrManager } from '@/access'
 import { socialLinkFields } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
+import { revalidateSiteShellGlobal } from '@/hooks/revalidateFrontend'
 import { validateAbsoluteHttpUrl } from '@/lib/url'
 
 export const SiteSettings: GlobalConfig = {
@@ -16,6 +17,9 @@ export const SiteSettings: GlobalConfig = {
     read: anyone,
     update: adminOrManager,
     readVersions: adminOrManager,
+  },
+  hooks: {
+    afterChange: [revalidateSiteShellGlobal],
   },
   versions: {
     max: 25,

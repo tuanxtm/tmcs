@@ -10,14 +10,20 @@ import { validateAbsoluteHttpUrl } from '@/lib/url'
  * (metadata, canonical, OG/Twitter, robots, JSON-LD). Rendering itself
  * is deferred to the frontend phase.
  */
-export const seoFields = (options?: { includeArticleFields?: boolean }): Field => {
+export const seoFields = (options?: {
+  includeArticleFields?: boolean
+  /** Hide the group label when placed inside an SEO tab. */
+  embeddedInTab?: boolean
+}): Field => {
   const includeArticleFields = options?.includeArticleFields ?? true
+  const embeddedInTab = options?.embeddedInTab ?? false
 
   return {
     name: 'seo',
     type: 'group',
-    label: 'SEO',
+    label: embeddedInTab ? false : 'SEO',
     admin: {
+      hideGutter: embeddedInTab,
       description:
         'Search and social metadata. Frontend rendering (meta tags, sitemap, hreflang) comes later.',
     },

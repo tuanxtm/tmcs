@@ -1,21 +1,27 @@
 import type { GlobalConfig } from 'payload'
 
 import { adminOrManager, anyone } from '@/access'
+import { slimRichTextEditor } from '@/fields/slimRichText'
+import { revalidateFrontpageGlobal } from '@/hooks/revalidateFrontend'
+import { STORY_SHAPE_OPTIONS } from '@/lib/story-shapes'
 
-export const Homepage: GlobalConfig = {
-  slug: 'homepage',
-  label: 'Homepage',
+export const Frontpage: GlobalConfig = {
+  slug: 'frontpage',
+  label: 'Frontpage',
   admin: {
     group: 'Settings',
-    description: 'Curated homepage content. No frontend styling controls.',
+    description: 'Curated frontpage content. No frontend styling controls.',
   },
   access: {
     read: anyone,
     update: adminOrManager,
     readVersions: adminOrManager,
   },
+  hooks: {
+    afterChange: [revalidateFrontpageGlobal],
+  },
   versions: {
-    max: 25,
+    max: 10,
   },
   fields: [
     {
@@ -53,16 +59,12 @@ export const Homepage: GlobalConfig = {
     },
     {
       name: 'activeDecorationPack',
-      type: 'select',
-      defaultValue: 'plant',
-      options: [
-        { label: 'Plant', value: 'plant' },
-        { label: 'New Year', value: 'new-year' },
-        { label: 'Christmas', value: 'christmas' },
-      ],
+      type: 'relationship',
+      relationTo: 'decoration-packs',
+      required: true,
       admin: {
         description:
-          'Which Feed decorations pack fills leftover bento gaps. Add items under Content → Feed decorations.',
+          'Which decoration pack fills leftover bento gaps and supplies the footer SVG via its footer item.',
       },
     },
     {
@@ -70,7 +72,7 @@ export const Homepage: GlobalConfig = {
       type: 'group',
       admin: {
         description:
-          'Single closing tile shown once at the end of the homepage feed. Not packed from Short stories.',
+          'Single closing tile shown once at the end of the frontpage feed. Not packed from Short stories.',
       },
       fields: [
         {
@@ -80,44 +82,26 @@ export const Homepage: GlobalConfig = {
           label: 'Show end-of-feed tile',
         },
         {
-          name: 'eyebrow',
-          type: 'text',
+          name: 'text',
+          type: 'richText',
           localized: true,
-          defaultValue: 'End of feed',
+          editor: slimRichTextEditor,
           admin: {
             condition: (_, siblingData) => Boolean(siblingData?.enabled),
           },
-        },
-        {
-          name: 'title',
-          type: 'text',
-          localized: true,
-          required: true,
-          defaultValue: 'Thanks for reading',
-          admin: {
-            condition: (_, siblingData) => Boolean(siblingData?.enabled),
-          },
-        },
-        {
-          name: 'message',
-          type: 'textarea',
-          localized: true,
-          admin: {
-            condition: (_, siblingData) => Boolean(siblingData?.enabled),
-            description: 'Short note — keep it compact for a feed tile.',
+          validate: (value, { siblingData }) => {
+            const sibling = siblingData as { enabled?: boolean | null } | undefined
+            if (sibling?.enabled && !value) {
+              return 'Text is required when the closing tile is enabled.'
+            }
+            return true
           },
         },
         {
           name: 'preferredShape',
           type: 'select',
           defaultValue: '2x1',
-          options: [
-            { label: '1 × 1', value: '1x1' },
-            { label: '2 × 1', value: '2x1' },
-            { label: '3 × 1', value: '3x1' },
-            { label: '1 × 2', value: '1x2' },
-            { label: '2 × 2', value: '2x2' },
-          ],
+          options: [...STORY_SHAPE_OPTIONS],
           admin: {
             condition: (_, siblingData) => Boolean(siblingData?.enabled),
             description: 'Preferred footprint. Falls back to the largest shape that fits the last gap.',

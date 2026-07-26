@@ -9,20 +9,16 @@ import {
   TABLET_COLUMNS,
 } from '@/app/(frontend)/_lib/feed-packer'
 import { resolvePostCardSize } from '@/app/(frontend)/_lib/post-card-layout'
-import type { PostCardView, ShortStoryCardView } from '@/app/(frontend)/_lib/types'
+import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
+
+import type { EndOfFeedView, PostCardView, ShortStoryCardView } from '@/app/(frontend)/_lib/types'
 
 function makePost(overrides: Partial<PostCardView> & Pick<PostCardView, 'id' | 'cardSize'>): PostCardView {
   return {
     title: `Post ${overrides.id}`,
-    slug: `post-${overrides.id}`,
     href: null,
-    excerpt: null,
     publishedAt: '2026-01-01T00:00:00.000Z',
-    readingTime: 3,
-    authorName: 'Author',
-    categories: [],
     image: null,
-    featured: false,
     ...overrides,
   }
 }
@@ -34,11 +30,9 @@ function makeStory(
     title: `Story ${overrides.id}`,
     text: `Body for story ${overrides.id}`,
     variant: 'note',
-    image: null,
     allowedShapes: null,
     href: null,
     newTab: false,
-    publishedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
   }
 }
@@ -78,12 +72,25 @@ describe('resolvePostCardSize', () => {
 })
 
 describe('feed packer', () => {
-  const closing = {
+  const closing: EndOfFeedView = {
     enabled: true,
-    eyebrow: 'End of feed',
-    title: 'Thanks for reading',
-    message: 'Come back later.',
-    preferredShape: '2x1' as const,
+    text: {
+      root: {
+        type: 'root',
+        children: [
+          {
+            type: 'paragraph',
+            children: [{ type: 'text', text: 'Thanks for reading', version: 1 }],
+            version: 1,
+          },
+        ],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        version: 1,
+      },
+    } as DefaultTypedEditorState,
+    preferredShape: '2x1',
   }
 
   it('packs posts and fills closed gaps with unique stories', () => {
@@ -188,7 +195,9 @@ describe('feed packer', () => {
     const storiesPlaced = sealed.tiles.filter((tile) => tile.kind === 'story')
     expect(closings).toHaveLength(1)
     expect(storiesPlaced).toHaveLength(0)
-    expect(closings[0]?.title).toBe('Thanks for reading')
+    expect(closings[0]?.text.root.children[0]).toMatchObject({
+      type: 'paragraph',
+    })
   })
 
   it('fills leftover holes with decorations', () => {
@@ -201,9 +210,8 @@ describe('feed packer', () => {
     const stories = Array.from({ length: 8 }, (_, index) => makeStory({ id: index + 1 }))
     const decorations = Array.from({ length: 4 }, (_, index) => ({
       id: index + 1,
-      title: `Plant ${index + 1}`,
-      pack: 'plant' as const,
-      svgMarkup: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg>',
+      packId: 1,
+      imageUrl: `/plant-${index + 1}.webp`,
       allowedShapes: ['1x1'] as const,
       weight: 1,
     })).map((d) => ({ ...d, allowedShapes: [...d.allowedShapes] }))

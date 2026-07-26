@@ -11,7 +11,8 @@ import {
 import { ownerField, publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
 import { assignOwner, preventCreatorPublish, setPublishedAt, setReadingTime } from '@/hooks'
-import { getServerURL } from '@/lib/env'
+import { revalidatePosts, revalidatePostsDelete } from '@/hooks/revalidateFrontend'
+import { buildPreviewUrl } from '@/lib/preview'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -26,16 +27,13 @@ export const Posts: CollectionConfig = {
     // Preview URL is prepared for the future frontend; the public preview page is deferred.
     preview: (doc, { locale }) => {
       const slug = typeof doc?.slug === 'string' ? doc.slug : ''
-      const base = getServerURL()
       // Frontend follow-up: implement /preview/posts/[slug] with draft mode auth.
-      return `${base}/preview/posts/${slug}?locale=${locale || 'en'}`
+      return buildPreviewUrl('posts', slug, locale)
     },
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 375,
-      },
+      // Autosave disabled — avoids D1 write storms while typing in Admin (Worker cost).
       schedulePublish: true,
       validate: false,
     },
@@ -50,48 +48,78 @@ export const Posts: CollectionConfig = {
   },
   hooks: {
     beforeChange: [assignOwner, preventCreatorPublish, setPublishedAt, setReadingTime],
+    afterChange: [revalidatePosts],
+    afterDelete: [revalidatePostsDelete],
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      localized: true,
-    },
-    slugField({
-      name: 'slug',
-      useAsSlug: 'title',
-      localized: true,
-      required: true,
-    }),
-    {
-      name: 'excerpt',
-      type: 'textarea',
-      localized: true,
-      admin: {
-        description: 'Short summary used in listings and SEO fallbacks.',
-      },
-    },
-    {
-      name: 'content',
-      type: 'richText',
-      localized: true,
-      required: true,
-    },
-    {
-      name: 'featuredImage',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'gallery',
-      type: 'array',
-      fields: [
+      type: 'tabs',
+      tabs: [
         {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          required: true,
+          label: 'Content',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              localized: true,
+            },
+            slugField({
+              name: 'slug',
+              useAsSlug: 'title',
+              localized: true,
+              required: true,
+            }),
+            {
+              name: 'excerpt',
+              type: 'textarea',
+              localized: true,
+              admin: {
+                description: 'Short summary used in listings and SEO fallbacks.',
+              },
+            },
+            {
+              name: 'content',
+              type: 'richText',
+              localized: true,
+              required: true,
+            },
+            {
+              name: 'featuredImage',
+              type: 'upload',
+              relationTo: 'media',
+            },
+            {
+              name: 'gallery',
+              type: 'array',
+              fields: [
+                {
+                  name: 'image',
+                  type: 'upload',
+                  relationTo: 'media',
+                  required: true,
+                },
+              ],
+            },
+            {
+              name: 'relatedPosts',
+              type: 'relationship',
+              relationTo: 'posts',
+              hasMany: true,
+              filterOptions: ({ id }) => {
+                if (!id) return true
+                return {
+                  id: {
+                    not_equals: id,
+                  },
+                }
+              },
+            },
+          ],
+        },
+        {
+          label: 'SEO',
+          fields: [seoFields({ includeArticleFields: true, embeddedInTab: true })],
         },
       ],
     },
@@ -122,20 +150,6 @@ export const Posts: CollectionConfig = {
       },
     },
     {
-      name: 'relatedPosts',
-      type: 'relationship',
-      relationTo: 'posts',
-      hasMany: true,
-      filterOptions: ({ id }) => {
-        if (!id) return true
-        return {
-          id: {
-            not_equals: id,
-          },
-        }
-      },
-    },
-    {
       name: 'featured',
       type: 'checkbox',
       defaultValue: false,
@@ -158,7 +172,6 @@ export const Posts: CollectionConfig = {
           'Homepage bento footprint. Auto derives size from featured status, image aspect ratio, and a stable ID hash.',
       },
     },
-
     {
       name: 'readingTime',
       type: 'number',
@@ -179,6 +192,5 @@ export const Posts: CollectionConfig = {
     },
     ownerField(),
     translationReadyField(),
-    seoFields({ includeArticleFields: true }),
   ],
 }

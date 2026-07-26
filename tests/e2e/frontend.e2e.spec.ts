@@ -33,8 +33,13 @@ test.describe('Frontend homepage', () => {
     await page.goto('http://localhost:3000/')
     const hero = page.locator('section[aria-labelledby="hero-heading"]')
     await expect(hero).toBeVisible()
-    const grid = hero.locator('.lg\\:grid').first()
+    const grid = hero.locator('.lg\\:grid-cols-2').first()
     await expect(grid).toBeVisible()
+    // Image panel precedes the text panel in DOM order.
+    const panels = grid.locator(':scope > div')
+    await expect(panels).toHaveCount(2)
+    await expect(panels.nth(0).locator('#hero-heading')).toHaveCount(0)
+    await expect(panels.nth(1).locator('#hero-heading')).toHaveCount(1)
   })
 
   test('desktop post feed uses a four-column bento grid', async ({ page }) => {

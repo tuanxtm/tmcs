@@ -6,7 +6,7 @@ import Link from 'next/link'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
-import { homeHref } from '@/app/(frontend)/_lib/locale'
+import { homeHref, localePath } from '@/app/(frontend)/_lib/locale'
 import type { NavItemView } from '@/app/(frontend)/_lib/types'
 
 import { DesktopNav } from './desktop-nav'
@@ -16,9 +16,10 @@ type SiteHeaderProps = {
   locale: LocaleCode
   siteName: string
   navigation: NavItemView[]
+  contactEmail: string | null
 }
 
-export function SiteHeader({ locale, siteName, navigation }: SiteHeaderProps) {
+export function SiteHeader({ locale, siteName, navigation, contactEmail }: SiteHeaderProps) {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -27,6 +28,10 @@ export function SiteHeader({ locale, siteName, navigation }: SiteHeaderProps) {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  const contactHref = contactEmail
+    ? `mailto:${contactEmail}`
+    : localePath(locale, '/contact')
 
   return (
     <header className="dash-b sticky top-0 z-40 bg-transparent">
@@ -41,13 +46,22 @@ export function SiteHeader({ locale, siteName, navigation }: SiteHeaderProps) {
         >
           <Link
             href={homeHref(locale)}
-            className="p-2 font-mono font-bold text-sm uppercase tracking-[0.18em] transition-opacity hover:opacity-70"
+            translate="no"
+            className="p-2 font-mono text-sm font-bold uppercase tracking-[0.18em] transition-opacity hover:opacity-70"
           >
             {siteName}
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center self-stretch">
             <DesktopNav items={navigation} />
+            <div className="dash-l flex items-center self-stretch px-4">
+              <Link
+                href={contactHref}
+                className="inline-flex items-center justify-center text-foreground px-3 py-1.5 font-sans text-xs font-medium uppercase no-underline transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Contact
+              </Link>
+            </div>
             <MobileNav items={navigation} siteName={siteName} />
           </div>
         </div>

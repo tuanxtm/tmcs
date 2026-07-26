@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { hashWithSecret } from '@/lib/crypto'
+import { CONTACT_CATEGORY_VALUES, type ContactCategory } from '@/lib/contact'
 import { getContactHashSecret, getServerURL } from '@/lib/env'
 import { isLocaleCode } from '@/lib/locales'
 
@@ -97,8 +98,8 @@ export async function POST(request: Request): Promise<Response> {
   const locale = isLocaleCode(body.locale) ? body.locale : 'en'
   const category =
     typeof body.category === 'string' &&
-    ['general', 'project', 'speaking', 'other'].includes(body.category)
-      ? (body.category as 'general' | 'project' | 'speaking' | 'other')
+    (CONTACT_CATEGORY_VALUES as readonly string[]).includes(body.category)
+      ? (body.category as ContactCategory)
       : 'general'
 
   let sourcePage: string | undefined

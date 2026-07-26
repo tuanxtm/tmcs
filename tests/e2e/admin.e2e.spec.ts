@@ -64,9 +64,11 @@ test.describe('Admin Panel — Manager role', () => {
     await page.goto('http://localhost:3000/admin/collections/posts')
     await expect(page.locator('h1', { hasText: 'Posts' }).first()).toBeVisible()
 
+    // Users is hidden from the nav for non-admins; deep links render Admin "Not Found".
+    await expect(page.locator('nav a[href="/admin/collections/users"]')).toHaveCount(0)
+
     await page.goto('http://localhost:3000/admin/collections/users')
-    // Users collection is hidden for non-admins; expect redirect or forbidden/empty
-    await expect(page).not.toHaveURL(/\/admin\/collections\/users$/)
+    await expect(page.locator('h1', { hasText: 'Nothing found' }).first()).toBeVisible()
   })
 })
 
