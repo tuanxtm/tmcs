@@ -1,6 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
-import { anyone, fieldAdminOrManager, staffOnly } from '@/access'
+import {
+  anyone,
+  canDeleteOwnMedia,
+  canUpdateOwnMedia,
+  fieldAdminOrManager,
+  staffOnly,
+} from '@/access'
 import { assignUploadedBy } from '@/hooks'
 import {
   revalidateFeedDecorations,
@@ -10,6 +16,7 @@ import {
 /**
  * WebP uploads for feed ornaments (R2).
  * Compose packs via Decoration packs → Items.
+ * Creators may create ornaments and update/delete only their own (same as Media).
  */
 export const FeedDecorations: CollectionConfig = {
   slug: 'feed-decorations',
@@ -26,8 +33,8 @@ export const FeedDecorations: CollectionConfig = {
   access: {
     create: staffOnly,
     read: anyone,
-    update: staffOnly,
-    delete: staffOnly,
+    update: canUpdateOwnMedia,
+    delete: canDeleteOwnMedia,
   },
   hooks: {
     beforeChange: [assignUploadedBy],
