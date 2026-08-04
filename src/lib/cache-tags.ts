@@ -4,8 +4,11 @@
  */
 export const CACHE_TAGS = {
   siteShell: 'site-shell',
-  frontpage: 'frontpage',
+  pages: 'pages',
   posts: 'posts',
+  projects: 'projects',
+  things: 'things',
+  videos: 'videos',
   shortStories: 'short-stories',
   decorationPacks: 'decoration-packs',
   media: 'media',

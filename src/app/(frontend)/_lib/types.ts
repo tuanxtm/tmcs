@@ -37,13 +37,6 @@ export type FooterGroupView = {
   links: NavChildView[]
 }
 
-export type SocialLinkView = {
-  id: string
-  platform: string
-  url: string
-  label: string
-}
-
 export type SiteShellView = {
   locale: LocaleCode
   siteName: string
@@ -51,15 +44,17 @@ export type SiteShellView = {
   description: string | null
   siteUrl: string
   contactEmail: string | null
+  /** Website / social links from Site Settings (for contact dialogs, etc.). */
+  profileLinks: NavChildView[]
   navigation: NavItemView[]
   footer: {
     text: DefaultTypedEditorState | null
     decorationImageUrl: string | null
     groups: FooterGroupView[]
-    socialLinks: SocialLinkView[]
     legalLinks: NavChildView[]
     copyright: string | null
   }
+  activeDecorationPackId: number
   robotsIndex: boolean
   defaultSocialImage: MediaView | null
   seo: {
@@ -70,24 +65,15 @@ export type SiteShellView = {
 }
 
 export type HeroView = {
-  heading: string
-  subheading: string | null
-  profileSummary: string | null
+  siteName: string
+  tagline: string | null
   image: MediaView | null
+  coverImage: MediaView | null
+  bio: DefaultTypedEditorState | null
+  links: NavChildView[]
 }
 
-export type EndOfFeedView = {
-  enabled: boolean
-  text: DefaultTypedEditorState
-  preferredShape: StoryShape
-}
-
-export type FrontpageView = HeroView & {
-  endOfFeed: EndOfFeedView | null
-  activeDecorationPackId: number
-}
-
-/** Slim DTO for homepage feed tiles — only fields the UI and packer consume. */
+/** Slim DTO for homepage feed tiles — only fields the UI consumes. */
 export type PostCardView = {
   id: number
   title: string
@@ -95,7 +81,39 @@ export type PostCardView = {
   href: string | null
   publishedAt: string | null
   image: MediaView | null
-  cardSize: 'small' | 'wide' | 'tall' | 'large'
+}
+
+export type ProjectCardView = {
+  id: number
+  title: string
+  /** Present only when a public project detail route exists. */
+  href: string | null
+  publishedAt: string | null
+  image: MediaView | null
+}
+
+export type ThingCardView = {
+  id: number
+  name: string
+  description: string | null
+  primaryImage: MediaView | null
+  detailImage: MediaView | null
+  affiliateUrl: string | null
+  linkLabel: string | null
+  publishedAt: string | null
+}
+
+export type VideoProvider = 'youtube' | 'tiktok' | 'instagram' | 'other'
+
+export type VideoCardView = {
+  id: number
+  title: string
+  provider: VideoProvider
+  sourceUrl: string
+  /** Parsed YouTube id when provider is youtube; otherwise null. */
+  youtubeId: string | null
+  publishedAt: string | null
+  image: MediaView | null
 }
 
 export type ShortStoryCardView = {
@@ -123,4 +141,131 @@ export type PostsPageView = {
   /** Opaque keyset cursor for the next page; null when exhausted. */
   nextCursor: string | null
   hasNextPage: boolean
+}
+
+export type ProjectsPageView = {
+  docs: ProjectCardView[]
+  /** Opaque keyset cursor for the next page; null when exhausted. */
+  nextCursor: string | null
+  hasNextPage: boolean
+}
+
+export type VideosPageView = {
+  docs: VideoCardView[]
+  nextCursor: string | null
+  hasNextPage: boolean
+}
+
+export type PageSeoView = {
+  metaTitle: string | null
+  metaDescription: string | null
+  ogImage: MediaView | null
+  canonicalUrl: string | null
+  noIndex: boolean
+  noFollow: boolean
+}
+
+export type HeroBlockView = {
+  blockType: 'hero'
+  id: string
+  label: string | null
+  title: string
+  tagline: string | null
+  bio: DefaultTypedEditorState | null
+  coverImage: MediaView | null
+  profileImage: MediaView | null
+  links: NavChildView[]
+  cursorPopup: string | null
+}
+
+export type FeedType = 'posts' | 'projects' | 'things' | 'videos'
+
+export type FeedPaginationMode = 'static' | 'infinite'
+
+type FeedSectionBase = {
+  blockType: 'feedSection'
+  id: string
+  heading: string
+  description: string | null
+  pagination: FeedPaginationMode
+  nextCursor: string | null
+  hasNextPage: boolean
+  showViewAll: boolean
+  viewAllLabel: string | null
+  viewAllHref: string | null
+  cursorPopup: string | null
+  cursorPopupEmpty: string | null
+  cursorPopupItem: string | null
+  cursorPopupViewAll: string | null
+}
+
+export type FeedSectionBlockView =
+  | (FeedSectionBase & {
+      feedType: 'posts'
+      docs: PostCardView[]
+    })
+  | (FeedSectionBase & {
+      feedType: 'projects'
+      docs: ProjectCardView[]
+    })
+  | (FeedSectionBase & {
+      feedType: 'things'
+      docs: ThingCardView[]
+    })
+  | (FeedSectionBase & {
+      feedType: 'videos'
+      docs: VideoCardView[]
+    })
+
+export type RichTextBlockView = {
+  blockType: 'richText'
+  id: string
+  content: DefaultTypedEditorState
+}
+
+export type MediaBlockView = {
+  blockType: 'media'
+  id: string
+  media: MediaView
+  caption: string | null
+}
+
+export type CallToActionBlockView = {
+  blockType: 'callToAction'
+  id: string
+  heading: string
+  body: string | null
+  links: NavChildView[]
+}
+
+export type ProjectsGridBlockView = {
+  blockType: 'projectsGrid'
+  id: string
+  heading: string | null
+  docs: ProjectCardView[]
+}
+
+export type ResolvedBlockView =
+  | HeroBlockView
+  | FeedSectionBlockView
+  | RichTextBlockView
+  | MediaBlockView
+  | CallToActionBlockView
+  | ProjectsGridBlockView
+
+export type CmsPageView = {
+  title: string
+  summary: string | null
+  slug: string
+  template: 'home' | 'about' | 'contact' | 'generic'
+  heroMedia: MediaView | null
+  seo: PageSeoView
+  blocks: ResolvedBlockView[]
+  /** Alternate-locale path when a localized sibling slug exists; otherwise null. */
+  alternateSlug: string | null
+}
+
+export type HomePageView = CmsPageView & {
+  /** True when constructed from site-settings + latest feeds because no published home page exists. */
+  usedFallback: boolean
 }

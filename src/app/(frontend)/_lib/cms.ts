@@ -2,38 +2,44 @@ import { cache } from 'react'
 import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
 
-import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
-
 import { CACHE_TAGS } from '@/lib/cache-tags'
 import { getServerURL } from '@/lib/env'
 import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
 import { lexicalToPlainText } from '@/lib/readingTime'
-import type { StoryShape } from '@/lib/story-shapes'
-import type { DecorationPack, FeedDecoration, Media, Page, Post, ShortStory } from '@/payload-types'
+import type { DecorationPack, FeedDecoration, Media, Page, Post, Project, ShortStory, Thing, Video } from '@/payload-types'
 import config from '@payload-config'
 
 import { resolveCmsLink } from './links'
-import { resolvePostCardSize } from './post-card-layout'
 import { cursorFromPost, decodePostsCursor } from './posts-cursor'
 import type {
   FeedDecorationView,
   FooterGroupView,
-  FrontpageView,
   MediaView,
   NavChildView,
   NavItemView,
   PostCardView,
   PostsPageView,
+  ProjectCardView,
+  ProjectsPageView,
+  HeroView,
   ShortStoryCardView,
   SiteShellView,
-  SocialLinkView,
+  ThingCardView,
+  VideoCardView,
+  VideoProvider,
+  VideosPageView,
 } from './types'
+import { parseYouTubeVideoId } from '@/lib/youtube'
 
-export const POSTS_PAGE_SIZE = 6
+export const POSTS_PAGE_SIZE = 11
+export const PROJECTS_PAGE_SIZE = 11
+export const VIDEOS_PAGE_SIZE = 11
 export const SHORT_STORIES_POOL_LIMIT = 48
 export const FEED_DECORATIONS_POOL_LIMIT = 48
 export const FEED_POOL_LIMIT = 48
+/** Homepage Things showcase: default preview tile count (plus optional View all). */
+export const THINGS_HOMEPAGE_LIMIT = 5
 
 /** Fields selected for public decoration-pack reads (not the full collection doc). */
 type SlimDecorationPack = {
@@ -131,29 +137,18 @@ function toFeedDecorationView(
   const imageUrl = isFeedDecorationFile(file) ? file.url : null
   if (!imageUrl) return null
 
-  const allowedShapes =
-    item.allowedShapes && item.allowedShapes.length > 0
-      ? (item.allowedShapes as StoryShape[])
-      : (['1x1'] as StoryShape[])
-
   return {
     id: item.id,
     packId,
     imageUrl,
-    allowedShapes,
+    // Packer default until the feed layout is redesigned.
+    allowedShapes: ['1x1'],
     weight: typeof item.weight === 'number' && item.weight > 0 ? item.weight : 1,
   }
 }
 
 function toPostCard(post: Post): PostCardView {
   const image = toMediaView(post.featuredImage)
-  const featured = Boolean(post.featured)
-  const cardSize = resolvePostCardSize({
-    id: post.id,
-    cardSize: post.cardSize,
-    featured,
-    image,
-  })
 
   return {
     id: post.id,
@@ -162,16 +157,64 @@ function toPostCard(post: Post): PostCardView {
     href: null,
     publishedAt: post.publishedAt ?? null,
     image,
-    cardSize,
   }
 }
 
-function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCardView {
-  const allowedShapes =
-    story.allowedShapes && story.allowedShapes.length > 0
-      ? (story.allowedShapes as StoryShape[])
-      : null
+function toProjectCard(project: Project): ProjectCardView {
+  const image = toMediaView(project.coverImage)
 
+  return {
+    id: project.id,
+    title: project.title,
+    // Detail routes are deferred; cards render without links until then.
+    href: null,
+    publishedAt: project.publishedAt ?? null,
+    image,
+  }
+}
+
+function toThingCard(thing: Thing): ThingCardView {
+  const primaryImage = toMediaView(thing.primaryImage)
+  const detailImage = toMediaView(thing.detailImage) || primaryImage
+
+  return {
+    id: thing.id,
+    name: thing.name,
+    description: thing.description ?? null,
+    primaryImage,
+    detailImage,
+    affiliateUrl: thing.affiliateUrl ?? null,
+    linkLabel: thing.linkLabel ?? null,
+    publishedAt: thing.publishedAt ?? null,
+  }
+}
+
+function toVideoProvider(value: unknown): VideoProvider {
+  if (value === 'tiktok' || value === 'instagram' || value === 'other' || value === 'youtube') {
+    return value
+  }
+  return 'other'
+}
+
+function toVideoCard(video: Video): VideoCardView {
+  const provider = toVideoProvider(video.provider)
+  const sourceUrl = video.sourceUrl || ''
+  const youtubeId = provider === 'youtube' ? parseYouTubeVideoId(sourceUrl) : null
+
+  return {
+    id: video.id,
+    title: video.title,
+    provider,
+    sourceUrl,
+    youtubeId,
+    publishedAt: video.publishedAt ?? null,
+    image: toMediaView(video.thumbnail),
+  }
+}
+
+export { toPostCard, toProjectCard, toThingCard, toVideoCard }
+
+function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCardView {
   let href: string | null = null
   let newTab = false
   if (story.link?.enabled) {
@@ -196,7 +239,8 @@ function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCard
     title: story.title,
     text: lexicalToPlainText(story.content),
     variant: story.variant,
-    allowedShapes,
+    // Packer default: allow every footprint until the feed layout is redesigned.
+    allowedShapes: null,
     href,
     newTab,
   }
@@ -226,58 +270,19 @@ const getCachedDecorationPack = (packId: number) =>
     tags: [CACHE_TAGS.decorationPacks],
   })()
 
-async function loadFrontpageRaw(locale: LocaleCode) {
+async function loadSiteSettings(locale: LocaleCode) {
   const payload = await getPayloadClient()
   return payload.findGlobal({
-    slug: 'frontpage',
+    slug: 'site-settings',
     locale,
-    depth: 1,
+    depth: 2,
     overrideAccess: false,
-    select: {
-      heroHeading: true,
-      heroSubheading: true,
-      profileSummary: true,
-      heroImage: true,
-      activeDecorationPack: true,
-      endOfFeed: true,
-    },
   })
 }
 
-const getCachedFrontpageRaw = (locale: LocaleCode) =>
-  unstable_cache(async () => loadFrontpageRaw(locale), ['frontpage-raw', locale], {
-    tags: [CACHE_TAGS.frontpage, CACHE_TAGS.media],
-  })()
-
-async function loadSiteShellGlobals(locale: LocaleCode) {
-  const payload = await getPayloadClient()
-  const [siteSettings, navigation, footer] = await Promise.all([
-    payload.findGlobal({
-      slug: 'site-settings',
-      locale,
-      depth: 1,
-      overrideAccess: false,
-    }),
-    payload.findGlobal({
-      slug: 'navigation',
-      locale,
-      depth: 2,
-      overrideAccess: false,
-    }),
-    payload.findGlobal({
-      slug: 'footer',
-      locale,
-      depth: 2,
-      overrideAccess: false,
-    }),
-  ])
-
-  return { siteSettings, navigation, footer }
-}
-
-const getCachedSiteShellGlobals = (locale: LocaleCode) =>
-  unstable_cache(async () => loadSiteShellGlobals(locale), ['site-shell-globals', locale], {
-    tags: [CACHE_TAGS.siteShell, CACHE_TAGS.media],
+const getCachedSiteSettings = (locale: LocaleCode) =>
+  unstable_cache(async () => loadSiteSettings(locale), ['site-settings', locale], {
+    tags: [CACHE_TAGS.siteShell, CACHE_TAGS.media, CACHE_TAGS.decorationPacks],
   })()
 
 async function loadPostsPage(locale: LocaleCode, cursorRaw: string | null): Promise<PostsPageView> {
@@ -315,8 +320,6 @@ async function loadPostsPage(locale: LocaleCode, cursorRaw: string | null): Prom
       title: true,
       featuredImage: true,
       publishedAt: true,
-      featured: true,
-      cardSize: true,
     },
   })
 
@@ -336,8 +339,132 @@ async function loadPostsPage(locale: LocaleCode, cursorRaw: string | null): Prom
 const getCachedPostsPage = (locale: LocaleCode, cursorRaw: string | null) =>
   unstable_cache(
     async () => loadPostsPage(locale, cursorRaw),
-    ['posts-page', locale, cursorRaw ?? 'start'],
+    ['posts-page', locale, cursorRaw ?? 'start', String(POSTS_PAGE_SIZE)],
     { tags: [CACHE_TAGS.posts, CACHE_TAGS.media] },
+  )()
+
+async function loadProjectsPage(
+  locale: LocaleCode,
+  cursorRaw: string | null,
+): Promise<ProjectsPageView> {
+  const payload = await getPayloadClient()
+  const cursor = decodePostsCursor(cursorRaw)
+
+  const where = cursor
+    ? {
+        and: [
+          publishedStatusWhere,
+          {
+            or: [
+              { publishedAt: { less_than: cursor.publishedAt } },
+              {
+                and: [
+                  { publishedAt: { equals: cursor.publishedAt } },
+                  { id: { less_than: cursor.id } },
+                ],
+              },
+            ],
+          },
+        ],
+      }
+    : publishedStatusWhere
+
+  const result = await payload.find({
+    collection: 'projects',
+    locale,
+    where,
+    sort: '-publishedAt,-id',
+    limit: PROJECTS_PAGE_SIZE + 1,
+    depth: 1,
+    overrideAccess: false,
+    select: {
+      title: true,
+      coverImage: true,
+      publishedAt: true,
+    },
+  })
+
+  const hasNextPage = result.docs.length > PROJECTS_PAGE_SIZE
+  const pageDocs = hasNextPage ? result.docs.slice(0, PROJECTS_PAGE_SIZE) : result.docs
+  const cards = pageDocs.map((project) => toProjectCard(project as Project))
+  const last = cards[cards.length - 1]
+  const nextCursor = hasNextPage && last ? cursorFromPost(last) : null
+
+  return {
+    docs: cards,
+    nextCursor,
+    hasNextPage,
+  }
+}
+
+const getCachedProjectsPage = (locale: LocaleCode, cursorRaw: string | null) =>
+  unstable_cache(
+    async () => loadProjectsPage(locale, cursorRaw),
+    ['projects-page', locale, cursorRaw ?? 'start', String(PROJECTS_PAGE_SIZE)],
+    { tags: [CACHE_TAGS.projects, CACHE_TAGS.media] },
+  )()
+
+async function loadVideosPage(
+  locale: LocaleCode,
+  cursorRaw: string | null,
+): Promise<VideosPageView> {
+  const payload = await getPayloadClient()
+  const cursor = decodePostsCursor(cursorRaw)
+
+  const where = cursor
+    ? {
+        and: [
+          publishedStatusWhere,
+          {
+            or: [
+              { publishedAt: { less_than: cursor.publishedAt } },
+              {
+                and: [
+                  { publishedAt: { equals: cursor.publishedAt } },
+                  { id: { less_than: cursor.id } },
+                ],
+              },
+            ],
+          },
+        ],
+      }
+    : publishedStatusWhere
+
+  const result = await payload.find({
+    collection: 'videos',
+    locale,
+    where,
+    sort: '-publishedAt,-id',
+    limit: VIDEOS_PAGE_SIZE + 1,
+    depth: 1,
+    overrideAccess: false,
+    select: {
+      title: true,
+      provider: true,
+      sourceUrl: true,
+      thumbnail: true,
+      publishedAt: true,
+    },
+  })
+
+  const hasNextPage = result.docs.length > VIDEOS_PAGE_SIZE
+  const pageDocs = hasNextPage ? result.docs.slice(0, VIDEOS_PAGE_SIZE) : result.docs
+  const cards = pageDocs.map((video) => toVideoCard(video as Video))
+  const last = cards[cards.length - 1]
+  const nextCursor = hasNextPage && last ? cursorFromPost(last) : null
+
+  return {
+    docs: cards,
+    nextCursor,
+    hasNextPage,
+  }
+}
+
+const getCachedVideosPage = (locale: LocaleCode, cursorRaw: string | null) =>
+  unstable_cache(
+    async () => loadVideosPage(locale, cursorRaw),
+    ['videos-page', locale, cursorRaw ?? 'start', String(VIDEOS_PAGE_SIZE)],
+    { tags: [CACHE_TAGS.videos, CACHE_TAGS.media] },
   )()
 
 async function loadShortStories(locale: LocaleCode): Promise<ShortStoryCardView[]> {
@@ -355,7 +482,6 @@ async function loadShortStories(locale: LocaleCode): Promise<ShortStoryCardView[
       title: true,
       content: true,
       variant: true,
-      allowedShapes: true,
       link: true,
     },
   })
@@ -368,28 +494,20 @@ const getCachedShortStories = (locale: LocaleCode) =>
     tags: [CACHE_TAGS.shortStories],
   })()
 
-export const getFrontpage = cache(async (locale: LocaleCode): Promise<FrontpageView> => {
-  const frontpage = await getCachedFrontpageRaw(locale)
+export const getHero = cache(async (locale: LocaleCode): Promise<HeroView> => {
+  const siteSettings = await getCachedSiteSettings(locale)
 
-  const preferredShape = frontpage.endOfFeed?.preferredShape
-  const endOfFeedEnabled = frontpage.endOfFeed?.enabled !== false
-  const endOfFeedText = frontpage.endOfFeed?.text as DefaultTypedEditorState | null | undefined
-  const endOfFeed =
-    endOfFeedEnabled && endOfFeedText
-      ? {
-          enabled: true as const,
-          text: endOfFeedText,
-          preferredShape: (preferredShape as StoryShape | undefined) || '2x1',
-        }
-      : null
+  const links = (siteSettings.links || [])
+    .map((link, index) => toNavChild(link, locale, index))
+    .filter((link): link is NavChildView => Boolean(link))
 
   return {
-    heading: frontpage.heroHeading || '',
-    subheading: frontpage.heroSubheading ?? null,
-    profileSummary: frontpage.profileSummary ?? null,
-    image: toMediaView(frontpage.heroImage),
-    endOfFeed,
-    activeDecorationPackId: packIdFromValue(frontpage.activeDecorationPack),
+    siteName: siteSettings.siteName || 'TMCS',
+    tagline: siteSettings.tagline ?? null,
+    image: toMediaView(siteSettings.profileImage),
+    coverImage: toMediaView(siteSettings.coverImage),
+    bio: (siteSettings.bio as HeroView['bio']) ?? null,
+    links,
   }
 })
 
@@ -406,16 +524,13 @@ export const getFeedDecorations = cache(async (packId: number): Promise<FeedDeco
 })
 
 export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellView> => {
-  const [{ siteSettings, navigation, footer }, frontpage] = await Promise.all([
-    getCachedSiteShellGlobals(locale),
-    getCachedFrontpageRaw(locale),
-  ])
+  const siteSettings = await getCachedSiteSettings(locale)
 
-  const packId = packIdFromValue(frontpage.activeDecorationPack)
+  const packId = packIdFromValue(siteSettings.activeDecorationPack)
   const pack = packId ? await getCachedDecorationPack(packId) : null
   const decorationImageUrl = footerDecorationUrlFromPack(pack)
 
-  const navItems: NavItemView[] = (navigation.items || []).flatMap((item, index) => {
+  const navItems: NavItemView[] = (siteSettings.navigation || []).flatMap((item, index) => {
     const parent = toNavChild(item, locale, index)
     if (!parent) return []
 
@@ -431,7 +546,7 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
     ]
   })
 
-  const footerGroups: FooterGroupView[] = (footer.groups || []).map((group, index) => ({
+  const footerGroups: FooterGroupView[] = (siteSettings.footerGroups || []).map((group, index) => ({
     id: group.id || `group-${index}`,
     title: group.title,
     links: (group.links || [])
@@ -439,14 +554,11 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
       .filter((link): link is NavChildView => Boolean(link)),
   }))
 
-  const socialLinks: SocialLinkView[] = (footer.socialLinks || []).map((link, index) => ({
-    id: link.id || `social-${index}`,
-    platform: link.platform,
-    url: link.url,
-    label: link.label || link.platform,
-  }))
+  const legalLinks = (siteSettings.legalLinks || [])
+    .map((link, index) => toNavChild(link, locale, index))
+    .filter((link): link is NavChildView => Boolean(link))
 
-  const legalLinks = (footer.legalLinks || [])
+  const profileLinks = (siteSettings.links || [])
     .map((link, index) => toNavChild(link, locale, index))
     .filter((link): link is NavChildView => Boolean(link))
 
@@ -457,15 +569,16 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
     description: siteSettings.description ?? null,
     siteUrl: siteSettings.siteUrl || getServerURL(),
     contactEmail: siteSettings.contactEmail ?? null,
+    profileLinks,
     navigation: navItems,
     footer: {
-      text: (footer.text as SiteShellView['footer']['text']) ?? null,
+      text: (siteSettings.footerText as SiteShellView['footer']['text']) ?? null,
       decorationImageUrl,
       groups: footerGroups,
-      socialLinks,
       legalLinks,
-      copyright: footer.copyright ?? null,
+      copyright: siteSettings.copyright ?? null,
     },
+    activeDecorationPackId: packId,
     robotsIndex: siteSettings.robots?.indexSite !== false,
     defaultSocialImage: toMediaView(siteSettings.defaultSocialImage),
     seo: {
@@ -480,6 +593,18 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
 export const getPostsPage = cache(
   async (locale: LocaleCode, cursor: string | null = null): Promise<PostsPageView> => {
     return getCachedPostsPage(locale, cursor)
+  },
+)
+
+export const getProjectsPage = cache(
+  async (locale: LocaleCode, cursor: string | null = null): Promise<ProjectsPageView> => {
+    return getCachedProjectsPage(locale, cursor)
+  },
+)
+
+export const getVideosPage = cache(
+  async (locale: LocaleCode, cursor: string | null = null): Promise<VideosPageView> => {
+    return getCachedVideosPage(locale, cursor)
   },
 )
 

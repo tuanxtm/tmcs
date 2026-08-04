@@ -4,17 +4,23 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.4307 0.0995 147.52);
-  --secondary-background: oklch(0.3417 0.0547 150.07);
-  --foreground: oklch(0.9236 0.0353 115.42);
+  --gradient-1: oklch(0.4989 0.1064 147.66);
+  --gradient-2: oklch(0.6788 0.1119 133.94);
+  --gradient-3: oklch(0.7508 0.1058 133.58);
+  --gradient-4: oklch(0.8671 0.0704 133.59);
+  --background: oklch(0.9604 0.0011 197.14);
+  --secondary-background: oklch(0.9515 0.0067 97.35);
+  --foreground: oklch(0.2273 0.0038 286.09);
   --card: oklch(0.995 0.001 95);
-  --card-foreground: oklch(0.18 0.01 95);
+  --card-foreground: oklch(0.1668 0.0084 296.92);
   --popover: oklch(0.995 0.001 95);
-  --popover-foreground: oklch(0.18 0.01 95);
-  --primary: oklch(0.4342 0.0894 147.56);
-  --primary-foreground: oklch(0.98 0.002 95);
+  --popover-foreground: oklch(0.1668 0.0084 296.92);
+  --primary: oklch(0.7508 0.1058 133.58);
+  --primary-foreground: oklch(0.1668 0.0084 296.92);
   --secondary: oklch(0.95 0.004 95);
-  --secondary-foreground: oklch(0.695 0.0397 115.63);
+  --secondary-foreground: oklch(0.5007 0.0047 286.23);
+  --hover-background: oklch(0.7508 0.1058 133.58 / 0.5);
+  --hover-foreground: oklch(0.2273 0.0038 286.09);
   --muted: oklch(0.945 0.004 95);
   --muted-foreground: oklch(0.48 0.01 95);
   --accent: oklch(0.94 0.006 95);
@@ -26,13 +32,16 @@
   --ring: oklch(0.35 0.02 95);
   --radius: 0.25rem;
   --panel: oklch(0.992 0.001 95 / 0.86);
-  --header-height: 4rem;
-  --content-max: 80rem;
-  --page-gutter: clamp(1rem, 3vw, 2rem);
+  --header-height: 3rem;
+  --section-sticky-header-height: 1.5rem;
+  --scrollbar-size: 10px;
+  --page-gutter: var(--scrollbar-size);
+  --fold-height: 100dvh;
+  --hero-fold-height: calc(var(--fold-height) - (2 * var(--header-height)));
   /* Pencil sketch lines — mostly straight, more graphite grit. Tune these */
   --sketch-color: color-mix(in oklch, var(--foreground) 52%, transparent);
-  --sketch-weight: 6px;
-  --sketch-tile: 64px;
+  --sketch-weight: 3px;
+  --sketch-tile: 32px;
   --rail: var(--sketch-color);
   /* Straight strokes + soft parallels + grain dash for pencil texture */
   --sketch-h: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='6' viewBox='0 0 64 6' fill='none'%3E%3Cline x1='0' y1='3' x2='64' y2='3' stroke='%23000' stroke-width='1.3' stroke-opacity='.72'/%3E%3Cline x1='0' y1='2.45' x2='64' y2='2.45' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='0' y1='3.55' x2='64' y2='3.55' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='0' y1='3' x2='64' y2='3' stroke='%23000' stroke-width='2' stroke-opacity='.18' stroke-dasharray='1.1 1.4 .5 1.9 .8 1.2 .4 1.6 1.3 1'/%3E%3C/svg%3E");
@@ -41,6 +50,10 @@
 }
 
 @theme inline {
+  --color-gradient-1: var(--gradient-1);
+  --color-gradient-2: var(--gradient-2);
+  --color-gradient-3: var(--gradient-3);
+  --color-gradient-4: var(--gradient-4);
   --color-background: var(--background);
   --color-secondary-background: var(--secondary-background);
   --color-foreground: var(--foreground);
@@ -52,6 +65,8 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-hover-background: var(--hover-background);
+  --color-hover-foreground: var(--hover-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -75,7 +90,8 @@
   }
 
   html {
-    @apply scroll-smooth antialiased;
+    /* Native smooth scroll fights Lenis — Lenis owns wheel inertia. */
+    @apply antialiased;
   }
 
   body {
@@ -101,7 +117,9 @@
    Do NOT set scrollbar-width/color on Chromium: those force the native
    (rounded + arrows) scrollbar and ignore ::-webkit-scrollbar. */
 html {
-  scrollbar-gutter: auto;
+  /* Always reserve classic-scrollbar width so splash/Lenis lock
+     (overflow hidden/clip) doesn't shift the layout when unlocking. */
+  scrollbar-gutter: stable;
 }
 
 html::-webkit-scrollbar,
@@ -123,13 +141,13 @@ body::-webkit-scrollbar-button:end:increment {
 
 html::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track {
-  background: var(--primary);
+  background: var(--background);
   border-radius: 0;
 }
 
 html::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb {
-  background-color: var(--foreground);
+  background-color: color-mix(in oklch, var(--foreground) 52%, transparent);
   border: 0;
   border-radius: 0;
   box-shadow: none;
@@ -138,42 +156,106 @@ body::-webkit-scrollbar-thumb {
 
 html::-webkit-scrollbar-corner,
 body::-webkit-scrollbar-corner {
-  background: var(--foreground);
+  background: var(--background);
   border-radius: 0;
 }
 
 @supports (-moz-appearance: none) {
   html {
     scrollbar-width: thin;
-    scrollbar-color: var(--primary) var(--foreground);
+    scrollbar-color: var(--background) var(--foreground);
   }
 }
 
 @layer utilities {
-  .bg-mesh-gradient {
-    background-color: #000000; /* Deep forest green base */
-  }
-
   .page-frame {
     @apply relative mx-auto w-full;
-    max-width: var(--content-max);
+    max-width: none;
     padding-inline: var(--page-gutter);
     container-type: inline-size;
-    /* Match post-feed MOBILE/TABLET/DESKTOP_COLUMNS for tile-sized layout chrome */
-    --bento-cols: 2;
+    /* Footer decoration chrome — 4-up editorial grid column width */
+    --bento-cols: 4;
     --bento-tile: calc(100cqw / var(--bento-cols));
   }
 
-  @media (min-width: 768px) {
+  @media (max-width: 1023px) {
     .page-frame {
-      --bento-cols: 3;
+      --bento-cols: 2;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .page-frame {
+      --bento-cols: 1;
+    }
+  }
+
+  .section-header {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    padding-inline: 0.5rem;
+    overflow: hidden;
+  }
+
+  .feed-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    column-gap: 0;
+    row-gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .feed-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 1024px) {
-    .page-frame {
-      --bento-cols: 4;
+    .feed-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
+  }
+
+  .feed-grid-item {
+    position: relative;
+    z-index: 0;
+    min-width: 0;
+  }
+
+  .things-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    column-gap: 0;
+    row-gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .things-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .things-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .things-grid-item {
+    position: relative;
+    z-index: 0;
+    min-width: 0;
   }
 
   .page-label {
@@ -191,56 +273,94 @@ body::-webkit-scrollbar-corner {
     background: var(--panel);
     backdrop-filter: blur(12px);
   }
-
-  .bento-tile {
-    position: relative;
-    height: 100%;
-    min-width: 0;
-    min-height: 0;
-    overflow: hidden;
-  }
 }
 
-.bento-grid-host {
-  container-type: inline-size;
-  width: 100%;
-}
+/*
+  Pencil sketch lines — vertical rails/separators + dash-t/dash-b horizontals.
+  Tune: --sketch-color, --sketch-weight, --sketch-tile
+*/
 
-.bento-grid {
-  --bento-cols: 1;
-  position: relative;
-  isolation: isolate;
-  width: 100%;
-  grid-template-columns: repeat(var(--bento-cols), minmax(0, 1fr));
-  /* Row track = column track. cqw comes from .bento-grid-host (not self). */
-  grid-auto-rows: calc(100cqw / var(--bento-cols));
-}
-
-.bento-grid-sep {
+/* Full-height column rules — same mask technique as .dash-l / .dash-rail. */
+.feed-grid-rules {
   pointer-events: none;
   position: absolute;
-  z-index: 20;
-  background-color: var(--sketch-color);
+  inset: 0;
+  z-index: 1;
 }
 
-.bento-grid-sep-v {
+.feed-grid-rule {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
   width: var(--sketch-weight);
   transform: translateX(-50%);
+  background-color: var(--sketch-color);
   -webkit-mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
   mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
 }
 
-.bento-grid-sep-h {
-  height: var(--sketch-weight);
-  transform: translateY(-50%);
-  -webkit-mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
-  mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
+@media (min-width: 640px) and (max-width: 1023px) {
+  .feed-grid-rule:nth-child(1) {
+    display: block;
+    left: 50%;
+  }
 }
 
-/*
-  Pencil sketch lines — straight geometry, graphite texture (layered + grain).
-  Tune: --sketch-color, --sketch-weight, --sketch-tile
-*/
+@media (min-width: 1024px) {
+  .feed-grid-rule:nth-child(1) {
+    display: block;
+    left: 25%;
+  }
+
+  .feed-grid-rule:nth-child(2) {
+    display: block;
+    left: 50%;
+  }
+
+  .feed-grid-rule:nth-child(3) {
+    display: block;
+    left: 75%;
+  }
+}
+
+.things-grid-rules {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.things-grid-rule {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--sketch-weight);
+  transform: translateX(-50%);
+  background-color: var(--sketch-color);
+  -webkit-mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
+  mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .things-grid-rule:nth-child(1) {
+    display: block;
+    left: 50%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .things-grid-rule:nth-child(1) {
+    display: block;
+    left: 33.333%;
+  }
+
+  .things-grid-rule:nth-child(2) {
+    display: block;
+    left: 66.666%;
+  }
+}
 
 /* Don't force position on .dash-b — sticky headers need position: sticky. */
 .dash-b:not(.sticky) {
@@ -251,12 +371,31 @@ body::-webkit-scrollbar-corner {
   content: '';
   pointer-events: none;
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   left: 0;
   right: 0;
   bottom: 0;
   height: var(--sketch-weight);
   transform: translateY(50%);
+  background-color: var(--sketch-color);
+  -webkit-mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
+  mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
+}
+
+.dash-t {
+  position: relative;
+}
+
+.dash-t::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--sketch-weight);
+  transform: translateY(-50%);
   background-color: var(--sketch-color);
   -webkit-mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
   mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
@@ -293,30 +432,22 @@ body::-webkit-scrollbar-corner {
   z-index: 1;
   border-radius: inherit;
   background-color: var(--sketch-color);
-  -webkit-mask-image: var(--sketch-h), var(--sketch-h), var(--sketch-v), var(--sketch-v);
-  mask-image: var(--sketch-h), var(--sketch-h), var(--sketch-v), var(--sketch-v);
+  -webkit-mask-image: var(--sketch-v), var(--sketch-v);
+  mask-image: var(--sketch-v), var(--sketch-v);
   -webkit-mask-size:
-    var(--sketch-tile) var(--sketch-weight),
-    var(--sketch-tile) var(--sketch-weight),
     var(--sketch-weight) var(--sketch-tile),
     var(--sketch-weight) var(--sketch-tile);
   mask-size:
-    var(--sketch-tile) var(--sketch-weight),
-    var(--sketch-tile) var(--sketch-weight),
     var(--sketch-weight) var(--sketch-tile),
     var(--sketch-weight) var(--sketch-tile);
   -webkit-mask-position:
     top left,
-    bottom left,
-    top left,
     top right;
   mask-position:
     top left,
-    bottom left,
-    top left,
     top right;
-  -webkit-mask-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-  mask-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  -webkit-mask-repeat: repeat-y, repeat-y;
+  mask-repeat: repeat-y, repeat-y;
 }
 
 .dash-rail {
@@ -338,6 +469,85 @@ a,
 button,
 [role='button'] {
   touch-action: manipulation;
+}
+
+/* Boot splash — first visit / hard reload only (layout-mounted client overlay). */
+.boot-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+  pointer-events: auto;
+}
+
+/* Clip roll-up / intro to each text line’s box. */
+.boot-splash-line {
+  overflow: hidden;
+}
+
+html.boot-splash-active {
+  overflow: hidden;
+}
+
+/* Lenis uses overflow:clip when stopped, which can drop the gutter.
+   Match splash lock so scrollbar-gutter: stable keeps width stable. */
+html.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: hidden;
+}
+
+/* Intro runs on the clip wrappers so exit transforms on the text aren’t overridden. */
+.boot-splash-greeting-wrap,
+.boot-splash-bar-wrap {
+  opacity: 0;
+}
+
+@keyframes boot-splash-intro {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* JS path: play a staggered enter for greeting + bar. */
+.boot-splash--js .boot-splash-greeting-wrap {
+  animation: boot-splash-intro 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.boot-splash--js .boot-splash-bar-wrap {
+  animation: boot-splash-intro 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+/* No-JS: content visible, then parent auto-hides. */
+@media (scripting: none) {
+  .boot-splash-greeting-wrap,
+  .boot-splash-bar-wrap {
+    opacity: 1;
+  }
+}
+
+/* No-JS: scroll up to reveal the site without hydration. */
+@keyframes boot-splash-noscript-reveal {
+  0%,
+  70% {
+    transform: translateY(0);
+    visibility: visible;
+  }
+  100% {
+    transform: translateY(-100%);
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.boot-splash:not(.boot-splash--js) {
+  animation: boot-splash-noscript-reveal 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

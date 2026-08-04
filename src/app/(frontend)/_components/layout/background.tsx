@@ -1,25 +1,71 @@
+'use client'
+
+import dynamic from 'next/dynamic'
+
+import { BootReveal, useBootReveal } from '@/app/(frontend)/_components/providers/boot-reveal'
+
+const ColorBends = dynamic(() => import('@/components/ColorBends'), {
+  ssr: false,
+})
+
+function BackgroundEffect() {
+  const {
+    state: { phase },
+  } = useBootReveal()
+  // Defer the Three.js chunk until the splash handoff reaches the background beat.
+  const loadWebGL = phase === 'background' || phase === 'ready'
+
+  return (
+    <BootReveal.Effect>
+      {loadWebGL ? (
+        <ColorBends
+          colors={['#8BA876', '#5A7D4A', '#C5D4A8']}
+          bandWidth={4}
+          rotation={180}
+          speed={0.03}
+          scale={1}
+          frequency={1}
+          warpStrength={1}
+          mouseInfluence={0.5}
+          noise={0.12}
+          parallax={0.5}
+          iterations={1}
+          intensity={2}
+          fontSize={12}
+          timeOffset={64}
+          gridOpacity={0.2}
+          transparent
+          autoRotate={0}
+        />
+      ) : null}
+    </BootReveal.Effect>
+  )
+}
+
 export function Background() {
-  const railInset =
-    'max(var(--page-gutter), calc((100% - min(100%, var(--content-max))) / 2 + var(--page-gutter)))'
+  // Full-width page frame: rails sit on the page gutters.
+  const railInset = 'var(--page-gutter)'
 
   return (
     <>
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[linear-gradient(267deg,var(--background)_4.22%,var(--secondary-background)_97.98%)]" />
-        <div
-          className="absolute inset-0 opacity-50 mix-blend-soft-light"
-          style={{
-            backgroundImage: 'url(/noise.svg)',
-            backgroundSize: '60px 60px',
-            backgroundRepeat: 'repeat',
-          }}
-        />
+      {/* Solid plane always present so splash never reveals emptiness.
+          ColorBends loads only after the splash content reveal. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-dvh w-full overflow-hidden bg-background"
+      >
+        <BackgroundEffect />
       </div>
       {/* Rails above header blur so L/R strokes aren't doubled or buried */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[45]">
-        <span className="dash-rail dash-rail-left absolute inset-y-0" style={{ left: railInset }} />
-        <span className="dash-rail dash-rail-right absolute inset-y-0" style={{ right: railInset }} />
-      </div>
+      <BootReveal.Chrome>
+        <div className="pointer-events-none fixed inset-0 z-[45]">
+          <span className="dash-rail dash-rail-left absolute inset-y-0" style={{ left: railInset }} />
+          <span
+            className="dash-rail dash-rail-right absolute inset-y-0"
+            style={{ right: railInset }}
+          />
+        </div>
+      </BootReveal.Chrome>
     </>
   )
 }

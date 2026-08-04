@@ -69,7 +69,7 @@ export function createCollectionRevalidateDeleteHook(
   }
 }
 
-/** Globals always affect the public shell or frontpage when updated. */
+/** Globals always affect the public site shell when updated. */
 export function createGlobalRevalidateHook(tags: CacheTag[]): GlobalAfterChangeHook {
   return ({ doc, req: { context, payload } }) => {
     if (shouldSkip(context)) return doc
@@ -81,32 +81,57 @@ export function createGlobalRevalidateHook(tags: CacheTag[]): GlobalAfterChangeH
 export const revalidatePosts = createCollectionRevalidateHook([CACHE_TAGS.posts])
 export const revalidatePostsDelete = createCollectionRevalidateDeleteHook([CACHE_TAGS.posts])
 
+export const revalidateProjects = createCollectionRevalidateHook([CACHE_TAGS.projects])
+export const revalidateProjectsDelete = createCollectionRevalidateDeleteHook([CACHE_TAGS.projects])
+
+export const revalidateThings = createCollectionRevalidateHook([CACHE_TAGS.things])
+export const revalidateThingsDelete = createCollectionRevalidateDeleteHook([CACHE_TAGS.things])
+
+export const revalidateVideos = createCollectionRevalidateHook([CACHE_TAGS.videos])
+export const revalidateVideosDelete = createCollectionRevalidateDeleteHook([CACHE_TAGS.videos])
+
 export const revalidateShortStories = createCollectionRevalidateHook([CACHE_TAGS.shortStories])
 export const revalidateShortStoriesDelete = createCollectionRevalidateDeleteHook([
   CACHE_TAGS.shortStories,
 ])
 
-export const revalidatePages = createCollectionRevalidateHook([CACHE_TAGS.siteShell])
-export const revalidatePagesDelete = createCollectionRevalidateDeleteHook([CACHE_TAGS.siteShell])
+export const revalidatePages = createCollectionRevalidateHook([
+  CACHE_TAGS.pages,
+  CACHE_TAGS.siteShell,
+])
+export const revalidatePagesDelete = createCollectionRevalidateDeleteHook([
+  CACHE_TAGS.pages,
+  CACHE_TAGS.siteShell,
+])
 
 export const revalidateMedia = createCollectionRevalidateHook([
   CACHE_TAGS.media,
   CACHE_TAGS.posts,
-  CACHE_TAGS.frontpage,
+  CACHE_TAGS.projects,
+  CACHE_TAGS.things,
+  CACHE_TAGS.videos,
+  CACHE_TAGS.pages,
   CACHE_TAGS.siteShell,
 ])
 export const revalidateMediaDelete = createCollectionRevalidateDeleteHook(
-  [CACHE_TAGS.media, CACHE_TAGS.posts, CACHE_TAGS.frontpage, CACHE_TAGS.siteShell],
+  [
+    CACHE_TAGS.media,
+    CACHE_TAGS.posts,
+    CACHE_TAGS.projects,
+    CACHE_TAGS.things,
+    CACHE_TAGS.videos,
+    CACHE_TAGS.pages,
+    CACHE_TAGS.siteShell,
+  ],
   { always: true },
 )
 
 export const revalidateDecorationPacks = createCollectionRevalidateHook([
   CACHE_TAGS.decorationPacks,
   CACHE_TAGS.siteShell,
-  CACHE_TAGS.frontpage,
 ])
 export const revalidateDecorationPacksDelete = createCollectionRevalidateDeleteHook(
-  [CACHE_TAGS.decorationPacks, CACHE_TAGS.siteShell, CACHE_TAGS.frontpage],
+  [CACHE_TAGS.decorationPacks, CACHE_TAGS.siteShell],
   { always: true },
 )
 
@@ -119,9 +144,7 @@ export const revalidateFeedDecorationsDelete = createCollectionRevalidateDeleteH
   { always: true },
 )
 
-export const revalidateSiteShellGlobal = createGlobalRevalidateHook([CACHE_TAGS.siteShell])
-export const revalidateFrontpageGlobal = createGlobalRevalidateHook([
-  CACHE_TAGS.frontpage,
+export const revalidateSiteShellGlobal = createGlobalRevalidateHook([
   CACHE_TAGS.siteShell,
   CACHE_TAGS.decorationPacks,
 ])

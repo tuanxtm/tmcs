@@ -9,6 +9,8 @@
  */
 
 import 'dotenv/config'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
 import { getPayload } from 'payload'
 import type { Payload } from 'payload'
 
@@ -170,7 +172,6 @@ async function upsertShortStory(
     title: string
     text: string
     variant: 'note' | 'quote' | 'image'
-    allowedShapes?: ('1x1' | '2x1' | '3x1' | '1x2' | '2x2')[]
   },
   vi: { title: string; text: string },
   ownerId: number,
@@ -186,7 +187,6 @@ async function upsertShortStory(
   const base = {
     title: en.title,
     variant: en.variant,
-    allowedShapes: en.allowedShapes,
     content: richText(en.text),
     owner: ownerId,
     _status: 'published' as const,
@@ -220,6 +220,189 @@ async function upsertShortStory(
     },
     locale: 'vi',
     overrideAccess: true,
+  })
+
+  return doc
+}
+
+async function upsertSeedMedia(
+  payload: Payload,
+  filename: string,
+  alt: string,
+): Promise<number> {
+  const existing = await payload.find({
+    collection: 'media',
+    where: { filename: { equals: filename } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+  if (existing.docs[0]) return existing.docs[0].id
+
+  const localPath = path.join(process.cwd(), 'public', filename)
+  const buffer = await readFile(localPath)
+  // Plain Uint8Array — Node Buffer fails Miniflare/devalue (same as decoration-upload).
+  const bytes = new Uint8Array(buffer)
+
+  const created = await payload.create({
+    collection: 'media',
+    data: {
+      alt,
+      kind: 'image',
+    },
+    file: {
+      data: bytes,
+      mimetype: 'image/webp',
+      name: filename,
+      size: bytes.byteLength,
+    },
+    overrideAccess: true,
+    context: { disableRevalidate: true },
+  })
+
+  return created.id
+}
+
+async function upsertThingByName(
+  payload: Payload,
+  en: {
+    name: string
+    description: string
+    affiliateUrl?: string | null
+    linkLabel?: string | null
+    featured?: boolean
+  },
+  vi: {
+    name: string
+    description: string
+    affiliateUrl?: string | null
+    linkLabel?: string | null
+  },
+  images: { primary: number; detail?: number },
+  ownerId: number,
+  days: number,
+) {
+  const existing = await payload.find({
+    collection: 'things',
+    where: { name: { equals: en.name } },
+    limit: 1,
+    depth: 0,
+    locale: 'en',
+    overrideAccess: true,
+  })
+
+  const base = {
+    name: en.name,
+    description: en.description,
+    primaryImage: images.primary,
+    detailImage: images.detail ?? images.primary,
+    affiliateUrl: en.affiliateUrl ?? null,
+    linkLabel: en.linkLabel ?? null,
+    featured: Boolean(en.featured),
+    owner: ownerId,
+    _status: 'published' as const,
+    publishedAt: daysAgo(days),
+    translationReady: { vi: true },
+  }
+
+  const doc =
+    existing.docs[0] ||
+    (await payload.create({
+      collection: 'things',
+      data: base as never,
+      locale: 'en',
+      overrideAccess: true,
+    }))
+
+  if (existing.docs[0]) {
+    await payload.update({
+      collection: 'things',
+      id: doc.id,
+      data: base as never,
+      locale: 'en',
+      overrideAccess: true,
+    })
+  }
+
+  await payload.update({
+    collection: 'things',
+    id: doc.id,
+    data: {
+      name: vi.name,
+      description: vi.description,
+      affiliateUrl: vi.affiliateUrl ?? null,
+      linkLabel: vi.linkLabel ?? null,
+    } as never,
+    locale: 'vi',
+    overrideAccess: true,
+  })
+
+  return doc
+}
+
+async function upsertVideoByTitle(
+  payload: Payload,
+  en: {
+    title: string
+    provider: 'youtube' | 'tiktok' | 'instagram' | 'other'
+    sourceUrl: string
+    featured?: boolean
+  },
+  vi: { title: string },
+  thumbnailId: number,
+  ownerId: number,
+  days: number,
+) {
+  const existing = await payload.find({
+    collection: 'videos',
+    where: { title: { equals: en.title } },
+    limit: 1,
+    depth: 0,
+    locale: 'en',
+    overrideAccess: true,
+  })
+
+  const base = {
+    title: en.title,
+    provider: en.provider,
+    sourceUrl: en.sourceUrl,
+    thumbnail: thumbnailId,
+    featured: Boolean(en.featured),
+    owner: ownerId,
+    _status: 'published' as const,
+    publishedAt: daysAgo(days),
+    translationReady: { vi: true },
+  }
+
+  const doc =
+    existing.docs[0] ||
+    (await payload.create({
+      collection: 'videos',
+      data: base as never,
+      locale: 'en',
+      overrideAccess: true,
+      // Skip network thumbnail fetch during seed — we supply Media explicitly.
+      context: { youtubeThumbAttempted: true, disableRevalidate: true },
+    }))
+
+  if (existing.docs[0]) {
+    await payload.update({
+      collection: 'videos',
+      id: doc.id,
+      data: base as never,
+      locale: 'en',
+      overrideAccess: true,
+      context: { youtubeThumbAttempted: true, disableRevalidate: true },
+    })
+  }
+
+  await payload.update({
+    collection: 'videos',
+    id: doc.id,
+    data: { title: vi.title } as never,
+    locale: 'vi',
+    overrideAccess: true,
+    context: { disableRevalidate: true },
   })
 
   return doc
@@ -354,100 +537,65 @@ const PROJECT_SEEDS = [
     en: {
       title: 'Modular Workbench System',
       summary: 'A t-track workbench with interchangeable fixtures for electronics and woodworking.',
-      challenge: 'One bench had to support soldering, sawing, and laptop work without constant resets.',
-      solution: 'Designed a modular top with removable inserts, integrated power, and mobile tool trays.',
-      outcome: 'Swap contexts in under five minutes; fewer stray parts on the surface.',
     },
     vi: {
       title: 'Hệ bàn thợ module',
       summary: 'Bàn t-track với đồ gá thay đổi cho điện tử và mộc.',
-      challenge: 'Một bàn phải hàn, cưa và làm việc laptop mà không setup lại liên tục.',
-      solution: 'Mặt bàn module, nguồn tích hợp và khay dụng cụ di động.',
-      outcome: 'Đổi ngữ cảnh dưới năm phút; ít linh kiện rơi vãi.',
     },
-    projectType: 'design' as const,
     featured: true,
-    order: 1,
+    authorKey: 'hana' as const,
   },
   {
     slug: 'desk-power-rail',
     en: {
       title: 'Desk Power Rail',
       summary: 'Under-desk USB-C and AC distribution with fused branches for a clean cable path.',
-      challenge: 'Multiple chargers and lab supplies created a tangled power mess.',
-      solution: 'Built a fused rail with labeled branches, strain relief, and a single inlet.',
-      outcome: 'Reduced desk clutter; easier to trace faults during prototyping.',
     },
     vi: {
       title: 'Thanh nguồn bàn làm việc',
       summary: 'Phân phối USB-C và AC dưới bàn với nhánh có cầu chì.',
-      challenge: 'Nhiều sạc và nguồn lab làm rối dây điện.',
-      solution: 'Thanh nguồn có cầu chì, nhãn nhánh và một điểm vào.',
-      outcome: 'Giảm rối; dễ truy vết lỗi khi prototype.',
     },
-    projectType: 'infra' as const,
     featured: true,
-    order: 2,
+    authorKey: 'khoa' as const,
   },
   {
     slug: 'sensor-planter',
     en: {
       title: 'Sensor Planter',
       summary: 'ESP32 planter monitoring soil moisture, light, and ambient temperature.',
-      challenge: 'Plants died silently between waterings during busy weeks.',
-      solution: 'Low-power sensor node with local alerts and a weekly trend chart.',
-      outcome: 'Catch dry spells early; less guesswork on watering.',
     },
     vi: {
       title: 'Chậu cảm biến',
       summary: 'Chậu ESP32 theo dõi độ ẩm đất, ánh sáng và nhiệt độ.',
-      challenge: 'Cây chết lặng lẽ giữa các lần tưới khi bận.',
-      solution: 'Node cảm biến tiết kiệm điện, cảnh báo local và biểu đồ tuần.',
-      outcome: 'Phát hiện khô sớm; ít đoán mò khi tưới.',
     },
-    projectType: 'web' as const,
     featured: false,
-    order: 3,
+    authorKey: 'hana' as const,
   },
   {
     slug: 'print-farm-enclosure',
     en: {
       title: 'Print Farm Enclosure',
       summary: 'Stacked printer enclosure with filtered exhaust and vibration isolation.',
-      challenge: 'ABS fumes and resonance traveled through a small apartment workshop.',
-      solution: 'Enclosure stack with HEPA path, foam feet, and shared filament dry box.',
-      outcome: 'Quieter prints; more predictable ABS results.',
     },
     vi: {
       title: 'Vỏ farm in 3D',
       summary: 'Vỏ máy in xếp chồng có lọc khí thải và cách rung.',
-      challenge: 'Khí ABS và rung lan trong xưởng nhỏ.',
-      solution: 'Vỏ xếp chồng, đường HEPA, chân foam và hộp khô filament chung.',
-      outcome: 'In êm hơn; ABS ổn định hơn.',
     },
-    projectType: 'design' as const,
     featured: false,
-    order: 4,
+    authorKey: 'khoa' as const,
   },
   {
     slug: 'homelab-rack',
     en: {
       title: 'Homelab Rack',
       summary: '12U rolling rack with cable comb, PDU labeling, and hot-aisle airflow notes.',
-      challenge: 'Services sprawled across shelves with no cooling story.',
-      solution: 'Compact rack, blanking panels, intake/exhaust mapping, and service map.',
-      outcome: 'Stable thermals; faster incident triage.',
     },
     vi: {
       title: 'Rack homelab',
       summary: 'Rack 12U có lược dây, nhãn PDU và ghi chú luồng khí.',
-      challenge: 'Dịch vụ tràn kệ, không có chiến lược làm mát.',
-      solution: 'Rack gọn, tấm che, sơ đồ hút/thổi và bản đồ dịch vụ.',
-      outcome: 'Nhiệt ổn định; xử lý sự cố nhanh hơn.',
     },
-    projectType: 'infra' as const,
     featured: true,
-    order: 5,
+    authorKey: 'hana' as const,
   },
 ] as const
 
@@ -517,20 +665,17 @@ const POST_TITLES_VI = [
   'Xuất bản bài viết dự án DIY',
 ] as const
 
-const CARD_SIZES = ['auto', 'small', 'wide', 'tall', 'large'] as const
 
 const SHORT_STORY_SEEDS = [
   {
     key: 'ss01',
     en: { title: 'Measure twice', text: 'A quick note before cutting stock: mark, step back, mark again.', variant: 'note' as const },
     vi: { title: 'Đo hai lần', text: 'Ghi chú nhanh trước khi cắt: đánh dấu, lùi lại, đánh dấu lại.' },
-    allowedShapes: ['1x1', '2x1'] as const,
   },
   {
     key: 'ss02',
     en: { title: 'Bench rule', text: 'If it takes longer to find the tool than to use it, the tool needs a home.', variant: 'quote' as const },
     vi: { title: 'Quy tắc bàn thợ', text: 'Nếu tìm dụng cụ lâu hơn dùng nó, dụng cụ cần một chỗ.' },
-    allowedShapes: ['1x1', '1x2', '2x1'] as const,
   },
   {
     key: 'ss03',
@@ -541,7 +686,6 @@ const SHORT_STORY_SEEDS = [
     key: 'ss04',
     en: { title: 'Local first', text: 'Automate the plant sensor locally before exposing another cloud dashboard.', variant: 'quote' as const },
     vi: { title: 'Local trước', text: 'Tự động hóa cảm biến cây local trước khi thêm dashboard cloud.' },
-    allowedShapes: ['2x1', '3x1'] as const,
   },
   {
     key: 'ss05',
@@ -552,19 +696,16 @@ const SHORT_STORY_SEEDS = [
     key: 'ss06',
     en: { title: 'Rack mantra', text: 'Label the cable before you trust the service.', variant: 'quote' as const },
     vi: { title: 'Câu rack', text: 'Dán nhãn dây trước khi tin dịch vụ.' },
-    allowedShapes: ['1x1', '2x2'] as const,
   },
   {
     key: 'ss07',
     en: { title: 'Vent sketch', text: 'A napkin drawing of intake vs exhaust beats a perfect render that ships late.', variant: 'note' as const },
     vi: { title: 'Phác thông gió', text: 'Vẽ giấy ăn hút/thổi tốt hơn render hoàn hảo trễ hạn.' },
-    allowedShapes: ['1x2', '2x2'] as const,
   },
   {
     key: 'ss08',
     en: { title: 'Shop light', text: 'Cross-light the bench; kill the shadows on your smallest parts.', variant: 'note' as const },
     vi: { title: 'Đèn xưởng', text: 'Chiếu chéo bàn; xóa bóng trên chi tiết nhỏ nhất.' },
-    allowedShapes: ['2x1', '3x1'] as const,
   },
   {
     key: 'ss09',
@@ -575,19 +716,16 @@ const SHORT_STORY_SEEDS = [
     key: 'ss10',
     en: { title: 'Ship the log', text: 'Publish the messy notes. Someone else is stuck on the same bench problem.', variant: 'note' as const },
     vi: { title: 'Xuất nhật ký', text: 'Đăng ghi chú lộn xộn. Ai đó cũng kẹt cùng vấn đề bàn thợ.' },
-    allowedShapes: ['1x1', '2x1', '1x2'] as const,
   },
   {
     key: 'ss11',
     en: { title: 'Torque habit', text: 'Snug the screw, then stop. Stripped threads cost more time than caution.', variant: 'note' as const },
     vi: { title: 'Thói quen siết', text: 'Vặn vừa khít rồi dừng. Ren hỏng tốn thời gian hơn cẩn thận.' },
-    allowedShapes: ['1x1'] as const,
   },
   {
     key: 'ss12',
     en: { title: 'Test clip', text: 'A labeled bag of clipped leads beats a drawer of mystery metal.', variant: 'quote' as const },
     vi: { title: 'Túi chân cắt', text: 'Túi có nhãn đựng chân cắt tốt hơn ngăn kéo kim loại không rõ nguồn.' },
-    allowedShapes: ['2x1', '3x1'] as const,
   },
   {
     key: 'ss13',
@@ -598,19 +736,16 @@ const SHORT_STORY_SEEDS = [
     key: 'ss14',
     en: { title: 'Quiet hours', text: 'Schedule the loud prints for when neighbors are at work.', variant: 'quote' as const },
     vi: { title: 'Giờ yên', text: 'Hẹn in ồn khi hàng xóm đi làm.' },
-    allowedShapes: ['1x2', '2x2'] as const,
   },
   {
     key: 'ss15',
     en: { title: 'Backup bit', text: 'Keep a duplicate end mill one drawer down. Dull catches at the worst moment.', variant: 'note' as const },
     vi: { title: 'Mũi dự phòng', text: 'Giữ mũi phay dự phòng một ngăn dưới. Cùn kẹt đúng lúc tệ nhất.' },
-    allowedShapes: ['1x1', '2x1'] as const,
   },
   {
     key: 'ss16',
     en: { title: 'Ground loop', text: 'If the scope lies, check the ground before chasing ghosts in firmware.', variant: 'quote' as const },
     vi: { title: 'Vòng mass', text: 'Nếu scope sai, kiểm tra mass trước khi truy firmware ma.' },
-    allowedShapes: ['2x1', '3x1', '2x2'] as const,
   },
   {
     key: 'ss17',
@@ -621,19 +756,224 @@ const SHORT_STORY_SEEDS = [
     key: 'ss18',
     en: { title: 'Spare USB', text: 'Label the data-only cables. Charging cables lie during flashing.', variant: 'note' as const },
     vi: { title: 'USB dự phòng', text: 'Dán nhãn cáp chỉ data. Cáp sạc nói dối khi flash.' },
-    allowedShapes: ['1x1', '1x2'] as const,
   },
   {
     key: 'ss19',
     en: { title: 'Scope budget', text: 'Buy the probe you will actually reach for, not the one that impresses on paper.', variant: 'quote' as const },
     vi: { title: 'Ngân sách scope', text: 'Mua đầu dò bạn thực sự dùng, không phải cái ấn tượng trên giấy.' },
-    allowedShapes: ['1x1', '2x1', '1x2'] as const,
   },
   {
     key: 'ss20',
     en: { title: 'End of day', text: 'Power down the bench, cap the flux, and leave one note for morning-you.', variant: 'note' as const },
     vi: { title: 'Cuối ngày', text: 'Tắt nguồn bàn, đậy flux, để một ghi chú cho bạn sáng mai.' },
-    allowedShapes: ['2x1', '3x1'] as const,
+  },
+] as const
+
+const THING_SEEDS = [
+  {
+    en: {
+      name: 'Soldering station',
+      description: 'Temperature-controlled iron for nightly repairs.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE1',
+      featured: true,
+    },
+    vi: {
+      name: 'Trạm hàn',
+      description: 'Mỏ hàn chỉnh nhiệt cho sửa chữa ban đêm.',
+      affiliateUrl: 'https://shopee.vn/soldering-station',
+    },
+  },
+  {
+    en: {
+      name: 'ESD mat',
+      description: 'Grounded work surface for sensitive boards.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE2',
+    },
+    vi: {
+      name: 'Thảm ESD',
+      description: 'Mặt bàn nối mass cho mạch nhạy cảm.',
+      affiliateUrl: 'https://shopee.vn/esd-mat',
+    },
+  },
+  {
+    en: {
+      name: 'Helping hands',
+      description: 'Third hand with magnifier for fine joints.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE3',
+    },
+    vi: {
+      name: 'Kẹp hỗ trợ',
+      description: 'Tay thứ ba kèm kính lúp cho mối hàn nhỏ.',
+      affiliateUrl: null,
+    },
+  },
+  {
+    en: {
+      name: 'Digital calipers',
+      description: '0.01 mm readings for enclosure fits.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE4',
+    },
+    vi: {
+      name: 'Thước kẹp điện tử',
+      description: 'Độ chính xác 0.01 mm cho khít vỏ.',
+      affiliateUrl: 'https://shopee.vn/digital-calipers',
+    },
+  },
+  {
+    en: {
+      name: 'Flush cutters',
+      description: 'Clean lead trims without nicking pads.',
+      affiliateUrl: null,
+    },
+    vi: {
+      name: 'Kềm cắt chân',
+      description: 'Cắt chân sạch không cạo pad.',
+      affiliateUrl: null,
+    },
+  },
+  {
+    en: {
+      name: 'Kapton tape',
+      description: 'Heat-safe masking for rework.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE6',
+    },
+    vi: {
+      name: 'Băng Kapton',
+      description: 'Băng chịu nhiệt cho rework.',
+      affiliateUrl: 'https://shopee.vn/kapton-tape',
+    },
+  },
+  {
+    en: {
+      name: 'USB microscope',
+      description: 'Inspect joints before powering up.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE7',
+    },
+    vi: {
+      name: 'Kính hiển vi USB',
+      description: 'Kiểm mối hàn trước khi cấp nguồn.',
+      affiliateUrl: 'https://shopee.vn/usb-microscope',
+    },
+  },
+  {
+    en: {
+      name: 'Bench PSU',
+      description: 'Current-limited supply for first boots.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE8',
+    },
+    vi: {
+      name: 'Nguồn bàn',
+      description: 'Nguồn giới hạn dòng cho lần boot đầu.',
+      affiliateUrl: 'https://shopee.vn/bench-psu',
+    },
+  },
+  {
+    en: {
+      name: 'Logic analyzer',
+      description: 'Capture I2C and UART when firmware ghosts appear.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE9',
+    },
+    vi: {
+      name: 'Logic analyzer',
+      description: 'Bắt I2C và UART khi firmware ma xuất hiện.',
+      affiliateUrl: 'https://shopee.vn/logic-analyzer',
+    },
+  },
+  {
+    en: {
+      name: 'Wire strippers',
+      description: 'Self-adjusting jaws for 30–10 AWG.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLEA',
+    },
+    vi: {
+      name: 'Kìm tuốt dây',
+      description: 'Hàm tự chỉnh cho 30–10 AWG.',
+      affiliateUrl: 'https://shopee.vn/wire-strippers',
+    },
+  },
+  {
+    en: {
+      name: 'Fume extractor',
+      description: 'Carbon filter for late-night soldering.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLEB',
+    },
+    vi: {
+      name: 'Hút khói',
+      description: 'Lọc carbon cho hàn khuya.',
+      affiliateUrl: 'https://shopee.vn/fume-extractor',
+    },
+  },
+  {
+    en: {
+      name: 'Multimeter',
+      description: 'True-RMS meter for AC and DC checks.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLEC',
+    },
+    vi: {
+      name: 'Đồng hồ vạn năng',
+      description: 'True-RMS cho kiểm AC và DC.',
+      affiliateUrl: 'https://shopee.vn/multimeter',
+    },
+  },
+  {
+    en: {
+      name: 'Hot air station',
+      description: 'For QFN rework and heat-shrink.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLED',
+    },
+    vi: {
+      name: 'Trạm hơi nóng',
+      description: 'Cho rework QFN và ống gen.',
+      affiliateUrl: 'https://shopee.vn/hot-air',
+    },
+  },
+  {
+    en: {
+      name: 'Parts organizer',
+      description: 'Labeled bins so SMD resistors stay findable.',
+      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLEE',
+    },
+    vi: {
+      name: 'Hộp linh kiện',
+      description: 'Ngăn có nhãn để điện trở SMD luôn tìm được.',
+      affiliateUrl: 'https://shopee.vn/parts-organizer',
+    },
+  },
+] as const
+
+const VIDEO_SEEDS = [
+  {
+    en: {
+      title: 'Desk cable routing',
+      provider: 'youtube' as const,
+      sourceUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      featured: true,
+    },
+    vi: { title: 'Đi dây bàn làm việc' },
+  },
+  {
+    en: {
+      title: 'Hot tip: flux before solder',
+      provider: 'tiktok' as const,
+      sourceUrl: 'https://www.tiktok.com/@tmcs/video/7123456789012345678',
+    },
+    vi: { title: 'Mẹo: flux trước khi hàn' },
+  },
+  {
+    en: {
+      title: 'Workshop reel — calipers',
+      provider: 'instagram' as const,
+      sourceUrl: 'https://www.instagram.com/reel/AbCdEfGhIjK/',
+    },
+    vi: { title: 'Reel xưởng — thước kẹp' },
+  },
+  {
+    en: {
+      title: 'Bench PSU first boot',
+      provider: 'youtube' as const,
+      sourceUrl: 'https://youtu.be/dQw4w9WgXcQ',
+    },
+    vi: { title: 'Boot đầu nguồn bàn' },
   },
 ] as const
 
@@ -786,6 +1126,10 @@ async function seed() {
       siteUrl: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
       contactEmail: requireEnv('SEED_ADMIN_EMAIL'),
       robots: { indexSite: false },
+      bio: richText(
+        'Documenting builds, failures, and the tools that survive them.',
+        'Based in a small home workshop — posting maker notes and desk setups.',
+      ),
     },
     locale: 'en',
     overrideAccess: true,
@@ -797,6 +1141,10 @@ async function seed() {
       siteName: 'TMCS Portfolio',
       tagline: 'Dự án DIY, không gian tech và ghi chú maker',
       description: 'Trang mẫu — dự án xưởng, setup bàn và thử nghiệm điện tử.',
+      bio: richText(
+        'Ghi lại bản build, thất bại và dụng cụ còn sót lại.',
+        'Từ một xưởng nhỏ tại nhà — chia sẻ ghi chú maker và setup bàn.',
+      ),
     },
     locale: 'vi',
     overrideAccess: true,
@@ -807,39 +1155,11 @@ async function seed() {
   await upsertPackBySlug(payload, 'christmas', { title: 'Christmas' })
 
   await payload.updateGlobal({
-    slug: 'frontpage',
+    slug: 'site-settings',
     data: {
-      heroHeading: 'Workshop notes from the bench',
-      heroSubheading: 'DIY projects, desk setups, and electronics experiments.',
-      profileSummary: 'Documenting builds, failures, and the tools that survive them.',
       activeDecorationPack: plantPack.id,
-      endOfFeed: {
-        enabled: true,
-        text: richText(
-          'Thanks for reading',
-          'More notes land here as they leave the bench.',
-        ),
-        preferredShape: '2x1',
-      },
     },
     locale: 'en',
-    overrideAccess: true,
-  })
-
-  await payload.updateGlobal({
-    slug: 'frontpage',
-    data: {
-      heroHeading: 'Ghi chú từ bàn thợ',
-      heroSubheading: 'Dự án DIY, setup bàn và thử nghiệm điện tử.',
-      profileSummary: 'Ghi lại bản build, thất bại và dụng cụ còn sót lại.',
-      activeDecorationPack: plantPack.id,
-      endOfFeed: {
-        enabled: true,
-        text: richText('Cảm ơn đã đọc', 'Thêm ghi chú sẽ xuất hiện khi chúng rời bàn thợ.'),
-        preferredShape: '2x1',
-      },
-    },
-    locale: 'vi',
     overrideAccess: true,
   })
 
@@ -847,7 +1167,6 @@ async function seed() {
     id: string
     title: string
     file: number
-    allowedShapes: ('1x1' | '2x1' | '1x2' | '2x2')[]
     weight: number
   }> = []
 
@@ -861,7 +1180,6 @@ async function seed() {
       id: `plant-item-${index + 1}`,
       title: deco.title,
       file: fileId,
-      allowedShapes: [...deco.allowedShapes],
       weight: deco.weight,
     })
   }
@@ -905,7 +1223,6 @@ async function seed() {
     const category = categoryIds[i % categoryIds.length]
     const tagA = tags[tagSlugs[i % tagSlugs.length]].id
     const tagB = tags[tagSlugs[(i + 3) % tagSlugs.length]].id
-    const cardSize = CARD_SIZES[i % CARD_SIZES.length]
     const featured = i < 3 || i % 11 === 0
 
     const doc = await upsertBySlug(payload, 'posts', slug, {
@@ -913,14 +1230,13 @@ async function seed() {
       excerpt: `Notes from the bench on ${POST_TITLES[i].toLowerCase()}.`,
       content: richText(
         `This seeded post covers ${POST_TITLES[i].toLowerCase()} in a DIY tech workspace context.`,
-        'It exists to exercise the bento feed, bilingual content, and editorial card sizes.',
+        'It exists to exercise the bento feed and bilingual content.',
       ),
       author,
       owner: admin.id,
       categories: [category],
       tags: [tagA, tagB],
       featured,
-      cardSize,
       _status: 'published',
       publishedAt: daysAgo(POST_TITLES.length - i),
       translationReady: { vi: true },
@@ -963,7 +1279,6 @@ async function seed() {
         title: story.en.title,
         text: story.en.text,
         variant: story.en.variant,
-        allowedShapes: 'allowedShapes' in story ? [...story.allowedShapes] : undefined,
       },
       story.vi,
       admin.id,
@@ -972,21 +1287,15 @@ async function seed() {
 
   // 5 projects
   const projectIds: number[] = []
-  for (const project of PROJECT_SEEDS) {
+  for (const [index, project] of PROJECT_SEEDS.entries()) {
     const doc = await upsertBySlug(payload, 'projects', project.slug, {
       title: project.en.title,
       summary: project.en.summary,
-      challenge: project.en.challenge,
-      solution: project.en.solution,
-      outcome: project.en.outcome,
-      author: authors[project.order % 2 === 0 ? 'khoa' : 'hana'].id,
+      author: authors[project.authorKey].id,
       owner: admin.id,
-      projectType: project.projectType,
-      projectStatus: 'completed',
       featured: project.featured,
-      order: project.order,
       _status: 'published',
-      publishedAt: daysAgo(project.order * 14),
+      publishedAt: daysAgo((index + 1) * 14),
       translationReady: { vi: true },
     })
 
@@ -996,9 +1305,6 @@ async function seed() {
       data: {
         title: project.vi.title,
         summary: project.vi.summary,
-        challenge: project.vi.challenge,
-        solution: project.vi.solution,
-        outcome: project.vi.outcome,
       },
       locale: 'vi',
       overrideAccess: true,
@@ -1011,21 +1317,48 @@ async function seed() {
     title: 'CNC fixture draft',
     summary: 'Unpublished fixture concept.',
     owner: creator?.id || admin.id,
-    projectStatus: 'concept',
     _status: 'draft',
   })
 
-  await payload.updateGlobal({
-    slug: 'frontpage',
-    data: {
-      featuredProjects: projectIds.filter((_, i) => PROJECT_SEEDS[i]?.featured),
-      featuredPosts: postIds.slice(0, 4),
-    },
-    locale: 'en',
-    overrideAccess: true,
-  })
+  // Seed media reused by Things / Videos (plant WebPs already in public/).
+  const mediaIds: number[] = []
+  for (const [index, plant] of PLANT_DECORATION_SEEDS.entries()) {
+    const id = await upsertSeedMedia(payload, plant.filename, `Seed media ${index + 1}`)
+    mediaIds.push(id)
+  }
+  if (mediaIds.length === 0) {
+    throw new Error('Expected plant decoration files for Things/Videos seed media.')
+  }
 
-  await upsertBySlug(payload, 'pages', 'about', {
+  const thingIds: number[] = []
+  for (const [index, thing] of THING_SEEDS.entries()) {
+    const primary = mediaIds[index % mediaIds.length]
+    const detail = mediaIds[(index + 1) % mediaIds.length]
+    const doc = await upsertThingByName(
+      payload,
+      thing.en,
+      thing.vi,
+      { primary, detail },
+      admin.id,
+      (index + 1) * 3,
+    )
+    thingIds.push(doc.id)
+  }
+
+  const videoIds: number[] = []
+  for (const [index, video] of VIDEO_SEEDS.entries()) {
+    const doc = await upsertVideoByTitle(
+      payload,
+      video.en,
+      video.vi,
+      mediaIds[index % mediaIds.length],
+      admin.id,
+      (index + 1) * 5,
+    )
+    videoIds.push(doc.id)
+  }
+
+  const aboutPage = await upsertBySlug(payload, 'pages', 'about', {
     title: 'About',
     summary: 'Maker behind the workshop notes.',
     template: 'about',
@@ -1039,51 +1372,496 @@ async function seed() {
     ],
     _status: 'published',
     publishedAt: daysAgo(90),
-  })
-
-  const portfolioPage = await upsertBySlug(payload, 'pages', 'portfolio', {
-    title: 'Portfolio',
-    summary: 'Selected workshop builds and case studies.',
-    template: 'generic',
-    layout: [
-      {
-        blockType: 'richText',
-        content: richText(
-          'Case studies from the bench — modular furniture, power distribution, sensors, enclosures, and homelab work.',
-        ),
-      },
-      {
-        blockType: 'projectsGrid',
-        heading: 'Featured projects',
-        items: projectIds,
-        featuredOnly: false,
-      },
-    ],
-    _status: 'published',
-    publishedAt: daysAgo(60),
     translationReady: { vi: true },
   })
 
   await payload.update({
     collection: 'pages',
-    id: portfolioPage.id,
+    id: aboutPage.id,
     data: {
-      title: 'Portfolio',
-      summary: 'Các bản build và case study đã chọn.',
+      title: 'Giới thiệu',
+      slug: 'about',
+      summary: 'Maker đứng sau các ghi chú xưởng.',
       layout: [
         {
           blockType: 'richText',
           content: richText(
-            'Case study từ bàn thợ — nội thất module, phân phối nguồn, cảm biến, vỏ bọc và homelab.',
+            'Trang này ghi lại dự án DIY, setup bàn làm việc và thử nghiệm điện tử từ một xưởng nhỏ tại nhà.',
           ),
         },
+      ],
+    },
+    locale: 'vi',
+    overrideAccess: true,
+  })
+
+  const projectsPage = await upsertBySlug(payload, 'pages', 'projects', {
+    title: 'Projects',
+    summary: 'Selected workshop builds and case studies.',
+    template: 'generic',
+    layout: [
+      {
+        id: 'seed-projects-index',
+        blockType: 'feedSection',
+        heading: 'projects',
+        description: 'All published builds from the workshop.',
+        feedType: 'projects',
+        source: 'latest',
+        pagination: 'infinite',
+        limit: 11,
+        showViewAll: false,
+        cursorPopup: "cool projects, isn't it ?",
+        cursorPopupEmpty: 'nothing here yet',
+        cursorPopupItem: 'view details',
+      },
+    ],
+    _status: 'published',
+    publishedAt: daysAgo(60),
+    translationReady: { vi: true },
+    seo: {
+      metaTitle: 'Projects',
+      metaDescription: 'Selected workshop builds and case studies.',
+    },
+  })
+
+  const postsPage = await upsertBySlug(payload, 'pages', 'posts', {
+    title: 'Posts',
+    summary: 'Notes, process logs, and maker write-ups.',
+    template: 'generic',
+    layout: [
+      {
+        id: 'seed-posts-index',
+        blockType: 'feedSection',
+        heading: 'posts',
+        description: 'All published notes from the bench.',
+        feedType: 'posts',
+        source: 'latest',
+        pagination: 'infinite',
+        limit: 11,
+        showViewAll: false,
+        cursorPopup: 'explore posts',
+        cursorPopupEmpty: 'nothing here yet',
+        cursorPopupItem: 'view details',
+      },
+    ],
+    _status: 'published',
+    publishedAt: daysAgo(55),
+    translationReady: { vi: true },
+    seo: {
+      metaTitle: 'Posts',
+      metaDescription: 'Notes, process logs, and maker write-ups.',
+    },
+  })
+
+  const thingsPage = await upsertBySlug(payload, 'pages', 'things', {
+    title: 'Things',
+    summary: 'Tools and gear from the bench.',
+    template: 'generic',
+    layout: [
+      {
+        id: 'seed-things-index',
+        blockType: 'feedSection',
+        heading: 'things',
+        description: 'All published tools and gear from the workshop.',
+        feedType: 'things',
+        source: 'latest',
+        pagination: 'infinite',
+        limit: 11,
+        showViewAll: false,
+        cursorPopup: 'tools & gear',
+        cursorPopupEmpty: 'nothing here yet',
+        cursorPopupItem: 'shop this',
+      },
+    ],
+    _status: 'published',
+    publishedAt: daysAgo(50),
+    translationReady: { vi: true },
+    seo: {
+      metaTitle: 'Things',
+      metaDescription: 'Tools and gear from the bench.',
+    },
+  })
+
+  const homePage = await upsertBySlug(payload, 'pages', 'home', {
+    title: 'Home',
+    summary: 'DIY builds, tech workspace, and maker notes',
+    template: 'home',
+    layout: [
+      {
+        id: 'seed-home-hero',
+        blockType: 'hero',
+        label: 'Hero',
+        title: 'TMCS Portfolio',
+        tagline: 'DIY builds, tech workspace, and maker notes',
+        bio: richText('Documenting builds, failures, and the tools that survive them.'),
+        cursorPopup: 'scroll down',
+        links: [
+          {
+            id: 'seed-home-hero-about',
+            label: 'About',
+            linkType: 'internal',
+            page: aboutPage.id,
+            newTab: false,
+          },
+        ],
+      },
+      {
+        id: 'seed-home-projects',
+        blockType: 'feedSection',
+        heading: 'projects',
+        description: 'Selected builds from the workshop.',
+        feedType: 'projects',
+        source: 'latest',
+        pagination: 'static',
+        limit: 11,
+        showViewAll: true,
+        viewAllLabel: 'View all projects',
+        viewAllPage: projectsPage.id,
+        cursorPopup: "cool projects, isn't it ?",
+        cursorPopupEmpty: 'nothing here yet',
+        cursorPopupItem: 'view details',
+        cursorPopupViewAll: 'view all projects',
+      },
+      {
+        id: 'seed-home-posts',
+        blockType: 'feedSection',
+        heading: 'posts',
+        description: 'Notes, process logs, and maker write-ups.',
+        feedType: 'posts',
+        source: 'latest',
+        pagination: 'static',
+        limit: 11,
+        showViewAll: true,
+        viewAllLabel: 'View all posts',
+        viewAllPage: postsPage.id,
+        cursorPopup: 'explore posts',
+        cursorPopupEmpty: 'nothing here yet',
+        cursorPopupItem: 'view details',
+        cursorPopupViewAll: 'view all posts',
+      },
+      {
+        id: 'seed-home-things',
+        blockType: 'feedSection',
+        heading: 'things',
+        description: 'Tools and gear from the bench.',
+        feedType: 'things',
+        source: 'latest',
+        pagination: 'static',
+        limit: 5,
+        showViewAll: true,
+        viewAllLabel: 'View all things',
+        viewAllPage: thingsPage.id,
+        cursorPopup: 'tools & gear',
+        cursorPopupEmpty: 'nothing here yet',
+        cursorPopupItem: 'shop this',
+        cursorPopupViewAll: 'view all things',
+      },
+      {
+        id: 'seed-home-videos',
+        blockType: 'feedSection',
+        heading: 'videos',
+        description: 'Short clips from the workshop.',
+        feedType: 'videos',
+        source: 'latest',
+        pagination: 'static',
+        limit: 11,
+        showViewAll: false,
+        cursorPopup: 'watch',
+        cursorPopupEmpty: 'nothing here yet',
+        cursorPopupItem: 'play',
+      },
+    ],
+    _status: 'published',
+    publishedAt: daysAgo(120),
+    translationReady: { vi: true },
+    seo: {
+      metaTitle: 'TMCS Portfolio',
+      metaDescription: 'DIY builds, tech workspace, and maker notes from a home workshop.',
+    },
+  })
+
+  const seedLinks = [
+    {
+      id: 'seed-link-about',
+      labelEn: 'About',
+      labelVi: 'Giới thiệu',
+      linkType: 'internal' as const,
+      page: aboutPage.id,
+      newTab: false,
+    },
+    {
+      id: 'seed-link-projects',
+      labelEn: 'Projects',
+      labelVi: 'Dự án',
+      linkType: 'internal' as const,
+      page: projectsPage.id,
+      newTab: false,
+    },
+    {
+      id: 'seed-link-posts',
+      labelEn: 'Posts',
+      labelVi: 'Bài viết',
+      linkType: 'internal' as const,
+      page: postsPage.id,
+      newTab: false,
+    },
+    {
+      id: 'seed-link-instagram',
+      labelEn: 'Instagram',
+      labelVi: 'Instagram',
+      linkType: 'external' as const,
+      url: 'https://instagram.com/tmcs',
+      newTab: true,
+    },
+    {
+      id: 'seed-link-youtube',
+      labelEn: 'YouTube',
+      labelVi: 'YouTube',
+      linkType: 'external' as const,
+      url: 'https://youtube.com/@tmcs',
+      newTab: true,
+    },
+    {
+      id: 'seed-link-github',
+      labelEn: 'GitHub',
+      labelVi: 'GitHub',
+      linkType: 'external' as const,
+      url: 'https://github.com/tmcs',
+      newTab: true,
+    },
+  ]
+
+  await payload.updateGlobal({
+    slug: 'site-settings',
+    data: {
+      bio: richText(
+        'Documenting builds, failures, and the tools that survive them.',
+        'Based in a small home workshop — posting maker notes and desk setups.',
+      ),
+      links: seedLinks.map((link) => ({
+        id: link.id,
+        label: link.labelEn,
+        linkType: link.linkType,
+        page: 'page' in link ? link.page : undefined,
+        url: 'url' in link ? link.url : undefined,
+        newTab: link.newTab,
+      })),
+    },
+    locale: 'en',
+    overrideAccess: true,
+  })
+
+  await payload.updateGlobal({
+    slug: 'site-settings',
+    data: {
+      bio: richText(
+        'Ghi lại bản build, thất bại và dụng cụ còn sót lại.',
+        'Từ một xưởng nhỏ tại nhà — chia sẻ ghi chú maker và setup bàn.',
+      ),
+      links: seedLinks.map((link) => ({
+        id: link.id,
+        label: link.labelVi,
+        linkType: link.linkType,
+        page: 'page' in link ? link.page : undefined,
+        url: 'url' in link ? link.url : undefined,
+        newTab: link.newTab,
+      })),
+    },
+    locale: 'vi',
+    overrideAccess: true,
+  })
+
+  await payload.update({
+    collection: 'pages',
+    id: projectsPage.id,
+    data: {
+      title: 'Dự án',
+      slug: 'projects',
+      summary: 'Các bản build và case study đã chọn.',
+      layout: [
         {
-          blockType: 'projectsGrid',
-          heading: 'Dự án nổi bật',
-          items: projectIds,
-          featuredOnly: false,
+          id: 'seed-projects-index',
+          blockType: 'feedSection',
+          heading: 'dự án',
+          description: 'Tất cả bản build đã xuất bản từ xưởng.',
+          feedType: 'projects',
+          source: 'latest',
+          pagination: 'infinite',
+          limit: 11,
+          showViewAll: false,
+          cursorPopup: 'những dự án hay, đúng không?',
+          cursorPopupEmpty: 'chưa có gì ở đây',
+          cursorPopupItem: 'xem chi tiết',
         },
       ],
+      seo: {
+        metaTitle: 'Dự án',
+        metaDescription: 'Các bản build và case study đã chọn.',
+      },
+    },
+    locale: 'vi',
+    overrideAccess: true,
+  })
+
+  await payload.update({
+    collection: 'pages',
+    id: postsPage.id,
+    data: {
+      title: 'Bài viết',
+      slug: 'posts',
+      summary: 'Ghi chú, nhật ký quy trình và bài viết maker.',
+      layout: [
+        {
+          id: 'seed-posts-index',
+          blockType: 'feedSection',
+          heading: 'bài viết',
+          description: 'Tất cả ghi chú đã xuất bản từ bàn thợ.',
+          feedType: 'posts',
+          source: 'latest',
+          pagination: 'infinite',
+          limit: 11,
+          showViewAll: false,
+          cursorPopup: 'khám phá bài viết',
+          cursorPopupEmpty: 'chưa có gì ở đây',
+          cursorPopupItem: 'xem chi tiết',
+        },
+      ],
+      seo: {
+        metaTitle: 'Bài viết',
+        metaDescription: 'Ghi chú, nhật ký quy trình và bài viết maker.',
+      },
+    },
+    locale: 'vi',
+    overrideAccess: true,
+  })
+
+  await payload.update({
+    collection: 'pages',
+    id: thingsPage.id,
+    data: {
+      title: 'Món đồ',
+      slug: 'things',
+      summary: 'Dụng cụ và đồ nghề từ bàn thợ.',
+      layout: [
+        {
+          id: 'seed-things-index',
+          blockType: 'feedSection',
+          heading: 'món đồ',
+          description: 'Tất cả dụng cụ và đồ nghề đã xuất bản từ xưởng.',
+          feedType: 'things',
+          source: 'latest',
+          pagination: 'infinite',
+          limit: 11,
+          showViewAll: false,
+          cursorPopup: 'dụng cụ & đồ nghề',
+          cursorPopupEmpty: 'chưa có gì ở đây',
+          cursorPopupItem: 'mua món này',
+        },
+      ],
+      seo: {
+        metaTitle: 'Món đồ',
+        metaDescription: 'Dụng cụ và đồ nghề từ bàn thợ.',
+      },
+    },
+    locale: 'vi',
+    overrideAccess: true,
+  })
+
+  await payload.update({
+    collection: 'pages',
+    id: homePage.id,
+    data: {
+      title: 'Trang chủ',
+      summary: 'Dự án DIY, không gian tech và ghi chú maker',
+      layout: [
+        {
+          id: 'seed-home-hero',
+          blockType: 'hero',
+          label: 'Hero',
+          title: 'TMCS Portfolio',
+          tagline: 'Dự án DIY, không gian tech và ghi chú maker',
+          bio: richText('Ghi lại bản build, thất bại và dụng cụ còn sót lại.'),
+          cursorPopup: 'kéo xuống',
+          links: [
+            {
+              id: 'seed-home-hero-about',
+              label: 'Giới thiệu',
+              linkType: 'internal',
+              page: aboutPage.id,
+              newTab: false,
+            },
+          ],
+        },
+        {
+          id: 'seed-home-projects',
+          blockType: 'feedSection',
+          heading: 'dự án',
+          description: 'Những bản build chọn lọc từ xưởng.',
+          feedType: 'projects',
+          source: 'latest',
+          pagination: 'static',
+          limit: 11,
+          showViewAll: true,
+          viewAllLabel: 'Xem tất cả dự án',
+          viewAllPage: projectsPage.id,
+          cursorPopup: 'những dự án hay, đúng không?',
+          cursorPopupEmpty: 'chưa có gì ở đây',
+          cursorPopupItem: 'xem chi tiết',
+          cursorPopupViewAll: 'xem tất cả dự án',
+        },
+        {
+          id: 'seed-home-posts',
+          blockType: 'feedSection',
+          heading: 'bài viết',
+          description: 'Ghi chú, nhật ký quy trình và bài viết maker.',
+          feedType: 'posts',
+          source: 'latest',
+          pagination: 'static',
+          limit: 11,
+          showViewAll: true,
+          viewAllLabel: 'Xem tất cả bài viết',
+          viewAllPage: postsPage.id,
+          cursorPopup: 'khám phá bài viết',
+          cursorPopupEmpty: 'chưa có gì ở đây',
+          cursorPopupItem: 'xem chi tiết',
+          cursorPopupViewAll: 'xem tất cả bài viết',
+        },
+        {
+          id: 'seed-home-things',
+          blockType: 'feedSection',
+          heading: 'món đồ',
+          description: 'Dụng cụ và đồ nghề từ bàn thợ.',
+          feedType: 'things',
+          source: 'latest',
+          pagination: 'static',
+          limit: 5,
+          showViewAll: true,
+          viewAllLabel: 'Xem tất cả món đồ',
+          viewAllPage: thingsPage.id,
+          cursorPopup: 'dụng cụ & đồ nghề',
+          cursorPopupEmpty: 'chưa có gì ở đây',
+          cursorPopupItem: 'mua món này',
+          cursorPopupViewAll: 'xem tất cả món đồ',
+        },
+        {
+          id: 'seed-home-videos',
+          blockType: 'feedSection',
+          heading: 'video',
+          description: 'Clip ngắn từ xưởng.',
+          feedType: 'videos',
+          source: 'latest',
+          pagination: 'static',
+          limit: 11,
+          showViewAll: false,
+          cursorPopup: 'xem',
+          cursorPopupEmpty: 'chưa có gì ở đây',
+          cursorPopupItem: 'phát',
+        },
+      ],
+      seo: {
+        metaTitle: 'TMCS Portfolio',
+        metaDescription: 'Dự án DIY, không gian tech và ghi chú maker từ xưởng tại nhà.',
+      },
     },
     locale: 'vi',
     overrideAccess: true,
@@ -1097,6 +1875,12 @@ async function seed() {
   console.log(`- Published posts: ${postIds.length}`)
   console.log(`- Short stories: ${SHORT_STORY_SEEDS.length}`)
   console.log(`- Published projects: ${projectIds.length}`)
+  console.log(`- Things: ${thingIds.length}`)
+  console.log(`- Videos: ${videoIds.length}`)
+  console.log(`- Home page: ${homePage.id}`)
+  console.log(`- Posts page: ${postsPage.id}`)
+  console.log(`- Projects page: ${projectsPage.id}`)
+  console.log(`- Things page: ${thingsPage.id}`)
   if (managerEmail) console.log(`- Manager: ${managerEmail}`)
   if (creatorEmail) console.log(`- Creator: ${creatorEmail}`)
   console.log('Seed complete. Run bun run migrate if schema migrations are pending.')

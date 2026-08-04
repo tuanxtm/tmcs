@@ -56,6 +56,8 @@ export const socialLinkFields: Field[] = [
       { label: 'YouTube', value: 'youtube' },
       { label: 'Facebook', value: 'facebook' },
       { label: 'Instagram', value: 'instagram' },
+      { label: 'TikTok', value: 'tiktok' },
+      { label: 'Threads', value: 'threads' },
       { label: 'Website', value: 'website' },
       { label: 'Other', value: 'other' },
     ],

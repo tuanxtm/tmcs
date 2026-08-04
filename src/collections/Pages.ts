@@ -5,7 +5,7 @@ import { adminOrManager, publishedOrStaff } from '@/access'
 import { pageBlocks } from '@/blocks'
 import { publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
-import { setPublishedAt } from '@/hooks'
+import { setPublishedAt, validateHomePage } from '@/hooks'
 import { revalidatePages, revalidatePagesDelete } from '@/hooks/revalidateFrontend'
 import { buildPreviewUrl } from '@/lib/preview'
 
@@ -19,6 +19,8 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'template', '_status', 'updatedAt'],
     group: 'Content',
+    description:
+      'Home template documents power `/` and `/vi` via layout blocks. Other templates render at `/[slug]` and `/vi/[slug]`.',
     preview: (doc, { locale }) => {
       const slug = typeof doc?.slug === 'string' ? doc.slug : ''
       return buildPreviewUrl('pages', slug, locale)
@@ -40,7 +42,7 @@ export const Pages: CollectionConfig = {
     readVersions: adminOrManager,
   },
   hooks: {
-    beforeChange: [setPublishedAt],
+    beforeChange: [setPublishedAt, validateHomePage],
     afterChange: [revalidatePages],
     afterDelete: [revalidatePagesDelete],
   },
@@ -99,7 +101,8 @@ export const Pages: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
-        description: 'Stable template key for the future frontend. No styling encoded here.',
+        description:
+          'Home powers `/` and `/vi`. Only one published Home page is allowed; it must include exactly one Hero block.',
       },
     },
     publishedAtField(),

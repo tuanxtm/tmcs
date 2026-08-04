@@ -16,7 +16,7 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-[50vh] dash-b py-20">
+    <div className="min-h-[50vh] py-20">
       <p className="page-label">Error</p>
       <h1 className="mt-4 text-3xl font-medium tracking-tight">Something went wrong</h1>
       <p className="mt-3 max-w-lg text-sm text-muted-foreground">

@@ -1,16 +1,17 @@
 import { test, expect } from '@playwright/test'
 
 /**
- * Public frontend checks for the localized homepage shell and post feed.
+ * Public frontend checks for the localized homepage shell and CMS block feed.
  * Content reads use Payload Local API / Server Actions; public REST remains under `(payload)/api`.
  */
 test.describe('Frontend homepage', () => {
-  test('english homepage renders hero and posts section', async ({ page }) => {
+  test('english homepage renders hero and feed sections', async ({ page }) => {
     const response = await page.goto('http://localhost:3000/')
     expect(response?.ok()).toBeTruthy()
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
     await expect(page.locator('#hero-heading')).toBeVisible()
-    await expect(page.locator('#posts-heading')).toBeVisible()
+    await expect(page.locator('[data-feed-type="projects"]')).toBeVisible()
+    await expect(page.locator('[data-feed-type="posts"]')).toBeVisible()
     await expect(page.locator('header')).toBeVisible()
     await expect(page.locator('footer')).toBeVisible()
   })
@@ -20,33 +21,104 @@ test.describe('Frontend homepage', () => {
     expect(response?.ok()).toBeTruthy()
     await expect(page.locator('html')).toHaveAttribute('lang', 'vi')
     await expect(page.locator('#hero-heading')).toBeVisible()
+    await expect(page.locator('[data-feed-type="projects"] .section-header h2')).toBeVisible()
   })
 
-  test('header is sticky', async ({ page }) => {
+  test('header is sticky and shows site name', async ({ page }) => {
     await page.goto('http://localhost:3000/')
     const header = page.locator('header')
     await expect(header).toHaveCSS('position', 'sticky')
+    await expect(header.locator('a').first()).toBeVisible()
+    await expect(header).toHaveAttribute('data-scrolled', 'false')
+
+    await page.evaluate(() => window.scrollTo(0, 120))
+    await expect(header).toHaveAttribute('data-scrolled', 'true')
   })
 
-  test('desktop hero places image before text in the grid', async ({ page }) => {
+  test('section headers stick below the site header', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
-    const hero = page.locator('section[aria-labelledby="hero-heading"]')
-    await expect(hero).toBeVisible()
-    const grid = hero.locator('.lg\\:grid-cols-2').first()
-    await expect(grid).toBeVisible()
-    // Image panel precedes the text panel in DOM order.
-    const panels = grid.locator(':scope > div')
-    await expect(panels).toHaveCount(2)
-    await expect(panels.nth(0).locator('#hero-heading')).toHaveCount(0)
-    await expect(panels.nth(1).locator('#hero-heading')).toHaveCount(1)
+
+    const sectionHeader = page.locator('[data-feed-type="projects"] .section-header')
+    await expect(sectionHeader).toHaveCSS('position', 'sticky')
+    await expect(sectionHeader).toHaveAttribute('data-stuck', 'false')
+
+    const expectedStickyHeight = await page.evaluate(() => {
+      const raw = getComputedStyle(document.documentElement)
+        .getPropertyValue('--section-sticky-header-height')
+        .trim()
+      const value = Number.parseFloat(raw)
+      if (raw.endsWith('rem')) {
+        return value * Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
+      }
+      return value
+    })
+
+    await page.evaluate(() => {
+      const siteHeader = document.querySelector('header')
+      const sectionHeaderEl = document.querySelector('[data-feed-type="projects"] .section-header')
+      if (!siteHeader || !sectionHeaderEl) return
+      const siteHeight = siteHeader.getBoundingClientRect().height
+      const absoluteTop = sectionHeaderEl.getBoundingClientRect().top + window.scrollY
+      window.scrollTo({ top: absoluteTop - siteHeight + 4, behavior: 'instant' })
+    })
+
+    await expect(sectionHeader).toHaveAttribute('data-stuck', 'true')
+    await expect
+      .poll(async () => {
+        const box = await sectionHeader.boundingBox()
+        return box?.height ?? 0
+      })
+      .toBeLessThan(expectedStickyHeight + 2)
+
+    const metrics = await page.evaluate(() => {
+      const siteHeader = document.querySelector('header')
+      const sectionHeaderEl = document.querySelector('[data-feed-type="projects"] .section-header')
+      if (!siteHeader || !sectionHeaderEl) return null
+      return {
+        top: sectionHeaderEl.getBoundingClientRect().top,
+        siteBottom: siteHeader.getBoundingClientRect().bottom,
+        height: sectionHeaderEl.getBoundingClientRect().height,
+      }
+    })
+
+    expect(metrics).not.toBeNull()
+    expect(Math.abs(metrics!.top - metrics!.siteBottom)).toBeLessThan(3)
+    expect(Math.abs(metrics!.height - expectedStickyHeight)).toBeLessThan(2)
   })
 
-  test('desktop post feed uses a four-column bento grid', async ({ page }) => {
+  test('first fold is header + hero + first section header at 100dvh', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
-    const grid = page.locator('.bento-grid:visible')
-    if ((await page.locator('.bento-tile').count()) === 0) {
+
+    const fold = await page.evaluate(() => {
+      const header = document.querySelector('header')
+      const hero = document.querySelector('#hero')
+      const sectionHeader = document.querySelector('[data-feed-type] .section-header')
+      if (!header || !hero || !sectionHeader) return null
+
+      const headerRect = header.getBoundingClientRect()
+      const heroRect = hero.getBoundingClientRect()
+      const sectionRect = sectionHeader.getBoundingClientRect()
+      const total = headerRect.height + heroRect.height + sectionRect.height
+      return {
+        total,
+        viewport: window.innerHeight,
+        headerHeight: headerRect.height,
+        sectionHeaderHeight: sectionRect.height,
+      }
+    })
+
+    expect(fold).not.toBeNull()
+    expect(Math.abs(fold!.total - fold!.viewport) / fold!.viewport).toBeLessThan(0.03)
+    expect(Math.abs(fold!.headerHeight - fold!.sectionHeaderHeight)).toBeLessThan(2)
+  })
+
+  test('desktop feed grids use four columns', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('http://localhost:3000/')
+    const grid = page.locator('[data-feed-type="projects"] .feed-grid')
+    if ((await page.locator('[data-feed-type="projects"] .feed-grid-item').count()) === 0) {
       test.skip()
       return
     }
@@ -54,81 +126,56 @@ test.describe('Frontend homepage', () => {
     await expect(grid).toHaveCSS('grid-template-columns', /.+ .+ .+ .+/)
   })
 
-  test('1x1 bento tiles stay square on desktop', async ({ page }) => {
+  test('feed images keep natural aspect ratios', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
 
-    const square = await page.locator('.bento-grid:visible').evaluate((grid) => {
-      const cols = Number.parseFloat(getComputedStyle(grid).getPropertyValue('--bento-cols')) || 4
-      const cellSize = grid.getBoundingClientRect().width / cols
-      if (cellSize <= 0) return null
-
-      for (const tile of grid.querySelectorAll('.bento-tile')) {
-        const rect = tile.getBoundingClientRect()
-        const isOneByOne =
-          Math.abs(rect.width - cellSize) / cellSize < 0.05 &&
-          Math.abs(rect.height - cellSize) / cellSize < 0.05
-        if (isOneByOne) {
-          return { width: rect.width, height: rect.height }
-        }
-      }
-      return null
-    })
-
-    if (!square || square.width <= 0) {
+    const images = page.locator('[data-feed-type="projects"] .feed-grid-item img')
+    if ((await images.count()) === 0) {
       test.skip()
       return
     }
 
-    expect(Math.abs(square.width - square.height) / square.width).toBeLessThan(0.02)
+    const natural = await images.first().evaluate((img: HTMLImageElement) => {
+      if (!img.naturalWidth || !img.naturalHeight) return null
+      const rect = img.getBoundingClientRect()
+      const naturalRatio = img.naturalWidth / img.naturalHeight
+      const renderedRatio = rect.width / rect.height
+      return { naturalRatio, renderedRatio }
+    })
+
+    if (!natural) {
+      test.skip()
+      return
+    }
+
+    expect(Math.abs(natural.naturalRatio - natural.renderedRatio) / natural.naturalRatio).toBeLessThan(
+      0.08,
+    )
   })
 
-  test('mobile post feed uses a two-column packed grid', async ({ page }) => {
+  test('mobile feed collapses to one column', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('http://localhost:3000/')
 
-    const grid = page.locator('.bento-grid:visible')
-    if ((await page.locator('.bento-tile').count()) === 0) {
+    const grid = page.locator('[data-feed-type="projects"] .feed-grid')
+    if ((await page.locator('[data-feed-type="projects"] .feed-grid-item').count()) === 0) {
       test.skip()
       return
     }
 
     await expect(grid).toBeVisible()
-    await expect(grid).toHaveCSS('grid-template-columns', /.+ .+/)
-
-    const square = await grid.evaluate((el) => {
-      const cols = Number.parseFloat(getComputedStyle(el).getPropertyValue('--bento-cols')) || 2
-      const cellSize = el.getBoundingClientRect().width / cols
-      if (cellSize <= 0) return null
-
-      for (const tile of el.querySelectorAll('.bento-tile')) {
-        const rect = tile.getBoundingClientRect()
-        const isOneByOne =
-          Math.abs(rect.width - cellSize) / cellSize < 0.05 &&
-          Math.abs(rect.height - cellSize) / cellSize < 0.05
-        if (isOneByOne) {
-          return { width: rect.width, height: rect.height }
-        }
-      }
-      return null
-    })
-
-    if (!square || square.width <= 0) {
-      test.skip()
-      return
-    }
-
-    expect(Math.abs(square.width - square.height) / square.width).toBeLessThan(0.02)
+    await expect(grid).toHaveCSS('grid-template-columns', /^[^\s]+$/)
   })
 
-  test('post tile titles remain accessible to assistive tech', async ({ page }) => {
+  test('feed tile titles remain accessible to assistive tech', async ({ page }) => {
     await page.goto('http://localhost:3000/')
-    const tile = page.locator('.bento-tile').first()
+    const tile = page.locator('[data-feed-type="projects"] .feed-grid-item').first()
     if ((await tile.count()) === 0) {
       test.skip()
       return
     }
-    await expect(tile.locator('.sr-only, h3').first()).toBeAttached()
+    await expect(tile.locator('h3').first()).toBeAttached()
   })
 
   test('payload posts REST API serves published docs', async ({ request }) => {
@@ -142,14 +189,133 @@ test.describe('Frontend homepage', () => {
     expect(body).toHaveProperty('hasNextPage')
   })
 
-  test('payload short-stories REST API is readable', async ({ request }) => {
+  test('payload projects REST API serves published docs', async ({ request }) => {
     const response = await request.get(
-      'http://localhost:3000/api/short-stories?limit=6&depth=0&locale=en',
+      'http://localhost:3000/api/projects?limit=6&page=1&sort=-publishedAt&depth=1&locale=en',
     )
     expect(response.ok()).toBeTruthy()
     const body = await response.json()
     expect(body).toHaveProperty('docs')
     expect(Array.isArray(body.docs)).toBeTruthy()
+    expect(body).toHaveProperty('hasNextPage')
+  })
+
+  test('load more / infinite scroll affordance is available on archive pages', async ({ page }) => {
+    await page.goto('http://localhost:3000/posts')
+    const endMarker = page.getByText('End of feed')
+    const scrollHint = page.getByText(/Scroll for more|Loading/i)
+    const hasEnd = (await endMarker.count()) > 0
+    const hasScroll = (await scrollHint.count()) > 0
+    const hasPosts = (await page.locator('[data-feed-type="posts"]').count()) > 0
+    expect(hasEnd || hasScroll || hasPosts).toBeTruthy()
+  })
+
+  test('posts section shows view all tile after feed items', async ({ page }) => {
+    await page.goto('http://localhost:3000/')
+    const items = page.locator('[data-feed-type="posts"] .feed-grid-item')
+    const count = await items.count()
+    if (count === 0) {
+      test.skip()
+      return
+    }
+
+    const viewAll = page.getByRole('link', { name: /view all posts/i })
+    await expect(viewAll).toBeVisible()
+    await expect(viewAll).toHaveAttribute('href', /\/posts$/)
+    expect(count).toBeLessThanOrEqual(12)
+  })
+
+  test('projects section shows view all tile after feed items', async ({ page }) => {
+    await page.goto('http://localhost:3000/')
+    const items = page.locator('[data-feed-type="projects"] .feed-grid-item')
+    const count = await items.count()
+    if (count === 0) {
+      test.skip()
+      return
+    }
+
+    const viewAll = page.getByRole('link', { name: /view all projects/i })
+    await expect(viewAll).toBeVisible()
+    await expect(viewAll).toHaveAttribute('href', /\/projects$/)
+    expect(count).toBeLessThanOrEqual(12)
+  })
+
+  test('about page renders from CMS slug route', async ({ page }) => {
+    const response = await page.goto('http://localhost:3000/about')
+    expect(response?.ok()).toBeTruthy()
+    await expect(page.locator('header')).toBeVisible()
+    await expect(page.locator('main')).toBeVisible()
+  })
+
+  test('projects archive page uses infinite feed section', async ({ page }) => {
+    const response = await page.goto('http://localhost:3000/projects')
+    expect(response?.ok()).toBeTruthy()
+    await expect(page.locator('[data-feed-type="projects"]')).toBeVisible()
+  })
+
+  test('vietnamese about page sets lang', async ({ page }) => {
+    const response = await page.goto('http://localhost:3000/vi/about')
+    expect(response?.ok()).toBeTruthy()
+    await expect(page.locator('html')).toHaveAttribute('lang', 'vi')
+  })
+
+  test('unknown page slug returns not found', async ({ page }) => {
+    const response = await page.goto('http://localhost:3000/this-page-does-not-exist-xyz')
+    expect(response?.status()).toBe(404)
+    await expect(page.getByRole('heading', { name: /page not found/i })).toBeVisible()
+  })
+
+  test('posts archive grows after scrolling when more pages exist', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('http://localhost:3000/posts')
+
+    const items = page.locator('[data-feed-type="posts"] .feed-grid-item')
+    const initialCount = await items.count()
+    if (initialCount === 0) {
+      test.skip()
+      return
+    }
+
+    const scrollHint = page.getByText(/Scroll for more/i)
+    if ((await scrollHint.count()) === 0) {
+      test.skip()
+      return
+    }
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+    await expect
+      .poll(async () => items.count(), { timeout: 10000 })
+      .toBeGreaterThan(initialCount)
+  })
+
+  test('cursor popup follows section under the pointer', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('http://localhost:3000/')
+
+    const bubble = page.locator('[data-cursor-popup-bubble]')
+
+    const hero = page.locator('#hero')
+    await hero.hover({ position: { x: 40, y: 40 } })
+    await expect(bubble).toHaveCount(0)
+    await expect(bubble).toBeVisible({ timeout: 2000 })
+    await expect(bubble).toHaveText(/scroll down|kéo xuống/i)
+
+    const projectsHeader = page.locator('[data-feed-type="projects"] .section-header h2')
+    await projectsHeader.scrollIntoViewIfNeeded()
+    await projectsHeader.hover()
+    await expect(bubble).toBeVisible({ timeout: 2000 })
+    await expect(bubble).toHaveText(/cool projects|dự án/i)
+
+    const postsHeader = page.locator('[data-feed-type="posts"] .section-header h2')
+    await postsHeader.scrollIntoViewIfNeeded()
+    await postsHeader.hover()
+    await expect(bubble).toBeVisible({ timeout: 2000 })
+    await expect(bubble).toHaveText(/explore posts|bài viết/i)
+
+    const footer = page.locator('footer')
+    await footer.scrollIntoViewIfNeeded()
+    await footer.hover({ position: { x: 40, y: 20 } })
+    await expect(bubble).toHaveCount(0)
   })
 
   test('focus styles remain visible on skip link', async ({ page }) => {
@@ -157,15 +323,6 @@ test.describe('Frontend homepage', () => {
     await page.keyboard.press('Tab')
     const skip = page.getByRole('link', { name: 'Skip to content' })
     await expect(skip).toBeFocused()
-  })
-
-  test('load more control is available when hasNextPage is true', async ({ page }) => {
-    await page.goto('http://localhost:3000/')
-    const endMarker = page.getByText('End of feed')
-    const loadMore = page.getByRole('button', { name: 'Load more' })
-    const hasEnd = (await endMarker.count()) > 0
-    const hasLoadMore = (await loadMore.count()) > 0
-    expect(hasEnd || hasLoadMore).toBeTruthy()
   })
 
   test('contact endpoint rejects invalid payloads', async ({ request }) => {

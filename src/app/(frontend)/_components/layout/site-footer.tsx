@@ -1,15 +1,4 @@
 import Link from 'next/link'
-import {
-  IconBrandFacebook,
-  IconBrandGithub,
-  IconBrandInstagram,
-  IconBrandLinkedin,
-  IconBrandX,
-  IconBrandYoutube,
-  IconLink,
-  IconWorld,
-  type Icon,
-} from '@tabler/icons-react'
 
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { FooterDecoration } from '@/app/(frontend)/_components/layout/footer-decoration'
@@ -18,17 +7,6 @@ import type { SiteShellView } from '@/app/(frontend)/_lib/types'
 
 type SiteFooterProps = {
   shell: SiteShellView
-}
-
-const SOCIAL_ICONS: Record<string, Icon> = {
-  github: IconBrandGithub,
-  linkedin: IconBrandLinkedin,
-  x: IconBrandX,
-  youtube: IconBrandYoutube,
-  facebook: IconBrandFacebook,
-  instagram: IconBrandInstagram,
-  website: IconWorld,
-  other: IconLink,
 }
 
 function replaceYear(value: string | null, siteName: string): string {
@@ -43,7 +21,7 @@ export function SiteFooter({ shell }: SiteFooterProps) {
 
   return (
     <footer>
-      <div className="dash-b relative flex h-[calc(2*var(--bento-tile))] flex-col justify-between p-2">
+      <div className="relative flex h-[calc(2*var(--bento-tile))] flex-col justify-between p-2">
         <div className="max-w-sm">
           {footer.text ? (
             <CmsRichText
@@ -91,26 +69,6 @@ export function SiteFooter({ shell }: SiteFooterProps) {
             {replaceYear(footer.copyright, siteName)}
           </p>
         </div>
-        {footer.socialLinks.length > 0 ? (
-          <ul className="flex flex-row items-center gap-3">
-            {footer.socialLinks.map((link) => {
-              const Icon = SOCIAL_ICONS[link.platform] ?? IconLink
-              return (
-                <li key={link.id}>
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={link.label || link.platform}
-                    className="text-secondary-foreground transition-colors hover:text-foreground"
-                  >
-                    <Icon aria-hidden="true" className="size-5" stroke={2} />
-                  </a>
-                </li>
-              )
-            })}
-          </ul>
-        ) : null}
       </div>
     </footer>
   )

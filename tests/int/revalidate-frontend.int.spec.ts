@@ -10,6 +10,7 @@ import {
   createCollectionRevalidateDeleteHook,
   createCollectionRevalidateHook,
   createGlobalRevalidateHook,
+  revalidatePages,
 } from '@/hooks/revalidateFrontend'
 import { CACHE_TAGS } from '@/lib/cache-tags'
 
@@ -64,13 +65,24 @@ describe('revalidateFrontend hooks', () => {
   })
 
   it('always revalidates globals unless disabled', () => {
-    const hook = createGlobalRevalidateHook([CACHE_TAGS.frontpage, CACHE_TAGS.siteShell])
+    const hook = createGlobalRevalidateHook([CACHE_TAGS.siteShell, CACHE_TAGS.decorationPacks])
     hook({
       doc: {},
       req: { context: {}, payload: { logger: { info: vi.fn() } } },
     } as never)
 
-    expect(revalidateTag).toHaveBeenCalledWith(CACHE_TAGS.frontpage, 'max')
+    expect(revalidateTag).toHaveBeenCalledWith(CACHE_TAGS.siteShell, 'max')
+    expect(revalidateTag).toHaveBeenCalledWith(CACHE_TAGS.decorationPacks, 'max')
+  })
+
+  it('revalidates pages and site shell when a page publishes', () => {
+    revalidatePages({
+      doc: { _status: 'published', template: 'home' },
+      previousDoc: { _status: 'draft', template: 'home' },
+      req: { context: {}, payload: { logger: { info: vi.fn() } } },
+    } as never)
+
+    expect(revalidateTag).toHaveBeenCalledWith(CACHE_TAGS.pages, 'max')
     expect(revalidateTag).toHaveBeenCalledWith(CACHE_TAGS.siteShell, 'max')
   })
 })

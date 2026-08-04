@@ -27,3 +27,7 @@ export function switchLocalePath(pathname: string, target: LocaleCode): string {
 export function homeHref(locale: LocaleCode): string {
   return localePath(locale, '/')
 }
+
+export function pageHref(locale: LocaleCode, slug: string): string {
+  return localePath(locale, `/${slug}`)
+}

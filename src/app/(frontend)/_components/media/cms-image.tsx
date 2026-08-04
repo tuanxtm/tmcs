@@ -54,7 +54,7 @@ export function CmsImage({
         height={height}
         sizes={sizes}
         priority={priority}
-        className={cn('h-auto w-full object-cover', imgClassName)}
+        className={cn('h-auto w-full', imgClassName)}
       />
     </div>
   )

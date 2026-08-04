@@ -5,8 +5,14 @@ import type { Metadata } from 'next'
 import { getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { parseLocale, SITE_LOCALE_HEADER } from '@/app/(frontend)/_lib/locale'
 import { Background } from '@/app/(frontend)/_components/layout/background'
+import { BootSplash } from '@/app/(frontend)/_components/layout/boot-splash'
+import { CursorPopup } from '@/app/(frontend)/_components/layout/cursor-popup'
 import { SiteFooter } from '@/app/(frontend)/_components/layout/site-footer'
-import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
+import {
+  BootRevealContent,
+  BootRevealProvider,
+} from '@/app/(frontend)/_components/providers/boot-reveal'
+import { LenisProvider } from '@/app/(frontend)/_components/providers/lenis-provider'
 import { MotionProvider } from '@/app/(frontend)/_components/providers/motion-provider'
 
 import './styles.css'
@@ -60,24 +66,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${geistSans.variable} ${geistMono.variable} ${fanwoodText.variable}`}
     >
       <body className="relative min-h-dvh text-foreground">
-        <Background />
         <MotionProvider>
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
-          >
-            Skip to content
-          </a>
-          <SiteHeader
-            locale={locale}
-            siteName={shell.siteName}
-            navigation={shell.navigation}
-            contactEmail={shell.contactEmail}
-          />
-          <div className="page-frame">
-            <main id="main-content">{children}</main>
-            <SiteFooter shell={shell} />
-          </div>
+          <LenisProvider>
+            <BootRevealProvider>
+              <Background />
+              <BootSplash locale={locale} />
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
+              >
+                Skip to content
+              </a>
+              <BootRevealContent className="page-frame">
+                <main id="main-content">{children}</main>
+                <SiteFooter shell={shell} />
+              </BootRevealContent>
+              <CursorPopup />
+            </BootRevealProvider>
+          </LenisProvider>
         </MotionProvider>
       </body>
     </html>

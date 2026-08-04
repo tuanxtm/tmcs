@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 
-import { getFeedDecorations, getFrontpage, getPostsPage, getShortStories, getSiteShell } from '@/app/(frontend)/_lib/cms'
+import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
+import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
+import { getSiteShell } from '@/app/(frontend)/_lib/cms'
+import { firstHeroBlock, getHomePage } from '@/app/(frontend)/_lib/home-page'
 import { homeHref } from '@/app/(frontend)/_lib/locale'
 import type { LocaleCode } from '@/lib/locales'
-import { Hero } from '@/app/(frontend)/_components/home/hero'
-import { PostFeed } from '@/app/(frontend)/_components/posts/post-feed'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,12 +14,19 @@ type HomePageProps = {
 }
 
 export async function generateHomeMetadata(locale: LocaleCode): Promise<Metadata> {
-  const [shell, frontpage] = await Promise.all([getSiteShell(locale), getFrontpage(locale)])
-  const title = shell.seo.metaTitle || shell.siteName
+  const [shell, home] = await Promise.all([getSiteShell(locale), getHomePage(locale)])
+  const hero = firstHeroBlock(home.blocks)
+
+  const title = home.seo.metaTitle || home.title || shell.seo.metaTitle || shell.siteName
   const description =
-    frontpage.subheading || shell.seo.metaDescription || shell.description || undefined
-  const image = frontpage.image || shell.seo.ogImage || shell.defaultSocialImage
-  const canonical = `${shell.siteUrl}${homeHref(locale)}`
+    home.seo.metaDescription ||
+    home.summary ||
+    hero?.tagline ||
+    shell.seo.metaDescription ||
+    shell.description ||
+    undefined
+  const image = home.seo.ogImage || home.heroMedia || hero?.coverImage || hero?.profileImage || shell.seo.ogImage || shell.defaultSocialImage
+  const canonical = home.seo.canonicalUrl || `${shell.siteUrl}${homeHref(locale)}`
 
   return {
     title,
@@ -53,41 +61,29 @@ export async function generateHomeMetadata(locale: LocaleCode): Promise<Metadata
       description,
       images: image ? [image.url] : undefined,
     },
-    robots: shell.robotsIndex
-      ? undefined
-      : {
-          index: false,
-          follow: false,
-        },
+    robots:
+      home.seo.noIndex || !shell.robotsIndex
+        ? {
+            index: false,
+            follow: !home.seo.noFollow && shell.robotsIndex,
+          }
+        : home.seo.noFollow
+          ? { follow: false }
+          : undefined,
   }
 }
 
 export async function HomePage({ locale }: HomePageProps) {
-  // Frontpage starts immediately so decorations can chain from its pack ID
-  // while posts/stories load in parallel.
-  const frontpagePromise = getFrontpage(locale)
-  const decorationsPromise = frontpagePromise.then((hero) =>
-    getFeedDecorations(hero.activeDecorationPackId),
-  )
-
-  const [hero, posts, shortStories, decorations] = await Promise.all([
-    frontpagePromise,
-    getPostsPage(locale, null),
-    getShortStories(locale),
-    decorationsPromise,
-  ])
+  const [shell, home] = await Promise.all([getSiteShell(locale), getHomePage(locale)])
 
   return (
-    <div className="min-h-[50vh]">
-      <Hero hero={hero} />
-      <PostFeed
+    <div>
+      <SiteHeader siteName={shell.siteName} locale={locale} navigation={shell.navigation} />
+      <PageBlocks
+        blocks={home.blocks}
         locale={locale}
-        initialDocs={posts.docs}
-        initialShortStories={shortStories}
-        initialDecorations={decorations}
-        endOfFeed={hero.endOfFeed}
-        initialHasNextPage={posts.hasNextPage}
-        initialNextCursor={posts.nextCursor}
+        contactEmail={shell.contactEmail}
+        profileLinks={shell.profileLinks}
       />
     </div>
   )

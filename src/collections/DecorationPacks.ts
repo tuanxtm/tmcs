@@ -6,7 +6,6 @@ import {
   revalidateDecorationPacks,
   revalidateDecorationPacksDelete,
 } from '@/hooks/revalidateFrontend'
-import { DECORATION_SHAPE_OPTIONS, type DecorationShape } from '@/lib/story-shapes'
 
 const clearStaleFooterItem: CollectionBeforeChangeHook = ({ data }) => {
   if (!data) return data
@@ -45,7 +44,7 @@ export const DecorationPacks: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     group: 'Decorations',
     description:
-      'Themed SVG ornament sets for the feed and footer. Activate one from Frontpage settings.',
+      'Themed SVG ornament sets for the feed and footer. Activate one from Site settings → Appearance.',
   },
   access: {
     create: adminOrManager,
@@ -101,16 +100,6 @@ export const DecorationPacks: CollectionConfig = {
           },
         },
         {
-          name: 'allowedShapes',
-          type: 'select',
-          hasMany: true,
-          defaultValue: ['1x1'],
-          options: [...DECORATION_SHAPE_OPTIONS],
-          admin: {
-            description: 'Leave empty to allow 1×1 only. Prefer 1×1 for plant ornaments.',
-          },
-        },
-        {
           name: 'weight',
           type: 'number',
           defaultValue: 1,
@@ -136,5 +125,3 @@ export const DecorationPacks: CollectionConfig = {
     },
   ],
 }
-
-export type { DecorationShape }

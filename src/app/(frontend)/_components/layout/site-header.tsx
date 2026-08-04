@@ -1,70 +1,63 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import Link from 'next/link'
-
+import Image from 'next/image'
+import { HeaderNav } from '@/app/(frontend)/_components/layout/header-nav'
+import { homeHref } from '@/app/(frontend)/_lib/locale'
+import type { NavItemView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
-import { homeHref, localePath } from '@/app/(frontend)/_lib/locale'
-import type { NavItemView } from '@/app/(frontend)/_lib/types'
+const SCROLL_BLUR_THRESHOLD = 8
 
-import { DesktopNav } from './desktop-nav'
-import { MobileNav } from './mobile-nav'
-
-type SiteHeaderProps = {
-  locale: LocaleCode
-  siteName: string
-  navigation: NavItemView[]
-  contactEmail: string | null
+function subscribeScroll(onStoreChange: () => void) {
+  window.addEventListener('scroll', onStoreChange, { passive: true })
+  return () => window.removeEventListener('scroll', onStoreChange)
 }
 
-export function SiteHeader({ locale, siteName, navigation, contactEmail }: SiteHeaderProps) {
-  const [scrolled, setScrolled] = useState(false)
+function getScrolledSnapshot() {
+  return window.scrollY > SCROLL_BLUR_THRESHOLD
+}
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+function getScrolledServerSnapshot() {
+  return false
+}
 
-  const contactHref = contactEmail
-    ? `mailto:${contactEmail}`
-    : localePath(locale, '/contact')
+type SiteHeaderProps = {
+  siteName: string
+  locale: LocaleCode
+  navigation: NavItemView[]
+}
+
+export function SiteHeader({ siteName, locale, navigation }: SiteHeaderProps) {
+  const scrolled = useSyncExternalStore(
+    subscribeScroll,
+    getScrolledSnapshot,
+    getScrolledServerSnapshot,
+  )
 
   return (
-    <header className="dash-b sticky top-0 z-40 bg-transparent">
-      {/* Gutter wrapper — no blur here, so outside the rails stays clear */}
-      <div className="mx-auto w-full max-w-[var(--content-max)] px-[var(--page-gutter)]">
-        <div
-          className={cn(
-            'flex items-center justify-between gap-4 transition-[background-color,backdrop-filter]',
-            scrolled ? 'backdrop-blur-md' : 'bg-transparent',
-          )}
-          style={{ minHeight: 'var(--header-height)' }}
-        >
+    <header
+      data-scrolled={scrolled ? 'true' : 'false'}
+      className={cn(
+        'sticky top-0 z-40 transition-[background-color,backdrop-filter,-webkit-backdrop-filter] duration-300 ease-out',
+        scrolled
+          ? 'bg-background/35 backdrop-blur-md supports-backdrop-filter:bg-background/25'
+          : 'bg-transparent',
+      )}
+    >
+      <div className="flex h-[var(--header-height)] min-h-[var(--header-height)] items-center justify-between gap-4 p-2">
+        <div className="flex items-center gap-2">
+          <Image src="/logo.svg" alt={siteName} width={100} height={100} className="size-3" />
           <Link
             href={homeHref(locale)}
-            translate="no"
-            className="p-2 font-mono text-sm font-bold uppercase tracking-[0.18em] transition-opacity hover:opacity-70"
+            className="inline-flex min-h-11 items-center font-mono text-xs font-bold lowercase text-foreground transition-colors hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {siteName}
           </Link>
-
-          <div className="flex items-center self-stretch">
-            <DesktopNav items={navigation} />
-            <div className="dash-l flex items-center self-stretch px-4">
-              <Link
-                href={contactHref}
-                className="inline-flex items-center justify-center text-foreground px-3 py-1.5 font-sans text-xs font-medium uppercase no-underline transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                Contact
-              </Link>
-            </div>
-            <MobileNav items={navigation} siteName={siteName} />
-          </div>
         </div>
+        <HeaderNav items={navigation} className="min-w-0" />
       </div>
     </header>
   )

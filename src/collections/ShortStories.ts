@@ -13,7 +13,6 @@ import {
   revalidateShortStories,
   revalidateShortStoriesDelete,
 } from '@/hooks/revalidateFrontend'
-import { STORY_SHAPE_OPTIONS, type StoryShape } from '@/lib/story-shapes'
 import { validateAbsoluteHttpUrl } from '@/lib/url'
 
 export const ShortStories: CollectionConfig = {
@@ -88,17 +87,6 @@ export const ShortStories: CollectionConfig = {
       },
     },
     {
-      name: 'allowedShapes',
-      type: 'select',
-      hasMany: true,
-      options: [...STORY_SHAPE_OPTIONS],
-      admin: {
-        position: 'sidebar',
-        description:
-          'Optional. Leave empty to allow every footprint. Restrict when content only works in certain orientations.',
-      },
-    },
-    {
       name: 'link',
       type: 'group',
       admin: {
@@ -165,5 +153,3 @@ export const ShortStories: CollectionConfig = {
     translationReadyField(),
   ],
 }
-
-export type { StoryShape }

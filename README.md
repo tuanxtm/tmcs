@@ -105,27 +105,28 @@ bunx wrangler secret put CONTACT_HASH_SECRET
 
 **Collections:** users, media, authors, categories, tags, posts, projects, pages, contact-submissions
 
-**Globals:** site-settings, navigation, footer, homepage
+**Globals:** site-settings (includes navigation, footer, appearance/decoration pack, analytics, SEO)
 
-**Portfolio:** a single published `pages` document (seeded slug `portfolio`) using rich-text + projects-grid blocks — not separate collections. Public rendering of that page is deferred.
+**Posts / Projects index pages:** seeded `pages` documents (`slug: posts` / `projects`) rendered through the dynamic `/[slug]` route with infinite-scroll feed blocks. Collection detail routes remain deferred.
 
-**Posts / Projects / Pages:** drafts, autosave, schedulePublish, versions, localized SEO group.
+**Posts / Projects / Pages:** drafts, schedulePublish, versions, localized SEO group.
 
 ## Public frontend (current)
 
 Implemented:
 
-- `/` and `/vi` homepage shell (nav, footer, hero, post feed)
+- `/` and `/vi` homepage shell (nav, footer, hero, CMS layout blocks)
+- `/[slug]` and `/vi/[slug]` for published non-home Pages (about, posts, projects, …)
 - Locale header injection via `src/proxy.ts` (Next.js 16 proxy convention)
 - `POST /api/contact` and `GET|POST /api/cron/jobs`
 
 Deferred (CMS may still store these; UI does not link yet):
 
-- `/posts/[slug]`, `/projects/[slug]`, `/[pageSlug]`
+- `/posts/[slug]`, `/projects/[slug]` collection detail routes
 - Draft preview routes under `/preview/...`
 - Contact form UI (API exists)
 
-Internal CMS page links and post-card destinations are suppressed until those routes exist. External nav/footer links still render.
+Internal CMS page links resolve by localized slug. Post/project cards still omit `href` until detail routes exist. External nav/footer links still render.
 
 ## Localization
 

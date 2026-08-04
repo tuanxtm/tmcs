@@ -11,7 +11,7 @@ export function FooterDecoration({ imageUrl, className }: FooterDecorationProps)
     <div
       aria-hidden="true"
       className={cn(
-        'deco-image aspect-square h-[var(--bento-tile)] w-[var(--bento-tile)] shrink-0 -scale-x-100 bg-foreground',
+        'deco-image aspect-square h-[calc(var(--bento-tile)*2)] w-[calc(var(--bento-tile)*2)] shrink-0 -scale-x-100 bg-foreground',
         '[mask-size:contain] [mask-repeat:no-repeat] [mask-position:center]',
         '[-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:center]',
         className,

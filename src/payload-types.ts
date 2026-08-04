@@ -77,6 +77,8 @@ export interface Config {
     'feed-decorations': FeedDecoration;
     'decoration-packs': DecorationPack;
     projects: Project;
+    things: Thing;
+    videos: Video;
     pages: Page;
     'contact-submissions': ContactSubmission;
     'payload-kv': PayloadKv;
@@ -97,6 +99,8 @@ export interface Config {
     'feed-decorations': FeedDecorationsSelect<false> | FeedDecorationsSelect<true>;
     'decoration-packs': DecorationPacksSelect<false> | DecorationPacksSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    things: ThingsSelect<false> | ThingsSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -111,15 +115,9 @@ export interface Config {
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'vi') | ('en' | 'vi')[];
   globals: {
     'site-settings': SiteSetting;
-    navigation: Navigation;
-    footer: Footer;
-    frontpage: Frontpage;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
-    navigation: NavigationSelect<false> | NavigationSelect<true>;
-    footer: FooterSelect<false> | FooterSelect<true>;
-    frontpage: FrontpageSelect<false> | FrontpageSelect<true>;
   };
   locale: 'en' | 'vi';
   widgets: {
@@ -245,7 +243,17 @@ export interface Author {
   website?: string | null;
   socialLinks?:
     | {
-        platform: 'github' | 'linkedin' | 'x' | 'youtube' | 'facebook' | 'instagram' | 'website' | 'other';
+        platform:
+          | 'github'
+          | 'linkedin'
+          | 'x'
+          | 'youtube'
+          | 'facebook'
+          | 'instagram'
+          | 'tiktok'
+          | 'threads'
+          | 'website'
+          | 'other';
         url: string;
         label?: string | null;
         id?: string | null;
@@ -390,10 +398,6 @@ export interface Post {
   tags?: (number | Tag)[] | null;
   featured?: boolean | null;
   /**
-   * Homepage bento footprint. Auto derives size from featured status, image aspect ratio, and a stable ID hash.
-   */
-  cardSize?: ('auto' | 'small' | 'wide' | 'tall' | 'large') | null;
-  /**
    * Estimated minutes; calculated from content.
    */
   readingTime?: number | null;
@@ -452,10 +456,6 @@ export interface ShortStory {
    */
   image?: (number | null) | Media;
   /**
-   * Optional. Leave empty to allow every footprint. Restrict when content only works in certain orientations.
-   */
-  allowedShapes?: ('1x1' | '2x1' | '3x1' | '1x2' | '2x2')[] | null;
-  /**
    * Optional destination when the story tile is clicked.
    */
   link?: {
@@ -485,6 +485,8 @@ export interface ShortStory {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Home template documents power `/` and `/vi` via layout blocks. Other templates render at `/[slug]` and `/vi/[slug]`.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
@@ -500,6 +502,103 @@ export interface Page {
   heroMedia?: (number | null) | Media;
   layout?:
     | (
+        | {
+            /**
+             * Small label above the title (e.g. “Hero”).
+             */
+            label?: string | null;
+            title: string;
+            tagline?: string | null;
+            bio?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            coverImage?: (number | null) | Media;
+            profileImage?: (number | null) | Media;
+            links?:
+              | {
+                  label: string;
+                  linkType: 'internal' | 'external';
+                  page?: (number | null) | Page;
+                  url?: string | null;
+                  newTab?: boolean | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Cursor popup text while hovering this section.
+             */
+            cursorPopup?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            heading: string;
+            /**
+             * Optional short blurb shown below the section heading.
+             */
+            description?: string | null;
+            /**
+             * Posts/Projects/Videos use the feed grid. Things uses a custom showcase layout with the same source logic.
+             */
+            feedType: 'posts' | 'projects' | 'things' | 'videos';
+            source: 'latest' | 'featured' | 'manual';
+            /**
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls — only available for latest published.
+             */
+            pagination?: ('static' | 'infinite') | null;
+            /**
+             * Initial item count. For static previews this is the full grid size; for infinite scroll it is the first page size.
+             */
+            limit: number;
+            showViewAll?: boolean | null;
+            /**
+             * Label for the trailing tile (e.g. “View all posts”).
+             */
+            viewAllLabel?: string | null;
+            /**
+             * CMS page the View all tile links to (e.g. Posts or Projects index page).
+             */
+            viewAllPage?: (number | null) | Page;
+            postItems?: (number | Post)[] | null;
+            projectItems?: (number | Project)[] | null;
+            /**
+             * Homepage Things showcase uses up to 5 tiles plus an optional View all tile.
+             */
+            thingItems?: (number | Thing)[] | null;
+            videoItems?: (number | Video)[] | null;
+            /**
+             * While hovering the section (header / grid chrome).
+             */
+            cursorPopup?: string | null;
+            /**
+             * When the section has no items yet.
+             */
+            cursorPopupEmpty?: string | null;
+            /**
+             * While hovering an individual feed tile.
+             */
+            cursorPopupItem?: string | null;
+            /**
+             * While hovering the “View all” tile.
+             */
+            cursorPopupViewAll?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'feedSection';
+          }
         | {
             content: {
               root: {
@@ -590,7 +689,7 @@ export interface Page {
     noFollow?: boolean | null;
   };
   /**
-   * Stable template key for the future frontend. No styling encoded here.
+   * Home powers `/` and `/vi`. Only one published Home page is allowed; it must include exactly one Hero block.
    */
   template: 'home' | 'about' | 'contact' | 'generic';
   /**
@@ -620,9 +719,6 @@ export interface Project {
   generateSlug?: boolean | null;
   slug: string;
   summary: string;
-  challenge?: string | null;
-  solution?: string | null;
-  outcome?: string | null;
   content?: {
     root: {
       type: string;
@@ -646,24 +742,7 @@ export interface Project {
         id?: string | null;
       }[]
     | null;
-  demoUrl?: string | null;
-  /**
-   * Hide or omit if the repository is private/confidential.
-   */
-  repositoryUrl?: string | null;
-  documentationUrl?: string | null;
-  repositoryPrivate?: boolean | null;
-  client?: string | null;
-  clientConfidential?: boolean | null;
-  projectType?: ('web' | 'mobile' | 'library' | 'infra' | 'design' | 'other') | null;
   relatedProjects?: (number | Project)[] | null;
-  results?:
-    | {
-        label: string;
-        value: string;
-        id?: string | null;
-      }[]
-    | null;
   /**
    * Search and social metadata. Frontend rendering (meta tags, sitemap, hreflang) comes later.
    */
@@ -699,13 +778,95 @@ export interface Project {
     noIndex?: boolean | null;
     noFollow?: boolean | null;
   };
-  projectStatus?: ('in-progress' | 'completed' | 'archived' | 'concept') | null;
-  startDate?: string | null;
-  endDate?: string | null;
   author?: (number | null) | Author;
-  contributors?: (number | Author)[] | null;
+  categories?: (number | Category)[] | null;
+  tags?: (number | Tag)[] | null;
   featured?: boolean | null;
-  order?: number | null;
+  /**
+   * Set automatically on first publish. Managers may override.
+   */
+  publishedAt?: string | null;
+  /**
+   * Internal ownership for Creator access control. Hidden from public APIs via select.
+   */
+  owner?: (number | null) | User;
+  /**
+   * Editorial signal only.
+   */
+  translationReady?: {
+    vi?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Products and tools you use — affiliate links are localized (Amazon / Shopee).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "things".
+ */
+export interface Thing {
+  id: number;
+  name: string;
+  /**
+   * Short blurb shown in the Things showcase panel.
+   */
+  description?: string | null;
+  /**
+   * Large showcase image (left / top).
+   */
+  primaryImage: number | Media;
+  /**
+   * Optional smaller panel image. Falls back to the primary image when empty.
+   */
+  detailImage?: (number | null) | Media;
+  /**
+   * Localized shop link (e.g. Amazon for English, Shopee for Vietnamese). Empty locales fall back to English, then a contact dialog.
+   */
+  affiliateUrl?: string | null;
+  /**
+   * Optional CTA label (defaults to “Shop” / “Mua”).
+   */
+  linkLabel?: string | null;
+  featured?: boolean | null;
+  /**
+   * Set automatically on first publish. Managers may override.
+   */
+  publishedAt?: string | null;
+  /**
+   * Internal ownership for Creator access control. Hidden from public APIs via select.
+   */
+  owner?: (number | null) | User;
+  /**
+   * Editorial signal only.
+   */
+  translationReady?: {
+    vi?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Social video links. Cards show R2 thumbnails only — YouTube can auto-import a thumb on save; other platforms need a manual upload.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  title: string;
+  provider: 'youtube' | 'tiktok' | 'instagram' | 'other';
+  /**
+   * Canonical social post URL. YouTube plays inline on click; others open externally.
+   */
+  sourceUrl: string;
+  /**
+   * Required for non-YouTube. YouTube auto-imports once on save when empty; you can still upload a custom thumb.
+   */
+  thumbnail?: (number | null) | Media;
+  featured?: boolean | null;
   /**
    * Set automatically on first publish. Managers may override.
    */
@@ -746,7 +907,7 @@ export interface FeedDecoration {
   height?: number | null;
 }
 /**
- * Themed SVG ornament sets for the feed and footer. Activate one from Frontpage settings.
+ * Themed SVG ornament sets for the feed and footer. Activate one from Site settings → Appearance.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "decoration-packs".
@@ -775,10 +936,6 @@ export interface DecorationPack {
          * SVG file stored in R2. Loaded on demand on the public site.
          */
         file: number | FeedDecoration;
-        /**
-         * Leave empty to allow 1×1 only. Prefer 1×1 for plant ornaments.
-         */
-        allowedShapes?: ('1x1' | '2x1' | '1x2' | '2x2')[] | null;
         /**
          * Higher weight = more likely to be picked.
          */
@@ -986,6 +1143,14 @@ export interface PayloadLockedDocument {
         value: number | Project;
       } | null)
     | ({
+        relationTo: 'things';
+        value: number | Thing;
+      } | null)
+    | ({
+        relationTo: 'videos';
+        value: number | Video;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -1176,7 +1341,6 @@ export interface PostsSelect<T extends boolean = true> {
   categories?: T;
   tags?: T;
   featured?: T;
-  cardSize?: T;
   readingTime?: T;
   publishedAt?: T;
   originalPublishedAt?: T;
@@ -1199,7 +1363,6 @@ export interface ShortStoriesSelect<T extends boolean = true> {
   content?: T;
   variant?: T;
   image?: T;
-  allowedShapes?: T;
   link?:
     | T
     | {
@@ -1251,7 +1414,6 @@ export interface DecorationPacksSelect<T extends boolean = true> {
     | {
         title?: T;
         file?: T;
-        allowedShapes?: T;
         weight?: T;
         id?: T;
       };
@@ -1268,9 +1430,6 @@ export interface ProjectsSelect<T extends boolean = true> {
   generateSlug?: T;
   slug?: T;
   summary?: T;
-  challenge?: T;
-  solution?: T;
-  outcome?: T;
   content?: T;
   coverImage?: T;
   gallery?:
@@ -1280,21 +1439,7 @@ export interface ProjectsSelect<T extends boolean = true> {
         caption?: T;
         id?: T;
       };
-  demoUrl?: T;
-  repositoryUrl?: T;
-  documentationUrl?: T;
-  repositoryPrivate?: T;
-  client?: T;
-  clientConfidential?: T;
-  projectType?: T;
   relatedProjects?: T;
-  results?:
-    | T
-    | {
-        label?: T;
-        value?: T;
-        id?: T;
-      };
   seo?:
     | T
     | {
@@ -1308,13 +1453,54 @@ export interface ProjectsSelect<T extends boolean = true> {
         noIndex?: T;
         noFollow?: T;
       };
-  projectStatus?: T;
-  startDate?: T;
-  endDate?: T;
   author?: T;
-  contributors?: T;
+  categories?: T;
+  tags?: T;
   featured?: T;
-  order?: T;
+  publishedAt?: T;
+  owner?: T;
+  translationReady?:
+    | T
+    | {
+        vi?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "things_select".
+ */
+export interface ThingsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  primaryImage?: T;
+  detailImage?: T;
+  affiliateUrl?: T;
+  linkLabel?: T;
+  featured?: T;
+  publishedAt?: T;
+  owner?: T;
+  translationReady?:
+    | T
+    | {
+        vi?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  title?: T;
+  provider?: T;
+  sourceUrl?: T;
+  thumbnail?: T;
+  featured?: T;
   publishedAt?: T;
   owner?: T;
   translationReady?:
@@ -1339,6 +1525,52 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
+        hero?:
+          | T
+          | {
+              label?: T;
+              title?: T;
+              tagline?: T;
+              bio?: T;
+              coverImage?: T;
+              profileImage?: T;
+              links?:
+                | T
+                | {
+                    label?: T;
+                    linkType?: T;
+                    page?: T;
+                    url?: T;
+                    newTab?: T;
+                    id?: T;
+                  };
+              cursorPopup?: T;
+              id?: T;
+              blockName?: T;
+            };
+        feedSection?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              feedType?: T;
+              source?: T;
+              pagination?: T;
+              limit?: T;
+              showViewAll?: T;
+              viewAllLabel?: T;
+              viewAllPage?: T;
+              postItems?: T;
+              projectItems?: T;
+              thingItems?: T;
+              videoItems?: T;
+              cursorPopup?: T;
+              cursorPopupEmpty?: T;
+              cursorPopupItem?: T;
+              cursorPopupViewAll?: T;
+              id?: T;
+              blockName?: T;
+            };
         richText?:
           | T
           | {
@@ -1504,7 +1736,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Site-wide identity, contact display, and default SEO.
+ * Site-wide identity, navigation, footer, appearance, analytics, and default SEO.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
@@ -1512,25 +1744,118 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   siteName: string;
+  /**
+   * Short line under the site name.
+   */
   tagline?: string | null;
   description?: string | null;
-  ownerSummary?: string | null;
   /**
    * Canonical production site URL (no trailing slash preferred).
    */
   siteUrl: string;
   contactEmail?: string | null;
-  contactPhone?: string | null;
-  location?: string | null;
-  defaultSocialImage?: (number | null) | Media;
-  socialLinks?:
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  coverImage?: (number | null) | Media;
+  profileImage?: (number | null) | Media;
+  /**
+   * Website, social, and other profile links.
+   */
+  links?:
     | {
-        platform: 'github' | 'linkedin' | 'x' | 'youtube' | 'facebook' | 'instagram' | 'website' | 'other';
-        url: string;
-        label?: string | null;
+        label: string;
+        linkType: 'internal' | 'external';
+        page?: (number | null) | Page;
+        url?: string | null;
+        newTab?: boolean | null;
         id?: string | null;
       }[]
     | null;
+  navigation?:
+    | {
+        label: string;
+        linkType: 'internal' | 'external';
+        page?: (number | null) | Page;
+        url?: string | null;
+        newTab?: boolean | null;
+        /**
+         * One nested level only.
+         */
+        children?:
+          | {
+              label: string;
+              linkType: 'internal' | 'external';
+              page?: (number | null) | Page;
+              url?: string | null;
+              newTab?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  footerText?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  footerGroups?:
+    | {
+        title: string;
+        links?:
+          | {
+              label: string;
+              linkType: 'internal' | 'external';
+              page?: (number | null) | Page;
+              url?: string | null;
+              newTab?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  legalLinks?:
+    | {
+        label: string;
+        linkType: 'internal' | 'external';
+        page?: (number | null) | Page;
+        url?: string | null;
+        newTab?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Use {{year}} as a placeholder for the current year in the frontend.
+   */
+  copyright?: string | null;
+  /**
+   * Which decoration pack fills leftover bento gaps and supplies the footer SVG via its footer item.
+   */
+  activeDecorationPack: number | DecorationPack;
   analytics?: {
     provider?: ('none' | 'plausible' | 'umami' | 'ga' | 'other') | null;
     /**
@@ -1538,6 +1863,7 @@ export interface SiteSetting {
      */
     siteId?: string | null;
   };
+  defaultSocialImage?: (number | null) | Media;
   robots?: {
     indexSite?: boolean | null;
   };
@@ -1581,172 +1907,83 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "navigation".
- */
-export interface Navigation {
-  id: number;
-  items?:
-    | {
-        label: string;
-        linkType: 'internal' | 'external';
-        page?: (number | null) | Page;
-        url?: string | null;
-        newTab?: boolean | null;
-        /**
-         * One nested level only.
-         */
-        children?:
-          | {
-              label: string;
-              linkType: 'internal' | 'external';
-              page?: (number | null) | Page;
-              url?: string | null;
-              newTab?: boolean | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footer".
- */
-export interface Footer {
-  id: number;
-  text?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  groups?:
-    | {
-        title: string;
-        links?:
-          | {
-              label: string;
-              linkType: 'internal' | 'external';
-              page?: (number | null) | Page;
-              url?: string | null;
-              newTab?: boolean | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  socialLinks?:
-    | {
-        platform: 'github' | 'linkedin' | 'x' | 'youtube' | 'facebook' | 'instagram' | 'website' | 'other';
-        url: string;
-        label?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  legalLinks?:
-    | {
-        label: string;
-        linkType: 'internal' | 'external';
-        page?: (number | null) | Page;
-        url?: string | null;
-        newTab?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Use {{year}} as a placeholder for the current year in the frontend.
-   */
-  copyright?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Curated frontpage content. No frontend styling controls.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "frontpage".
- */
-export interface Frontpage {
-  id: number;
-  heroHeading: string;
-  heroSubheading?: string | null;
-  profileSummary?: string | null;
-  heroImage?: (number | null) | Media;
-  featuredPosts?: (number | Post)[] | null;
-  featuredProjects?: (number | Project)[] | null;
-  /**
-   * Which decoration pack fills leftover bento gaps and supplies the footer SVG via its footer item.
-   */
-  activeDecorationPack: number | DecorationPack;
-  /**
-   * Single closing tile shown once at the end of the frontpage feed. Not packed from Short stories.
-   */
-  endOfFeed?: {
-    enabled?: boolean | null;
-    text?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    /**
-     * Preferred footprint. Falls back to the largest shape that fits the last gap.
-     */
-    preferredShape?: ('1x1' | '2x1' | '3x1' | '1x2' | '2x2') | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   siteName?: T;
   tagline?: T;
   description?: T;
-  ownerSummary?: T;
   siteUrl?: T;
   contactEmail?: T;
-  contactPhone?: T;
-  location?: T;
-  defaultSocialImage?: T;
-  socialLinks?:
+  bio?: T;
+  coverImage?: T;
+  profileImage?: T;
+  links?:
     | T
     | {
-        platform?: T;
-        url?: T;
         label?: T;
+        linkType?: T;
+        page?: T;
+        url?: T;
+        newTab?: T;
         id?: T;
       };
+  navigation?:
+    | T
+    | {
+        label?: T;
+        linkType?: T;
+        page?: T;
+        url?: T;
+        newTab?: T;
+        children?:
+          | T
+          | {
+              label?: T;
+              linkType?: T;
+              page?: T;
+              url?: T;
+              newTab?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  footerText?: T;
+  footerGroups?:
+    | T
+    | {
+        title?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              linkType?: T;
+              page?: T;
+              url?: T;
+              newTab?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  legalLinks?:
+    | T
+    | {
+        label?: T;
+        linkType?: T;
+        page?: T;
+        url?: T;
+        newTab?: T;
+        id?: T;
+      };
+  copyright?: T;
+  activeDecorationPack?: T;
   analytics?:
     | T
     | {
         provider?: T;
         siteId?: T;
       };
+  defaultSocialImage?: T;
   robots?:
     | T
     | {
@@ -1764,103 +2001,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         twitterCard?: T;
         noIndex?: T;
         noFollow?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "navigation_select".
- */
-export interface NavigationSelect<T extends boolean = true> {
-  items?:
-    | T
-    | {
-        label?: T;
-        linkType?: T;
-        page?: T;
-        url?: T;
-        newTab?: T;
-        children?:
-          | T
-          | {
-              label?: T;
-              linkType?: T;
-              page?: T;
-              url?: T;
-              newTab?: T;
-              id?: T;
-            };
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footer_select".
- */
-export interface FooterSelect<T extends boolean = true> {
-  text?: T;
-  groups?:
-    | T
-    | {
-        title?: T;
-        links?:
-          | T
-          | {
-              label?: T;
-              linkType?: T;
-              page?: T;
-              url?: T;
-              newTab?: T;
-              id?: T;
-            };
-        id?: T;
-      };
-  socialLinks?:
-    | T
-    | {
-        platform?: T;
-        url?: T;
-        label?: T;
-        id?: T;
-      };
-  legalLinks?:
-    | T
-    | {
-        label?: T;
-        linkType?: T;
-        page?: T;
-        url?: T;
-        newTab?: T;
-        id?: T;
-      };
-  copyright?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "frontpage_select".
- */
-export interface FrontpageSelect<T extends boolean = true> {
-  heroHeading?: T;
-  heroSubheading?: T;
-  profileSummary?: T;
-  heroImage?: T;
-  featuredPosts?: T;
-  featuredProjects?: T;
-  activeDecorationPack?: T;
-  endOfFeed?:
-    | T
-    | {
-        enabled?: T;
-        text?: T;
-        preferredShape?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1896,6 +2036,14 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'projects';
           value: number | Project;
+        } | null)
+      | ({
+          relationTo: 'things';
+          value: number | Thing;
+        } | null)
+      | ({
+          relationTo: 'videos';
+          value: number | Video;
         } | null)
       | ({
           relationTo: 'pages';

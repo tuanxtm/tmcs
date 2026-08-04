@@ -1,15 +1,14 @@
 import { describe, it, expect } from 'vitest'
 
-import { isImplementedPublicPath, resolveCmsLink } from '@/app/(frontend)/_lib/links'
+import { resolveCmsLink, resolvePageHref } from '@/app/(frontend)/_lib/links'
+import { pageHref } from '@/app/(frontend)/_lib/locale'
 
 describe('Frontend public link contract', () => {
-  it('only treats home locale roots as implemented public paths', () => {
-    expect(isImplementedPublicPath('/')).toBe(true)
-    expect(isImplementedPublicPath('/vi')).toBe(true)
-    expect(isImplementedPublicPath('/posts/hello')).toBe(false)
-    expect(isImplementedPublicPath('/vi/posts/hello')).toBe(false)
-    expect(isImplementedPublicPath('/portfolio')).toBe(false)
-    expect(isImplementedPublicPath('/vi/portfolio')).toBe(false)
+  it('resolves localized page hrefs from slugs', () => {
+    expect(pageHref('en', 'posts')).toBe('/posts')
+    expect(pageHref('vi', 'posts')).toBe('/vi/posts')
+    expect(pageHref('en', 'about')).toBe('/about')
+    expect(pageHref('vi', 'about')).toBe('/vi/about')
   })
 
   it('keeps external CMS links', () => {
@@ -31,7 +30,7 @@ describe('Frontend public link contract', () => {
     })
   })
 
-  it('suppresses internal CMS page links until detail routes exist', () => {
+  it('resolves internal CMS page links by localized slug', () => {
     expect(
       resolveCmsLink(
         {
@@ -41,7 +40,12 @@ describe('Frontend public link contract', () => {
         },
         'en',
       ),
-    ).toBeNull()
+    ).toEqual({
+      label: 'Portfolio',
+      href: '/portfolio',
+      newTab: false,
+      external: false,
+    })
 
     expect(
       resolveCmsLink(
@@ -52,7 +56,12 @@ describe('Frontend public link contract', () => {
         },
         'vi',
       ),
-    ).toBeNull()
+    ).toEqual({
+      label: 'Portfolio',
+      href: '/vi/portfolio',
+      newTab: false,
+      external: false,
+    })
   })
 
   it('allows explicit home page slugs', () => {
@@ -71,5 +80,11 @@ describe('Frontend public link contract', () => {
       newTab: false,
       external: false,
     })
+  })
+
+  it('resolves page relationships without a label via resolvePageHref', () => {
+    expect(resolvePageHref({ slug: 'posts' }, 'en')).toBe('/posts')
+    expect(resolvePageHref({ slug: 'home' }, 'vi')).toBe('/vi')
+    expect(resolvePageHref(null, 'en')).toBeNull()
   })
 })

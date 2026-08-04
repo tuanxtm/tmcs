@@ -11,7 +11,9 @@ import { Posts } from './Posts'
 import { Projects } from './Projects'
 import { ShortStories } from './ShortStories'
 import { Tags } from './Tags'
+import { Things } from './Things'
 import { Users } from './Users'
+import { Videos } from './Videos'
 
 /**
  * Collection registration order.
@@ -29,6 +31,8 @@ export const collections: CollectionConfig[] = [
   FeedDecorations,
   DecorationPacks,
   Projects,
+  Things,
+  Videos,
   Pages,
   ContactSubmissions,
 ]

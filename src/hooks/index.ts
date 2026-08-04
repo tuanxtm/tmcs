@@ -47,6 +47,64 @@ export const setPublishedAt: CollectionBeforeChangeHook = ({ data, originalDoc }
   return data
 }
 
+type LayoutBlock = {
+  blockType?: string | null
+}
+
+/**
+ * Home page publication guards:
+ * - only one published `template: home` document
+ * - published home pages must include exactly one `hero` block
+ *
+ * Drafts remain permissive (Pages drafts use `validate: false`).
+ */
+export const validateHomePage: CollectionBeforeChangeHook = async ({
+  data,
+  originalDoc,
+  operation,
+  req,
+}) => {
+  const template = data.template ?? originalDoc?.template
+  const status = data._status ?? originalDoc?._status
+
+  if (template !== 'home' || status !== 'published') {
+    return data
+  }
+
+  const layout = (data.layout ?? originalDoc?.layout) as LayoutBlock[] | null | undefined
+  const heroCount = Array.isArray(layout)
+    ? layout.filter((block) => block?.blockType === 'hero').length
+    : 0
+
+  if (heroCount !== 1) {
+    throw new APIError('Published home pages must include exactly one Hero block.', 400)
+  }
+
+  const currentId =
+    operation === 'update' && originalDoc?.id != null ? String(originalDoc.id) : null
+
+  const existing = await req.payload.find({
+    collection: 'pages',
+    where: {
+      and: [
+        { template: { equals: 'home' } },
+        { _status: { equals: 'published' } },
+        ...(currentId ? [{ id: { not_equals: currentId } }] : []),
+      ],
+    },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+    req,
+  })
+
+  if (existing.totalDocs > 0) {
+    throw new APIError('Only one published Home page is allowed.', 400)
+  }
+
+  return data
+}
+
 /**
  * Defensive publish guard for Creators (access control is primary).
  */

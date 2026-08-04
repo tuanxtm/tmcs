@@ -38,7 +38,8 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/vi', '/vi/:path*', '/admin/:path*', '/api/:path*'],
+  // Cover locale roots, English single-segment CMS pages, Vietnamese paths, Admin, and APIs.
+  matcher: ['/', '/:slug', '/vi', '/vi/:path*', '/admin/:path*', '/api/:path*'],
 }
 
 function isTrustedHost(host: string, request: NextRequest): boolean {

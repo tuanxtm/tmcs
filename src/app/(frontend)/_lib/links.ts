@@ -17,21 +17,17 @@ export type ResolvedLink = {
   external: boolean
 }
 
-/**
- * Public App Router paths that exist today.
- * Internal CMS page links are suppressed until matching dynamic routes ship.
- */
-export function isImplementedPublicPath(pathname: string): boolean {
-  const normalized = pathname.replace(/\/+$/, '') || '/'
-  return normalized === '/' || normalized === '/vi' || normalized.startsWith('/api/')
-}
-
 function getPageSlug(page: unknown): string | null {
   if (!page || typeof page !== 'object') return null
   const slug = (page as { slug?: unknown }).slug
   return typeof slug === 'string' && slug.length > 0 ? slug : null
 }
 
+/**
+ * Resolve a CMS link to a public href.
+ * Internal page relationships use the populated localized slug.
+ * Home / homepage slugs map to the locale home route.
+ */
 export function resolveCmsLink(
   link: CmsLinkInput | null | undefined,
   locale: LocaleCode,
@@ -61,15 +57,18 @@ export function resolveCmsLink(
     }
   }
 
-  const href = localePath(locale, `/${slug}`)
-  if (!isImplementedPublicPath(href)) {
-    return null
-  }
-
   return {
     label: link.label,
-    href,
+    href: localePath(locale, `/${slug}`),
     newTab: Boolean(link.newTab),
     external: false,
   }
+}
+
+/** Resolve a populated pages relationship to a public path, or null. */
+export function resolvePageHref(page: unknown, locale: LocaleCode): string | null {
+  const slug = getPageSlug(page)
+  if (!slug) return null
+  if (slug === 'home' || slug === 'homepage') return homeHref(locale)
+  return localePath(locale, `/${slug}`)
 }

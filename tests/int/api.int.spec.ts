@@ -24,6 +24,8 @@ describe('API smoke', () => {
         'tags',
         'authors',
         'contact-submissions',
+        'things',
+        'videos',
       ]),
     )
     expect(slugs).not.toContain('skills')
@@ -32,9 +34,7 @@ describe('API smoke', () => {
   })
 
   it('has expected globals', async () => {
-    expect(payload.config.globals.map((g) => g.slug)).toEqual(
-      expect.arrayContaining(['site-settings', 'navigation', 'footer', 'frontpage']),
-    )
+    expect(payload.config.globals.map((g) => g.slug)).toEqual(['site-settings'])
   })
 
   it('has en/vi localization', async () => {
