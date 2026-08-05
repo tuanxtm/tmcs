@@ -31,12 +31,6 @@ export type NavItemView = {
   children: NavChildView[]
 }
 
-export type FooterGroupView = {
-  id: string
-  title: string
-  links: NavChildView[]
-}
-
 export type SiteShellView = {
   locale: LocaleCode
   siteName: string
@@ -47,13 +41,6 @@ export type SiteShellView = {
   /** Website / social links from Site Settings (for contact dialogs, etc.). */
   profileLinks: NavChildView[]
   navigation: NavItemView[]
-  footer: {
-    text: DefaultTypedEditorState | null
-    decorationImageUrl: string | null
-    groups: FooterGroupView[]
-    legalLinks: NavChildView[]
-    copyright: string | null
-  }
   activeDecorationPackId: number
   robotsIndex: boolean
   defaultSocialImage: MediaView | null
@@ -141,6 +128,21 @@ export type PostsPageView = {
   /** Opaque keyset cursor for the next page; null when exhausted. */
   nextCursor: string | null
   hasNextPage: boolean
+}
+
+export type PostDetailView = {
+  id: number
+  title: string
+  slug: string
+  excerpt: string | null
+  content: DefaultTypedEditorState | null
+  featuredImage: MediaView | null
+  publishedAt: string | null
+  readingTime: number | null
+  author: { name: string } | null
+  categories: { name: string }[]
+  tags: { name: string }[]
+  seo: PageSeoView
 }
 
 export type ProjectsPageView = {
@@ -245,6 +247,28 @@ export type ProjectsGridBlockView = {
   docs: ProjectCardView[]
 }
 
+export type TypewriterBlockView = {
+  blockType: 'typewriter'
+  id: string
+  /** Pre-resolved plain-text strings ready for the Typewriter component. */
+  texts: string[]
+}
+
+export type ScrambleHoverBlockView = {
+  blockType: 'scramble-hover'
+  id: string
+  /** Pre-resolved plain-text strings ready for the ScrambleHover component. */
+  texts: string[]
+}
+
+export type FooterBlockView = {
+  blockType: 'footer'
+  id: string
+  footerText: DefaultTypedEditorState | null
+  legalLinks: NavChildView[]
+  copyright: string | null
+}
+
 export type ResolvedBlockView =
   | HeroBlockView
   | FeedSectionBlockView
@@ -252,6 +276,9 @@ export type ResolvedBlockView =
   | MediaBlockView
   | CallToActionBlockView
   | ProjectsGridBlockView
+  | TypewriterBlockView
+  | ScrambleHoverBlockView
+  | FooterBlockView
 
 export type CmsPageView = {
   title: string

@@ -1,5 +1,5 @@
 ---
-description: 
+description:
 alwaysApply: true
 ---
 
@@ -7,6 +7,16 @@ alwaysApply: true
 
 This project uses the Payload CMS skill at `.agents/skills/payload/`.
 Start with `.agents/skills/payload/SKILL.md` for a quick reference, then see `.agents/skills/payload/reference/` for detailed docs.
+
+## Core principles
+
+- **Simplicity**: Use the simplest solution that works, don't overcomplicate things, don't overengineer, don't over thinking.
+- **Consistency**: Use the same solution for the same problem.
+- **Modularity**: Use the small possible modules.
+- **Reusability**: Use the same modules in multiple places.
+- **Maintainability**: Use the simplest solution that is easy to maintain.
+- **Scalability**: Use the simplest solution that is easy to scale.
+- **Performance**: Use the simplest solution that is maximizing performance.
 
 ## Project backend map
 
@@ -18,7 +28,7 @@ TMCS is a **single** Next.js + Payload app (not a multi-package monorepo) target
 | ---------------------------------- | ------------------------------------------------------------------------------ |
 | `src/payload.config.ts`            | Payload config: localization, jobs access, GraphQL disabled, D1/R2, migrations |
 | `src/collections/`                 | Content + auth collections                                                     |
-| `src/globals/`                     | Site settings (nav, footer, appearance, analytics, SEO)                         |
+| `src/globals/`                     | Site settings (nav, footer, appearance, analytics, SEO)                        |
 | `src/access/`                      | RBAC helpers                                                                   |
 | `src/fields/`                      | Reusable SEO + common fields                                                   |
 | `src/hooks/`                       | Owner, publish date, last-admin protection                                     |

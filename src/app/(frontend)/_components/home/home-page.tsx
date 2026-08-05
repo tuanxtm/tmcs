@@ -84,6 +84,7 @@ export async function HomePage({ locale }: HomePageProps) {
         locale={locale}
         contactEmail={shell.contactEmail}
         profileLinks={shell.profileLinks}
+        siteName={shell.siteName}
       />
     </div>
   )

@@ -107,7 +107,7 @@ export function ThingShowcaseTile({
 
       <MissingLinkDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChangeAction={setDialogOpen}
         locale={locale}
         thingName={thing.name}
         contact={contact}

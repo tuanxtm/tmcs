@@ -155,8 +155,7 @@ export function BootRevealContent({
     actions: { revealBackground },
   } = useBootReveal()
   const reduceMotion = useReducedMotion()
-  const visible =
-    phase === 'idle' || phase === 'content' || phase === 'background' || phase === 'ready'
+  const visible = isBootReadyPhase(phase)
 
   return (
     <motion.div
@@ -182,8 +181,7 @@ export function BootRevealChrome({ children }: { children: React.ReactNode }) {
     state: { phase },
   } = useBootReveal()
   const reduceMotion = useReducedMotion()
-  const visible =
-    phase === 'idle' || phase === 'content' || phase === 'background' || phase === 'ready'
+  const visible = isBootReadyPhase(phase)
 
   return (
     <motion.div

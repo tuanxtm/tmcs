@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 
+import { generatePostMetadata, PostPage } from '@/app/(frontend)/_components/posts/post-page'
 import {
   CmsPage,
   generateCmsPageMetadata,
   isReservedPageSlug,
 } from '@/app/(frontend)/_components/pages/cms-page'
-import { notFound } from 'next/navigation'
+import { getPageBySlug, getPostBySlug, resolveSlug } from '@/app/(frontend)/_lib/page-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,14 +17,32 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  if (isReservedPageSlug(slug)) {
-    return { title: 'Not found' }
+  if (isReservedPageSlug(slug)) return { title: 'Not found' }
+
+  const resolved = await resolveSlug('en', slug)
+  if (!resolved) return { title: 'Not found' }
+
+  if (resolved.collection === 'posts') {
+    const post = await getPostBySlug('en', slug)
+    if (!post) return { title: 'Not found' }
+    return generatePostMetadata(post, 'en')
   }
+
   return generateCmsPageMetadata('en', slug)
 }
 
 export default async function EnglishCmsPage({ params }: PageProps) {
   const { slug } = await params
   if (isReservedPageSlug(slug)) notFound()
+
+  const resolved = await resolveSlug('en', slug)
+  if (!resolved) notFound()
+
+  if (resolved.collection === 'posts') {
+    const post = await getPostBySlug('en', slug)
+    if (!post) notFound()
+    return <PostPage view={post} locale="en" />
+  }
+
   return <CmsPage locale="en" slug={slug} />
 }

@@ -28,11 +28,10 @@ export const Videos: CollectionConfig = {
   },
   versions: {
     drafts: {
-      // Autosave disabled — avoids D1 write storms while typing in Admin (Worker cost).
       schedulePublish: true,
       validate: false,
     },
-    maxPerDoc: 25,
+    maxPerDoc: 10,
   },
   access: {
     create: canCreateOwnedContent,
@@ -74,13 +73,16 @@ export const Videos: CollectionConfig = {
       required: true,
       validate: (
         value: unknown,
-        { siblingData }: { siblingData?: { provider?: 'youtube' | 'tiktok' | 'instagram' | 'other' } },
+        {
+          siblingData,
+        }: { siblingData?: { provider?: 'youtube' | 'tiktok' | 'instagram' | 'other' } },
       ) =>
         validateVideoSourceUrl(value, {
           siblingData,
         }),
       admin: {
-        description: 'Canonical social post URL. YouTube plays inline on click; others open externally.',
+        description:
+          'Canonical social post URL. YouTube plays inline on click; others open externally.',
       },
     },
     {

@@ -11,3 +11,66 @@
   --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
   --font-fanwood: 'Fanwood Text', ui-serif, Georgia, serif;
 }
+
+/* Force the rich text editor's default font to body (sans-serif), not serif or mono.
+   Payload doesn't bind the Lexical editor's editable surface to --font-body, so it
+   can inherit from a context that resolves to serif/mono. Pin it explicitly.
+   Type scale matches Payload's heading scale (type.scss %h1..%h6) with paragraph
+   pinned to the field-label size (13px/20px) so the editor sits flush with chrome. */
+.rich-text-lexical .ContentEditable__root,
+.rich-text-lexical .ContentEditable__root > *,
+.rich-text-lexical .LexicalEditorTheme__text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.rich-text-lexical .LexicalEditorTheme__paragraph,
+.rich-text-lexical .LexicalEditorTheme__list {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.rich-text-lexical .LexicalEditorTheme__h1 {
+  font-family: var(--font-body);
+  font-size: 32px;
+  line-height: 36px;
+  font-weight: 500;
+}
+.rich-text-lexical .LexicalEditorTheme__h2 {
+  font-family: var(--font-body);
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 500;
+}
+.rich-text-lexical .LexicalEditorTheme__h3 {
+  font-family: var(--font-body);
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 500;
+}
+.rich-text-lexical .LexicalEditorTheme__h4 {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+}
+.rich-text-lexical .LexicalEditorTheme__h5 {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+}
+.rich-text-lexical .LexicalEditorTheme__h6 {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+}
+
+.rich-text-lexical .LexicalEditorTheme__quote {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 22px;
+}

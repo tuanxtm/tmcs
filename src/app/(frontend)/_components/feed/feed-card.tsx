@@ -66,7 +66,7 @@ export function FeedCard({
         />
       ) : (
         <div
-          className="flex aspect-[4/3] w-full items-center justify-center bg-foreground/5"
+          className="flex aspect-[4/3] w-full items-center justify-center bg-foreground/5 backdrop-blur-sm"
           aria-hidden="true"
         />
       )}

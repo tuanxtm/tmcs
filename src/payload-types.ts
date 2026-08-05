@@ -651,6 +651,58 @@ export interface Page {
             blockName?: string | null;
             blockType: 'projectsGrid';
           }
+        | {
+            /**
+             * Pick the short stories to cycle through. Order is preserved.
+             */
+            stories: (number | ShortStory)[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'typewriter';
+          }
+        | {
+            /**
+             * Pick the short stories to display. Each one scrambles on hover. Order is preserved.
+             */
+            stories: (number | ShortStory)[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'scramble-hover';
+          }
+        | {
+            footerText?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            legalLinks?:
+              | {
+                  label: string;
+                  linkType: 'internal' | 'external';
+                  page?: (number | null) | Page;
+                  url?: string | null;
+                  newTab?: boolean | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Use {{year}} as a placeholder for the current year in the frontend.
+             */
+            copyright?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'footer';
+          }
       )[]
     | null;
   /**
@@ -1613,6 +1665,38 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        typewriter?:
+          | T
+          | {
+              stories?: T;
+              id?: T;
+              blockName?: T;
+            };
+        'scramble-hover'?:
+          | T
+          | {
+              stories?: T;
+              id?: T;
+              blockName?: T;
+            };
+        footer?:
+          | T
+          | {
+              footerText?: T;
+              legalLinks?:
+                | T
+                | {
+                    label?: T;
+                    linkType?: T;
+                    page?: T;
+                    url?: T;
+                    newTab?: T;
+                    id?: T;
+                  };
+              copyright?: T;
+              id?: T;
+              blockName?: T;
+            };
       };
   seo?:
     | T
@@ -1807,51 +1891,6 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
-  footerText?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  footerGroups?:
-    | {
-        title: string;
-        links?:
-          | {
-              label: string;
-              linkType: 'internal' | 'external';
-              page?: (number | null) | Page;
-              url?: string | null;
-              newTab?: boolean | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  legalLinks?:
-    | {
-        label: string;
-        linkType: 'internal' | 'external';
-        page?: (number | null) | Page;
-        url?: string | null;
-        newTab?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Use {{year}} as a placeholder for the current year in the frontend.
-   */
-  copyright?: string | null;
   /**
    * Which decoration pack fills leftover bento gaps and supplies the footer SVG via its footer item.
    */
@@ -1948,34 +1987,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
             };
         id?: T;
       };
-  footerText?: T;
-  footerGroups?:
-    | T
-    | {
-        title?: T;
-        links?:
-          | T
-          | {
-              label?: T;
-              linkType?: T;
-              page?: T;
-              url?: T;
-              newTab?: T;
-              id?: T;
-            };
-        id?: T;
-      };
-  legalLinks?:
-    | T
-    | {
-        label?: T;
-        linkType?: T;
-        page?: T;
-        url?: T;
-        newTab?: T;
-        id?: T;
-      };
-  copyright?: T;
   activeDecorationPack?: T;
   analytics?:
     | T

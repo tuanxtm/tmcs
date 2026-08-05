@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 
 import { BootReveal, useBootReveal } from '@/app/(frontend)/_components/providers/boot-reveal'
 
-const ColorBends = dynamic(() => import('@/components/ColorBends'), {
+const ColorBends = dynamic(() => import('@/components/ui/color-bends'), {
   ssr: false,
 })
 
@@ -26,9 +26,9 @@ function BackgroundEffect() {
           scale={1}
           frequency={1}
           warpStrength={1}
-          mouseInfluence={0.5}
+          mouseInfluence={0.1}
           noise={0.12}
-          parallax={0.5}
+          parallax={0.25}
           iterations={1}
           intensity={2}
           fontSize={12}
@@ -59,7 +59,10 @@ export function Background() {
       {/* Rails above header blur so L/R strokes aren't doubled or buried */}
       <BootReveal.Chrome>
         <div className="pointer-events-none fixed inset-0 z-[45]">
-          <span className="dash-rail dash-rail-left absolute inset-y-0" style={{ left: railInset }} />
+          <span
+            className="dash-rail dash-rail-left absolute inset-y-0"
+            style={{ left: railInset }}
+          />
           <span
             className="dash-rail dash-rail-right absolute inset-y-0"
             style={{ right: railInset }}

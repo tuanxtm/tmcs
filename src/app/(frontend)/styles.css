@@ -203,18 +203,12 @@ body::-webkit-scrollbar-corner {
   .feed-grid {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
     column-gap: 0;
     row-gap: 1.5rem;
     padding-bottom: 1.5rem;
     width: 100%;
-  }
-
-  @media (min-width: 640px) {
-    .feed-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 
   @media (min-width: 1024px) {
@@ -232,18 +226,12 @@ body::-webkit-scrollbar-corner {
   .things-grid {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
     column-gap: 0;
     row-gap: 1.5rem;
     padding-bottom: 1.5rem;
     width: 100%;
-  }
-
-  @media (min-width: 640px) {
-    .things-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 
   @media (min-width: 1024px) {
@@ -307,6 +295,13 @@ body::-webkit-scrollbar-corner {
   }
 }
 
+@media (max-width: 639px) {
+  .feed-grid-rule:nth-child(1) {
+    display: block;
+    left: 50%;
+  }
+}
+
 @media (min-width: 1024px) {
   .feed-grid-rule:nth-child(1) {
     display: block;
@@ -344,6 +339,13 @@ body::-webkit-scrollbar-corner {
 }
 
 @media (min-width: 640px) and (max-width: 1023px) {
+  .things-grid-rule:nth-child(1) {
+    display: block;
+    left: 50%;
+  }
+}
+
+@media (max-width: 639px) {
   .things-grid-rule:nth-child(1) {
     display: block;
     left: 50%;
@@ -498,39 +500,8 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   overflow: hidden;
 }
 
-/* Intro runs on the clip wrappers so exit transforms on the text aren’t overridden. */
-.boot-splash-greeting-wrap,
-.boot-splash-bar-wrap {
-  opacity: 0;
-}
-
-@keyframes boot-splash-intro {
-  from {
-    opacity: 0;
-    transform: translateY(0.6rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* JS path: play a staggered enter for greeting + bar. */
-.boot-splash--js .boot-splash-greeting-wrap {
-  animation: boot-splash-intro 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.boot-splash--js .boot-splash-bar-wrap {
-  animation: boot-splash-intro 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
-}
-
-/* No-JS: content visible, then parent auto-hides. */
-@media (scripting: none) {
-  .boot-splash-greeting-wrap,
-  .boot-splash-bar-wrap {
-    opacity: 1;
-  }
-}
+/* JS-driven intro is handled by Motion (initial/animate on the line elements)
+   so the entry mirrors the exit: text rises up through the clip wrapper. */
 
 /* No-JS: scroll up to reveal the site without hydration. */
 @keyframes boot-splash-noscript-reveal {
@@ -546,8 +517,10 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   }
 }
 
-.boot-splash:not(.boot-splash--js) {
-  animation: boot-splash-noscript-reveal 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+@media (scripting: none) {
+  .boot-splash {
+    animation: boot-splash-noscript-reveal 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -5,6 +5,9 @@ import { FeedSection } from '@/app/(frontend)/_components/feed/feed-section'
 import { Hero } from '@/app/(frontend)/_components/hero'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
+import { TypewriterBlock } from '@/app/(frontend)/_components/blocks/typewriter'
+import { ScrambleHoverBlock } from '@/app/(frontend)/_components/blocks/scramble-hover'
+import { FooterBlock } from '@/app/(frontend)/_components/blocks/footer'
 import { ThingsSection } from '@/app/(frontend)/_components/things/things-section'
 import type { ContactLinks } from '@/app/(frontend)/_components/things/missing-link-dialog'
 import type { NavChildView, ResolvedBlockView } from '@/app/(frontend)/_lib/types'
@@ -16,6 +19,7 @@ type PageBlocksProps = {
   className?: string
   contactEmail?: string | null
   profileLinks?: NavChildView[]
+  siteName: string
 }
 
 function sectionDomIds(blockId: string) {
@@ -31,6 +35,7 @@ export function PageBlocks({
   className,
   contactEmail = null,
   profileLinks = [],
+  siteName,
 }: PageBlocksProps) {
   if (blocks.length === 0) return null
 
@@ -245,6 +250,15 @@ export function PageBlocks({
                 </div>
               </section>,
             )
+
+          case 'typewriter':
+            return wrap(<TypewriterBlock block={block} />)
+
+          case 'scramble-hover':
+            return wrap(<ScrambleHoverBlock block={block} />)
+
+          case 'footer':
+            return wrap(<FooterBlock block={block} siteName={siteName} />)
 
           default: {
             if (process.env.NODE_ENV !== 'production') {

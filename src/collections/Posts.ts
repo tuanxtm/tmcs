@@ -12,6 +12,7 @@ import { ownerField, publishedAtField, translationReadyField } from '@/fields/co
 import { seoFields } from '@/fields/seoFields'
 import { assignOwner, preventCreatorPublish, setPublishedAt, setReadingTime } from '@/hooks'
 import { revalidatePosts, revalidatePostsDelete } from '@/hooks/revalidateFrontend'
+import { deleteSlugReservations, upsertSlugReservations } from '@/hooks/slugReservations'
 import { buildPreviewUrl } from '@/lib/preview'
 
 export const Posts: CollectionConfig = {
@@ -37,7 +38,7 @@ export const Posts: CollectionConfig = {
       schedulePublish: true,
       validate: false,
     },
-    maxPerDoc: 50,
+    maxPerDoc: 10,
   },
   access: {
     create: canCreateOwnedContent,
@@ -48,8 +49,20 @@ export const Posts: CollectionConfig = {
   },
   hooks: {
     beforeChange: [assignOwner, preventCreatorPublish, setPublishedAt, setReadingTime],
-    afterChange: [revalidatePosts],
-    afterDelete: [revalidatePostsDelete],
+    afterChange: [
+      revalidatePosts,
+      async ({ doc, operation, req }) => {
+        if (operation === 'create' || operation === 'update') {
+          await upsertSlugReservations(req.payload, 'posts', doc as { id: number; slug?: unknown })
+        }
+      },
+    ],
+    afterDelete: [
+      revalidatePostsDelete,
+      async ({ doc, req }) => {
+        await deleteSlugReservations(req.payload, 'posts', doc as { id: number })
+      },
+    ],
   },
   fields: [
     {

@@ -136,9 +136,11 @@ export function FeedSection(props: FeedSectionProps) {
     docs.length === 0 ? cursorPopupEmpty || cursorPopup || undefined : cursorPopup || undefined
 
   const descriptionNode = description ? (
-    <p className="px-2 pb-3 font-mono text-xs leading-relaxed text-muted-foreground">
-      {description}
-    </p>
+    <div className="px-2 pb-2 w-full grid md:grid-cols-2 grid-cols-1 ">
+      <p className="font-mono text-xs tracking-[-0.01em] leading-relaxed text-muted-foreground font-medium">
+        {description}
+      </p>
+    </div>
   ) : null
 
   if (docs.length === 0) {

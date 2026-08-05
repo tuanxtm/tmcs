@@ -23,7 +23,7 @@ export const SiteSettings: GlobalConfig = {
     afterChange: [revalidateSiteShellGlobal],
   },
   versions: {
-    max: 25,
+    max: 10,
   },
   fields: [
     {
@@ -122,54 +122,6 @@ export const SiteSettings: GlobalConfig = {
                   fields: linkFields,
                 },
               ],
-            },
-          ],
-        },
-        {
-          label: 'Footer',
-          fields: [
-            {
-              name: 'footerText',
-              type: 'richText',
-              localized: true,
-              editor: slimRichTextEditor,
-              label: 'Text',
-            },
-            {
-              name: 'footerGroups',
-              type: 'array',
-              label: 'Groups',
-              labels: {
-                singular: 'Group',
-                plural: 'Groups',
-              },
-              fields: [
-                {
-                  name: 'title',
-                  type: 'text',
-                  localized: true,
-                  required: true,
-                },
-                {
-                  name: 'links',
-                  type: 'array',
-                  fields: linkFields,
-                },
-              ],
-            },
-            {
-              name: 'legalLinks',
-              type: 'array',
-              label: 'Legal links',
-              fields: linkFields,
-            },
-            {
-              name: 'copyright',
-              type: 'text',
-              localized: true,
-              admin: {
-                description: 'Use {{year}} as a placeholder for the current year in the frontend.',
-              },
             },
           ],
         },

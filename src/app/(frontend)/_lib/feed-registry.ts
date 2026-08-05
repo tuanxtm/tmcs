@@ -127,7 +127,7 @@ async function loadPosts(args: {
   manualIds: number[]
 }): Promise<PostCardView[]> {
   const limit = clampLimit(args.limit)
-  const select = { title: true, featuredImage: true, publishedAt: true } as const
+  const select = { title: true, slug: true, featuredImage: true, publishedAt: true } as const
 
   if (args.source === 'manual') {
     return loadOrderedManual({
@@ -136,7 +136,7 @@ async function loadPosts(args: {
       manualIds: args.manualIds,
       limit,
       select,
-      toCard: (doc) => toPostCard(doc as Post),
+      toCard: (doc) => toPostCard(doc as Post, args.locale),
     })
   }
 
@@ -146,7 +146,7 @@ async function loadPosts(args: {
     source: args.source,
     limit,
     select,
-    toCard: (doc) => toPostCard(doc as Post),
+    toCard: (doc) => toPostCard(doc as Post, args.locale),
   })
 }
 

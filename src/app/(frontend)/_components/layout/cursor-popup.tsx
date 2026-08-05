@@ -151,12 +151,8 @@ export function CursorPopup() {
           {visible && label ? (
             <motion.div
               key={label}
-              className="overflow-hidden p-0.5 whitespace-nowrap text-xs font-mono tracking-tight bg-gradient-3 leading-none"
-              initial={
-                reduceMotion
-                  ? false
-                  : { clipPath: 'inset(0 50% 0 50%)' }
-              }
+              className="overflow-hidden py-0.5 px-1 whitespace-nowrap text-xs font-mono tracking-tight bg-gradient-3/80 leading-none"
+              initial={reduceMotion ? false : { clipPath: 'inset(0 50% 0 50%)' }}
               animate={{ clipPath: 'inset(0 0% 0 0%)' }}
               exit={reduceMotion ? undefined : { clipPath: 'inset(0 50% 0 50%)' }}
               transition={{ duration: reduceMotion ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}

@@ -30,7 +30,7 @@ export const Things: CollectionConfig = {
       schedulePublish: true,
       validate: false,
     },
-    maxPerDoc: 25,
+    maxPerDoc: 10,
   },
   access: {
     create: canCreateOwnedContent,

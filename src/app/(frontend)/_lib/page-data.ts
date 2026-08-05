@@ -18,30 +18,36 @@ import {
   getPostsPage,
   getProjectsPage,
   getVideosPage,
+  loadShortStoryTexts,
   toMediaView,
 } from '@/app/(frontend)/_lib/cms'
 import { resolveCmsLink, resolvePageHref } from '@/app/(frontend)/_lib/links'
+import { loadPostBySlug } from '@/app/(frontend)/_lib/cms'
 import type {
   CallToActionBlockView,
   CmsPageView,
   FeedSectionBlockView,
   FeedType,
+  FooterBlockView,
   HeroBlockView,
   HomePageView,
   MediaBlockView,
   NavChildView,
   PostCardView,
+  PostDetailView,
   ProjectCardView,
   ProjectsGridBlockView,
   ResolvedBlockView,
   RichTextBlockView,
   ThingCardView,
+  TypewriterBlockView,
   VideoCardView,
+  ScrambleHoverBlockView,
 } from '@/app/(frontend)/_lib/types'
 import { CACHE_TAGS } from '@/lib/cache-tags'
 import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
-import type { Page } from '@/payload-types'
+import type { Page, Post } from '@/payload-types'
 import config from '@payload-config'
 
 const getPayloadClient = cache(async () => getPayload({ config }))
@@ -330,6 +336,60 @@ async function resolveProjectsGridBlock(
   }
 }
 
+async function resolveTypewriterBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'typewriter' }>,
+  locale: LocaleCode,
+  index: number,
+): Promise<TypewriterBlockView | null> {
+  const ids = relationIds(block.stories)
+  if (ids.length === 0) return null
+
+  const texts = await loadShortStoryTexts(locale, ids)
+  const filtered = texts.filter((text) => text.length > 0)
+  if (filtered.length === 0) return null
+
+  return {
+    blockType: 'typewriter',
+    id: blockId(block, `typewriter-${index}`),
+    texts: filtered,
+  }
+}
+
+async function resolveScrambleHoverBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'scramble-hover' }>,
+  locale: LocaleCode,
+  index: number,
+): Promise<ScrambleHoverBlockView | null> {
+  const ids = relationIds(block.stories)
+  if (ids.length === 0) return null
+
+  const texts = await loadShortStoryTexts(locale, ids)
+  const filtered = texts.filter((text) => text.length > 0)
+  if (filtered.length === 0) return null
+
+  return {
+    blockType: 'scramble-hover',
+    id: blockId(block, `scramble-hover-${index}`),
+    texts: filtered,
+  }
+}
+
+async function resolveFooterBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'footer' }>,
+  locale: LocaleCode,
+  index: number,
+): Promise<FooterBlockView> {
+  const legalLinks = toNavLinks(block.legalLinks || [], locale)
+
+  return {
+    blockType: 'footer',
+    id: blockId(block, `footer-${index}`),
+    footerText: (block.footerText as DefaultTypedEditorState | null | undefined) ?? null,
+    legalLinks,
+    copyright: block.copyright ?? null,
+  }
+}
+
 export async function resolveLayoutBlocks(
   layout: Page['layout'],
   locale: LocaleCode,
@@ -351,6 +411,12 @@ export async function resolveLayoutBlocks(
           return resolveCallToActionBlock(block, locale, index)
         case 'projectsGrid':
           return resolveProjectsGridBlock(block, locale, index)
+        case 'typewriter':
+          return resolveTypewriterBlock(block, locale, index)
+        case 'scramble-hover':
+          return resolveScrambleHoverBlock(block, locale, index)
+        case 'footer':
+          return resolveFooterBlock(block, locale, index)
         default:
           return null
       }
@@ -651,4 +717,88 @@ export const getPageBySlug = cache(
 
 export function firstHeroBlock(blocks: ResolvedBlockView[]): HeroBlockView | null {
   return blocks.find((block): block is HeroBlockView => block.blockType === 'hero') ?? null
+}
+
+// ─── Slug Dispatcher ───────────────────────────────────────────────────────────
+
+type SlugReservation = {
+  collection: 'pages' | 'posts'
+  contentId: number
+}
+
+async function loadSlugReservation(
+  locale: LocaleCode,
+  slug: string,
+): Promise<SlugReservation | null> {
+  const payload = await getPayloadClient()
+  // payload.db is the Drizzle DatabaseAdapter; the raw D1 binding (with
+  // .prepare()) is at payload.db.binding. Set at adapter construction time,
+  // so it's always available even before connect() runs.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db: any = payload.db.binding
+  const stmt = db.prepare('SELECT collection, content_id FROM slug_reservations WHERE slug = ? AND locale = ? LIMIT 1')
+  const result = (await stmt.bind(slug, locale).first()) as { collection: string; content_id: number } | null
+  if (!result) return null
+  return { collection: result.collection as 'pages' | 'posts', contentId: result.content_id }
+}
+
+/** Resolve a slug to its collection + content ID. Returns null if not reserved. */
+export async function resolveSlug(
+  locale: LocaleCode,
+  slug: string,
+): Promise<{ collection: 'pages' | 'posts'; contentId: number } | null> {
+  return loadSlugReservation(locale, slug)
+}
+
+function toPostDetailView(post: Post): PostDetailView {
+  return {
+    id: post.id,
+    title: post.title,
+    slug: typeof post.slug === 'string' ? post.slug : '',
+    excerpt: post.excerpt ?? null,
+    content: post.content ?? null,
+    featuredImage: toMediaView(post.featuredImage),
+    publishedAt: post.publishedAt ?? null,
+    readingTime: post.readingTime ?? null,
+    author:
+      post.author && typeof post.author === 'object' && 'title' in post.author
+        ? { name: String((post.author as { title?: unknown }).title) || 'Unknown' }
+        : null,
+    categories: (post.categories || [])
+      .map((c) =>
+        typeof c === 'object' && c && 'title' in c
+          ? { name: String((c as { title?: unknown }).title) }
+          : null,
+      )
+      .filter((c): c is { name: string } => c !== null),
+    tags: (post.tags || [])
+      .map((t) =>
+        typeof t === 'object' && t && 'title' in t
+          ? { name: String((t as { title?: unknown }).title) }
+          : null,
+      )
+      .filter((t): t is { name: string } => t !== null),
+    seo: {
+      metaTitle: post.seo?.metaTitle ?? null,
+      metaDescription: post.seo?.metaDescription ?? post.excerpt ?? null,
+      ogImage: toMediaView(post.seo?.ogImage) || toMediaView(post.featuredImage),
+      canonicalUrl: post.seo?.canonicalUrl ?? null,
+      noIndex: Boolean(post.seo?.noIndex),
+      noFollow: Boolean(post.seo?.noFollow),
+    },
+  }
+}
+
+/** Load a post by slug. Returns null if the slug is not reserved for posts. */
+export async function getPostBySlug(
+  locale: LocaleCode,
+  slug: string,
+): Promise<PostDetailView | null> {
+  const resolved = await resolveSlug(locale, slug)
+  if (!resolved || resolved.collection !== 'posts') return null
+
+  const post = await loadPostBySlug(locale, slug)
+  if (!post) return null
+
+  return toPostDetailView(post)
 }

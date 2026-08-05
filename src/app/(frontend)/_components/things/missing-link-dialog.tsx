@@ -22,7 +22,7 @@ export type ContactLinks = {
 
 type MissingLinkDialogProps = {
   open: boolean
-  onOpenChange: (open: boolean) => void
+  onOpenChangeAction: (open: boolean) => void
   locale: LocaleCode
   thingName: string
   contact: ContactLinks
@@ -58,7 +58,7 @@ function inferPlatform(label: string, href: string): string {
 
 export function MissingLinkDialog({
   open,
-  onOpenChange,
+  onOpenChangeAction,
   locale,
   thingName,
   contact,
@@ -69,7 +69,7 @@ export function MissingLinkDialog({
     : null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{copy.title}</DialogTitle>
@@ -93,11 +93,7 @@ export function MissingLinkDialog({
                     <Link
                       href={link.href}
                       target={link.newTab || link.external ? '_blank' : undefined}
-                      rel={
-                        link.newTab || link.external
-                          ? 'noopener noreferrer'
-                          : undefined
-                      }
+                      rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
                       className="inline-flex min-h-11 min-w-11 items-center justify-center border border-border text-foreground transition-colors hover:bg-hover-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       aria-label={link.label}
                     >
@@ -113,7 +109,7 @@ export function MissingLinkDialog({
             type="button"
             variant="ghost"
             className="w-full justify-center"
-            onClick={() => onOpenChange(false)}
+            onClick={() => onOpenChangeAction(false)}
           >
             {copy.close}
           </Button>

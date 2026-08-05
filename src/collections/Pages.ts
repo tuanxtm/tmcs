@@ -7,6 +7,11 @@ import { publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
 import { setPublishedAt, validateHomePage } from '@/hooks'
 import { revalidatePages, revalidatePagesDelete } from '@/hooks/revalidateFrontend'
+import {
+  checkSlugReservationConflict,
+  deleteSlugReservations,
+  upsertSlugReservations,
+} from '@/hooks/slugReservations'
 import { buildPreviewUrl } from '@/lib/preview'
 
 export const Pages: CollectionConfig = {
@@ -32,7 +37,7 @@ export const Pages: CollectionConfig = {
       schedulePublish: true,
       validate: false,
     },
-    maxPerDoc: 50,
+    maxPerDoc: 10,
   },
   access: {
     create: adminOrManager,
@@ -43,8 +48,20 @@ export const Pages: CollectionConfig = {
   },
   hooks: {
     beforeChange: [setPublishedAt, validateHomePage],
-    afterChange: [revalidatePages],
-    afterDelete: [revalidatePagesDelete],
+    afterChange: [
+      revalidatePages,
+      async ({ doc, operation, req }) => {
+        if (operation === 'create' || operation === 'update') {
+          await upsertSlugReservations(req.payload, 'pages', doc as { id: number; slug?: unknown })
+        }
+      },
+    ],
+    afterDelete: [
+      revalidatePagesDelete,
+      async ({ doc, req }) => {
+        await deleteSlugReservations(req.payload, 'pages', doc as { id: number })
+      },
+    ],
   },
   fields: [
     {

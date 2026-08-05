@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 
 import {
@@ -9,21 +9,9 @@ import {
 } from '@/app/(frontend)/_components/providers/boot-reveal'
 import type { LocaleCode } from '@/lib/locales'
 
-function subscribeClientReady() {
-  return () => {}
-}
-
-function getClientReadySnapshot() {
-  return true
-}
-
-function getServerReadySnapshot() {
-  return false
-}
-
 const GREETINGS = {
   en: "hi 🖐️, i'm tuantm. ",
-  vi: 'xin chào 🖐️, mình là tuantm.',
+  vi: 'xin chào 🖐️, mình là tuấn.',
 } as const
 
 const STATUS = {
@@ -32,21 +20,29 @@ const STATUS = {
 } as const
 
 const INTRO_MS = 600 // duration + stagger, matches CSS
-const FILL_DURATION_MS = 1200
+const FILL_DURATION_MS = 1500
 
-/** Bar width tracks the greeting’s visible glyphs (emoji collapsed out). */
+/** Bar width tracks the greeting’s monospace columns (emoji count as 2). */
+const graphemeSegmenter = new Intl.Segmenter(undefined, {
+  granularity: 'grapheme',
+})
+
+function visualWidth(value: string): number {
+  let width = 0
+  for (const { segment } of graphemeSegmenter.segment(value)) {
+    width += /\p{Extended_Pictographic}/u.test(segment) ? 2 : 1
+  }
+  return width
+}
+
 function consoleBarSlots(greeting: string): number {
-  const stripped = greeting
-    .replace(/\p{Extended_Pictographic}/gu, '')
-    .replace(/\uFE0F/g, '')
-    .replace(/\u200D/g, '')
-  return Math.max(1, [...stripped].length - 3)
+  return Math.max(1, visualWidth(greeting) - 6)
 }
 
 function barText(filled: number, slotCount: number): string {
   let slots = ''
   for (let i = 0; i < slotCount; i++) {
-    slots += i < filled ? '#' : '-'
+    slots += i < filled ? '#' : '_'
   }
   return `[${slots}]`
 }
@@ -67,11 +63,6 @@ export function BootSplash({ locale }: { locale: LocaleCode }) {
 
   const [visible, setVisible] = useState(true)
   const [busy, setBusy] = useState(true)
-  const jsReady = useSyncExternalStore(
-    subscribeClientReady,
-    getClientReadySnapshot,
-    getServerReadySnapshot,
-  )
 
   useEffect(() => {
     actionsRef.current = actions
@@ -128,8 +119,8 @@ export function BootSplash({ locale }: { locale: LocaleCode }) {
   }, [reduceMotion, slotCount])
 
   const exitDuration = reduceMotion ? 0.05 : SPLASH_EXIT_DURATION_S
-  const barDelay = reduceMotion ? 0 : 0.08
   const lineExit = reduceMotion ? { opacity: 0 } : { y: '-100%' }
+  const lineInitial = reduceMotion ? { opacity: 0 } : { y: '100%' }
   const lineTransition = {
     duration: exitDuration,
     ease: 'easeOut' as const,
@@ -140,16 +131,17 @@ export function BootSplash({ locale }: { locale: LocaleCode }) {
       {visible ? (
         <motion.div
           key="boot-splash"
-          className={jsReady ? 'boot-splash boot-splash--js' : 'boot-splash'}
+          className="boot-splash"
           role="status"
           aria-live="polite"
           aria-busy={busy}
           aria-label={busy ? status.loading : status.done}
           initial={false}
+          animate={{ opacity: 1 }}
           // Keep the solid backdrop until the clipped lines finish rolling up.
           exit={{ opacity: 1 }}
           transition={{
-            duration: exitDuration + barDelay,
+            duration: exitDuration,
             ease: 'easeOut',
           }}
         >
@@ -157,6 +149,8 @@ export function BootSplash({ locale }: { locale: LocaleCode }) {
             <div className="boot-splash-line boot-splash-greeting-wrap">
               <motion.p
                 className="boot-splash-greeting text-md whitespace-pre font-medium lowercase tracking-tight text-foreground/90"
+                initial={lineInitial}
+                animate={{ y: 0, opacity: 1 }}
                 exit={lineExit}
                 transition={lineTransition}
               >
@@ -164,11 +158,16 @@ export function BootSplash({ locale }: { locale: LocaleCode }) {
               </motion.p>
             </div>
             <div className="boot-splash-line boot-splash-bar-wrap">
-              <motion.div exit={lineExit} transition={{ ...lineTransition, delay: barDelay }}>
+              <motion.div
+                initial={lineInitial}
+                animate={{ y: 0, opacity: 1 }}
+                exit={lineExit}
+                transition={lineTransition}
+              >
                 <p
                   ref={barRef}
                   aria-hidden="true"
-                  className="boot-splash-bar font-mono text-sm lowercase tracking-tight text-foreground/90 whitespace-pre"
+                  className="boot-splash-bar font-mono text-sm lowercase tracking-normal text-foreground/90 whitespace-pre"
                 >
                   {barText(0, slotCount)}
                 </p>

@@ -19,12 +19,18 @@ function getAllowedDevOrigins(): string[] {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    localPatterns: [
-      {
-        pathname: '/api/media/file/**',
-      },
-    ],
+  //images: {
+  //  localPatterns: [
+  //    {
+  //      pathname: '/api/media/file/**',
+  //    },
+  //  ],
+  //},
+  // React Compiler is built into Next.js 16 — runs in the SWC pipeline before
+  // OpenNext bundles the output for Cloudflare Workers, so no runtime support
+  // is required in workerd.
+  reactCompiler: {
+    compilationMode: 'annotation' as const,
   },
   // Packages with Cloudflare Workers (workerd) specific code
   // Read more: https://opennext.js.org/cloudflare/howtos/workerd

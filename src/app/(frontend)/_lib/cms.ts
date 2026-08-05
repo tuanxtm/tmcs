@@ -7,14 +7,24 @@ import { getServerURL } from '@/lib/env'
 import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
 import { lexicalToPlainText } from '@/lib/readingTime'
-import type { DecorationPack, FeedDecoration, Media, Page, Post, Project, ShortStory, Thing, Video } from '@/payload-types'
+import type {
+  DecorationPack,
+  FeedDecoration,
+  Media,
+  Page,
+  Post,
+  Project,
+  ShortStory,
+  Thing,
+  Video,
+} from '@/payload-types'
 import config from '@payload-config'
 
 import { resolveCmsLink } from './links'
+import { pageHref } from './locale'
 import { cursorFromPost, decodePostsCursor } from './posts-cursor'
 import type {
   FeedDecorationView,
-  FooterGroupView,
   MediaView,
   NavChildView,
   NavItemView,
@@ -113,20 +123,6 @@ function packIdFromValue(value: unknown): number {
   return typeof value === 'number' ? value : 0
 }
 
-function footerDecorationUrlFromPack(pack: SlimDecorationPack | null | undefined): string | null {
-  if (!pack?.items?.length) return null
-
-  const footerItemId = pack.footerItem && pack.footerItem !== 'null' ? pack.footerItem : null
-  const footerRow = footerItemId
-    ? pack.items.find((item) => item.id === footerItemId)
-    : pack.items[0]
-
-  if (!footerRow) return null
-  const file = footerRow.file
-  if (isFeedDecorationFile(file) && file.url) return file.url
-  return null
-}
-
 function toFeedDecorationView(
   packId: number,
   item: NonNullable<SlimDecorationPack['items']>[number],
@@ -147,14 +143,14 @@ function toFeedDecorationView(
   }
 }
 
-function toPostCard(post: Post): PostCardView {
+function toPostCard(post: Post, locale: LocaleCode): PostCardView {
   const image = toMediaView(post.featuredImage)
+  const slug = typeof post.slug === 'string' ? post.slug : null
 
   return {
     id: post.id,
     title: post.title,
-    // Detail routes are deferred; cards render without links until then.
-    href: null,
+    href: slug ? pageHref(locale, slug) : null,
     publishedAt: post.publishedAt ?? null,
     image,
   }
@@ -213,6 +209,38 @@ function toVideoCard(video: Video): VideoCardView {
 }
 
 export { toPostCard, toProjectCard, toThingCard, toVideoCard }
+
+async function loadPostBySlug(locale: LocaleCode, slug: string): Promise<Post | null> {
+  const payload = await getPayloadClient()
+  const { docs } = await payload.find({
+    collection: 'posts',
+    locale,
+    fallbackLocale: false,
+    where: {
+      and: [publishedStatusWhere, { slug: { equals: slug } }, { slug: { exists: true } }],
+    },
+    limit: 1,
+    depth: 2,
+    overrideAccess: false,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      layout: true,
+      featuredImage: true,
+      publishedAt: true,
+      readingTime: true,
+      author: true,
+      categories: true,
+      tags: true,
+      seo: true,
+    },
+  })
+  return (docs[0] as Post | undefined) ?? null
+}
+
+export { loadPostBySlug }
 
 function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCardView {
   let href: string | null = null
@@ -325,7 +353,7 @@ async function loadPostsPage(locale: LocaleCode, cursorRaw: string | null): Prom
 
   const hasNextPage = result.docs.length > POSTS_PAGE_SIZE
   const pageDocs = hasNextPage ? result.docs.slice(0, POSTS_PAGE_SIZE) : result.docs
-  const cards = pageDocs.map((post) => toPostCard(post as Post))
+  const cards = pageDocs.map((post) => toPostCard(post as Post, locale))
   const last = cards[cards.length - 1]
   const nextCursor = hasNextPage && last ? cursorFromPost(last) : null
 
@@ -494,6 +522,35 @@ const getCachedShortStories = (locale: LocaleCode) =>
     tags: [CACHE_TAGS.shortStories],
   })()
 
+async function loadShortStoryTextsInner(locale: LocaleCode, ids: number[]): Promise<string[]> {
+  if (ids.length === 0) return []
+
+  const payload = await getPayloadClient()
+
+  const result = await payload.find({
+    collection: 'short-stories',
+    locale,
+    where: {
+      and: [publishedStatusWhere, { id: { in: ids } }],
+    },
+    sort: '-publishedAt',
+    limit: ids.length,
+    depth: 0,
+    overrideAccess: false,
+    select: {
+      id: true,
+      content: true,
+    },
+  })
+
+  const byId = new Map<number, string>()
+  for (const doc of result.docs) {
+    byId.set((doc as ShortStory).id, lexicalToPlainText((doc as ShortStory).content))
+  }
+
+  return ids.map((id) => byId.get(id) ?? '')
+}
+
 export const getHero = cache(async (locale: LocaleCode): Promise<HeroView> => {
   const siteSettings = await getCachedSiteSettings(locale)
 
@@ -527,8 +584,6 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
   const siteSettings = await getCachedSiteSettings(locale)
 
   const packId = packIdFromValue(siteSettings.activeDecorationPack)
-  const pack = packId ? await getCachedDecorationPack(packId) : null
-  const decorationImageUrl = footerDecorationUrlFromPack(pack)
 
   const navItems: NavItemView[] = (siteSettings.navigation || []).flatMap((item, index) => {
     const parent = toNavChild(item, locale, index)
@@ -546,18 +601,6 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
     ]
   })
 
-  const footerGroups: FooterGroupView[] = (siteSettings.footerGroups || []).map((group, index) => ({
-    id: group.id || `group-${index}`,
-    title: group.title,
-    links: (group.links || [])
-      .map((link, linkIndex) => toNavChild(link, locale, linkIndex))
-      .filter((link): link is NavChildView => Boolean(link)),
-  }))
-
-  const legalLinks = (siteSettings.legalLinks || [])
-    .map((link, index) => toNavChild(link, locale, index))
-    .filter((link): link is NavChildView => Boolean(link))
-
   const profileLinks = (siteSettings.links || [])
     .map((link, index) => toNavChild(link, locale, index))
     .filter((link): link is NavChildView => Boolean(link))
@@ -571,13 +614,6 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
     contactEmail: siteSettings.contactEmail ?? null,
     profileLinks,
     navigation: navItems,
-    footer: {
-      text: (siteSettings.footerText as SiteShellView['footer']['text']) ?? null,
-      decorationImageUrl,
-      groups: footerGroups,
-      legalLinks,
-      copyright: siteSettings.copyright ?? null,
-    },
     activeDecorationPackId: packId,
     robotsIndex: siteSettings.robots?.indexSite !== false,
     defaultSocialImage: toMediaView(siteSettings.defaultSocialImage),
@@ -611,3 +647,17 @@ export const getVideosPage = cache(
 export const getShortStories = cache(async (locale: LocaleCode): Promise<ShortStoryCardView[]> => {
   return getCachedShortStories(locale)
 })
+
+export const loadShortStoryTexts = cache(
+  async (locale: LocaleCode, ids: number[]): Promise<string[]> => {
+    if (ids.length === 0) return []
+    const key = [...ids].sort((a, b) => a - b).join(',')
+    return unstable_cache(
+      async () => loadShortStoryTextsInner(locale, ids),
+      ['short-story-texts', locale, key],
+      {
+        tags: [CACHE_TAGS.shortStories],
+      },
+    )()
+  },
+)

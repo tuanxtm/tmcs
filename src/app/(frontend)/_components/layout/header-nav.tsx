@@ -15,14 +15,17 @@ export function HeaderNav({ items, className }: HeaderNavProps) {
   if (items.length === 0) return null
 
   return (
-    <nav aria-label="Primary" className={cn('flex flex-wrap items-center justify-end gap-1', className)}>
-      <ul className="flex flex-wrap items-center justify-end gap-x-1 gap-y-1">
+    <nav
+      aria-label="Primary"
+      className={cn('flex flex-wrap items-center justify-end gap-1', className)}
+    >
+      <ul className="flex flex-wrap items-center justify-end gap-x-4 gap-y-1">
         {items.map((item) => (
           <li key={item.id} className="flex items-center gap-1">
             <Link
               href={item.href}
               {...externalLinkProps(item)}
-              className="inline-flex min-h-11 items-center px-2 font-mono text-xs font-bold uppercase tracking-wide text-secondary-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex min-h-11 items-center font-mono text-xs font-bold tracking-tight lowercase text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {item.label}
             </Link>
@@ -32,7 +35,7 @@ export function HeaderNav({ items, className }: HeaderNavProps) {
                     key={child.id}
                     href={child.href}
                     {...externalLinkProps(child)}
-                    className="inline-flex min-h-11 items-center px-2 font-mono text-xs uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex min-h-11 items-center font-mono text-xs tracking-tight lowercase text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {child.label}
                   </Link>

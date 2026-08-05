@@ -450,9 +450,8 @@ export default function ColorBends({
   ])
 
   useEffect(() => {
-    const material = materialRef.current
     const container = containerRef.current
-    if (!material || !container) return
+    if (!container) return
 
     const handlePointerMove = (e: PointerEvent) => {
       const rect = container.getBoundingClientRect()
@@ -461,9 +460,11 @@ export default function ColorBends({
       pointerTargetRef.current.set(x, y)
     }
 
-    container.addEventListener('pointermove', handlePointerMove)
+    // Listen on window so mouse input works even when an ancestor has
+    // `pointer-events: none` (the background sits behind interactive UI).
+    window.addEventListener('pointermove', handlePointerMove)
     return () => {
-      container.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointermove', handlePointerMove)
     }
   }, [])
 

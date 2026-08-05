@@ -7,7 +7,6 @@ import { parseLocale, SITE_LOCALE_HEADER } from '@/app/(frontend)/_lib/locale'
 import { Background } from '@/app/(frontend)/_components/layout/background'
 import { BootSplash } from '@/app/(frontend)/_components/layout/boot-splash'
 import { CursorPopup } from '@/app/(frontend)/_components/layout/cursor-popup'
-import { SiteFooter } from '@/app/(frontend)/_components/layout/site-footer'
 import {
   BootRevealContent,
   BootRevealProvider,
@@ -58,7 +57,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const headerList = await headers()
   const locale = parseLocale(headerList.get(SITE_LOCALE_HEADER))
-  const shell = await getSiteShell(locale)
 
   return (
     <html
@@ -79,7 +77,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </a>
               <BootRevealContent className="page-frame">
                 <main id="main-content">{children}</main>
-                <SiteFooter shell={shell} />
               </BootRevealContent>
               <CursorPopup />
             </BootRevealProvider>

@@ -4,8 +4,9 @@
  * Usage:
  *   bun run seed
  *
- * Requires SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD (and optional manager/creator).
- * Never embeds passwords. Safe to re-run — upserts by stable keys.
+ * Local-only credentials are baked in below (see SEED_USERS).
+ * Override by editing this file or extending it with env reads if needed.
+ * Never use these credentials in production. Safe to re-run — upserts by stable keys.
  */
 
 import 'dotenv/config'
@@ -19,19 +20,20 @@ import { PLANT_DECORATION_SEEDS } from './plant-decorations'
 import { upsertFeedDecorationFile } from './decoration-upload'
 
 type Locale = 'en' | 'vi'
+type SeedRole = 'admin' | 'manager' | 'creator'
 
-const requireEnv = (name: string): string => {
-  const value = process.env[name]?.trim()
-  if (!value) {
-    throw new Error(`Missing ${name}. Set it in .env before seeding.`)
-  }
-  return value
-}
+const SEED_USERS: ReadonlyArray<{
+  email: string
+  password: string
+  name: string
+  role: SeedRole
+}> = [
+  { email: 'admin@example.com', password: 'admin', name: 'Site Admin', role: 'admin' },
+  { email: 'manager@example.com', password: 'admin', name: 'Site Manager', role: 'manager' },
+  { email: 'creator@example.com', password: 'admin', name: 'Site Creator', role: 'creator' },
+] as const
 
-const optionalEnv = (name: string): string | undefined => {
-  const value = process.env[name]?.trim()
-  return value || undefined
-}
+const ADMIN_EMAIL = SEED_USERS.find((u) => u.role === 'admin')!.email
 
 function richText(...paragraphs: string[]) {
   return {
@@ -225,11 +227,7 @@ async function upsertShortStory(
   return doc
 }
 
-async function upsertSeedMedia(
-  payload: Payload,
-  filename: string,
-  alt: string,
-): Promise<number> {
+async function upsertSeedMedia(payload: Payload, filename: string, alt: string): Promise<number> {
   const existing = await payload.find({
     collection: 'media',
     where: { filename: { equals: filename } },
@@ -251,7 +249,7 @@ async function upsertSeedMedia(
       kind: 'image',
     },
     file: {
-      data: bytes,
+      data: Buffer.from(bytes),
       mimetype: 'image/webp',
       name: filename,
       size: bytes.byteLength,
@@ -415,13 +413,25 @@ async function upsertVideoByTitle(
 const CATEGORY_SEEDS = [
   {
     slug: 'diy-projects',
-    en: { title: 'DIY Projects', description: 'Hands-on builds, repairs, and weekend experiments.' },
-    vi: { title: 'Dự án DIY', description: 'Các bản build thực hành, sửa chữa và thử nghiệm cuối tuần.' },
+    en: {
+      title: 'DIY Projects',
+      description: 'Hands-on builds, repairs, and weekend experiments.',
+    },
+    vi: {
+      title: 'Dự án DIY',
+      description: 'Các bản build thực hành, sửa chữa và thử nghiệm cuối tuần.',
+    },
   },
   {
     slug: 'tech-workspace',
-    en: { title: 'Tech Workspace', description: 'Desk setups, ergonomics, and studio organization.' },
-    vi: { title: 'Không gian làm việc', description: 'Bàn làm việc, công thái học và tổ chức studio.' },
+    en: {
+      title: 'Tech Workspace',
+      description: 'Desk setups, ergonomics, and studio organization.',
+    },
+    vi: {
+      title: 'Không gian làm việc',
+      description: 'Bàn làm việc, công thái học và tổ chức studio.',
+    },
   },
   {
     slug: 'electronics',
@@ -441,7 +451,10 @@ const CATEGORY_SEEDS = [
   {
     slug: 'smart-home',
     en: { title: 'Smart Home', description: 'Sensors, automations, and local-first gadgets.' },
-    vi: { title: 'Nhà thông minh', description: 'Cảm biến, tự động hóa và thiết bị ưu tiên local.' },
+    vi: {
+      title: 'Nhà thông minh',
+      description: 'Cảm biến, tự động hóa và thiết bị ưu tiên local.',
+    },
   },
 ] as const
 
@@ -665,106 +678,212 @@ const POST_TITLES_VI = [
   'Xuất bản bài viết dự án DIY',
 ] as const
 
-
 const SHORT_STORY_SEEDS = [
   {
     key: 'ss01',
-    en: { title: 'Measure twice', text: 'A quick note before cutting stock: mark, step back, mark again.', variant: 'note' as const },
-    vi: { title: 'Đo hai lần', text: 'Ghi chú nhanh trước khi cắt: đánh dấu, lùi lại, đánh dấu lại.' },
+    en: {
+      title: 'Measure twice',
+      text: 'A quick note before cutting stock: mark, step back, mark again.',
+      variant: 'note' as const,
+    },
+    vi: {
+      title: 'Đo hai lần',
+      text: 'Ghi chú nhanh trước khi cắt: đánh dấu, lùi lại, đánh dấu lại.',
+    },
   },
   {
     key: 'ss02',
-    en: { title: 'Bench rule', text: 'If it takes longer to find the tool than to use it, the tool needs a home.', variant: 'quote' as const },
+    en: {
+      title: 'Bench rule',
+      text: 'If it takes longer to find the tool than to use it, the tool needs a home.',
+      variant: 'quote' as const,
+    },
     vi: { title: 'Quy tắc bàn thợ', text: 'Nếu tìm dụng cụ lâu hơn dùng nó, dụng cụ cần một chỗ.' },
   },
   {
     key: 'ss03',
-    en: { title: 'Spare ferrules', text: 'Keep three sizes in a labeled tin. Future-you is always soldering at 11pm.', variant: 'note' as const },
-    vi: { title: 'Đầu cosse dự phòng', text: 'Giữ ba cỡ trong hộp có nhãn. Bạn tương lai luôn hàn lúc 11 giờ tối.' },
+    en: {
+      title: 'Spare ferrules',
+      text: 'Keep three sizes in a labeled tin. Future-you is always soldering at 11pm.',
+      variant: 'note' as const,
+    },
+    vi: {
+      title: 'Đầu cosse dự phòng',
+      text: 'Giữ ba cỡ trong hộp có nhãn. Bạn tương lai luôn hàn lúc 11 giờ tối.',
+    },
   },
   {
     key: 'ss04',
-    en: { title: 'Local first', text: 'Automate the plant sensor locally before exposing another cloud dashboard.', variant: 'quote' as const },
-    vi: { title: 'Local trước', text: 'Tự động hóa cảm biến cây local trước khi thêm dashboard cloud.' },
+    en: {
+      title: 'Local first',
+      text: 'Automate the plant sensor locally before exposing another cloud dashboard.',
+      variant: 'quote' as const,
+    },
+    vi: {
+      title: 'Local trước',
+      text: 'Tự động hóa cảm biến cây local trước khi thêm dashboard cloud.',
+    },
   },
   {
     key: 'ss05',
-    en: { title: 'Filament note', text: 'Write the oven dry time on the spool. Memory is not a process.', variant: 'note' as const },
-    vi: { title: 'Ghi filament', text: 'Viết thời gian sấy lò lên cuộn. Trí nhớ không phải quy trình.' },
+    en: {
+      title: 'Filament note',
+      text: 'Write the oven dry time on the spool. Memory is not a process.',
+      variant: 'note' as const,
+    },
+    vi: {
+      title: 'Ghi filament',
+      text: 'Viết thời gian sấy lò lên cuộn. Trí nhớ không phải quy trình.',
+    },
   },
   {
     key: 'ss06',
-    en: { title: 'Rack mantra', text: 'Label the cable before you trust the service.', variant: 'quote' as const },
+    en: {
+      title: 'Rack mantra',
+      text: 'Label the cable before you trust the service.',
+      variant: 'quote' as const,
+    },
     vi: { title: 'Câu rack', text: 'Dán nhãn dây trước khi tin dịch vụ.' },
   },
   {
     key: 'ss07',
-    en: { title: 'Vent sketch', text: 'A napkin drawing of intake vs exhaust beats a perfect render that ships late.', variant: 'note' as const },
+    en: {
+      title: 'Vent sketch',
+      text: 'A napkin drawing of intake vs exhaust beats a perfect render that ships late.',
+      variant: 'note' as const,
+    },
     vi: { title: 'Phác thông gió', text: 'Vẽ giấy ăn hút/thổi tốt hơn render hoàn hảo trễ hạn.' },
   },
   {
     key: 'ss08',
-    en: { title: 'Shop light', text: 'Cross-light the bench; kill the shadows on your smallest parts.', variant: 'note' as const },
+    en: {
+      title: 'Shop light',
+      text: 'Cross-light the bench; kill the shadows on your smallest parts.',
+      variant: 'note' as const,
+    },
     vi: { title: 'Đèn xưởng', text: 'Chiếu chéo bàn; xóa bóng trên chi tiết nhỏ nhất.' },
   },
   {
     key: 'ss09',
-    en: { title: 'Iteration', text: 'Version three is where the project finally tells you what it wants to be.', variant: 'quote' as const },
+    en: {
+      title: 'Iteration',
+      text: 'Version three is where the project finally tells you what it wants to be.',
+      variant: 'quote' as const,
+    },
     vi: { title: 'Lặp', text: 'Phiên bản ba là lúc dự án nói bạn nó muốn trở thành gì.' },
   },
   {
     key: 'ss10',
-    en: { title: 'Ship the log', text: 'Publish the messy notes. Someone else is stuck on the same bench problem.', variant: 'note' as const },
-    vi: { title: 'Xuất nhật ký', text: 'Đăng ghi chú lộn xộn. Ai đó cũng kẹt cùng vấn đề bàn thợ.' },
+    en: {
+      title: 'Ship the log',
+      text: 'Publish the messy notes. Someone else is stuck on the same bench problem.',
+      variant: 'note' as const,
+    },
+    vi: {
+      title: 'Xuất nhật ký',
+      text: 'Đăng ghi chú lộn xộn. Ai đó cũng kẹt cùng vấn đề bàn thợ.',
+    },
   },
   {
     key: 'ss11',
-    en: { title: 'Torque habit', text: 'Snug the screw, then stop. Stripped threads cost more time than caution.', variant: 'note' as const },
-    vi: { title: 'Thói quen siết', text: 'Vặn vừa khít rồi dừng. Ren hỏng tốn thời gian hơn cẩn thận.' },
+    en: {
+      title: 'Torque habit',
+      text: 'Snug the screw, then stop. Stripped threads cost more time than caution.',
+      variant: 'note' as const,
+    },
+    vi: {
+      title: 'Thói quen siết',
+      text: 'Vặn vừa khít rồi dừng. Ren hỏng tốn thời gian hơn cẩn thận.',
+    },
   },
   {
     key: 'ss12',
-    en: { title: 'Test clip', text: 'A labeled bag of clipped leads beats a drawer of mystery metal.', variant: 'quote' as const },
-    vi: { title: 'Túi chân cắt', text: 'Túi có nhãn đựng chân cắt tốt hơn ngăn kéo kim loại không rõ nguồn.' },
+    en: {
+      title: 'Test clip',
+      text: 'A labeled bag of clipped leads beats a drawer of mystery metal.',
+      variant: 'quote' as const,
+    },
+    vi: {
+      title: 'Túi chân cắt',
+      text: 'Túi có nhãn đựng chân cắt tốt hơn ngăn kéo kim loại không rõ nguồn.',
+    },
   },
   {
     key: 'ss13',
-    en: { title: 'Flux reminder', text: 'Clean the joint before you blame the solder.', variant: 'note' as const },
+    en: {
+      title: 'Flux reminder',
+      text: 'Clean the joint before you blame the solder.',
+      variant: 'note' as const,
+    },
     vi: { title: 'Nhắc flux', text: 'Làm sạch mối hàn trước khi đổ lỗi cho thiếc.' },
   },
   {
     key: 'ss14',
-    en: { title: 'Quiet hours', text: 'Schedule the loud prints for when neighbors are at work.', variant: 'quote' as const },
+    en: {
+      title: 'Quiet hours',
+      text: 'Schedule the loud prints for when neighbors are at work.',
+      variant: 'quote' as const,
+    },
     vi: { title: 'Giờ yên', text: 'Hẹn in ồn khi hàng xóm đi làm.' },
   },
   {
     key: 'ss15',
-    en: { title: 'Backup bit', text: 'Keep a duplicate end mill one drawer down. Dull catches at the worst moment.', variant: 'note' as const },
-    vi: { title: 'Mũi dự phòng', text: 'Giữ mũi phay dự phòng một ngăn dưới. Cùn kẹt đúng lúc tệ nhất.' },
+    en: {
+      title: 'Backup bit',
+      text: 'Keep a duplicate end mill one drawer down. Dull catches at the worst moment.',
+      variant: 'note' as const,
+    },
+    vi: {
+      title: 'Mũi dự phòng',
+      text: 'Giữ mũi phay dự phòng một ngăn dưới. Cùn kẹt đúng lúc tệ nhất.',
+    },
   },
   {
     key: 'ss16',
-    en: { title: 'Ground loop', text: 'If the scope lies, check the ground before chasing ghosts in firmware.', variant: 'quote' as const },
+    en: {
+      title: 'Ground loop',
+      text: 'If the scope lies, check the ground before chasing ghosts in firmware.',
+      variant: 'quote' as const,
+    },
     vi: { title: 'Vòng mass', text: 'Nếu scope sai, kiểm tra mass trước khi truy firmware ma.' },
   },
   {
     key: 'ss17',
-    en: { title: 'Dust pass', text: 'Vacuum the bench after sanding. Electronics and sawdust are not friends.', variant: 'note' as const },
+    en: {
+      title: 'Dust pass',
+      text: 'Vacuum the bench after sanding. Electronics and sawdust are not friends.',
+      variant: 'note' as const,
+    },
     vi: { title: 'Hút bụi', text: 'Hút bàn sau khi chà nhám. Điện tử và mùn cưa không phải bạn.' },
   },
   {
     key: 'ss18',
-    en: { title: 'Spare USB', text: 'Label the data-only cables. Charging cables lie during flashing.', variant: 'note' as const },
+    en: {
+      title: 'Spare USB',
+      text: 'Label the data-only cables. Charging cables lie during flashing.',
+      variant: 'note' as const,
+    },
     vi: { title: 'USB dự phòng', text: 'Dán nhãn cáp chỉ data. Cáp sạc nói dối khi flash.' },
   },
   {
     key: 'ss19',
-    en: { title: 'Scope budget', text: 'Buy the probe you will actually reach for, not the one that impresses on paper.', variant: 'quote' as const },
-    vi: { title: 'Ngân sách scope', text: 'Mua đầu dò bạn thực sự dùng, không phải cái ấn tượng trên giấy.' },
+    en: {
+      title: 'Scope budget',
+      text: 'Buy the probe you will actually reach for, not the one that impresses on paper.',
+      variant: 'quote' as const,
+    },
+    vi: {
+      title: 'Ngân sách scope',
+      text: 'Mua đầu dò bạn thực sự dùng, không phải cái ấn tượng trên giấy.',
+    },
   },
   {
     key: 'ss20',
-    en: { title: 'End of day', text: 'Power down the bench, cap the flux, and leave one note for morning-you.', variant: 'note' as const },
+    en: {
+      title: 'End of day',
+      text: 'Power down the bench, cap the flux, and leave one note for morning-you.',
+      variant: 'note' as const,
+    },
     vi: { title: 'Cuối ngày', text: 'Tắt nguồn bàn, đậy flux, để một ghi chú cho bạn sáng mai.' },
   },
 ] as const
@@ -955,7 +1074,7 @@ const VIDEO_SEEDS = [
     en: {
       title: 'Hot tip: flux before solder',
       provider: 'tiktok' as const,
-      sourceUrl: 'https://www.tiktok.com/@tmcs/video/7123456789012345678',
+      sourceUrl: 'https://www.tiktok.com/@tuantm/video/7123456789012345678',
     },
     vi: { title: 'Mẹo: flux trước khi hàn' },
   },
@@ -991,9 +1110,7 @@ async function upsertAuthor(
 ) {
   const existing = await payload.find({
     collection: 'authors',
-    where: userId
-      ? { user: { equals: userId } }
-      : { displayName: { equals: seed.en.displayName } },
+    where: userId ? { user: { equals: userId } } : { displayName: { equals: seed.en.displayName } },
     limit: 1,
     depth: 0,
     overrideAccess: true,
@@ -1045,33 +1162,17 @@ async function seed() {
   const payload = await getPayload({ config })
 
   const admin = await upsertUser(payload, {
-    email: requireEnv('SEED_ADMIN_EMAIL'),
-    password: requireEnv('SEED_ADMIN_PASSWORD'),
-    name: optionalEnv('SEED_ADMIN_NAME') || 'Site Admin',
+    email: ADMIN_EMAIL,
+    password: SEED_USERS.find((u) => u.role === 'admin')!.password,
+    name: SEED_USERS.find((u) => u.role === 'admin')!.name,
     role: 'admin',
   })
 
-  const managerPassword = optionalEnv('SEED_MANAGER_PASSWORD')
-  const managerEmail = optionalEnv('SEED_MANAGER_EMAIL')
-  if (managerEmail && managerPassword) {
-    await upsertUser(payload, {
-      email: managerEmail,
-      password: managerPassword,
-      name: optionalEnv('SEED_MANAGER_NAME') || 'Site Manager',
-      role: 'manager',
-    })
-  }
-
-  const creatorPassword = optionalEnv('SEED_CREATOR_PASSWORD')
-  const creatorEmail = optionalEnv('SEED_CREATOR_EMAIL')
   let creator = null as Awaited<ReturnType<typeof upsertUser>> | null
-  if (creatorEmail && creatorPassword) {
-    creator = await upsertUser(payload, {
-      email: creatorEmail,
-      password: creatorPassword,
-      name: optionalEnv('SEED_CREATOR_NAME') || 'Site Creator',
-      role: 'creator',
-    })
+  for (const seedUser of SEED_USERS) {
+    if (seedUser.role === 'admin') continue
+    const doc = await upsertUser(payload, seedUser)
+    if (seedUser.role === 'creator') creator = doc
   }
 
   // Authors
@@ -1120,11 +1221,11 @@ async function seed() {
   await payload.updateGlobal({
     slug: 'site-settings',
     data: {
-      siteName: 'TMCS Portfolio',
+      siteName: 'tuantm',
       tagline: 'DIY builds, tech workspace, and maker notes',
       description: 'Seed site — workshop projects, desk setups, and electronics experiments.',
       siteUrl: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
-      contactEmail: requireEnv('SEED_ADMIN_EMAIL'),
+      contactEmail: ADMIN_EMAIL,
       robots: { indexSite: false },
       bio: richText(
         'Documenting builds, failures, and the tools that survive them.',
@@ -1138,7 +1239,7 @@ async function seed() {
   await payload.updateGlobal({
     slug: 'site-settings',
     data: {
-      siteName: 'TMCS Portfolio',
+      siteName: 'tuantm',
       tagline: 'Dự án DIY, không gian tech và ghi chú maker',
       description: 'Trang mẫu — dự án xưởng, setup bàn và thử nghiệm điện tử.',
       bio: richText(
@@ -1491,7 +1592,7 @@ async function seed() {
         id: 'seed-home-hero',
         blockType: 'hero',
         label: 'Hero',
-        title: 'TMCS Portfolio',
+        title: 'tuantm',
         tagline: 'DIY builds, tech workspace, and maker notes',
         bio: richText('Documenting builds, failures, and the tools that survive them.'),
         cursorPopup: 'scroll down',
@@ -1575,7 +1676,7 @@ async function seed() {
     publishedAt: daysAgo(120),
     translationReady: { vi: true },
     seo: {
-      metaTitle: 'TMCS Portfolio',
+      metaTitle: 'tuantm',
       metaDescription: 'DIY builds, tech workspace, and maker notes from a home workshop.',
     },
   })
@@ -1610,7 +1711,7 @@ async function seed() {
       labelEn: 'Instagram',
       labelVi: 'Instagram',
       linkType: 'external' as const,
-      url: 'https://instagram.com/tmcs',
+      url: 'https://instagram.com/tuantm',
       newTab: true,
     },
     {
@@ -1618,7 +1719,7 @@ async function seed() {
       labelEn: 'YouTube',
       labelVi: 'YouTube',
       linkType: 'external' as const,
-      url: 'https://youtube.com/@tmcs',
+      url: 'https://youtube.com/@tuantm',
       newTab: true,
     },
     {
@@ -1626,7 +1727,7 @@ async function seed() {
       labelEn: 'GitHub',
       labelVi: 'GitHub',
       linkType: 'external' as const,
-      url: 'https://github.com/tmcs',
+      url: 'https://github.com/tuantm',
       newTab: true,
     },
   ]
@@ -1778,7 +1879,7 @@ async function seed() {
           id: 'seed-home-hero',
           blockType: 'hero',
           label: 'Hero',
-          title: 'TMCS Portfolio',
+          title: 'tuantm',
           tagline: 'Dự án DIY, không gian tech và ghi chú maker',
           bio: richText('Ghi lại bản build, thất bại và dụng cụ còn sót lại.'),
           cursorPopup: 'kéo xuống',
@@ -1859,7 +1960,7 @@ async function seed() {
         },
       ],
       seo: {
-        metaTitle: 'TMCS Portfolio',
+        metaTitle: 'tuantm',
         metaDescription: 'Dự án DIY, không gian tech và ghi chú maker từ xưởng tại nhà.',
       },
     },
@@ -1881,8 +1982,9 @@ async function seed() {
   console.log(`- Posts page: ${postsPage.id}`)
   console.log(`- Projects page: ${projectsPage.id}`)
   console.log(`- Things page: ${thingsPage.id}`)
-  if (managerEmail) console.log(`- Manager: ${managerEmail}`)
-  if (creatorEmail) console.log(`- Creator: ${creatorEmail}`)
+  for (const seedUser of SEED_USERS) {
+    console.log(`- ${seedUser.role}: ${seedUser.email}`)
+  }
   console.log('Seed complete. Run bun run migrate if schema migrations are pending.')
   process.exit(0)
 }

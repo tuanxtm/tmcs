@@ -25,7 +25,9 @@ export function ViewAllFeedTile({ href, label, cursorPopup, className }: ViewAll
       data-cursor-popup={cursorPopup || label.toLowerCase()}
     >
       <div className="absolute bottom-2 right-2 flex gap-1">
-        <span className="font-mono text-xs font-medium tracking-tight text-foreground">{label}</span>
+        <span className="font-mono text-xs font-medium tracking-tight text-foreground">
+          {label}
+        </span>
         <IconArrowRight className="size-4 text-foreground" />
       </div>
     </Link>

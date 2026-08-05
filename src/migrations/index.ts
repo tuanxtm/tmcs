@@ -17,6 +17,10 @@ import * as migration_20260802_103200_feed_section_cursor_popups from './2026080
 import * as migration_20260802_153500_feed_section_description from './20260802_153500_feed_section_description'
 import * as migration_20260802_161000_feed_section_pagination_view_all_page from './20260802_161000_feed_section_pagination_view_all_page'
 import * as migration_20260803_125000_add_things_and_videos_collections from './20260803_125000_add_things_and_videos_collections'
+import * as migration_20260804_slug_reservations from './20260804_slug_reservations'
+import * as migration_20260805_012000_add_typewriter_block from './20260805_012000_add_typewriter_block'
+import * as migration_20260805_095000_add_scramble_hover_block from './20260805_095000_add_scramble_hover_block'
+import * as migration_20260805_120000_add_footer_block from './20260805_120000_add_footer_block'
 
 export const migrations = [
   {
@@ -113,5 +117,20 @@ export const migrations = [
     up: migration_20260803_125000_add_things_and_videos_collections.up,
     down: migration_20260803_125000_add_things_and_videos_collections.down,
     name: '20260803_125000_add_things_and_videos_collections',
+  },
+  {
+    up: migration_20260805_012000_add_typewriter_block.up,
+    down: migration_20260805_012000_add_typewriter_block.down,
+    name: '20260805_012000_add_typewriter_block',
+  },
+  {
+    up: migration_20260805_095000_add_scramble_hover_block.up,
+    down: migration_20260805_095000_add_scramble_hover_block.down,
+    name: '20260805_095000_add_scramble_hover_block',
+  },
+  {
+    up: migration_20260805_120000_add_footer_block.up,
+    down: migration_20260805_120000_add_footer_block.down,
+    name: '20260805_120000_add_footer_block',
   },
 ]

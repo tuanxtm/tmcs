@@ -57,7 +57,13 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     meta: {
-      titleSuffix: ' · tuantm\'s creative space',
+      titleSuffix: " · tuantm's creative space",
+    },
+    components: {
+      graphics: {
+        Icon: '@/app/(payload)/_components/root/icon',
+        Logo: '@/app/(payload)/_components/root/logo',
+      },
     },
   },
   collections,

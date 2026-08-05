@@ -36,7 +36,7 @@ export const Projects: CollectionConfig = {
       schedulePublish: true,
       validate: false,
     },
-    maxPerDoc: 50,
+    maxPerDoc: 10,
   },
   access: {
     create: canCreateOwnedContent,
