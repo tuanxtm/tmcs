@@ -79,7 +79,8 @@ export const DecorationPacks: CollectionConfig = {
         plural: 'Feed decorations',
       },
       admin: {
-        description: 'Ornaments in this pack. Upload WebP images; they are stored as Feed decorations.',
+        description:
+          'Ornaments in this pack. Upload WebP images; they are stored as Feed decorations.',
       },
       fields: [
         {
@@ -117,9 +118,9 @@ export const DecorationPacks: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description:
-          'Which ornament from Items appears in the site footer while this pack is active.',
+          'Which ornament from Items appears in the bottom right corner of the footer while this pack is active.',
         components: {
-          Field: '/components/FooterItemSelect#FooterItemSelect',
+          Field: '@/components/FooterItemSelect#FooterItemSelect',
         },
       },
     },
