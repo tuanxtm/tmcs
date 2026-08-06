@@ -8,13 +8,13 @@ import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
 import { GetPlatformProxyOptions } from 'wrangler'
 import { r2Storage } from '@payloadcms/storage-r2'
 
-import { collections } from './collections'
-import { globals } from './globals'
-import { constantTimeEqual } from './lib/crypto'
-import { getPayloadSecret, getServerURL, getTrustedOrigins } from './lib/env'
-import { DEFAULT_LOCALE, LOCALES } from './lib/locales'
-import { isAdminOrManager, type UserWithRole } from './lib/roles'
-import { migrations } from './migrations'
+import { collections } from '../collections'
+import { globals } from '../globals'
+import { constantTimeEqual } from '../lib/crypto'
+import { getPayloadSecret, getServerURL, getTrustedOrigins } from '../lib/env'
+import { DEFAULT_LOCALE, LOCALES } from '../lib/locales'
+import { isAdminOrManager, type UserWithRole } from '../lib/roles'
+import { migrations } from '../migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -58,6 +58,9 @@ export default buildConfig({
     },
     meta: {
       titleSuffix: " · tuantm's creative space",
+      icons: {
+        icon: '@/app/favicon.ico',
+      },
     },
     components: {
       graphics: {
@@ -65,6 +68,7 @@ export default buildConfig({
         Logo: '@/app/(payload)/_components/root/logo',
       },
     },
+    dateFormat: 'HH:mm dd/MM/yyyy',
   },
   collections,
   globals,
@@ -78,7 +82,7 @@ export default buildConfig({
   csrf: isProduction ? getTrustedOrigins() : [],
   cors: getTrustedOrigins(),
   typescript: {
-    outputFile: path.resolve(dirname, 'payload-types.ts'),
+    outputFile: path.resolve(dirname, 'types.ts'),
   },
   localization: {
     locales: [...LOCALES],
@@ -123,6 +127,7 @@ export default buildConfig({
       },
     }),
   ],
+  telemetry: false,
 })
 
 // Adapted from https://github.com/opennextjs/opennextjs-cloudflare/blob/d00b3a13e42e65aad76fba41774815726422cc39/packages/cloudflare/src/api/cloudflare-context.ts#L328C36-L328C46

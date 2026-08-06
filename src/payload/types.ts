@@ -996,7 +996,7 @@ export interface DecorationPack {
       }[]
     | null;
   /**
-   * Which ornament from Items appears in the site footer while this pack is active.
+   * Which ornament from Items appears in the bottom right corner of the footer while this pack is active.
    */
   footerItem?: string | null;
   updatedAt: string;
