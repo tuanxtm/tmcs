@@ -25,7 +25,7 @@ export async function generateHomeMetadata(locale: LocaleCode): Promise<Metadata
     shell.seo.metaDescription ||
     shell.description ||
     undefined
-  const image = home.seo.ogImage || home.heroMedia || hero?.coverImage || hero?.profileImage || shell.seo.ogImage || shell.defaultSocialImage
+  const image = home.seo.ogImage || home.pageImage || hero?.heroImage || shell.seo.ogImage || shell.defaultSocialImage
   const canonical = home.seo.canonicalUrl || `${shell.siteUrl}${homeHref(locale)}`
 
   return {

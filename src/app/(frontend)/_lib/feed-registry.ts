@@ -16,7 +16,7 @@ import type {
 } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
-import type { Post, Project, Thing, Video } from '@/payload-types'
+import type { Post, Project, Thing, Video } from '@payload-types'
 import config from '@payload-config'
 
 const getPayloadClient = cache(async () => getPayload({ config }))

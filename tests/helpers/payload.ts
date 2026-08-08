@@ -4,7 +4,7 @@
 
 import { getPayload, type Payload } from 'payload'
 import config from '@payload-config'
-import type { User } from '@/payload-types'
+import type { User } from '@payload-types'
 
 export type TestUsers = {
   admin: User

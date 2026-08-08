@@ -24,6 +24,7 @@ import {
 import { resolveCmsLink, resolvePageHref } from '@/app/(frontend)/_lib/links'
 import { loadPostBySlug } from '@/app/(frontend)/_lib/cms'
 import type {
+  BlankSpaceBlockView,
   CallToActionBlockView,
   CmsPageView,
   FeedSectionBlockView,
@@ -44,10 +45,10 @@ import type {
   VideoCardView,
   ScrambleHoverBlockView,
 } from '@/app/(frontend)/_lib/types'
-import { CACHE_TAGS } from '@/lib/cache-tags'
+import { CACHE_TAGS, CMS_CACHE_VERSION } from '@/lib/cache-tags'
 import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
-import type { Page, Post } from '@/payload-types'
+import type { Link, Page, Post } from '@payload-types'
 import config from '@payload-config'
 
 const getPayloadClient = cache(async () => getPayload({ config }))
@@ -57,7 +58,7 @@ type PageLayoutBlock = NonNullable<Page['layout']>[number]
 const PAGE_SELECT = {
   title: true,
   summary: true,
-  heroMedia: true,
+  pageImage: true,
   layout: true,
   seo: true,
   slug: true,
@@ -68,38 +69,103 @@ function blockId(block: { id?: string | null }, fallback: string): string {
   return typeof block.id === 'string' && block.id.length > 0 ? block.id : fallback
 }
 
-function toNavLinks(
-  links:
-    | {
-        id?: string | null
-        label: string
-        linkType: 'internal' | 'external'
-        page?: unknown
-        url?: string | null
-        newTab?: boolean | null
-      }[]
-    | null
-    | undefined,
+
+/**
+ * Resolve Link IDs (from a relationship picker) into `NavChildView` items.
+ * Loads each Link via the Local API and applies the same resolver used inline.
+ * Accepts either unpopulated numeric IDs or populated Link objects; for
+ * populated objects we extract the id and resolve them directly.
+ *
+ * Wrapped with `cache()` so multiple blocks on the same page that reference
+ * overlapping Link ids share one Local API call per request.
+ */
+function collectLinkIds(
+  ids: Array<number | string | { id?: number | null } | null | undefined> | null | undefined,
+): number[] {
+  if (!ids?.length) return []
+  const seen = new Set<number>()
+  const numericIds: number[] = []
+  for (const value of ids) {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      if (!seen.has(value)) {
+        seen.add(value)
+        numericIds.push(value)
+      }
+    } else if (typeof value === 'string' && value.length > 0 && /^\d+$/.test(value)) {
+      const num = Number(value)
+      if (!seen.has(num)) {
+        seen.add(num)
+        numericIds.push(num)
+      }
+    } else if (value && typeof value === 'object' && typeof value.id === 'number') {
+      if (!seen.has(value.id)) {
+        seen.add(value.id)
+        numericIds.push(value.id)
+      }
+    }
+  }
+  return numericIds
+}
+
+const loadLinksByIds = cache(
+  async (locale: LocaleCode, numericIds: readonly number[]): Promise<Map<number, Link>> => {
+    if (numericIds.length === 0) return new Map()
+    const payload = await getPayloadClient()
+    const result = await payload.find({
+      collection: 'links',
+      locale,
+      fallbackLocale: false,
+      where: { id: { in: [...numericIds] } },
+      limit: numericIds.length,
+      depth: 1,
+      overrideAccess: false,
+    })
+    const byId = new Map<number, Link>()
+    for (const doc of result.docs) {
+      const link = doc as Link
+      byId.set(link.id, link)
+    }
+    return byId
+  },
+)
+
+async function resolveLinkIds(
+  ids: Array<number | string | { id?: number | null } | null | undefined> | null | undefined,
   locale: LocaleCode,
-): NavChildView[] {
-  if (!links?.length) return []
-  return links.flatMap((link, index) => {
-    const resolved = resolveCmsLink(link, locale)
-    if (!resolved) return []
-    return [
+  fallbackPrefix: string,
+): Promise<NavChildView[]> {
+  const numericIds = collectLinkIds(ids)
+  if (numericIds.length === 0) return []
+  const byId = await loadLinksByIds(locale, numericIds)
+
+  const out: NavChildView[] = []
+  for (const id of numericIds) {
+    const link = byId.get(id)
+    if (!link) continue
+    const resolved = resolveCmsLink(
       {
-        id: link.id || `link-${index}`,
-        ...resolved,
+        label: link.label,
+        linkType: link.linkType,
+        page: link.page ?? null,
+        url: link.url,
+        newTab: link.newTab,
       },
-    ]
-  })
+      locale,
+    )
+    if (!resolved) continue
+    out.push({
+      id: `${fallbackPrefix}-${id}`,
+      ...resolved,
+    })
+  }
+  return out
 }
 
 function toPageSeo(page: Page) {
   return {
     metaTitle: page.seo?.metaTitle ?? null,
     metaDescription: page.seo?.metaDescription ?? page.summary ?? null,
-    ogImage: toMediaView(page.seo?.ogImage) || toMediaView(page.heroMedia),
+    ogImage: toMediaView(page.seo?.ogImage) || toMediaView(page.pageImage),
     canonicalUrl: page.seo?.canonicalUrl ?? null,
     noIndex: Boolean(page.seo?.noIndex),
     noFollow: Boolean(page.seo?.noFollow),
@@ -111,6 +177,7 @@ async function resolveHeroBlock(
   locale: LocaleCode,
   index: number,
 ): Promise<HeroBlockView> {
+  const links = await resolveLinkIds(block.links, locale, `hero-${index}-link`)
   return {
     blockType: 'hero',
     id: blockId(block, `hero-${index}`),
@@ -118,9 +185,8 @@ async function resolveHeroBlock(
     title: block.title,
     tagline: block.tagline ?? null,
     bio: (block.bio as DefaultTypedEditorState | null | undefined) ?? null,
-    coverImage: toMediaView(block.coverImage),
-    profileImage: toMediaView(block.profileImage),
-    links: toNavLinks(block.links, locale),
+    heroImage: toMediaView(block.heroImage),
+    links,
     cursorPopup: block.cursorPopup ?? 'scroll down',
   }
 }
@@ -299,12 +365,13 @@ async function resolveCallToActionBlock(
   locale: LocaleCode,
   index: number,
 ): Promise<CallToActionBlockView> {
+  const links = await resolveLinkIds(block.links, locale, `cta-${index}-link`)
   return {
     blockType: 'callToAction',
     id: blockId(block, `cta-${index}`),
     heading: block.heading,
     body: block.body ?? null,
-    links: toNavLinks(block.links, locale),
+    links,
   }
 }
 
@@ -336,12 +403,22 @@ async function resolveProjectsGridBlock(
   }
 }
 
+async function resolveBlankSpaceBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'blankSpace' }>,
+  index: number,
+): Promise<BlankSpaceBlockView> {
+  return {
+    blockType: 'blankSpace',
+    id: blockId(block, `blank-space-${index}`),
+    height: block.height || '60vh',
+  }
+}
+
 async function resolveTypewriterBlock(
   block: Extract<PageLayoutBlock, { blockType: 'typewriter' }>,
   locale: LocaleCode,
   index: number,
-): Promise<TypewriterBlockView | null> {
-  const ids = relationIds(block.stories)
+): Promise<TypewriterBlockView | null> {  const ids = relationIds(block.stories)
   if (ids.length === 0) return null
 
   const texts = await loadShortStoryTexts(locale, ids)
@@ -379,7 +456,7 @@ async function resolveFooterBlock(
   locale: LocaleCode,
   index: number,
 ): Promise<FooterBlockView> {
-  const legalLinks = toNavLinks(block.legalLinks || [], locale)
+  const legalLinks = await resolveLinkIds(block.legalLinks, locale, `footer-${index}-legal`)
 
   return {
     blockType: 'footer',
@@ -415,6 +492,8 @@ export async function resolveLayoutBlocks(
           return resolveTypewriterBlock(block, locale, index)
         case 'scramble-hover':
           return resolveScrambleHoverBlock(block, locale, index)
+        case 'blankSpace':
+          return resolveBlankSpaceBlock(block, index)
         case 'footer':
           return resolveFooterBlock(block, locale, index)
         default:
@@ -456,7 +535,7 @@ function toCmsPageView(
     summary: page.summary ?? null,
     slug: page.slug,
     template: page.template,
-    heroMedia: toMediaView(page.heroMedia),
+    pageImage: toMediaView(page.pageImage),
     seo: toPageSeo(page),
     blocks,
     alternateSlug,
@@ -494,8 +573,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       title: hero.siteName,
       tagline: hero.tagline,
       bio: hero.bio,
-      coverImage: hero.coverImage,
-      profileImage: hero.image,
+      heroImage: hero.coverImage,
       links: hero.links,
       cursorPopup: 'scroll down',
     },
@@ -573,16 +651,18 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
     },
   ]
 
+  const pageImage = hero.coverImage
+
   return {
     title: hero.siteName,
     summary: hero.tagline,
     slug: 'home',
     template: 'home',
-    heroMedia: hero.coverImage || hero.image,
+    pageImage,
     seo: {
       metaTitle: null,
       metaDescription: hero.tagline,
-      ogImage: hero.coverImage || hero.image,
+      ogImage: pageImage,
       canonicalUrl: null,
       noIndex: false,
       noFollow: false,
@@ -668,9 +748,9 @@ async function loadPageBySlug(
 }
 
 const getCachedHomePage = (locale: LocaleCode) =>
-  // Key prefix bumped when Things/Videos homepage sections landed so stale
-  // layouts without those blocks are not served from the durable data cache.
-  unstable_cache(async () => loadHomePage(locale), ['home-page-v2', locale], {
+  // Cache key is namespaced by `CMS_CACHE_VERSION` so shape-changing edits
+  // can invalidate everything via a constant bump (see lib/cache-tags.ts).
+  unstable_cache(async () => loadHomePage(locale), [`home-page-v${CMS_CACHE_VERSION}`, locale], {
     tags: [
       CACHE_TAGS.pages,
       CACHE_TAGS.posts,
@@ -682,18 +762,21 @@ const getCachedHomePage = (locale: LocaleCode) =>
   })()
 
 const getCachedPageBySlug = (locale: LocaleCode, slug: string) =>
-  // Key prefix bumped when localized slug resolution changed so stale nulls
-  // (e.g. pre-seed VI slug misses) are not served from the R2 data cache.
-  unstable_cache(async () => loadPageBySlug(locale, slug), ['cms-page-v2', locale, slug], {
-    tags: [
-      CACHE_TAGS.pages,
-      CACHE_TAGS.posts,
-      CACHE_TAGS.projects,
-      CACHE_TAGS.things,
-      CACHE_TAGS.videos,
-      CACHE_TAGS.media,
-    ],
-  })()
+  // Same versioning policy as `getCachedHomePage` — see lib/cache-tags.ts.
+  unstable_cache(
+    async () => loadPageBySlug(locale, slug),
+    [`cms-page-v${CMS_CACHE_VERSION}`, locale, slug],
+    {
+      tags: [
+        CACHE_TAGS.pages,
+        CACHE_TAGS.posts,
+        CACHE_TAGS.projects,
+        CACHE_TAGS.things,
+        CACHE_TAGS.videos,
+        CACHE_TAGS.media,
+      ],
+    },
+  )()
 
 export const getHomePage = cache(async (locale: LocaleCode): Promise<HomePageView> => {
   // Seed/admin updates outside a Next request cannot revalidateTag; skip the

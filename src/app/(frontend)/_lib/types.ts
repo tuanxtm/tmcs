@@ -54,7 +54,6 @@ export type SiteShellView = {
 export type HeroView = {
   siteName: string
   tagline: string | null
-  image: MediaView | null
   coverImage: MediaView | null
   bio: DefaultTypedEditorState | null
   links: NavChildView[]
@@ -174,8 +173,7 @@ export type HeroBlockView = {
   title: string
   tagline: string | null
   bio: DefaultTypedEditorState | null
-  coverImage: MediaView | null
-  profileImage: MediaView | null
+  heroImage: MediaView | null
   links: NavChildView[]
   cursorPopup: string | null
 }
@@ -254,6 +252,13 @@ export type TypewriterBlockView = {
   texts: string[]
 }
 
+export type BlankSpaceBlockView = {
+  blockType: 'blankSpace'
+  id: string
+  /** CSS height for the blank section (e.g. "60vh", "400px"). */
+  height: string
+}
+
 export type ScrambleHoverBlockView = {
   blockType: 'scramble-hover'
   id: string
@@ -278,6 +283,7 @@ export type ResolvedBlockView =
   | ProjectsGridBlockView
   | TypewriterBlockView
   | ScrambleHoverBlockView
+  | BlankSpaceBlockView
   | FooterBlockView
 
 export type CmsPageView = {
@@ -285,7 +291,7 @@ export type CmsPageView = {
   summary: string | null
   slug: string
   template: 'home' | 'about' | 'contact' | 'generic'
-  heroMedia: MediaView | null
+  pageImage: MediaView | null
   seo: PageSeoView
   blocks: ResolvedBlockView[]
   /** Alternate-locale path when a localized sibling slug exists; otherwise null. */

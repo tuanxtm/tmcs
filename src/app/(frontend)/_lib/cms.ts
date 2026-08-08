@@ -17,7 +17,7 @@ import type {
   ShortStory,
   Thing,
   Video,
-} from '@/payload-types'
+} from '@payload-types'
 import config from '@payload-config'
 
 import { resolveCmsLink } from './links'
@@ -83,32 +83,36 @@ export function toMediaView(value: unknown): MediaView | null {
   }
 }
 
-function toNavChild(
-  item: {
-    id?: string | null
-    label: string
-    linkType: 'internal' | 'external'
-    page?: (number | null) | Page
+function toLinkChild(
+  linkDoc: unknown,
+  locale: LocaleCode,
+  fallbackIndex: number,
+  fallbackId: string,
+): NavChildView | null {
+  if (!linkDoc || typeof linkDoc !== 'object') return null
+  const link = linkDoc as {
+    id?: number | string | null
+    label?: string | null
+    linkType?: 'internal' | 'external' | null
+    page?: number | null | Page
     url?: string | null
     newTab?: boolean | null
-  },
-  locale: LocaleCode,
-  index: number,
-): NavChildView | null {
+  }
+
   const resolved = resolveCmsLink(
     {
-      label: item.label,
-      linkType: item.linkType,
-      page: isPage(item.page) ? item.page : null,
-      url: item.url,
-      newTab: item.newTab,
+      label: link.label,
+      linkType: link.linkType,
+      page: isPage(link.page) ? link.page : null,
+      url: link.url,
+      newTab: link.newTab,
     },
     locale,
   )
   if (!resolved) return null
 
   return {
-    id: item.id || `link-${index}`,
+    id: link.id != null ? String(link.id) : fallbackId,
     ...resolved,
   }
 }
@@ -310,7 +314,7 @@ async function loadSiteSettings(locale: LocaleCode) {
 
 const getCachedSiteSettings = (locale: LocaleCode) =>
   unstable_cache(async () => loadSiteSettings(locale), ['site-settings', locale], {
-    tags: [CACHE_TAGS.siteShell, CACHE_TAGS.media, CACHE_TAGS.decorationPacks],
+    tags: [CACHE_TAGS.siteShell, CACHE_TAGS.media, CACHE_TAGS.decorationPacks, CACHE_TAGS.links],
   })()
 
 async function loadPostsPage(locale: LocaleCode, cursorRaw: string | null): Promise<PostsPageView> {
@@ -554,14 +558,13 @@ async function loadShortStoryTextsInner(locale: LocaleCode, ids: number[]): Prom
 export const getHero = cache(async (locale: LocaleCode): Promise<HeroView> => {
   const siteSettings = await getCachedSiteSettings(locale)
 
-  const links = (siteSettings.links || [])
-    .map((link, index) => toNavChild(link, locale, index))
+  const links = (siteSettings.profileLinks || [])
+    .map((link, index) => toLinkChild(link, locale, index, `profile-link-${index}`))
     .filter((link): link is NavChildView => Boolean(link))
 
   return {
     siteName: siteSettings.siteName || 'TMCS',
     tagline: siteSettings.tagline ?? null,
-    image: toMediaView(siteSettings.profileImage),
     coverImage: toMediaView(siteSettings.coverImage),
     bio: (siteSettings.bio as HeroView['bio']) ?? null,
     links,
@@ -586,11 +589,13 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
   const packId = packIdFromValue(siteSettings.activeDecorationPack)
 
   const navItems: NavItemView[] = (siteSettings.navigation || []).flatMap((item, index) => {
-    const parent = toNavChild(item, locale, index)
+    const parent = toLinkChild(item.link, locale, index, `nav-${index}`)
     if (!parent) return []
 
     const children = (item.children || [])
-      .map((child, childIndex) => toNavChild(child, locale, childIndex))
+      .map((child, childIndex) =>
+        toLinkChild(child.link, locale, childIndex, `nav-${index}-child-${childIndex}`),
+      )
       .filter((child): child is NavChildView => Boolean(child))
 
     return [
@@ -601,8 +606,8 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
     ]
   })
 
-  const profileLinks = (siteSettings.links || [])
-    .map((link, index) => toNavChild(link, locale, index))
+  const profileLinks = (siteSettings.profileLinks || [])
+    .map((link, index) => toLinkChild(link, locale, index, `profile-link-${index}`))
     .filter((link): link is NavChildView => Boolean(link))
 
   return {
@@ -626,20 +631,50 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
   }
 })
 
+/**
+ * Decide whether to skip the durable data cache (`unstable_cache`) on this
+ * request.
+ *
+ * `next dev` writes `unstable_cache` entries to the in-memory cache, so seed
+ * runs that happen outside a Next request (CLI / Local API) leave stale rows
+ * for the next browser refresh. By default we skip the cache in development
+ * so freshly seeded content is visible immediately.
+ *
+ * Set `CMS_CACHE_DEV=1` (or `CMS_CACHE=1`) to force the cache on in dev —
+ * useful for integration tests that exercise `unstable_cache` itself.
+ */
+function isCacheEnabledInDev(): boolean {
+  return process.env.CMS_CACHE === '1' || process.env.CMS_CACHE_DEV === '1'
+}
+
+export function shouldUseCache(): boolean {
+  if (process.env.NODE_ENV === 'production') return true
+  return isCacheEnabledInDev()
+}
+
 export const getPostsPage = cache(
   async (locale: LocaleCode, cursor: string | null = null): Promise<PostsPageView> => {
+    if (!shouldUseCache()) {
+      return loadPostsPage(locale, cursor)
+    }
     return getCachedPostsPage(locale, cursor)
   },
 )
 
 export const getProjectsPage = cache(
   async (locale: LocaleCode, cursor: string | null = null): Promise<ProjectsPageView> => {
+    if (!shouldUseCache()) {
+      return loadProjectsPage(locale, cursor)
+    }
     return getCachedProjectsPage(locale, cursor)
   },
 )
 
 export const getVideosPage = cache(
   async (locale: LocaleCode, cursor: string | null = null): Promise<VideosPageView> => {
+    if (!shouldUseCache()) {
+      return loadVideosPage(locale, cursor)
+    }
     return getCachedVideosPage(locale, cursor)
   },
 )

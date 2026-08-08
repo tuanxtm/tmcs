@@ -35,9 +35,8 @@ export async function generateCmsPageMetadata(
     undefined
   const image =
     page.seo.ogImage ||
-    page.heroMedia ||
-    hero?.coverImage ||
-    hero?.profileImage ||
+    page.pageImage ||
+    hero?.heroImage ||
     shell.seo.ogImage ||
     shell.defaultSocialImage
   const canonical = page.seo.canonicalUrl || `${shell.siteUrl}${pageHref(locale, page.slug)}`
