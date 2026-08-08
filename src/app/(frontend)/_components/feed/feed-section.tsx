@@ -137,7 +137,7 @@ export function FeedSection(props: FeedSectionProps) {
 
   const descriptionNode = description ? (
     <div className="px-2 pb-2 w-full grid md:grid-cols-2 grid-cols-1 ">
-      <p className="font-mono text-xs tracking-[-0.01em] leading-relaxed text-muted-foreground font-medium">
+      <p className="text-xs tracking-[-0.01em] leading-relaxed text-muted-foreground font-medium">
         {description}
       </p>
     </div>
@@ -218,13 +218,13 @@ export function FeedSection(props: FeedSectionProps) {
           <p
             role="status"
             aria-live="polite"
-            className="font-mono text-xs uppercase tracking-wide text-muted-foreground"
+            className="text-xs uppercase tracking-wide text-muted-foreground"
           >
             {isPending ? 'Loading…' : hasNextPage ? 'Scroll for more' : 'End of feed'}
           </p>
           {error ? (
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <p role="alert" className="font-mono text-xs text-destructive">
+              <p role="alert" className="text-xs text-destructive">
                 {error}
               </p>
               <Button

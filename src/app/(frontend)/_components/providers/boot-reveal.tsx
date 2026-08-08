@@ -1,19 +1,11 @@
 'use client'
 
-import {
-  createContext,
-  use,
-  useCallback,
-  useEffect,
-  useState,
-  useSyncExternalStore,
-} from 'react'
+import { createContext, use, useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import { useLenis } from 'lenis/react'
 import { motion, useReducedMotion } from 'motion/react'
 
 export const SPLASH_EXIT_DURATION_S = 0.5
 export const CONTENT_REVEAL_DURATION_S = 0.5
-export const BG_REVEAL_DURATION_S = 1
 export const REVEAL_EASE = 'easeIn'
 
 const BOOT_READY_CLASS = 'boot-ready'
@@ -66,11 +58,7 @@ function getBootReadyServerSnapshot() {
 
 /** True once splash content may animate in (content / background / ready). */
 export function useBootReady() {
-  return useSyncExternalStore(
-    subscribeBootReady,
-    getBootReadySnapshot,
-    getBootReadyServerSnapshot,
-  )
+  return useSyncExternalStore(subscribeBootReady, getBootReadySnapshot, getBootReadyServerSnapshot)
 }
 
 export function useBootReveal() {
@@ -202,26 +190,18 @@ export function BootRevealChrome({ children }: { children: React.ReactNode }) {
 export function BootRevealEffect({ children }: { children: React.ReactNode }) {
   const {
     state: { phase },
-    actions: { finish },
   } = useBootReveal()
-  const reduceMotion = useReducedMotion()
   const visible = phase === 'idle' || phase === 'background' || phase === 'ready'
 
   return (
-    <motion.div
+    <div
       className="h-full w-full"
-      initial={false}
-      animate={visible ? { opacity: 1 } : { opacity: 0 }}
-      transition={{
-        duration: reduceMotion ? 0.05 : BG_REVEAL_DURATION_S,
-        ease: 'easeInOut',
-      }}
-      onAnimationComplete={() => {
-        if (phase === 'background') finish()
+      style={{
+        opacity: visible ? 1 : 0,
       }}
     >
       {children}
-    </motion.div>
+    </div>
   )
 }
 

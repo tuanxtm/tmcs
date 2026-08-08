@@ -25,7 +25,7 @@ export function ScrambleHoverBlock({ block }: ScrambleHoverBlockProps) {
         <ScrambleHover
           key={`${block.id}-${index}`}
           text={text}
-          className="font-mono text-xl lowercase tracking-tight leading-none font-medium max-w-4xl text-center text-foreground/50"
+          className="text-xl lowercase tracking-tight leading-none font-medium max-w-4xl text-center text-foreground/50"
         />
       ))}
     </section>

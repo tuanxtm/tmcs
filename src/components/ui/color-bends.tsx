@@ -410,7 +410,11 @@ export default function ColorBends({
       const full = h.length === 8 ? h.slice(0, 6) : h
       const v =
         full.length === 3
-          ? [parseInt(full[0] + full[0], 16), parseInt(full[1] + full[1], 16), parseInt(full[2] + full[2], 16)]
+          ? [
+              parseInt(full[0] + full[0], 16),
+              parseInt(full[1] + full[1], 16),
+              parseInt(full[2] + full[2], 16),
+            ]
           : [
               parseInt(full.slice(0, 2), 16),
               parseInt(full.slice(2, 4), 16),

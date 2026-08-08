@@ -52,7 +52,7 @@ export function ThingsSection({
     docs.length === 0 ? cursorPopupEmpty || cursorPopup || undefined : cursorPopup || undefined
 
   const descriptionNode = description ? (
-    <p className="px-2 pb-3 font-mono text-xs leading-relaxed text-muted-foreground">
+    <p className="px-2 pb-3 text-xs leading-relaxed text-muted-foreground">
       {description}
     </p>
   ) : null

@@ -27,7 +27,7 @@ export function TypewriterBlock({ block }: TypewriterBlockProps) {
         waitTime={3000}
         loop
         cursorChar="_"
-        className="font-2xl tracking-tight leading-none font-medium max-w-4xl text-center lowercase font-mono text-foreground/50"
+        className="font-2xl tracking-tight leading-none font-medium max-w-4xl text-center lowercase text-foreground/50"
       />
     </section>
   )

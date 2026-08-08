@@ -66,7 +66,7 @@ export function SectionHeader({ id, children, className }: SectionHeaderProps) {
         )}
         data-stuck={stuck ? 'true' : 'false'}
       >
-        <h2 id={id} className="font-mono text-xs font-bold text-foreground">
+        <h2 id={id} className="text-xs font-bold text-foreground">
           {children}
         </h2>
       </div>

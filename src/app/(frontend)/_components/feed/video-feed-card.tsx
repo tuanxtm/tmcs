@@ -159,7 +159,7 @@ export function VideoFeedCard({
               href={doc.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-[0.625rem] uppercase tracking-wide text-muted-foreground underline-offset-2 hover:underline"
+              className="text-[0.625rem] uppercase tracking-wide text-muted-foreground underline-offset-2 hover:underline"
             >
               Open on YouTube
             </a>

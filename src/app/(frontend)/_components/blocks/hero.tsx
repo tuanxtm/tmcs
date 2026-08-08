@@ -25,9 +25,9 @@ export function Hero({ hero, className }: HeroProps) {
       data-cursor-popup={hero.cursorPopup || 'scroll down'}
     >
       <div className="flex w-full max-w-3xl flex-col items-center justify-center gap-3 px-4 text-center">
-        {hero.coverImage ? (
+        {hero.heroImage ? (
           <CmsImage
-            media={hero.coverImage}
+            media={hero.heroImage}
             sizes="(min-width: 768px) 48rem, 100vw"
             className="mb-2 w-full max-w-xl"
             imgClassName="h-auto w-full"
@@ -35,24 +35,14 @@ export function Hero({ hero, className }: HeroProps) {
           />
         ) : null}
 
-        {hero.profileImage ? (
-          <CmsImage
-            media={hero.profileImage}
-            sizes="96px"
-            className="size-24 overflow-hidden rounded-full"
-            imgClassName="size-full object-cover"
-            priority
-          />
-        ) : null}
-
         {hero.label ? <p className="page-label">{hero.label}</p> : null}
 
-        <h1 id="hero-heading" className="display-title lowercase text-foreground">
+        <h1 id="hero-heading" className="uppercase font-bold text-4xl text-foreground">
           {hero.title}
         </h1>
 
         {hero.tagline ? (
-          <p className="max-w-md font-mono text-xs lowercase tracking-wide text-muted-foreground">
+          <p className="max-w-md text-xs lowercase tracking-wide text-muted-foreground">
             {hero.tagline}
           </p>
         ) : null}
@@ -72,7 +62,7 @@ export function Hero({ hero, className }: HeroProps) {
                   href={link.href}
                   target={link.newTab ? '_blank' : undefined}
                   rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
-                  className="font-mono text-xs uppercase tracking-wide text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="text-xs uppercase tracking-wide text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {link.label}
                 </Link>

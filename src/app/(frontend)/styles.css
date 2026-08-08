@@ -247,7 +247,7 @@ body::-webkit-scrollbar-corner {
   }
 
   .page-label {
-    @apply font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-muted-foreground;
+    @apply text-[0.6875rem] uppercase tracking-[0.18em] text-muted-foreground;
   }
 
   .display-title {
@@ -523,6 +523,22 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   }
 }
 
+/* Atmospheric background — fades + sharpens in once on mount. */
+@keyframes boot-bg-fade-in {
+  from {
+    opacity: 0;
+    filter: blur(40px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.boot-bg-fade-in {
+  animation: boot-bg-fade-in 2s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -537,4 +553,3 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
     scroll-behavior: auto !important;
   }
 }
-

@@ -78,7 +78,7 @@ export function SiteHeader({ siteName, locale, navigation }: SiteHeaderProps) {
             tabIndex={pastHero ? 0 : -1}
             aria-hidden={pastHero ? undefined : true}
             className={cn(
-              'inline-flex min-h-11 items-center font-mono text-xs font-bold lowercase text-foreground transition-[opacity,transform] duration-300 ease-out',
+              'inline-flex min-h-11 items-center text-xs font-bold lowercase text-foreground transition-[opacity,transform] duration-300 ease-out',
               pastHero ? 'opacity-100' : 'pointer-events-none opacity-0',
             )}
           >

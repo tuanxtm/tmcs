@@ -25,7 +25,7 @@ export function HeaderNav({ items, className }: HeaderNavProps) {
             <Link
               href={item.href}
               {...externalLinkProps(item)}
-              className="inline-flex min-h-11 items-center font-mono text-xs font-bold tracking-tight lowercase text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex min-h-11 items-center text-xs font-bold tracking-tight lowercase text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {item.label}
             </Link>
@@ -35,7 +35,7 @@ export function HeaderNav({ items, className }: HeaderNavProps) {
                     key={child.id}
                     href={child.href}
                     {...externalLinkProps(child)}
-                    className="inline-flex min-h-11 items-center font-mono text-xs tracking-tight lowercase text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex min-h-11 items-center text-xs tracking-tight lowercase text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {child.label}
                   </Link>

@@ -2,11 +2,12 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { FeedSection } from '@/app/(frontend)/_components/feed/feed-section'
-import { Hero } from '@/app/(frontend)/_components/hero'
+import { Hero } from '@/app/(frontend)/_components/blocks/hero'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import { TypewriterBlock } from '@/app/(frontend)/_components/blocks/typewriter'
 import { ScrambleHoverBlock } from '@/app/(frontend)/_components/blocks/scramble-hover'
+import { BlankSpaceBlock } from '@/app/(frontend)/_components/blocks/blank-space'
 import { FooterBlock } from '@/app/(frontend)/_components/blocks/footer'
 import { ThingsSection } from '@/app/(frontend)/_components/things/things-section'
 import type { ContactLinks } from '@/app/(frontend)/_components/things/missing-link-dialog'
@@ -213,7 +214,7 @@ export function PageBlocks({
                     imgClassName="h-auto w-full"
                   />
                   {block.caption ? (
-                    <figcaption className="mt-2 font-mono text-xs text-muted-foreground">
+                    <figcaption className="mt-2 text-xs text-muted-foreground">
                       {block.caption}
                     </figcaption>
                   ) : null}
@@ -227,7 +228,7 @@ export function PageBlocks({
                 <div className="mx-auto flex max-w-3xl flex-col gap-3 text-center">
                   <h2 className="display-title text-foreground">{block.heading}</h2>
                   {block.body ? (
-                    <p className="font-mono text-sm text-muted-foreground">{block.body}</p>
+                    <p className="text-sm text-muted-foreground">{block.body}</p>
                   ) : null}
                   {block.links.length > 0 ? (
                     <ul className="mt-2 flex flex-wrap items-center justify-center gap-3">
@@ -236,10 +237,8 @@ export function PageBlocks({
                           <Link
                             href={link.href}
                             target={link.newTab ? '_blank' : undefined}
-                            rel={
-                              link.newTab || link.external ? 'noopener noreferrer' : undefined
-                            }
-                            className="inline-flex min-h-11 items-center border border-foreground px-4 font-mono text-xs uppercase tracking-wide text-foreground transition-colors hover:bg-hover-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
+                            className="inline-flex min-h-11 items-center border border-foreground px-4 text-xs uppercase tracking-wide text-foreground transition-colors hover:bg-hover-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           >
                             {link.label}
                           </Link>
@@ -256,6 +255,9 @@ export function PageBlocks({
 
           case 'scramble-hover':
             return wrap(<ScrambleHoverBlock block={block} />)
+
+          case 'blankSpace':
+            return wrap(<BlankSpaceBlock block={block} />)
 
           case 'footer':
             return wrap(<FooterBlock block={block} siteName={siteName} />)
