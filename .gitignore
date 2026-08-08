@@ -53,3 +53,5 @@ next-env.d.ts
 # Internal planning docs (local only)
 plans/
 docs/
+
+backup_*
