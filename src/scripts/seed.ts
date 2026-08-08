@@ -239,7 +239,6 @@ async function upsertSeedMedia(payload: Payload, filename: string, alt: string):
 
   const localPath = path.join(process.cwd(), 'public', filename)
   const buffer = await readFile(localPath)
-  // Plain Uint8Array — Node Buffer fails Miniflare/devalue (same as decoration-upload).
   const bytes = new Uint8Array(buffer)
 
   const created = await payload.create({
@@ -249,7 +248,7 @@ async function upsertSeedMedia(payload: Payload, filename: string, alt: string):
       kind: 'image',
     },
     file: {
-      data: Buffer.from(bytes),
+      data: bytes as unknown as Buffer,
       mimetype: 'image/webp',
       name: filename,
       size: bytes.byteLength,
@@ -1103,6 +1102,63 @@ function slugify(title: string): string {
     .replace(/^-|-$/g, '')
 }
 
+async function upsertLink(
+  payload: Payload,
+  data: {
+    label: string
+    category: 'navigation' | 'social' | 'legal' | 'contact' | 'other'
+    linkType: 'internal' | 'external'
+    page?: number | null
+    url?: string | null
+    newTab: boolean
+  },
+  locale: Locale = 'en',
+): Promise<{ id: number }> {
+  const existing = await payload.find({
+    collection: 'links',
+    where: { label: { equals: data.label } },
+    limit: 1,
+    depth: 0,
+    locale,
+    overrideAccess: true,
+  })
+
+  const doc =
+    existing.docs[0] ||
+    (await payload.create({
+      collection: 'links',
+      data: {
+        label: data.label,
+        category: data.category,
+        linkType: data.linkType,
+        page: data.page ?? undefined,
+        url: data.url ?? undefined,
+        newTab: data.newTab,
+      },
+      locale,
+      overrideAccess: true,
+    }))
+
+  if (existing.docs[0]) {
+    await payload.update({
+      collection: 'links',
+      id: doc.id,
+      data: {
+        label: data.label,
+        category: data.category,
+        linkType: data.linkType,
+        page: data.page ?? undefined,
+        url: data.url ?? undefined,
+        newTab: data.newTab,
+      },
+      locale,
+      overrideAccess: true,
+    })
+  }
+
+  return { id: doc.id }
+}
+
 async function upsertAuthor(
   payload: Payload,
   seed: (typeof AUTHOR_SEEDS)[number],
@@ -1218,9 +1274,17 @@ async function seed() {
   }
 
   // Globals
+  // Create the decoration packs BEFORE the first site-settings update so
+  // `activeDecorationPack` (required) can point to a valid pack id from
+  // the start. Pack items are populated further below.
+  const plantPack = await upsertPackBySlug(payload, 'plant', { title: 'Plant' })
+  await upsertPackBySlug(payload, 'new-year', { title: 'New Year' })
+  await upsertPackBySlug(payload, 'christmas', { title: 'Christmas' })
+
   await payload.updateGlobal({
     slug: 'site-settings',
     data: {
+      activeDecorationPack: plantPack.id,
       siteName: 'tuantm',
       tagline: 'DIY builds, tech workspace, and maker notes',
       description: 'Seed site — workshop projects, desk setups, and electronics experiments.',
@@ -1248,19 +1312,6 @@ async function seed() {
       ),
     },
     locale: 'vi',
-    overrideAccess: true,
-  })
-
-  const plantPack = await upsertPackBySlug(payload, 'plant', { title: 'Plant' })
-  await upsertPackBySlug(payload, 'new-year', { title: 'New Year' })
-  await upsertPackBySlug(payload, 'christmas', { title: 'Christmas' })
-
-  await payload.updateGlobal({
-    slug: 'site-settings',
-    data: {
-      activeDecorationPack: plantPack.id,
-    },
-    locale: 'en',
     overrideAccess: true,
   })
 
@@ -1583,6 +1634,82 @@ async function seed() {
     },
   })
 
+  // Centralized link library. Created BEFORE the home page so the hero
+  // home-about link can reference the "About" link by id.
+  const seedLinkDefs = [
+    {
+      key: 'about',
+      category: 'navigation' as const,
+      en: { label: 'About', linkType: 'internal' as const, page: aboutPage.id },
+      vi: { label: 'Giới thiệu', linkType: 'internal' as const, page: aboutPage.id },
+      newTab: false,
+    },
+    {
+      key: 'projects',
+      category: 'navigation' as const,
+      en: { label: 'Projects', linkType: 'internal' as const, page: projectsPage.id },
+      vi: { label: 'Dự án', linkType: 'internal' as const, page: projectsPage.id },
+      newTab: false,
+    },
+    {
+      key: 'posts',
+      category: 'navigation' as const,
+      en: { label: 'Posts', linkType: 'internal' as const, page: postsPage.id },
+      vi: { label: 'Bài viết', linkType: 'internal' as const, page: postsPage.id },
+      newTab: false,
+    },
+    {
+      key: 'instagram',
+      category: 'social' as const,
+      en: { label: 'Instagram', linkType: 'external' as const, url: 'https://instagram.com/tuantm' },
+      vi: { label: 'Instagram', linkType: 'external' as const, url: 'https://instagram.com/tuantm' },
+      newTab: true,
+    },
+    {
+      key: 'youtube',
+      category: 'social' as const,
+      en: { label: 'YouTube', linkType: 'external' as const, url: 'https://youtube.com/@tuantm' },
+      vi: { label: 'YouTube', linkType: 'external' as const, url: 'https://youtube.com/@tuantm' },
+      newTab: true,
+    },
+    {
+      key: 'github',
+      category: 'social' as const,
+      en: { label: 'GitHub', linkType: 'external' as const, url: 'https://github.com/tuantm' },
+      vi: { label: 'GitHub', linkType: 'external' as const, url: 'https://github.com/tuantm' },
+      newTab: true,
+    },
+  ] as const
+
+  // Locale-aware maps: link ids stored per locale (pages use the same id; the
+  // displayed label is localized in the admin via the localized field).
+  const linkIds: Record<string, Record<(typeof seedLinkDefs)[number]['key'], number>> = {
+    en: {} as Record<(typeof seedLinkDefs)[number]['key'], number>,
+    vi: {} as Record<(typeof seedLinkDefs)[number]['key'], number>,
+  }
+  for (const def of seedLinkDefs) {
+    const baseEn = {
+      label: def.en.label,
+      category: def.category,
+      linkType: def.en.linkType,
+      page: 'page' in def.en ? def.en.page : undefined,
+      url: 'url' in def.en ? def.en.url : undefined,
+      newTab: def.newTab,
+    }
+    const baseVi = {
+      label: def.vi.label,
+      category: def.category,
+      linkType: def.vi.linkType,
+      page: 'page' in def.vi ? def.vi.page : undefined,
+      url: 'url' in def.vi ? def.vi.url : undefined,
+      newTab: def.newTab,
+    }
+    const en = await upsertLink(payload, baseEn, 'en')
+    const vi = await upsertLink(payload, baseVi, 'vi')
+    linkIds.en[def.key] = en.id
+    linkIds.vi[def.key] = vi.id
+  }
+
   const homePage = await upsertBySlug(payload, 'pages', 'home', {
     title: 'Home',
     summary: 'DIY builds, tech workspace, and maker notes',
@@ -1596,15 +1723,7 @@ async function seed() {
         tagline: 'DIY builds, tech workspace, and maker notes',
         bio: richText('Documenting builds, failures, and the tools that survive them.'),
         cursorPopup: 'scroll down',
-        links: [
-          {
-            id: 'seed-home-hero-about',
-            label: 'About',
-            linkType: 'internal',
-            page: aboutPage.id,
-            newTab: false,
-          },
-        ],
+        links: [linkIds.en.about],
       },
       {
         id: 'seed-home-projects',
@@ -1681,57 +1800,7 @@ async function seed() {
     },
   })
 
-  const seedLinks = [
-    {
-      id: 'seed-link-about',
-      labelEn: 'About',
-      labelVi: 'Giới thiệu',
-      linkType: 'internal' as const,
-      page: aboutPage.id,
-      newTab: false,
-    },
-    {
-      id: 'seed-link-projects',
-      labelEn: 'Projects',
-      labelVi: 'Dự án',
-      linkType: 'internal' as const,
-      page: projectsPage.id,
-      newTab: false,
-    },
-    {
-      id: 'seed-link-posts',
-      labelEn: 'Posts',
-      labelVi: 'Bài viết',
-      linkType: 'internal' as const,
-      page: postsPage.id,
-      newTab: false,
-    },
-    {
-      id: 'seed-link-instagram',
-      labelEn: 'Instagram',
-      labelVi: 'Instagram',
-      linkType: 'external' as const,
-      url: 'https://instagram.com/tuantm',
-      newTab: true,
-    },
-    {
-      id: 'seed-link-youtube',
-      labelEn: 'YouTube',
-      labelVi: 'YouTube',
-      linkType: 'external' as const,
-      url: 'https://youtube.com/@tuantm',
-      newTab: true,
-    },
-    {
-      id: 'seed-link-github',
-      labelEn: 'GitHub',
-      labelVi: 'GitHub',
-      linkType: 'external' as const,
-      url: 'https://github.com/tuantm',
-      newTab: true,
-    },
-  ]
-
+  // Wire SiteSettings → profileLinks + navigation from the Links library.
   await payload.updateGlobal({
     slug: 'site-settings',
     data: {
@@ -1739,14 +1808,12 @@ async function seed() {
         'Documenting builds, failures, and the tools that survive them.',
         'Based in a small home workshop — posting maker notes and desk setups.',
       ),
-      links: seedLinks.map((link) => ({
-        id: link.id,
-        label: link.labelEn,
-        linkType: link.linkType,
-        page: 'page' in link ? link.page : undefined,
-        url: 'url' in link ? link.url : undefined,
-        newTab: link.newTab,
-      })),
+      profileLinks: [linkIds.en.instagram, linkIds.en.youtube, linkIds.en.github],
+      navigation: [
+        { link: linkIds.en.projects },
+        { link: linkIds.en.posts },
+        { link: linkIds.en.about },
+      ],
     },
     locale: 'en',
     overrideAccess: true,
@@ -1759,14 +1826,12 @@ async function seed() {
         'Ghi lại bản build, thất bại và dụng cụ còn sót lại.',
         'Từ một xưởng nhỏ tại nhà — chia sẻ ghi chú maker và setup bàn.',
       ),
-      links: seedLinks.map((link) => ({
-        id: link.id,
-        label: link.labelVi,
-        linkType: link.linkType,
-        page: 'page' in link ? link.page : undefined,
-        url: 'url' in link ? link.url : undefined,
-        newTab: link.newTab,
-      })),
+      profileLinks: [linkIds.vi.instagram, linkIds.vi.youtube, linkIds.vi.github],
+      navigation: [
+        { link: linkIds.vi.projects },
+        { link: linkIds.vi.posts },
+        { link: linkIds.vi.about },
+      ],
     },
     locale: 'vi',
     overrideAccess: true,
@@ -1883,15 +1948,7 @@ async function seed() {
           tagline: 'Dự án DIY, không gian tech và ghi chú maker',
           bio: richText('Ghi lại bản build, thất bại và dụng cụ còn sót lại.'),
           cursorPopup: 'kéo xuống',
-          links: [
-            {
-              id: 'seed-home-hero-about',
-              label: 'Giới thiệu',
-              linkType: 'internal',
-              page: aboutPage.id,
-              newTab: false,
-            },
-          ],
+          links: [linkIds.vi.about],
         },
         {
           id: 'seed-home-projects',

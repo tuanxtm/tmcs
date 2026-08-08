@@ -88,9 +88,13 @@ export const Pages: CollectionConfig = {
               localized: true,
             },
             {
-              name: 'heroMedia',
+              name: 'pageImage',
               type: 'upload',
               relationTo: 'media',
+              label: 'Page image',
+              admin: {
+                description: 'Shared page image used as the hero/backdrop and as the OG image fallback.',
+              },
             },
             {
               name: 'layout',

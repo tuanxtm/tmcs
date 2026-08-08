@@ -1,7 +1,6 @@
 import type { GlobalConfig } from 'payload'
 
 import { adminOrManager, anyone, fieldAdminOrManager } from '@/access'
-import { linkFields } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
 import { slimRichTextEditor } from '@/fields/slimRichText'
 import { revalidateSiteShellGlobal } from '@/hooks/revalidateFrontend'
@@ -78,23 +77,14 @@ export const SiteSettings: GlobalConfig = {
               label: 'Cover image',
             },
             {
-              name: 'profileImage',
-              type: 'upload',
-              relationTo: 'media',
-              label: 'Profile image',
-            },
-            {
-              name: 'links',
-              type: 'array',
-              label: 'Links',
-              labels: {
-                singular: 'Link',
-                plural: 'Links',
-              },
+              name: 'profileLinks',
+              type: 'relationship',
+              relationTo: 'links',
+              hasMany: true,
+              label: 'Profile links',
               admin: {
-                description: 'Website, social, and other profile links.',
+                description: 'Website, social, and other profile links (contact dialogs, etc.).',
               },
-              fields: linkFields,
             },
           ],
         },
@@ -110,8 +100,20 @@ export const SiteSettings: GlobalConfig = {
                 singular: 'Item',
                 plural: 'Items',
               },
+              admin: {
+                description:
+                  'Pick links from the Links collection. Each item may have one nested level of children.',
+              },
               fields: [
-                ...linkFields,
+                {
+                  name: 'link',
+                  type: 'relationship',
+                  relationTo: 'links',
+                  required: true,
+                  admin: {
+                    description: 'Pick a link from the Links collection.',
+                  },
+                },
                 {
                   name: 'children',
                   type: 'array',
@@ -119,7 +121,14 @@ export const SiteSettings: GlobalConfig = {
                   admin: {
                     description: 'One nested level only.',
                   },
-                  fields: linkFields,
+                  fields: [
+                    {
+                      name: 'link',
+                      type: 'relationship',
+                      relationTo: 'links',
+                      required: true,
+                    },
+                  ],
                 },
               ],
             },

@@ -85,7 +85,7 @@ export const seoFields = (options?: {
         type: 'upload',
         relationTo: 'media',
         admin: {
-          description: 'Open Graph image override. Falls back to featured/cover image.',
+          description: 'Open Graph image. Falls back to the page image.',
         },
       },
       {

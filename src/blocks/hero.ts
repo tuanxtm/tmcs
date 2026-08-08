@@ -1,6 +1,6 @@
 import type { Block } from 'payload'
 
-import { linkFields } from '@/fields/common'
+import { linkPickerField } from '@/fields/common'
 import { slimRichTextEditor } from '@/fields/slimRichText'
 
 export const HeroBlock: Block = {
@@ -36,21 +36,18 @@ export const HeroBlock: Block = {
       editor: slimRichTextEditor,
     },
     {
-      name: 'coverImage',
+      name: 'heroImage',
       type: 'upload',
       relationTo: 'media',
+      label: 'Hero image',
     },
-    {
-      name: 'profileImage',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
+    linkPickerField({
       name: 'links',
-      type: 'array',
+      label: 'Links',
+      description: 'Pick links from the Links library.',
+      hasMany: true,
       maxRows: 8,
-      fields: linkFields,
-    },
+    }),
     {
       name: 'cursorPopup',
       type: 'text',

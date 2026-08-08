@@ -144,6 +144,17 @@ export const revalidateFeedDecorationsDelete = createCollectionRevalidateDeleteH
   { always: true },
 )
 
+// Links are public reads and consumed by navigation, hero, CTA, and footer blocks.
+// Treat links like a site-shell concern so any reference stays warm.
+export const revalidateLinks = createCollectionRevalidateHook([
+  CACHE_TAGS.links,
+  CACHE_TAGS.siteShell,
+])
+export const revalidateLinksDelete = createCollectionRevalidateDeleteHook(
+  [CACHE_TAGS.links, CACHE_TAGS.siteShell],
+  { always: true },
+)
+
 export const revalidateSiteShellGlobal = createGlobalRevalidateHook([
   CACHE_TAGS.siteShell,
   CACHE_TAGS.decorationPacks,

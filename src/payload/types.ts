@@ -80,6 +80,7 @@ export interface Config {
     things: Thing;
     videos: Video;
     pages: Page;
+    links: Link;
     'contact-submissions': ContactSubmission;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -102,6 +103,7 @@ export interface Config {
     things: ThingsSelect<false> | ThingsSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    links: LinksSelect<false> | LinksSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -372,7 +374,7 @@ export interface Post {
      */
     ogDescription?: string | null;
     /**
-     * Open Graph image override. Falls back to featured/cover image.
+     * Open Graph image. Falls back to the page image.
      */
     ogImage?: (number | null) | Media;
     twitterCard?: ('summary' | 'summary_large_image') | null;
@@ -499,7 +501,10 @@ export interface Page {
   generateSlug?: boolean | null;
   slug: string;
   summary?: string | null;
-  heroMedia?: (number | null) | Media;
+  /**
+   * Shared page image used as the hero/backdrop and as the OG image fallback.
+   */
+  pageImage?: (number | null) | Media;
   layout?:
     | (
         | {
@@ -524,18 +529,11 @@ export interface Page {
               };
               [k: string]: unknown;
             } | null;
-            coverImage?: (number | null) | Media;
-            profileImage?: (number | null) | Media;
-            links?:
-              | {
-                  label: string;
-                  linkType: 'internal' | 'external';
-                  page?: (number | null) | Page;
-                  url?: string | null;
-                  newTab?: boolean | null;
-                  id?: string | null;
-                }[]
-              | null;
+            heroImage?: (number | null) | Media;
+            /**
+             * Pick links from the Links library.
+             */
+            links?: (number | Link)[] | null;
             /**
              * Cursor popup text while hovering this section.
              */
@@ -629,16 +627,10 @@ export interface Page {
         | {
             heading: string;
             body?: string | null;
-            links?:
-              | {
-                  label: string;
-                  linkType: 'internal' | 'external';
-                  page?: (number | null) | Page;
-                  url?: string | null;
-                  newTab?: boolean | null;
-                  id?: string | null;
-                }[]
-              | null;
+            /**
+             * Pick up to 3 links from the Links library.
+             */
+            links?: (number | Link)[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'callToAction';
@@ -670,6 +662,15 @@ export interface Page {
             blockType: 'scramble-hover';
           }
         | {
+            /**
+             * CSS height for the blank section (e.g. 60vh, 400px, 5rem).
+             */
+            height?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'blankSpace';
+          }
+        | {
             footerText?: {
               root: {
                 type: string;
@@ -685,16 +686,10 @@ export interface Page {
               };
               [k: string]: unknown;
             } | null;
-            legalLinks?:
-              | {
-                  label: string;
-                  linkType: 'internal' | 'external';
-                  page?: (number | null) | Page;
-                  url?: string | null;
-                  newTab?: boolean | null;
-                  id?: string | null;
-                }[]
-              | null;
+            /**
+             * Pick legal links from the Links library.
+             */
+            legalLinks?: (number | Link)[] | null;
             /**
              * Use {{year}} as a placeholder for the current year in the frontend.
              */
@@ -730,7 +725,7 @@ export interface Page {
      */
     ogDescription?: string | null;
     /**
-     * Open Graph image override. Falls back to featured/cover image.
+     * Open Graph image. Falls back to the page image.
      */
     ogImage?: (number | null) | Media;
     twitterCard?: ('summary' | 'summary_large_image') | null;
@@ -757,6 +752,29 @@ export interface Page {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * Centralized link library. Reference these from navigation, hero, CTA, and footer blocks.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "links".
+ */
+export interface Link {
+  id: number;
+  /**
+   * Visible label rendered on the public site.
+   */
+  label: string;
+  /**
+   * Hint for which surfaces typically show this link. Picker fields may filter by category.
+   */
+  category?: ('navigation' | 'social' | 'legal' | 'contact' | 'other') | null;
+  linkType: 'internal' | 'external';
+  page?: (number | null) | Page;
+  url?: string | null;
+  newTab?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -820,7 +838,7 @@ export interface Project {
      */
     ogDescription?: string | null;
     /**
-     * Open Graph image override. Falls back to featured/cover image.
+     * Open Graph image. Falls back to the page image.
      */
     ogImage?: (number | null) | Media;
     twitterCard?: ('summary' | 'summary_large_image') | null;
@@ -1207,6 +1225,10 @@ export interface PayloadLockedDocument {
         value: number | Page;
       } | null)
     | ({
+        relationTo: 'links';
+        value: number | Link;
+      } | null)
+    | ({
         relationTo: 'contact-submissions';
         value: number | ContactSubmission;
       } | null);
@@ -1573,7 +1595,7 @@ export interface PagesSelect<T extends boolean = true> {
   generateSlug?: T;
   slug?: T;
   summary?: T;
-  heroMedia?: T;
+  pageImage?: T;
   layout?:
     | T
     | {
@@ -1584,18 +1606,8 @@ export interface PagesSelect<T extends boolean = true> {
               title?: T;
               tagline?: T;
               bio?: T;
-              coverImage?: T;
-              profileImage?: T;
-              links?:
-                | T
-                | {
-                    label?: T;
-                    linkType?: T;
-                    page?: T;
-                    url?: T;
-                    newTab?: T;
-                    id?: T;
-                  };
+              heroImage?: T;
+              links?: T;
               cursorPopup?: T;
               id?: T;
               blockName?: T;
@@ -1643,16 +1655,7 @@ export interface PagesSelect<T extends boolean = true> {
           | {
               heading?: T;
               body?: T;
-              links?:
-                | T
-                | {
-                    label?: T;
-                    linkType?: T;
-                    page?: T;
-                    url?: T;
-                    newTab?: T;
-                    id?: T;
-                  };
+              links?: T;
               id?: T;
               blockName?: T;
             };
@@ -1679,20 +1682,18 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        blankSpace?:
+          | T
+          | {
+              height?: T;
+              id?: T;
+              blockName?: T;
+            };
         footer?:
           | T
           | {
               footerText?: T;
-              legalLinks?:
-                | T
-                | {
-                    label?: T;
-                    linkType?: T;
-                    page?: T;
-                    url?: T;
-                    newTab?: T;
-                    id?: T;
-                  };
+              legalLinks?: T;
               copyright?: T;
               id?: T;
               blockName?: T;
@@ -1721,6 +1722,20 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "links_select".
+ */
+export interface LinksSelect<T extends boolean = true> {
+  label?: T;
+  category?: T;
+  linkType?: T;
+  page?: T;
+  url?: T;
+  newTab?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1854,37 +1869,25 @@ export interface SiteSetting {
     [k: string]: unknown;
   } | null;
   coverImage?: (number | null) | Media;
-  profileImage?: (number | null) | Media;
   /**
-   * Website, social, and other profile links.
+   * Website, social, and other profile links (contact dialogs, etc.).
    */
-  links?:
-    | {
-        label: string;
-        linkType: 'internal' | 'external';
-        page?: (number | null) | Page;
-        url?: string | null;
-        newTab?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
+  profileLinks?: (number | Link)[] | null;
+  /**
+   * Pick links from the Links collection. Each item may have one nested level of children.
+   */
   navigation?:
     | {
-        label: string;
-        linkType: 'internal' | 'external';
-        page?: (number | null) | Page;
-        url?: string | null;
-        newTab?: boolean | null;
+        /**
+         * Pick a link from the Links collection.
+         */
+        link: number | Link;
         /**
          * One nested level only.
          */
         children?:
           | {
-              label: string;
-              linkType: 'internal' | 'external';
-              page?: (number | null) | Page;
-              url?: string | null;
-              newTab?: boolean | null;
+              link: number | Link;
               id?: string | null;
             }[]
           | null;
@@ -1931,7 +1934,7 @@ export interface SiteSetting {
      */
     ogDescription?: string | null;
     /**
-     * Open Graph image override. Falls back to featured/cover image.
+     * Open Graph image. Falls back to the page image.
      */
     ogImage?: (number | null) | Media;
     twitterCard?: ('summary' | 'summary_large_image') | null;
@@ -1956,33 +1959,15 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   contactEmail?: T;
   bio?: T;
   coverImage?: T;
-  profileImage?: T;
-  links?:
-    | T
-    | {
-        label?: T;
-        linkType?: T;
-        page?: T;
-        url?: T;
-        newTab?: T;
-        id?: T;
-      };
+  profileLinks?: T;
   navigation?:
     | T
     | {
-        label?: T;
-        linkType?: T;
-        page?: T;
-        url?: T;
-        newTab?: T;
+        link?: T;
         children?:
           | T
           | {
-              label?: T;
-              linkType?: T;
-              page?: T;
-              url?: T;
-              newTab?: T;
+              link?: T;
               id?: T;
             };
         id?: T;

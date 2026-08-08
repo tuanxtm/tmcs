@@ -5,6 +5,7 @@ import { Categories } from './Categories'
 import { ContactSubmissions } from './ContactSubmissions'
 import { DecorationPacks } from './DecorationPacks'
 import { FeedDecorations } from './FeedDecorations'
+import { Links } from './Links'
 import { Media } from './Media'
 import { Pages } from './Pages'
 import { Posts } from './Posts'
@@ -34,5 +35,6 @@ export const collections: CollectionConfig[] = [
   Things,
   Videos,
   Pages,
+  Links,
   ContactSubmissions,
 ]

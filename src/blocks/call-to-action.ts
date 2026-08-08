@@ -1,6 +1,6 @@
 import type { Block } from 'payload'
 
-import { linkFields } from '@/fields/common'
+import { linkPickerField } from '@/fields/common'
 
 export const CallToActionBlock: Block = {
   slug: 'callToAction',
@@ -20,11 +20,12 @@ export const CallToActionBlock: Block = {
       type: 'textarea',
       localized: true,
     },
-    {
+    linkPickerField({
       name: 'links',
-      type: 'array',
+      label: 'Links',
+      description: 'Pick up to 3 links from the Links library.',
+      hasMany: true,
       maxRows: 3,
-      fields: linkFields,
-    },
+    }),
   ],
 }

@@ -1,6 +1,6 @@
 import type { Block } from 'payload'
 
-import { linkFields } from '@/fields/common'
+import { linkPickerField } from '@/fields/common'
 import { slimRichTextEditor } from '@/fields/slimRichText'
 
 export const FooterBlock: Block = {
@@ -17,12 +17,13 @@ export const FooterBlock: Block = {
       editor: slimRichTextEditor,
       label: 'Text',
     },
-    {
+    linkPickerField({
       name: 'legalLinks',
-      type: 'array',
       label: 'Legal links',
-      fields: linkFields,
-    },
+      description: 'Pick legal links from the Links library.',
+      hasMany: true,
+      category: 'legal',
+    }),
     {
       name: 'copyright',
       type: 'text',
