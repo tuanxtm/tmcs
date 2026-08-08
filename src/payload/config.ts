@@ -51,6 +51,9 @@ const cloudflare =
     : await getCloudflareContext({ async: true })
 
 export default buildConfig({
+  routes: {
+    admin: '/tm',
+  },
   admin: {
     user: 'users',
     importMap: {
@@ -111,7 +114,7 @@ export default buildConfig({
   },
   db: sqliteD1Adapter({
     binding: cloudflare.env.D1,
-    migrationDir: path.resolve(dirname, 'migrations'),
+    migrationDir: path.resolve(dirname, '..', 'migrations'),
     prodMigrations: migrations,
     // Schema is managed via migrations (see src/migrations). Disable drizzle push
     // to avoid "index already exists" races in tests and multi-process local runs.
