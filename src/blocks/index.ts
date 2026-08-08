@@ -1,3 +1,4 @@
+import { BlankSpaceBlock } from './blank-space'
 import { CallToActionBlock } from './call-to-action'
 import { FeedSectionBlock } from './feed-section'
 import { FooterBlock } from './footer'
@@ -9,6 +10,7 @@ import { ScrambleHoverBlock } from './scramble-hover'
 import { TypewriterBlock } from './typewriter'
 
 export {
+  BlankSpaceBlock,
   CallToActionBlock,
   FeedSectionBlock,
   FooterBlock,
@@ -29,5 +31,6 @@ export const pageBlocks = [
   ProjectsGridBlock,
   TypewriterBlock,
   ScrambleHoverBlock,
+  BlankSpaceBlock,
   FooterBlock,
 ]
