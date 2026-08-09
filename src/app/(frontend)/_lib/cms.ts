@@ -160,14 +160,14 @@ function toPostCard(post: Post, locale: LocaleCode): PostCardView {
   }
 }
 
-function toProjectCard(project: Project): ProjectCardView {
-  const image = toMediaView(project.coverImage)
+function toProjectCard(project: Project, locale: LocaleCode): ProjectCardView {
+  const image = toMediaView(project.featuredImage)
+  const slug = typeof project.slug === 'string' ? project.slug : null
 
   return {
     id: project.id,
     title: project.title,
-    // Detail routes are deferred; cards render without links until then.
-    href: null,
+    href: slug ? pageHref(locale, slug) : null,
     publishedAt: project.publishedAt ?? null,
     image,
   }
@@ -245,6 +245,38 @@ async function loadPostBySlug(locale: LocaleCode, slug: string): Promise<Post | 
 }
 
 export { loadPostBySlug }
+
+async function loadProjectBySlug(locale: LocaleCode, slug: string): Promise<Project | null> {
+  const payload = await getPayloadClient()
+  const { docs } = await payload.find({
+    collection: 'projects',
+    locale,
+    fallbackLocale: false,
+    where: {
+      and: [publishedStatusWhere, { slug: { equals: slug } }, { slug: { exists: true } }],
+    },
+    limit: 1,
+    depth: 2,
+    overrideAccess: false,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      summary: true,
+      content: true,
+      layout: true,
+      featuredImage: true,
+      publishedAt: true,
+      author: true,
+      categories: true,
+      tags: true,
+      seo: true,
+    },
+  })
+  return (docs[0] as Project | undefined) ?? null
+}
+
+export { loadProjectBySlug }
 
 function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCardView {
   let href: string | null = null
@@ -411,14 +443,15 @@ async function loadProjectsPage(
     overrideAccess: false,
     select: {
       title: true,
-      coverImage: true,
+      slug: true,
+      featuredImage: true,
       publishedAt: true,
     },
   })
 
   const hasNextPage = result.docs.length > PROJECTS_PAGE_SIZE
   const pageDocs = hasNextPage ? result.docs.slice(0, PROJECTS_PAGE_SIZE) : result.docs
-  const cards = pageDocs.map((project) => toProjectCard(project as Project))
+  const cards = pageDocs.map((project) => toProjectCard(project as Project, locale))
   const last = cards[cards.length - 1]
   const nextCursor = hasNextPage && last ? cursorFromPost(last) : null
 

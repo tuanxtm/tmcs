@@ -2,11 +2,11 @@ import Link from 'next/link'
 
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
-import type { HeroBlockView } from '@/app/(frontend)/_lib/types'
+import type { LayoutHeroBlockView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
 
 type HeroProps = {
-  hero: HeroBlockView
+  hero: LayoutHeroBlockView
   className?: string
 }
 

@@ -157,7 +157,7 @@ async function loadProjects(args: {
   manualIds: number[]
 }): Promise<ProjectCardView[]> {
   const limit = clampLimit(args.limit)
-  const select = { title: true, coverImage: true, publishedAt: true } as const
+  const select = { title: true, slug: true, featuredImage: true, publishedAt: true } as const
 
   if (args.source === 'manual') {
     return loadOrderedManual({
@@ -166,7 +166,7 @@ async function loadProjects(args: {
       manualIds: args.manualIds,
       limit,
       select,
-      toCard: (doc) => toProjectCard(doc as Project),
+      toCard: (doc) => toProjectCard(doc as Project, args.locale),
     })
   }
 
@@ -176,7 +176,7 @@ async function loadProjects(args: {
     source: args.source,
     limit,
     select,
-    toCard: (doc) => toProjectCard(doc as Project),
+    toCard: (doc) => toProjectCard(doc as Project, args.locale),
   })
 }
 

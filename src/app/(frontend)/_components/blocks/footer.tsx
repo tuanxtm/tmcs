@@ -1,11 +1,11 @@
 import Link from 'next/link'
 
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
-import type { FooterBlockView } from '@/app/(frontend)/_lib/types'
+import type { LayoutFooterBlockView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
 
 type FooterBlockProps = {
-  block: FooterBlockView
+  block: LayoutFooterBlockView
   siteName: string
 }
 

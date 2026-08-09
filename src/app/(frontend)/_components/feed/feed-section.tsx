@@ -190,7 +190,6 @@ export function FeedSection(props: FeedSectionProps) {
               <FeedCard
                 doc={doc as PostCardView | ProjectCardView}
                 locale={locale}
-                index={index}
                 cursorPopup={cursorPopupItem}
               />
             )}

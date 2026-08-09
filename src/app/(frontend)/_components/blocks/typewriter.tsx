@@ -1,10 +1,10 @@
 'use client'
 
 import Typewriter from '@/components/ui/typewriter'
-import type { TypewriterBlockView } from '@/app/(frontend)/_lib/types'
+import type { LayoutTypewriterBlockView } from '@/app/(frontend)/_lib/types'
 
 type TypewriterBlockProps = {
-  block: TypewriterBlockView
+  block: LayoutTypewriterBlockView
 }
 
 /**

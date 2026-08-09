@@ -22,38 +22,48 @@ import {
   toMediaView,
 } from '@/app/(frontend)/_lib/cms'
 import { resolveCmsLink, resolvePageHref } from '@/app/(frontend)/_lib/links'
-import { loadPostBySlug } from '@/app/(frontend)/_lib/cms'
+import { loadPostBySlug, loadProjectBySlug } from '@/app/(frontend)/_lib/cms'
 import type {
-  BlankSpaceBlockView,
-  CallToActionBlockView,
   CmsPageView,
+  ContentMediaBlockView,
   FeedSectionBlockView,
   FeedType,
-  FooterBlockView,
-  HeroBlockView,
   HomePageView,
-  MediaBlockView,
+  LayoutBlankSpaceBlockView,
+  LayoutFooterBlockView,
+  LayoutHeroBlockView,
+  LayoutRichTextWithoutBlockView,
+  LayoutScrambleHoverBlockView,
+  LayoutTypewriterBlockView,
   NavChildView,
   PostCardView,
   PostDetailView,
   ProjectCardView,
-  ProjectsGridBlockView,
+  ProjectDetailView,
   ResolvedBlockView,
-  RichTextBlockView,
   ThingCardView,
-  TypewriterBlockView,
   VideoCardView,
-  ScrambleHoverBlockView,
 } from '@/app/(frontend)/_lib/types'
 import { CACHE_TAGS, CMS_CACHE_VERSION } from '@/lib/cache-tags'
 import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
-import type { Link, Page, Post } from '@payload-types'
+import type { Link, Page, Post, Project } from '@payload-types'
 import config from '@payload-config'
 
 const getPayloadClient = cache(async () => getPayload({ config }))
 
 type PageLayoutBlock = NonNullable<Page['layout']>[number]
+
+/**
+ * Layout block shape regardless of which collection the layout belongs to.
+ * Posts and Projects use the same `pageBlocks` so their layouts are structurally
+ * identical to `Page['layout']` — they just belong to a different collection.
+ * We accept this union so the resolver is collection-agnostic.
+ */
+type AnyLayoutBlock =
+  | PageLayoutBlock
+  | (NonNullable<Post['layout']>[number])
+  | (NonNullable<Project['layout']>[number])
 
 const PAGE_SELECT = {
   title: true,
@@ -68,7 +78,6 @@ const PAGE_SELECT = {
 function blockId(block: { id?: string | null }, fallback: string): string {
   return typeof block.id === 'string' && block.id.length > 0 ? block.id : fallback
 }
-
 
 /**
  * Resolve Link IDs (from a relationship picker) into `NavChildView` items.
@@ -172,14 +181,14 @@ function toPageSeo(page: Page) {
   }
 }
 
-async function resolveHeroBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'hero' }>,
+async function resolveLayoutHeroBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'layoutHero' }>,
   locale: LocaleCode,
   index: number,
-): Promise<HeroBlockView> {
+): Promise<LayoutHeroBlockView> {
   const links = await resolveLinkIds(block.links, locale, `hero-${index}-link`)
   return {
-    blockType: 'hero',
+    blockType: 'layoutHero',
     id: blockId(block, `hero-${index}`),
     label: block.label ?? null,
     title: block.title,
@@ -192,7 +201,7 @@ async function resolveHeroBlock(
 }
 
 async function resolveFeedSectionBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'feedSection' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'layoutFeedSection' }>,
   locale: LocaleCode,
   index: number,
 ): Promise<FeedSectionBlockView | null> {
@@ -216,7 +225,7 @@ async function resolveFeedSectionBlock(
   const requestedPagination: FeedPaginationMode = isFeedPaginationMode(
     (block as { pagination?: unknown }).pagination,
   )
-    ? ((block as { pagination: FeedPaginationMode }).pagination)
+    ? (block as { pagination: FeedPaginationMode }).pagination
     : 'static'
   const pagination: FeedPaginationMode =
     feedType !== 'things' && source === 'latest' && requestedPagination === 'infinite'
@@ -234,7 +243,7 @@ async function resolveFeedSectionBlock(
       : null
 
   const base = {
-    blockType: 'feedSection' as const,
+    blockType: 'layoutFeedSection' as const,
     id: blockId(block, `feed-${feedType}-${index}`),
     heading: block.heading || adapter.defaultHeading,
     description: block.description ?? null,
@@ -304,7 +313,13 @@ async function resolveFeedSectionBlock(
   })
 
   if (feedType === 'posts') {
-    return { ...base, feedType: 'posts', docs: docs as PostCardView[], nextCursor: null, hasNextPage: false }
+    return {
+      ...base,
+      feedType: 'posts',
+      docs: docs as PostCardView[],
+      nextCursor: null,
+      hasNextPage: false,
+    }
   }
   if (feedType === 'projects') {
     return {
@@ -336,107 +351,46 @@ async function resolveFeedSectionBlock(
 }
 
 async function resolveRichTextBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'richText' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'layoutRichTextWithoutBlock' }>,
   index: number,
-): Promise<RichTextBlockView> {
+): Promise<LayoutRichTextWithoutBlockView> {
   return {
-    blockType: 'richText',
+    blockType: 'layoutRichTextWithoutBlock',
     id: blockId(block, `rich-text-${index}`),
     content: block.content as DefaultTypedEditorState,
   }
 }
 
-async function resolveMediaBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'media' }>,
+async function resolveContentMediaBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'contentMedia' }>,
   index: number,
-): Promise<MediaBlockView | null> {
+): Promise<ContentMediaBlockView | null> {
   const media = toMediaView(block.media)
   if (!media) return null
   return {
-    blockType: 'media',
-    id: blockId(block, `media-${index}`),
+    blockType: 'contentMedia',
+    id: blockId(block, `content-media-${index}`),
     media,
     caption: block.caption ?? null,
   }
 }
 
-async function resolveCallToActionBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'callToAction' }>,
-  locale: LocaleCode,
-  index: number,
-): Promise<CallToActionBlockView> {
-  const links = await resolveLinkIds(block.links, locale, `cta-${index}-link`)
-  return {
-    blockType: 'callToAction',
-    id: blockId(block, `cta-${index}`),
-    heading: block.heading,
-    body: block.body ?? null,
-    links,
-  }
-}
-
-async function resolveProjectsGridBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'projectsGrid' }>,
-  locale: LocaleCode,
-  index: number,
-): Promise<ProjectsGridBlockView> {
-  const adapter = FEED_SOURCE_REGISTRY.projects
-  const manualIds = relationIds(block.items)
-  const source: FeedSourceMode = block.featuredOnly
-    ? 'featured'
-    : manualIds.length > 0
-      ? 'manual'
-      : 'latest'
-
-  const docs = await adapter.loadCards({
-    locale,
-    source,
-    limit: manualIds.length > 0 ? manualIds.length : 11,
-    manualIds,
-  })
-
-  return {
-    blockType: 'projectsGrid',
-    id: blockId(block, `projects-grid-${index}`),
-    heading: block.heading ?? null,
-    docs,
-  }
-}
-
 async function resolveBlankSpaceBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'blankSpace' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'layoutBlankSpace' }>,
   index: number,
-): Promise<BlankSpaceBlockView> {
+): Promise<LayoutBlankSpaceBlockView> {
   return {
-    blockType: 'blankSpace',
+    blockType: 'layoutBlankSpace',
     id: blockId(block, `blank-space-${index}`),
     height: block.height || '60vh',
   }
 }
 
 async function resolveTypewriterBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'typewriter' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'layoutTypewriter' }>,
   locale: LocaleCode,
   index: number,
-): Promise<TypewriterBlockView | null> {  const ids = relationIds(block.stories)
-  if (ids.length === 0) return null
-
-  const texts = await loadShortStoryTexts(locale, ids)
-  const filtered = texts.filter((text) => text.length > 0)
-  if (filtered.length === 0) return null
-
-  return {
-    blockType: 'typewriter',
-    id: blockId(block, `typewriter-${index}`),
-    texts: filtered,
-  }
-}
-
-async function resolveScrambleHoverBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'scramble-hover' }>,
-  locale: LocaleCode,
-  index: number,
-): Promise<ScrambleHoverBlockView | null> {
+): Promise<LayoutTypewriterBlockView | null> {
   const ids = relationIds(block.stories)
   if (ids.length === 0) return null
 
@@ -445,21 +399,40 @@ async function resolveScrambleHoverBlock(
   if (filtered.length === 0) return null
 
   return {
-    blockType: 'scramble-hover',
+    blockType: 'layoutTypewriter',
+    id: blockId(block, `typewriter-${index}`),
+    texts: filtered,
+  }
+}
+
+async function resolveScrambleHoverBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'layoutScrambleHover' }>,
+  locale: LocaleCode,
+  index: number,
+): Promise<LayoutScrambleHoverBlockView | null> {
+  const ids = relationIds(block.stories)
+  if (ids.length === 0) return null
+
+  const texts = await loadShortStoryTexts(locale, ids)
+  const filtered = texts.filter((text) => text.length > 0)
+  if (filtered.length === 0) return null
+
+  return {
+    blockType: 'layoutScrambleHover',
     id: blockId(block, `scramble-hover-${index}`),
     texts: filtered,
   }
 }
 
 async function resolveFooterBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'footer' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'layoutFooter' }>,
   locale: LocaleCode,
   index: number,
-): Promise<FooterBlockView> {
+): Promise<LayoutFooterBlockView> {
   const legalLinks = await resolveLinkIds(block.legalLinks, locale, `footer-${index}-legal`)
 
   return {
-    blockType: 'footer',
+    blockType: 'layoutFooter',
     id: blockId(block, `footer-${index}`),
     footerText: (block.footerText as DefaultTypedEditorState | null | undefined) ?? null,
     legalLinks,
@@ -468,34 +441,40 @@ async function resolveFooterBlock(
 }
 
 export async function resolveLayoutBlocks(
-  layout: Page['layout'],
+  layout: AnyLayoutBlock[] | null | undefined,
   locale: LocaleCode,
 ): Promise<ResolvedBlockView[]> {
   if (!layout?.length) return []
 
   const resolved = await Promise.all(
-    layout.map(async (block, index) => {
-      switch (block.blockType) {
-        case 'hero':
-          return resolveHeroBlock(block, locale, index)
-        case 'feedSection':
-          return resolveFeedSectionBlock(block, locale, index)
-        case 'richText':
-          return resolveRichTextBlock(block, index)
-        case 'media':
-          return resolveMediaBlock(block, index)
-        case 'callToAction':
-          return resolveCallToActionBlock(block, locale, index)
-        case 'projectsGrid':
-          return resolveProjectsGridBlock(block, locale, index)
-        case 'typewriter':
-          return resolveTypewriterBlock(block, locale, index)
-        case 'scramble-hover':
-          return resolveScrambleHoverBlock(block, locale, index)
-        case 'blankSpace':
-          return resolveBlankSpaceBlock(block, index)
-        case 'footer':
-          return resolveFooterBlock(block, locale, index)
+    layout.map(async (block, index): Promise<ResolvedBlockView | null> => {
+      // Cast to PageLayoutBlock so the per-block resolvers can use the same
+      // Extract<PageLayoutBlock, { blockType: ... }> union. Since Posts and
+      // Projects share the same pageBlocks, the discriminated union narrows
+      // identically across collections.
+      const typed = block as PageLayoutBlock
+      switch (typed.blockType) {
+        case 'layoutHero':
+          return resolveLayoutHeroBlock(typed, locale, index)
+        case 'layoutFeedSection':
+          return resolveFeedSectionBlock(typed, locale, index)
+        case 'layoutRichTextWithoutBlock':
+          return resolveRichTextBlock(typed, index)
+        case 'contentMedia':
+          return resolveContentMediaBlock(typed, index)
+        case 'contentGallery':
+        case 'layoutRelatedItems':
+          // Frontend render is deferred until posts/projects detail routes
+          // are implemented. Skip so editors can author now.
+          return null
+        case 'layoutTypewriter':
+          return resolveTypewriterBlock(typed, locale, index)
+        case 'layoutScrambleHover':
+          return resolveScrambleHoverBlock(typed, locale, index)
+        case 'layoutBlankSpace':
+          return resolveBlankSpaceBlock(typed, index)
+        case 'layoutFooter':
+          return resolveFooterBlock(typed, locale, index)
         default:
           return null
       }
@@ -567,7 +546,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
 
   const blocks: ResolvedBlockView[] = [
     {
-      blockType: 'hero',
+      blockType: 'layoutHero',
       id: 'fallback-hero',
       label: 'Hero',
       title: hero.siteName,
@@ -578,7 +557,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopup: 'scroll down',
     },
     {
-      blockType: 'feedSection',
+      blockType: 'layoutFeedSection',
       id: 'fallback-projects',
       heading: FEED_SOURCE_REGISTRY.projects.defaultHeading,
       description: null,
@@ -596,7 +575,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupViewAll: FEED_SOURCE_REGISTRY.projects.defaultCursorPopupViewAll,
     },
     {
-      blockType: 'feedSection',
+      blockType: 'layoutFeedSection',
       id: 'fallback-posts',
       heading: FEED_SOURCE_REGISTRY.posts.defaultHeading,
       description: null,
@@ -614,7 +593,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupViewAll: FEED_SOURCE_REGISTRY.posts.defaultCursorPopupViewAll,
     },
     {
-      blockType: 'feedSection',
+      blockType: 'layoutFeedSection',
       id: 'fallback-things',
       heading: FEED_SOURCE_REGISTRY.things.defaultHeading,
       description: null,
@@ -632,7 +611,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupViewAll: null,
     },
     {
-      blockType: 'feedSection',
+      blockType: 'layoutFeedSection',
       id: 'fallback-videos',
       heading: FEED_SOURCE_REGISTRY.videos.defaultHeading,
       description: null,
@@ -798,14 +777,16 @@ export const getPageBySlug = cache(
   },
 )
 
-export function firstHeroBlock(blocks: ResolvedBlockView[]): HeroBlockView | null {
-  return blocks.find((block): block is HeroBlockView => block.blockType === 'hero') ?? null
+export function firstHeroBlock(blocks: ResolvedBlockView[]): LayoutHeroBlockView | null {
+  return blocks.find(
+    (block): block is LayoutHeroBlockView => block.blockType === 'layoutHero',
+  ) ?? null
 }
 
 // ─── Slug Dispatcher ───────────────────────────────────────────────────────────
 
 type SlugReservation = {
-  collection: 'pages' | 'posts'
+  collection: 'pages' | 'posts' | 'projects'
   contentId: number
 }
 
@@ -819,27 +800,43 @@ async function loadSlugReservation(
   // so it's always available even before connect() runs.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db: any = payload.db.binding
-  const stmt = db.prepare('SELECT collection, content_id FROM slug_reservations WHERE slug = ? AND locale = ? LIMIT 1')
-  const result = (await stmt.bind(slug, locale).first()) as { collection: string; content_id: number } | null
+  const stmt = db.prepare(
+    'SELECT collection, content_id FROM slug_reservations WHERE slug = ? AND locale = ? LIMIT 1',
+  )
+  const result = (await stmt.bind(slug, locale).first()) as {
+    collection: string
+    content_id: number
+  } | null
   if (!result) return null
-  return { collection: result.collection as 'pages' | 'posts', contentId: result.content_id }
+  return {
+    collection: result.collection as 'pages' | 'posts' | 'projects',
+    contentId: result.content_id,
+  }
 }
 
-/** Resolve a slug to its collection + content ID. Returns null if not reserved. */
-export async function resolveSlug(
-  locale: LocaleCode,
-  slug: string,
-): Promise<{ collection: 'pages' | 'posts'; contentId: number } | null> {
-  return loadSlugReservation(locale, slug)
-}
+/**
+ * Resolve a slug to its collection + content ID. Returns null if not reserved.
+ * Wrapped in `cache()` so repeated calls within a single request (e.g. once in
+ * `generateMetadata` and once in the page render) dedupe to a single
+ * `slug_reservations` lookup.
+ */
+export const resolveSlug = cache(
+  async (
+    locale: LocaleCode,
+    slug: string,
+  ): Promise<{ collection: 'pages' | 'posts' | 'projects'; contentId: number } | null> => {
+    return loadSlugReservation(locale, slug)
+  },
+)
 
-function toPostDetailView(post: Post): PostDetailView {
+function toPostDetailView(post: Post, blocks: ResolvedBlockView[]): PostDetailView {
   return {
     id: post.id,
     title: post.title,
     slug: typeof post.slug === 'string' ? post.slug : '',
     excerpt: post.excerpt ?? null,
     content: post.content ?? null,
+    blocks,
     featuredImage: toMediaView(post.featuredImage),
     publishedAt: post.publishedAt ?? null,
     readingTime: post.readingTime ?? null,
@@ -883,5 +880,62 @@ export async function getPostBySlug(
   const post = await loadPostBySlug(locale, slug)
   if (!post) return null
 
-  return toPostDetailView(post)
+  const [blocks] = await Promise.all([resolveLayoutBlocks(post.layout ?? [], locale)])
+
+  return toPostDetailView(post, blocks)
+}
+
+function toProjectDetailView(project: Project, blocks: ResolvedBlockView[]): ProjectDetailView {
+  return {
+    id: project.id,
+    title: project.title,
+    slug: typeof project.slug === 'string' ? project.slug : '',
+    summary: project.summary ?? null,
+    content: project.content ?? null,
+    blocks,
+    coverImage: toMediaView(project.featuredImage),
+    publishedAt: project.publishedAt ?? null,
+    author:
+      project.author && typeof project.author === 'object' && 'title' in project.author
+        ? { name: String((project.author as { title?: unknown }).title) || 'Unknown' }
+        : null,
+    categories: (project.categories || [])
+      .map((c) =>
+        typeof c === 'object' && c && 'title' in c
+          ? { name: String((c as { title?: unknown }).title) }
+          : null,
+      )
+      .filter((c): c is { name: string } => c !== null),
+    tags: (project.tags || [])
+      .map((t) =>
+        typeof t === 'object' && t && 'title' in t
+          ? { name: String((t as { title?: unknown }).title) }
+          : null,
+      )
+      .filter((t): t is { name: string } => t !== null),
+    seo: {
+      metaTitle: project.seo?.metaTitle ?? null,
+      metaDescription: project.seo?.metaDescription ?? project.summary ?? null,
+      ogImage: toMediaView(project.seo?.ogImage) || toMediaView(project.featuredImage),
+      canonicalUrl: project.seo?.canonicalUrl ?? null,
+      noIndex: Boolean(project.seo?.noIndex),
+      noFollow: Boolean(project.seo?.noFollow),
+    },
+  }
+}
+
+/** Load a project by slug. Returns null if the slug is not reserved for projects. */
+export async function getProjectBySlug(
+  locale: LocaleCode,
+  slug: string,
+): Promise<ProjectDetailView | null> {
+  const resolved = await resolveSlug(locale, slug)
+  if (!resolved || resolved.collection !== 'projects') return null
+
+  const project = await loadProjectBySlug(locale, slug)
+  if (!project) return null
+
+  const [blocks] = await Promise.all([resolveLayoutBlocks(project.layout ?? [], locale)])
+
+  return toProjectDetailView(project, blocks)
 }

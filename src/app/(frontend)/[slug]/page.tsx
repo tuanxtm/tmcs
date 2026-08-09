@@ -1,13 +1,18 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { generatePostMetadata, PostPage } from '@/app/(frontend)/_components/posts/post-page'
+import { DetailPage } from '@/app/(frontend)/_components/detail/detail-page'
+import { generateDetailMetadata } from '@/app/(frontend)/_components/detail/detail-metadata'
 import {
   CmsPage,
   generateCmsPageMetadata,
   isReservedPageSlug,
 } from '@/app/(frontend)/_components/pages/cms-page'
-import { getPageBySlug, getPostBySlug, resolveSlug } from '@/app/(frontend)/_lib/page-data'
+import {
+  getPostBySlug,
+  getProjectBySlug,
+  resolveSlug,
+} from '@/app/(frontend)/_lib/page-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,7 +30,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (resolved.collection === 'posts') {
     const post = await getPostBySlug('en', slug)
     if (!post) return { title: 'Not found' }
-    return generatePostMetadata(post, 'en')
+    return generateDetailMetadata(post, 'en', 'featuredImage')
+  }
+
+  if (resolved.collection === 'projects') {
+    const project = await getProjectBySlug('en', slug)
+    if (!project) return { title: 'Not found' }
+    return generateDetailMetadata(project, 'en', 'coverImage')
   }
 
   return generateCmsPageMetadata('en', slug)
@@ -41,7 +52,13 @@ export default async function EnglishCmsPage({ params }: PageProps) {
   if (resolved.collection === 'posts') {
     const post = await getPostBySlug('en', slug)
     if (!post) notFound()
-    return <PostPage view={post} locale="en" />
+    return <DetailPage view={post} locale="en" imageKey="featuredImage" />
+  }
+
+  if (resolved.collection === 'projects') {
+    const project = await getProjectBySlug('en', slug)
+    if (!project) notFound()
+    return <DetailPage view={project} locale="en" imageKey="coverImage" />
   }
 
   return <CmsPage locale="en" slug={slug} />

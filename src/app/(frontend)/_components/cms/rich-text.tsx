@@ -1,11 +1,14 @@
 import type { CSSProperties, ReactNode } from 'react'
-import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
+import type { DefaultTypedEditorState, SerializedBlockNode } from '@payloadcms/richtext-lexical'
 import {
+  type JSXConverter,
   type JSXConvertersFunction,
   RichText as ConvertRichText,
 } from '@payloadcms/richtext-lexical/react'
 
 import { textStateConfig } from '@/fields/textStateConfig'
+
+import { InlineBlock, type InlineBlockFields } from './inline-blocks'
 
 const NODE_STATE_KEY = '$'
 
@@ -13,8 +16,20 @@ function hyphenToCamel(str: string): string {
   return str.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase())
 }
 
+type BlockNode = SerializedBlockNode<{
+  blockName?: string | null
+  blockType: string
+}>
+
+const blockConverter: JSXConverter<BlockNode> = ({ node }) => (
+  <InlineBlock fields={node.fields as InlineBlockFields} />
+)
+
 const jsxConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
   ...defaultConverters,
+  blocks: {
+    layoutBlankSpace: blockConverter,
+  },
   text: (args) => {
     const { node } = args
 
@@ -58,3 +73,7 @@ type CmsRichTextProps = {
 export function CmsRichText({ data, className }: CmsRichTextProps) {
   return <ConvertRichText data={data} converters={jsxConverters} className={className} />
 }
+
+// Re-export the SerializedBlockNode type so other modules can type inline
+// block payloads without depending on the lexical package.
+export type { SerializedBlockNode }

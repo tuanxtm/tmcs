@@ -135,9 +135,27 @@ export type PostDetailView = {
   slug: string
   excerpt: string | null
   content: DefaultTypedEditorState | null
+  /** Optional blocks rendered below the article body (CTAs, related feeds, etc.). */
+  blocks: ResolvedBlockView[]
   featuredImage: MediaView | null
   publishedAt: string | null
   readingTime: number | null
+  author: { name: string } | null
+  categories: { name: string }[]
+  tags: { name: string }[]
+  seo: PageSeoView
+}
+
+export type ProjectDetailView = {
+  id: number
+  title: string
+  slug: string
+  summary: string | null
+  content: DefaultTypedEditorState | null
+  /** Optional blocks rendered below the project body (CTAs, related feeds, etc.). */
+  blocks: ResolvedBlockView[]
+  coverImage: MediaView | null
+  publishedAt: string | null
   author: { name: string } | null
   categories: { name: string }[]
   tags: { name: string }[]
@@ -166,8 +184,8 @@ export type PageSeoView = {
   noFollow: boolean
 }
 
-export type HeroBlockView = {
-  blockType: 'hero'
+export type LayoutHeroBlockView = {
+  blockType: 'layoutHero'
   id: string
   label: string | null
   title: string
@@ -179,11 +197,10 @@ export type HeroBlockView = {
 }
 
 export type FeedType = 'posts' | 'projects' | 'things' | 'videos'
-
 export type FeedPaginationMode = 'static' | 'infinite'
 
 type FeedSectionBase = {
-  blockType: 'feedSection'
+  blockType: 'layoutFeedSection'
   id: string
   heading: string
   description: string | null
@@ -217,74 +234,75 @@ export type FeedSectionBlockView =
       docs: VideoCardView[]
     })
 
-export type RichTextBlockView = {
-  blockType: 'richText'
+export type LayoutRichTextWithoutBlockView = {
+  blockType: 'layoutRichTextWithoutBlock'
   id: string
   content: DefaultTypedEditorState
 }
 
-export type MediaBlockView = {
-  blockType: 'media'
+export type ContentMediaBlockView = {
+  blockType: 'contentMedia'
   id: string
   media: MediaView
   caption: string | null
 }
 
-export type CallToActionBlockView = {
-  blockType: 'callToAction'
-  id: string
-  heading: string
-  body: string | null
-  links: NavChildView[]
-}
-
-export type ProjectsGridBlockView = {
-  blockType: 'projectsGrid'
-  id: string
-  heading: string | null
-  docs: ProjectCardView[]
-}
-
-export type TypewriterBlockView = {
-  blockType: 'typewriter'
+export type LayoutTypewriterBlockView = {
+  blockType: 'layoutTypewriter'
   id: string
   /** Pre-resolved plain-text strings ready for the Typewriter component. */
   texts: string[]
 }
 
-export type BlankSpaceBlockView = {
-  blockType: 'blankSpace'
+export type LayoutBlankSpaceBlockView = {
+  blockType: 'layoutBlankSpace'
   id: string
   /** CSS height for the blank section (e.g. "60vh", "400px"). */
   height: string
 }
 
-export type ScrambleHoverBlockView = {
-  blockType: 'scramble-hover'
+export type LayoutScrambleHoverBlockView = {
+  blockType: 'layoutScrambleHover'
   id: string
   /** Pre-resolved plain-text strings ready for the ScrambleHover component. */
   texts: string[]
 }
 
-export type FooterBlockView = {
-  blockType: 'footer'
+export type LayoutFooterBlockView = {
+  blockType: 'layoutFooter'
   id: string
   footerText: DefaultTypedEditorState | null
   legalLinks: NavChildView[]
   copyright: string | null
 }
 
+/**
+ * Stub view types for blocks that have schema but no frontend renderer yet.
+ * The frontend resolver returns `null` for these, so they never flow into the
+ * page renderer — the types exist only to keep the `ResolvedBlockView` union
+ * exhaustive when narrowing against the blockType discriminator.
+ */
+export type ContentGalleryBlockView = {
+  blockType: 'contentGallery'
+  id: string
+}
+
+export type LayoutRelatedItemsBlockView = {
+  blockType: 'layoutRelatedItems'
+  id: string
+}
+
 export type ResolvedBlockView =
-  | HeroBlockView
+  | LayoutHeroBlockView
   | FeedSectionBlockView
-  | RichTextBlockView
-  | MediaBlockView
-  | CallToActionBlockView
-  | ProjectsGridBlockView
-  | TypewriterBlockView
-  | ScrambleHoverBlockView
-  | BlankSpaceBlockView
-  | FooterBlockView
+  | LayoutRichTextWithoutBlockView
+  | ContentMediaBlockView
+  | ContentGalleryBlockView
+  | LayoutRelatedItemsBlockView
+  | LayoutTypewriterBlockView
+  | LayoutScrambleHoverBlockView
+  | LayoutBlankSpaceBlockView
+  | LayoutFooterBlockView
 
 export type CmsPageView = {
   title: string

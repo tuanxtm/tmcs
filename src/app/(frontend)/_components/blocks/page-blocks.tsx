@@ -1,10 +1,9 @@
-import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { FeedSection } from '@/app/(frontend)/_components/feed/feed-section'
 import { Hero } from '@/app/(frontend)/_components/blocks/hero'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
-import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
+import { ContentMediaBlock } from '@/app/(frontend)/_components/blocks/content-media'
 import { TypewriterBlock } from '@/app/(frontend)/_components/blocks/typewriter'
 import { ScrambleHoverBlock } from '@/app/(frontend)/_components/blocks/scramble-hover'
 import { BlankSpaceBlock } from '@/app/(frontend)/_components/blocks/blank-space'
@@ -30,6 +29,31 @@ function sectionDomIds(blockId: string) {
   }
 }
 
+/**
+ * Visual placeholder for blocks whose schema exists but whose frontend
+ * renderer is not implemented yet. Editors can author the content now; the
+ * frontend shows a clearly-labelled "coming soon" marker so the gap is
+ * obvious rather than silently dropping the block.
+ */
+function DeferredBlockPlaceholder({
+  blockType,
+  blockId,
+}: {
+  blockType: 'contentGallery' | 'layoutRelatedItems'
+  blockId: string
+}) {
+  return (
+    <aside
+      id={`block-${blockId}`}
+      aria-label={`${blockType} (placeholder)`}
+      className="mx-auto my-8 max-w-3xl rounded border border-dashed border-border bg-foreground/5 px-4 py-6 text-center text-xs uppercase tracking-wide text-muted-foreground"
+    >
+      <span className="font-mono">{blockType}</span>
+      <span className="ml-2 text-foreground/60">— coming soon</span>
+    </aside>
+  )
+}
+
 export function PageBlocks({
   blocks,
   locale,
@@ -50,7 +74,7 @@ export function PageBlocks({
       {blocks.map((block, index) => {
         const previous = index > 0 ? blocks[index - 1] : null
         // Preserve first-fold budget: no 3rem gap between hero and the following section.
-        const spaced = index > 0 && previous?.blockType !== 'hero'
+        const spaced = index > 0 && previous?.blockType !== 'layoutHero'
         const wrap = (node: ReactNode) => (
           <div key={block.id} className={spaced ? 'mt-12' : undefined}>
             {node}
@@ -58,10 +82,10 @@ export function PageBlocks({
         )
 
         switch (block.blockType) {
-          case 'hero':
+          case 'layoutHero':
             return <Hero key={block.id} hero={block} />
 
-          case 'feedSection': {
+          case 'layoutFeedSection': {
             const ids = sectionDomIds(block.id)
             // Remount when the server snapshot changes so client infinite-scroll state resets.
             const feedKey = [
@@ -169,31 +193,7 @@ export function PageBlocks({
             )
           }
 
-          case 'projectsGrid': {
-            const ids = sectionDomIds(block.id)
-            const feedKey = [
-              ids.sectionId,
-              'projects',
-              'static',
-              'start',
-              block.docs[0]?.id ?? 'empty',
-              block.docs.length,
-            ].join(':')
-            return wrap(
-              <FeedSection
-                key={feedKey}
-                locale={locale}
-                sectionId={ids.sectionId}
-                headingId={ids.headingId}
-                heading={block.heading || 'projects'}
-                feedType="projects"
-                docs={block.docs}
-                showViewAll={false}
-              />,
-            )
-          }
-
-          case 'richText':
+          case 'layoutRichTextWithoutBlock':
             return wrap(
               <section className="px-4 py-8">
                 <CmsRichText
@@ -203,63 +203,25 @@ export function PageBlocks({
               </section>,
             )
 
-          case 'media':
-            return wrap(
-              <section className="px-4 py-8">
-                <figure className="mx-auto max-w-4xl">
-                  <CmsImage
-                    media={block.media}
-                    sizes="(min-width: 1024px) 56rem, 100vw"
-                    className="w-full"
-                    imgClassName="h-auto w-full"
-                  />
-                  {block.caption ? (
-                    <figcaption className="mt-2 text-xs text-muted-foreground">
-                      {block.caption}
-                    </figcaption>
-                  ) : null}
-                </figure>
-              </section>,
-            )
+          case 'contentMedia':
+            return wrap(<ContentMediaBlock block={block} />)
 
-          case 'callToAction':
-            return wrap(
-              <section className="px-4 py-10">
-                <div className="mx-auto flex max-w-3xl flex-col gap-3 text-center">
-                  <h2 className="display-title text-foreground">{block.heading}</h2>
-                  {block.body ? (
-                    <p className="text-sm text-muted-foreground">{block.body}</p>
-                  ) : null}
-                  {block.links.length > 0 ? (
-                    <ul className="mt-2 flex flex-wrap items-center justify-center gap-3">
-                      {block.links.map((link) => (
-                        <li key={link.id}>
-                          <Link
-                            href={link.href}
-                            target={link.newTab ? '_blank' : undefined}
-                            rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
-                            className="inline-flex min-h-11 items-center border border-foreground px-4 text-xs uppercase tracking-wide text-foreground transition-colors hover:bg-hover-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                          >
-                            {link.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </div>
-              </section>,
-            )
+          case 'contentGallery':
+            return wrap(<DeferredBlockPlaceholder blockType="contentGallery" blockId={block.id} />)
 
-          case 'typewriter':
+          case 'layoutRelatedItems':
+            return wrap(<DeferredBlockPlaceholder blockType="layoutRelatedItems" blockId={block.id} />)
+
+          case 'layoutTypewriter':
             return wrap(<TypewriterBlock block={block} />)
 
-          case 'scramble-hover':
+          case 'layoutScrambleHover':
             return wrap(<ScrambleHoverBlock block={block} />)
 
-          case 'blankSpace':
+          case 'layoutBlankSpace':
             return wrap(<BlankSpaceBlock block={block} />)
 
-          case 'footer':
+          case 'layoutFooter':
             return wrap(<FooterBlock block={block} siteName={siteName} />)
 
           default: {
