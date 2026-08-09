@@ -3,11 +3,11 @@ import type { Block } from 'payload'
 import { linkPickerField } from '@/fields/common'
 import { slimRichTextEditor } from '@/fields/slimRichText'
 
-export const HeroBlock: Block = {
-  slug: 'hero',
+export const LayoutHeroBlock: Block = {
+  slug: 'layoutHero',
   labels: {
-    singular: 'Hero',
-    plural: 'Heroes',
+    singular: 'Layout - Hero',
+    plural: 'Layout - Heroes',
   },
   fields: [
     {

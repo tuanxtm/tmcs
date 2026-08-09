@@ -1,10 +1,10 @@
 import type { Block } from 'payload'
 
-export const ScrambleHoverBlock: Block = {
-  slug: 'scramble-hover',
+export const LayoutScrambleHoverBlock: Block = {
+  slug: 'layoutScrambleHover',
   labels: {
-    singular: 'Scramble Hover',
-    plural: 'Scramble Hover',
+    singular: 'Layout - Scramble Hover',
+    plural: 'Layout - Scramble Hover',
   },
   fields: [
     {

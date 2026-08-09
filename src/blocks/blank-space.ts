@@ -1,10 +1,10 @@
 import type { Block } from 'payload'
 
-export const BlankSpaceBlock: Block = {
-  slug: 'blankSpace',
+export const LayoutBlankSpaceBlock: Block = {
+  slug: 'layoutBlankSpace',
   labels: {
-    singular: 'Blank space',
-    plural: 'Blank spaces',
+    singular: 'Layout - Blank space',
+    plural: 'Layout - Blank spaces',
   },
   fields: [
     {

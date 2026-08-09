@@ -1,36 +1,36 @@
-import { BlankSpaceBlock } from './blank-space'
-import { CallToActionBlock } from './call-to-action'
-import { FeedSectionBlock } from './feed-section'
-import { FooterBlock } from './footer'
-import { HeroBlock } from './hero'
-import { MediaBlock } from './media'
-import { ProjectsGridBlock } from './projects-grid'
-import { RichTextBlock } from './rich-text'
-import { ScrambleHoverBlock } from './scramble-hover'
-import { TypewriterBlock } from './typewriter'
+import { LayoutBlankSpaceBlock } from './blank-space'
+import { ContentGalleryBlock } from './content-gallery'
+import { ContentMediaBlock } from './content-media'
+import { LayoutFeedSectionBlock } from './feed-section'
+import { LayoutFooterBlock } from './footer'
+import { LayoutHeroBlock } from './hero'
+import { LayoutRelatedItemsBlock } from './layout-related-items'
+import { LayoutRichTextWithoutBlock } from './rich-text'
+import { LayoutScrambleHoverBlock } from './scramble-hover'
+import { LayoutTypewriterBlock } from './typewriter'
 
 export {
-  BlankSpaceBlock,
-  CallToActionBlock,
-  FeedSectionBlock,
-  FooterBlock,
-  HeroBlock,
-  MediaBlock,
-  ProjectsGridBlock,
-  RichTextBlock,
-  ScrambleHoverBlock,
-  TypewriterBlock,
+  ContentGalleryBlock,
+  ContentMediaBlock,
+  LayoutBlankSpaceBlock,
+  LayoutFeedSectionBlock,
+  LayoutFooterBlock,
+  LayoutHeroBlock,
+  LayoutRelatedItemsBlock,
+  LayoutRichTextWithoutBlock,
+  LayoutScrambleHoverBlock,
+  LayoutTypewriterBlock,
 }
 
 export const pageBlocks = [
-  HeroBlock,
-  FeedSectionBlock,
-  RichTextBlock,
-  MediaBlock,
-  CallToActionBlock,
-  ProjectsGridBlock,
-  TypewriterBlock,
-  ScrambleHoverBlock,
-  BlankSpaceBlock,
-  FooterBlock,
+  LayoutHeroBlock,
+  LayoutFeedSectionBlock,
+  LayoutRichTextWithoutBlock,
+  ContentMediaBlock,
+  ContentGalleryBlock,
+  LayoutRelatedItemsBlock,
+  LayoutTypewriterBlock,
+  LayoutScrambleHoverBlock,
+  LayoutBlankSpaceBlock,
+  LayoutFooterBlock,
 ]

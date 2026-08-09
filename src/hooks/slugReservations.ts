@@ -17,7 +17,7 @@ function getD1(payload: Payload): D1Database {
  */
 export async function upsertSlugReservations(
   payload: Payload,
-  collection: 'pages' | 'posts',
+  collection: 'pages' | 'posts' | 'projects',
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   doc: { id: number; slug?: any },
 ): Promise<void> {
@@ -47,7 +47,7 @@ export async function upsertSlugReservations(
  */
 export async function deleteSlugReservations(
   payload: Payload,
-  collection: 'pages' | 'posts',
+  collection: 'pages' | 'posts' | 'projects',
   doc: { id: number },
 ): Promise<void> {
   const db = getD1(payload)
@@ -65,7 +65,7 @@ export async function checkSlugReservationConflict(
   payload: Payload,
   locale: Locale,
   slug: string,
-  selfCollection: 'pages' | 'posts',
+  selfCollection: 'pages' | 'posts' | 'projects',
   selfId?: number,
 ): Promise<string | null> {
   const db = getD1(payload)

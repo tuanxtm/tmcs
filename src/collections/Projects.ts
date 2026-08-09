@@ -8,10 +8,12 @@ import {
   canUpdateOwnedContent,
   publishedOrOwned,
 } from '@/access'
+import { pageBlocks } from '@/blocks'
 import { ownerField, publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
 import { assignOwner, preventCreatorPublish, setPublishedAt } from '@/hooks'
 import { revalidateProjects, revalidateProjectsDelete } from '@/hooks/revalidateFrontend'
+import { deleteSlugReservations, upsertSlugReservations } from '@/hooks/slugReservations'
 import { buildPreviewUrl } from '@/lib/preview'
 
 export const Projects: CollectionConfig = {
@@ -47,8 +49,24 @@ export const Projects: CollectionConfig = {
   },
   hooks: {
     beforeChange: [assignOwner, preventCreatorPublish, setPublishedAt],
-    afterChange: [revalidateProjects],
-    afterDelete: [revalidateProjectsDelete],
+    afterChange: [
+      revalidateProjects,
+      async ({ doc, operation, req }) => {
+        if (operation === 'create' || operation === 'update') {
+          await upsertSlugReservations(
+            req.payload,
+            'projects',
+            doc as { id: number; slug?: unknown },
+          )
+        }
+      },
+    ],
+    afterDelete: [
+      revalidateProjectsDelete,
+      async ({ doc, req }) => {
+        await deleteSlugReservations(req.payload, 'projects', doc as { id: number })
+      },
+    ],
   },
   fields: [
     {
@@ -76,40 +94,22 @@ export const Projects: CollectionConfig = {
               required: true,
             },
             {
+              name: 'featuredImage',
+              type: 'upload',
+              relationTo: 'media',
+            },
+            {
               name: 'content',
               type: 'richText',
               localized: true,
             },
             {
-              name: 'coverImage',
-              type: 'upload',
-              relationTo: 'media',
-            },
-            {
-              name: 'gallery',
-              type: 'array',
-              fields: [
-                {
-                  name: 'image',
-                  type: 'upload',
-                  relationTo: 'media',
-                  required: true,
-                },
-                {
-                  name: 'caption',
-                  type: 'text',
-                  localized: true,
-                },
-              ],
-            },
-            {
-              name: 'relatedProjects',
-              type: 'relationship',
-              relationTo: 'projects',
-              hasMany: true,
-              filterOptions: ({ id }) => {
-                if (!id) return true
-                return { id: { not_equals: id } }
+              name: 'layout',
+              type: 'blocks',
+              blocks: pageBlocks,
+              admin: {
+                description:
+                  'Optional blocks rendered below the project body (CTAs, related feeds, footers, etc.).',
               },
             },
           ],

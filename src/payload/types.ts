@@ -326,6 +326,7 @@ export interface Post {
    * Short summary used in listings and SEO fallbacks.
    */
   excerpt?: string | null;
+  featuredImage?: (number | null) | Media;
   content: {
     root: {
       type: string;
@@ -341,14 +342,232 @@ export interface Post {
     };
     [k: string]: unknown;
   };
-  featuredImage?: (number | null) | Media;
-  gallery?:
-    | {
-        image: number | Media;
-        id?: string | null;
-      }[]
+  /**
+   * Optional blocks rendered below the article body (CTAs, related feeds, footers, etc.).
+   */
+  layout?:
+    | (
+        | {
+            /**
+             * Small label above the title (e.g. “Hero”).
+             */
+            label?: string | null;
+            title: string;
+            tagline?: string | null;
+            bio?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            heroImage?: (number | null) | Media;
+            /**
+             * Pick links from the Links library.
+             */
+            links?: (number | Link)[] | null;
+            /**
+             * Cursor popup text while hovering this section.
+             */
+            cursorPopup?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutHero';
+          }
+        | {
+            heading: string;
+            /**
+             * Optional short blurb shown below the section heading.
+             */
+            description?: string | null;
+            /**
+             * Posts/Projects/Videos use the feed grid. Things uses a custom showcase layout with the same source logic.
+             */
+            feedType: 'posts' | 'projects' | 'things' | 'videos';
+            source: 'latest' | 'featured' | 'manual';
+            /**
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls — only available for latest published.
+             */
+            pagination?: ('static' | 'infinite') | null;
+            /**
+             * Initial item count. For static previews this is the full grid size; for infinite scroll it is the first page size.
+             */
+            limit: number;
+            showViewAll?: boolean | null;
+            /**
+             * Label for the trailing tile (e.g. “View all posts”).
+             */
+            viewAllLabel?: string | null;
+            /**
+             * CMS page the View all tile links to (e.g. Posts or Projects index page).
+             */
+            viewAllPage?: (number | null) | Page;
+            postItems?: (number | Post)[] | null;
+            projectItems?: (number | Project)[] | null;
+            /**
+             * Homepage Things showcase uses up to 5 tiles plus an optional View all tile.
+             */
+            thingItems?: (number | Thing)[] | null;
+            videoItems?: (number | Video)[] | null;
+            /**
+             * While hovering the section (header / grid chrome).
+             */
+            cursorPopup?: string | null;
+            /**
+             * When the section has no items yet.
+             */
+            cursorPopupEmpty?: string | null;
+            /**
+             * While hovering an individual feed tile.
+             */
+            cursorPopupItem?: string | null;
+            /**
+             * While hovering the “View all” tile.
+             */
+            cursorPopupViewAll?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutFeedSection';
+          }
+        | {
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutRichTextWithoutBlock';
+          }
+        | {
+            media: number | Media;
+            caption?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'contentMedia';
+          }
+        | {
+            items?:
+              | {
+                  image: number | Media;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'contentGallery';
+          }
+        | {
+            heading: string;
+            /**
+             * Which collection to pull related items from.
+             */
+            collection: 'posts' | 'projects';
+            /**
+             * Use the collection selector above to choose Posts or Projects.
+             */
+            items?:
+              | (
+                  | {
+                      relationTo: 'posts';
+                      value: number | Post;
+                    }
+                  | {
+                      relationTo: 'projects';
+                      value: number | Project;
+                    }
+                )[]
+              | null;
+            /**
+             * Maximum items rendered on the frontend.
+             */
+            limit?: number | null;
+            showViewAll?: boolean | null;
+            viewAllLabel?: string | null;
+            viewAllPage?: (number | null) | Page;
+            cursorPopup?: string | null;
+            cursorPopupItem?: string | null;
+            cursorPopupViewAll?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutRelatedItems';
+          }
+        | {
+            /**
+             * Pick the short stories to cycle through. Order is preserved.
+             */
+            stories: (number | ShortStory)[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutTypewriter';
+          }
+        | {
+            /**
+             * Pick the short stories to display. Each one scrambles on hover. Order is preserved.
+             */
+            stories: (number | ShortStory)[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutScrambleHover';
+          }
+        | {
+            /**
+             * CSS height for the blank section (e.g. 60vh, 400px, 5rem).
+             */
+            height?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutBlankSpace';
+          }
+        | {
+            footerText?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            /**
+             * Pick legal links from the Links library.
+             */
+            legalLinks?: (number | Link)[] | null;
+            /**
+             * Use {{year}} as a placeholder for the current year in the frontend.
+             */
+            copyright?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutFooter';
+          }
+      )[]
     | null;
-  relatedPosts?: (number | Post)[] | null;
   /**
    * Search and social metadata. Frontend rendering (meta tags, sitemap, hreflang) comes later.
    */
@@ -426,65 +645,27 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Compact feed fillers used to pack empty regions in the homepage bento grid.
+ * Centralized link library. Reference these from navigation, hero, CTA, and footer blocks.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "short-stories".
+ * via the `definition` "links".
  */
-export interface ShortStory {
+export interface Link {
   id: number;
-  title: string;
   /**
-   * Keep this short — it appears inside a compact feed tile.
+   * Visible label rendered on the public site.
    */
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  variant: 'note' | 'quote' | 'image';
+  label: string;
   /**
-   * Required for image-variant stories in practice; optional for others.
+   * Hint for which surfaces typically show this link. Picker fields may filter by category.
    */
-  image?: (number | null) | Media;
-  /**
-   * Optional destination when the story tile is clicked.
-   */
-  link?: {
-    enabled?: boolean | null;
-    label?: string | null;
-    linkType?: ('external' | 'internal') | null;
-    page?: (number | null) | Page;
-    url?: string | null;
-    newTab?: boolean | null;
-  };
-  /**
-   * Set automatically on first publish. Managers may override.
-   */
-  publishedAt?: string | null;
-  /**
-   * Internal ownership for Creator access control. Hidden from public APIs via select.
-   */
-  owner?: (number | null) | User;
-  /**
-   * Editorial signal only.
-   */
-  translationReady?: {
-    vi?: boolean | null;
-  };
+  category?: ('navigation' | 'social' | 'legal' | 'contact' | 'other') | null;
+  linkType: 'internal' | 'external';
+  page?: (number | null) | Page;
+  url?: string | null;
+  newTab?: boolean | null;
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * Home template documents power `/` and `/vi` via layout blocks. Other templates render at `/[slug]` and `/vi/[slug]`.
@@ -540,7 +721,7 @@ export interface Page {
             cursorPopup?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'hero';
+            blockType: 'layoutHero';
           }
         | {
             heading: string;
@@ -595,7 +776,7 @@ export interface Page {
             cursorPopupViewAll?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'feedSection';
+            blockType: 'layoutFeedSection';
           }
         | {
             content: {
@@ -615,33 +796,61 @@ export interface Page {
             };
             id?: string | null;
             blockName?: string | null;
-            blockType: 'richText';
+            blockType: 'layoutRichTextWithoutBlock';
           }
         | {
             media: number | Media;
             caption?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'media';
+            blockType: 'contentMedia';
+          }
+        | {
+            items?:
+              | {
+                  image: number | Media;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'contentGallery';
           }
         | {
             heading: string;
-            body?: string | null;
             /**
-             * Pick up to 3 links from the Links library.
+             * Which collection to pull related items from.
              */
-            links?: (number | Link)[] | null;
+            collection: 'posts' | 'projects';
+            /**
+             * Use the collection selector above to choose Posts or Projects.
+             */
+            items?:
+              | (
+                  | {
+                      relationTo: 'posts';
+                      value: number | Post;
+                    }
+                  | {
+                      relationTo: 'projects';
+                      value: number | Project;
+                    }
+                )[]
+              | null;
+            /**
+             * Maximum items rendered on the frontend.
+             */
+            limit?: number | null;
+            showViewAll?: boolean | null;
+            viewAllLabel?: string | null;
+            viewAllPage?: (number | null) | Page;
+            cursorPopup?: string | null;
+            cursorPopupItem?: string | null;
+            cursorPopupViewAll?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'callToAction';
-          }
-        | {
-            heading?: string | null;
-            items?: (number | Project)[] | null;
-            featuredOnly?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'projectsGrid';
+            blockType: 'layoutRelatedItems';
           }
         | {
             /**
@@ -650,7 +859,7 @@ export interface Page {
             stories: (number | ShortStory)[];
             id?: string | null;
             blockName?: string | null;
-            blockType: 'typewriter';
+            blockType: 'layoutTypewriter';
           }
         | {
             /**
@@ -659,7 +868,7 @@ export interface Page {
             stories: (number | ShortStory)[];
             id?: string | null;
             blockName?: string | null;
-            blockType: 'scramble-hover';
+            blockType: 'layoutScrambleHover';
           }
         | {
             /**
@@ -668,7 +877,7 @@ export interface Page {
             height?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'blankSpace';
+            blockType: 'layoutBlankSpace';
           }
         | {
             footerText?: {
@@ -696,7 +905,7 @@ export interface Page {
             copyright?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'footer';
+            blockType: 'layoutFooter';
           }
       )[]
     | null;
@@ -754,29 +963,6 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Centralized link library. Reference these from navigation, hero, CTA, and footer blocks.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "links".
- */
-export interface Link {
-  id: number;
-  /**
-   * Visible label rendered on the public site.
-   */
-  label: string;
-  /**
-   * Hint for which surfaces typically show this link. Picker fields may filter by category.
-   */
-  category?: ('navigation' | 'social' | 'legal' | 'contact' | 'other') | null;
-  linkType: 'internal' | 'external';
-  page?: (number | null) | Page;
-  url?: string | null;
-  newTab?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "projects".
  */
@@ -789,6 +975,7 @@ export interface Project {
   generateSlug?: boolean | null;
   slug: string;
   summary: string;
+  featuredImage?: (number | null) | Media;
   content?: {
     root: {
       type: string;
@@ -804,15 +991,232 @@ export interface Project {
     };
     [k: string]: unknown;
   } | null;
-  coverImage?: (number | null) | Media;
-  gallery?:
-    | {
-        image: number | Media;
-        caption?: string | null;
-        id?: string | null;
-      }[]
+  /**
+   * Optional blocks rendered below the project body (CTAs, related feeds, footers, etc.).
+   */
+  layout?:
+    | (
+        | {
+            /**
+             * Small label above the title (e.g. “Hero”).
+             */
+            label?: string | null;
+            title: string;
+            tagline?: string | null;
+            bio?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            heroImage?: (number | null) | Media;
+            /**
+             * Pick links from the Links library.
+             */
+            links?: (number | Link)[] | null;
+            /**
+             * Cursor popup text while hovering this section.
+             */
+            cursorPopup?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutHero';
+          }
+        | {
+            heading: string;
+            /**
+             * Optional short blurb shown below the section heading.
+             */
+            description?: string | null;
+            /**
+             * Posts/Projects/Videos use the feed grid. Things uses a custom showcase layout with the same source logic.
+             */
+            feedType: 'posts' | 'projects' | 'things' | 'videos';
+            source: 'latest' | 'featured' | 'manual';
+            /**
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls — only available for latest published.
+             */
+            pagination?: ('static' | 'infinite') | null;
+            /**
+             * Initial item count. For static previews this is the full grid size; for infinite scroll it is the first page size.
+             */
+            limit: number;
+            showViewAll?: boolean | null;
+            /**
+             * Label for the trailing tile (e.g. “View all posts”).
+             */
+            viewAllLabel?: string | null;
+            /**
+             * CMS page the View all tile links to (e.g. Posts or Projects index page).
+             */
+            viewAllPage?: (number | null) | Page;
+            postItems?: (number | Post)[] | null;
+            projectItems?: (number | Project)[] | null;
+            /**
+             * Homepage Things showcase uses up to 5 tiles plus an optional View all tile.
+             */
+            thingItems?: (number | Thing)[] | null;
+            videoItems?: (number | Video)[] | null;
+            /**
+             * While hovering the section (header / grid chrome).
+             */
+            cursorPopup?: string | null;
+            /**
+             * When the section has no items yet.
+             */
+            cursorPopupEmpty?: string | null;
+            /**
+             * While hovering an individual feed tile.
+             */
+            cursorPopupItem?: string | null;
+            /**
+             * While hovering the “View all” tile.
+             */
+            cursorPopupViewAll?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutFeedSection';
+          }
+        | {
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutRichTextWithoutBlock';
+          }
+        | {
+            media: number | Media;
+            caption?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'contentMedia';
+          }
+        | {
+            items?:
+              | {
+                  image: number | Media;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'contentGallery';
+          }
+        | {
+            heading: string;
+            /**
+             * Which collection to pull related items from.
+             */
+            collection: 'posts' | 'projects';
+            /**
+             * Use the collection selector above to choose Posts or Projects.
+             */
+            items?:
+              | (
+                  | {
+                      relationTo: 'posts';
+                      value: number | Post;
+                    }
+                  | {
+                      relationTo: 'projects';
+                      value: number | Project;
+                    }
+                )[]
+              | null;
+            /**
+             * Maximum items rendered on the frontend.
+             */
+            limit?: number | null;
+            showViewAll?: boolean | null;
+            viewAllLabel?: string | null;
+            viewAllPage?: (number | null) | Page;
+            cursorPopup?: string | null;
+            cursorPopupItem?: string | null;
+            cursorPopupViewAll?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutRelatedItems';
+          }
+        | {
+            /**
+             * Pick the short stories to cycle through. Order is preserved.
+             */
+            stories: (number | ShortStory)[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutTypewriter';
+          }
+        | {
+            /**
+             * Pick the short stories to display. Each one scrambles on hover. Order is preserved.
+             */
+            stories: (number | ShortStory)[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutScrambleHover';
+          }
+        | {
+            /**
+             * CSS height for the blank section (e.g. 60vh, 400px, 5rem).
+             */
+            height?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutBlankSpace';
+          }
+        | {
+            footerText?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            /**
+             * Pick legal links from the Links library.
+             */
+            legalLinks?: (number | Link)[] | null;
+            /**
+             * Use {{year}} as a placeholder for the current year in the frontend.
+             */
+            copyright?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'layoutFooter';
+          }
+      )[]
     | null;
-  relatedProjects?: (number | Project)[] | null;
   /**
    * Search and social metadata. Frontend rendering (meta tags, sitemap, hreflang) comes later.
    */
@@ -937,6 +1341,67 @@ export interface Video {
    */
   thumbnail?: (number | null) | Media;
   featured?: boolean | null;
+  /**
+   * Set automatically on first publish. Managers may override.
+   */
+  publishedAt?: string | null;
+  /**
+   * Internal ownership for Creator access control. Hidden from public APIs via select.
+   */
+  owner?: (number | null) | User;
+  /**
+   * Editorial signal only.
+   */
+  translationReady?: {
+    vi?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Compact feed fillers used to pack empty regions in the homepage bento grid.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "short-stories".
+ */
+export interface ShortStory {
+  id: number;
+  title: string;
+  /**
+   * Keep this short — it appears inside a compact feed tile.
+   */
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  variant: 'note' | 'quote' | 'image';
+  /**
+   * Required for image-variant stories in practice; optional for others.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Optional destination when the story tile is clicked.
+   */
+  link?: {
+    enabled?: boolean | null;
+    label?: string | null;
+    linkType?: ('external' | 'internal') | null;
+    page?: (number | null) | Page;
+    url?: string | null;
+    newTab?: boolean | null;
+  };
   /**
    * Set automatically on first publish. Managers may override.
    */
@@ -1382,15 +1847,122 @@ export interface PostsSelect<T extends boolean = true> {
   generateSlug?: T;
   slug?: T;
   excerpt?: T;
-  content?: T;
   featuredImage?: T;
-  gallery?:
+  content?: T;
+  layout?:
     | T
     | {
-        image?: T;
-        id?: T;
+        layoutHero?:
+          | T
+          | {
+              label?: T;
+              title?: T;
+              tagline?: T;
+              bio?: T;
+              heroImage?: T;
+              links?: T;
+              cursorPopup?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutFeedSection?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              feedType?: T;
+              source?: T;
+              pagination?: T;
+              limit?: T;
+              showViewAll?: T;
+              viewAllLabel?: T;
+              viewAllPage?: T;
+              postItems?: T;
+              projectItems?: T;
+              thingItems?: T;
+              videoItems?: T;
+              cursorPopup?: T;
+              cursorPopupEmpty?: T;
+              cursorPopupItem?: T;
+              cursorPopupViewAll?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutRichTextWithoutBlock?:
+          | T
+          | {
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        contentMedia?:
+          | T
+          | {
+              media?: T;
+              caption?: T;
+              id?: T;
+              blockName?: T;
+            };
+        contentGallery?:
+          | T
+          | {
+              items?:
+                | T
+                | {
+                    image?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        layoutRelatedItems?:
+          | T
+          | {
+              heading?: T;
+              collection?: T;
+              items?: T;
+              limit?: T;
+              showViewAll?: T;
+              viewAllLabel?: T;
+              viewAllPage?: T;
+              cursorPopup?: T;
+              cursorPopupItem?: T;
+              cursorPopupViewAll?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutTypewriter?:
+          | T
+          | {
+              stories?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutScrambleHover?:
+          | T
+          | {
+              stories?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutBlankSpace?:
+          | T
+          | {
+              height?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutFooter?:
+          | T
+          | {
+              footerText?: T;
+              legalLinks?: T;
+              copyright?: T;
+              id?: T;
+              blockName?: T;
+            };
       };
-  relatedPosts?: T;
   seo?:
     | T
     | {
@@ -1504,16 +2076,122 @@ export interface ProjectsSelect<T extends boolean = true> {
   generateSlug?: T;
   slug?: T;
   summary?: T;
+  featuredImage?: T;
   content?: T;
-  coverImage?: T;
-  gallery?:
+  layout?:
     | T
     | {
-        image?: T;
-        caption?: T;
-        id?: T;
+        layoutHero?:
+          | T
+          | {
+              label?: T;
+              title?: T;
+              tagline?: T;
+              bio?: T;
+              heroImage?: T;
+              links?: T;
+              cursorPopup?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutFeedSection?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              feedType?: T;
+              source?: T;
+              pagination?: T;
+              limit?: T;
+              showViewAll?: T;
+              viewAllLabel?: T;
+              viewAllPage?: T;
+              postItems?: T;
+              projectItems?: T;
+              thingItems?: T;
+              videoItems?: T;
+              cursorPopup?: T;
+              cursorPopupEmpty?: T;
+              cursorPopupItem?: T;
+              cursorPopupViewAll?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutRichTextWithoutBlock?:
+          | T
+          | {
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        contentMedia?:
+          | T
+          | {
+              media?: T;
+              caption?: T;
+              id?: T;
+              blockName?: T;
+            };
+        contentGallery?:
+          | T
+          | {
+              items?:
+                | T
+                | {
+                    image?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        layoutRelatedItems?:
+          | T
+          | {
+              heading?: T;
+              collection?: T;
+              items?: T;
+              limit?: T;
+              showViewAll?: T;
+              viewAllLabel?: T;
+              viewAllPage?: T;
+              cursorPopup?: T;
+              cursorPopupItem?: T;
+              cursorPopupViewAll?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutTypewriter?:
+          | T
+          | {
+              stories?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutScrambleHover?:
+          | T
+          | {
+              stories?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutBlankSpace?:
+          | T
+          | {
+              height?: T;
+              id?: T;
+              blockName?: T;
+            };
+        layoutFooter?:
+          | T
+          | {
+              footerText?: T;
+              legalLinks?: T;
+              copyright?: T;
+              id?: T;
+              blockName?: T;
+            };
       };
-  relatedProjects?: T;
   seo?:
     | T
     | {
@@ -1599,7 +2277,7 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        hero?:
+        layoutHero?:
           | T
           | {
               label?: T;
@@ -1612,7 +2290,7 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        feedSection?:
+        layoutFeedSection?:
           | T
           | {
               heading?: T;
@@ -1635,14 +2313,14 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        richText?:
+        layoutRichTextWithoutBlock?:
           | T
           | {
               content?: T;
               id?: T;
               blockName?: T;
             };
-        media?:
+        contentMedia?:
           | T
           | {
               media?: T;
@@ -1650,46 +2328,57 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        callToAction?:
+        contentGallery?:
           | T
           | {
-              heading?: T;
-              body?: T;
-              links?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    caption?: T;
+                    id?: T;
+                  };
               id?: T;
               blockName?: T;
             };
-        projectsGrid?:
+        layoutRelatedItems?:
           | T
           | {
               heading?: T;
+              collection?: T;
               items?: T;
-              featuredOnly?: T;
+              limit?: T;
+              showViewAll?: T;
+              viewAllLabel?: T;
+              viewAllPage?: T;
+              cursorPopup?: T;
+              cursorPopupItem?: T;
+              cursorPopupViewAll?: T;
               id?: T;
               blockName?: T;
             };
-        typewriter?:
+        layoutTypewriter?:
           | T
           | {
               stories?: T;
               id?: T;
               blockName?: T;
             };
-        'scramble-hover'?:
+        layoutScrambleHover?:
           | T
           | {
               stories?: T;
               id?: T;
               blockName?: T;
             };
-        blankSpace?:
+        layoutBlankSpace?:
           | T
           | {
               height?: T;
               id?: T;
               blockName?: T;
             };
-        footer?:
+        layoutFooter?:
           | T
           | {
               footerText?: T;

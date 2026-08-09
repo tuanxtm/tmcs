@@ -54,7 +54,7 @@ type LayoutBlock = {
 /**
  * Home page publication guards:
  * - only one published `template: home` document
- * - published home pages must include exactly one `hero` block
+ * - published home pages must include exactly one `layoutHero` block
  *
  * Drafts remain permissive (Pages drafts use `validate: false`).
  */
@@ -73,7 +73,7 @@ export const validateHomePage: CollectionBeforeChangeHook = async ({
 
   const layout = (data.layout ?? originalDoc?.layout) as LayoutBlock[] | null | undefined
   const heroCount = Array.isArray(layout)
-    ? layout.filter((block) => block?.blockType === 'hero').length
+    ? layout.filter((block) => block?.blockType === 'layoutHero').length
     : 0
 
   if (heroCount !== 1) {

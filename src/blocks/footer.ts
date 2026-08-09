@@ -3,11 +3,11 @@ import type { Block } from 'payload'
 import { linkPickerField } from '@/fields/common'
 import { slimRichTextEditor } from '@/fields/slimRichText'
 
-export const FooterBlock: Block = {
-  slug: 'footer',
+export const LayoutFooterBlock: Block = {
+  slug: 'layoutFooter',
   labels: {
-    singular: 'Footer',
-    plural: 'Footers',
+    singular: 'Layout - Footer',
+    plural: 'Layout - Footers',
   },
   fields: [
     {

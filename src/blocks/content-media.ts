@@ -1,10 +1,10 @@
 import type { Block } from 'payload'
 
-export const MediaBlock: Block = {
-  slug: 'media',
+export const ContentMediaBlock: Block = {
+  slug: 'contentMedia',
   labels: {
-    singular: 'Media',
-    plural: 'Media',
+    singular: 'Content - Media',
+    plural: 'Content - Media',
   },
   fields: [
     {

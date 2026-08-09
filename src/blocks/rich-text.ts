@@ -1,10 +1,12 @@
 import type { Block } from 'payload'
 
-export const RichTextBlock: Block = {
-  slug: 'richText',
+import { blockRichTextEditor } from '@/fields/blockRichText'
+
+export const LayoutRichTextWithoutBlock: Block = {
+  slug: 'layoutRichTextWithoutBlock',
   labels: {
-    singular: 'Rich text',
-    plural: 'Rich text',
+    singular: 'Layout - Rich text (without block)',
+    plural: 'Layout - Rich text (without block)',
   },
   fields: [
     {
@@ -12,6 +14,9 @@ export const RichTextBlock: Block = {
       type: 'richText',
       required: true,
       localized: true,
+      // Override the global editor to avoid the recursive schema when
+      // `BlocksFeature` is enabled globally — see `blockRichTextEditor`.
+      editor: blockRichTextEditor,
     },
   ],
 }

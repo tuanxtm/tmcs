@@ -8,6 +8,7 @@ import {
   canUpdateOwnedContent,
   publishedOrOwned,
 } from '@/access'
+import { pageBlocks } from '@/blocks'
 import { ownerField, publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
 import { assignOwner, preventCreatorPublish, setPublishedAt, setReadingTime } from '@/hooks'
@@ -92,40 +93,23 @@ export const Posts: CollectionConfig = {
               },
             },
             {
+              name: 'featuredImage',
+              type: 'upload',
+              relationTo: 'media',
+            },
+            {
               name: 'content',
               type: 'richText',
               localized: true,
               required: true,
             },
             {
-              name: 'featuredImage',
-              type: 'upload',
-              relationTo: 'media',
-            },
-            {
-              name: 'gallery',
-              type: 'array',
-              fields: [
-                {
-                  name: 'image',
-                  type: 'upload',
-                  relationTo: 'media',
-                  required: true,
-                },
-              ],
-            },
-            {
-              name: 'relatedPosts',
-              type: 'relationship',
-              relationTo: 'posts',
-              hasMany: true,
-              filterOptions: ({ id }) => {
-                if (!id) return true
-                return {
-                  id: {
-                    not_equals: id,
-                  },
-                }
+              name: 'layout',
+              type: 'blocks',
+              blocks: pageBlocks,
+              admin: {
+                description:
+                  'Optional blocks rendered below the article body (CTAs, related feeds, footers, etc.).',
               },
             },
           ],
