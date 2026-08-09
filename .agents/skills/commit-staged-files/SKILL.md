@@ -96,12 +96,10 @@ For each group, in order:
    ```bash
    git commit -m "$(cat <<'EOF'
    <subject line>
-
-   Co-Authored-By: Claude <noreply@anthropic.com>
    EOF
    )"
    ```
-   Omit `Co-Authored-By` if the user has set up a different convention. Add a body only when the change needs context that the subject can't carry.
+   Don't add `Co-Authored-By` in any commit message.
 
 ### 4. Verify
 

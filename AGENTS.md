@@ -5,8 +5,9 @@ alwaysApply: true
 
 # Agents
 
-This project uses the Payload CMS skill at `.agents/skills/payload/`.
-Start with `.agents/skills/payload/SKILL.md` for a quick reference, then see `.agents/skills/payload/reference/` for detailed docs.
+1. This project uses the Payload CMS skill at `.agents/skills/payload/`. Start with `.agents/skills/payload/SKILL.md` for a quick reference, then see `.agents/skills/payload/reference/` for detailed docs.
+
+2. Next.js: ALWAYS read docs before coding. Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated — the docs are the source of truth.
 
 ## Core principles
 
@@ -26,7 +27,7 @@ TMCS is a **single** Next.js + Payload app (not a multi-package monorepo) target
 
 | Path                               | Purpose                                                                        |
 | ---------------------------------- | ------------------------------------------------------------------------------ |
-| `src/payload.config.ts`            | Payload config: localization, jobs access, GraphQL disabled, D1/R2, migrations |
+| `src/payload/config.ts`            | Payload config: localization, jobs access, GraphQL disabled, D1/R2, migrations |
 | `src/collections/`                 | Content + auth collections                                                     |
 | `src/globals/`                     | Site settings (nav, footer, appearance, analytics, SEO)                        |
 | `src/access/`                      | RBAC helpers                                                                   |
