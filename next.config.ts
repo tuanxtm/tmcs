@@ -19,13 +19,13 @@ function getAllowedDevOrigins(): string[] {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  //images: {
-  //  localPatterns: [
-  //    {
-  //      pathname: '/api/media/file/**',
-  //    },
-  //  ],
-  //},
+  // View Transitions API — opt-in via experimental flag. `<Link transitionTypes>`
+  // and `<ViewTransition>` work automatically. `useEffectEvent` / Suspense /
+  // `next/dynamic` already pass through. Browser support: Chromium 111+, Firefox
+  // 144+, Safari 18.2+ — graceful fallback is the default cross-fade.
+  experimental: {
+    viewTransition: true,
+  },
   // React Compiler is built into Next.js 16 — runs in the SWC pipeline before
   // OpenNext bundles the output for Cloudflare Workers, so no runtime support
   // is required in workerd.

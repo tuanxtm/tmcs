@@ -68,9 +68,9 @@ function BackgroundEffect() {
             scale={1}
             frequency={1}
             warpStrength={1}
-            mouseInfluence={0.1}
+            mouseInfluence={0.05}
             noise={0.12}
-            parallax={0.25}
+            parallax={0.15}
             iterations={1}
             intensity={2}
             fontSize={12}

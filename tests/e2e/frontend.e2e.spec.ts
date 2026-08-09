@@ -44,14 +44,9 @@ test.describe('Frontend homepage', () => {
     await expect(sectionHeader).toHaveAttribute('data-stuck', 'false')
 
     const expectedStickyHeight = await page.evaluate(() => {
-      const raw = getComputedStyle(document.documentElement)
-        .getPropertyValue('--section-sticky-header-height')
-        .trim()
-      const value = Number.parseFloat(raw)
-      if (raw.endsWith('rem')) {
-        return value * Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
-      }
-      return value
+      const root = getComputedStyle(document.documentElement)
+      const headerHeight = parseFloat(root.getPropertyValue('--header-height'))
+      return headerHeight / 2
     })
 
     await page.evaluate(() => {

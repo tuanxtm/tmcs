@@ -11,8 +11,8 @@ import 'lenis/dist/lenis.css'
 /** Lower lerp + softer wheel = cinematic / portfolio scroll. */
 const LENIS_OPTIONS: LenisOptions = {
   autoRaf: true,
-  lerp: 0.07,
-  wheelMultiplier: 0.8,
+  lerp: 0.065,
+  wheelMultiplier: 0.65,
   touchMultiplier: 1.4,
   syncTouch: false,
   anchors: true,

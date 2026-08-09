@@ -33,7 +33,6 @@
   --radius: 0.25rem;
   --panel: oklch(0.992 0.001 95 / 0.86);
   --header-height: 3rem;
-  --section-sticky-header-height: 1.5rem;
   --scrollbar-size: 10px;
   --page-gutter: var(--scrollbar-size);
   --fold-height: 100dvh;
@@ -198,6 +197,11 @@ body::-webkit-scrollbar-corner {
     align-items: center;
     padding-inline: 0.5rem;
     overflow: hidden;
+    /* Fixed height — half the site header. No shrink animation: a height
+       transition on a sticky element invalidates the entire sticky containing
+       block on every frame and compounds Lenis over-target momentum. */
+    height: calc(var(--header-height) / 2);
+    min-height: calc(var(--header-height) / 2);
   }
 
   .feed-grid {
@@ -551,5 +555,99 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* View Transitions — recipes for <ViewTransition> classes used by the frontend.
+   See .agents/skills/vercel-react-view-transitions/AGENTS.md for the source. */
+:root {
+  --vt-duration-exit: 150ms;
+  --vt-duration-enter: 210ms;
+  --vt-duration-move: 400ms;
+}
+
+/* Shared element morph — smooth blur during the image morph between feed card
+   and detail hero. The image-pair blur sells the size change without flicker. */
+::view-transition-group(.morph) {
+  animation-duration: var(--vt-duration-move);
+}
+
+::view-transition-image-pair(.morph) {
+  animation-name: via-blur;
+}
+
+@keyframes via-blur {
+  30% {
+    filter: blur(3px);
+  }
+}
+
+/* Directional navigation slides — used alongside addTransitionType on router
+   pushes. 'nav-forward' = page coming in from the right (push). 'nav-back' =
+   page coming in from the left (browser history push). */
+::view-transition-new(.slide-from-right) {
+  --slide-offset: 60px;
+  animation:
+    var(--vt-duration-enter) ease-out var(--vt-duration-exit) both fade,
+    var(--vt-duration-move) ease-in-out both slide;
+}
+
+::view-transition-old(.slide-to-left) {
+  --slide-offset: -60px;
+  animation:
+    var(--vt-duration-exit) ease-in both fade reverse,
+    var(--vt-duration-move) ease-in-out both slide reverse;
+}
+
+::view-transition-new(.slide-from-left) {
+  --slide-offset: -60px;
+  animation:
+    var(--vt-duration-enter) ease-out var(--vt-duration-exit) both fade,
+    var(--vt-duration-move) ease-in-out both slide;
+}
+
+::view-transition-old(.slide-to-right) {
+  --slide-offset: 60px;
+  animation:
+    var(--vt-duration-exit) ease-in both fade reverse,
+    var(--vt-duration-move) ease-in-out both slide reverse;
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(var(--slide-offset));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fade-in for elements that mount on the detail page (title, meta). Pair with
+   `default="none"` on the <ViewTransition> so the cross-fade doesn't fire. */
+::view-transition-new(.fade-in) {
+  animation: var(--vt-duration-enter) ease-out var(--vt-duration-exit) both fade;
+}
+
+::view-transition-old(.fade-in) {
+  animation: var(--vt-duration-exit) ease-in both fade reverse;
+}
+
+/* Reduced motion — collapse every view transition to a snap. Users with
+   prefers-reduced-motion must still see the new page, just instantly. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }

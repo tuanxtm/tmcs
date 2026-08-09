@@ -17,7 +17,7 @@ function siteHeaderOffset(): number {
 
 /**
  * Sticky section title that sits under the site header.
- * When stuck: shrinks to --section-sticky-header-height, primary + blur.
+ * Height is fixed (calc(--header-height / 2))
  */
 export function SectionHeader({ id, children, className }: SectionHeaderProps) {
   const sentinelRef = useRef<HTMLDivElement>(null)
@@ -58,10 +58,10 @@ export function SectionHeader({ id, children, className }: SectionHeaderProps) {
       <div ref={sentinelRef} className="pointer-events-none h-0 w-full" aria-hidden="true" />
       <div
         className={cn(
-          'section-header transition-[height,min-height,background-color,backdrop-filter,-webkit-backdrop-filter,padding] duration-300 ease-out',
+          'section-header transition-[background-color,backdrop-filter,-webkit-backdrop-filter] duration-300 ease-out',
           stuck
-            ? 'h-[var(--section-sticky-header-height)] min-h-[var(--section-sticky-header-height)] bg-primary/35 py-0 backdrop-blur-md supports-backdrop-filter:bg-primary/25'
-            : 'h-[var(--header-height)] min-h-[var(--header-height)] bg-transparent',
+            ? 'bg-primary/35 backdrop-blur-md supports-backdrop-filter:bg-primary/25'
+            : 'bg-transparent',
           className,
         )}
         data-stuck={stuck ? 'true' : 'false'}
