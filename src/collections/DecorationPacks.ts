@@ -120,9 +120,15 @@ export const DecorationPacks: CollectionConfig = {
         description:
           'Which ornament from Items appears in the bottom right corner of the footer while this pack is active.',
         components: {
-          Field: '@/components/FooterItemSelect#FooterItemSelect',
+          Field: '@/fields/arrayFieldSelect#ArrayFieldSelect',
         },
-      },
+        arrayFieldSelect: {
+          arrayField: 'items',
+          rowFields: ['title', 'id'],
+          emptyPlaceholder: 'Add items first',
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
     },
   ],
 }

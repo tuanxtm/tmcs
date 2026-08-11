@@ -101,8 +101,6 @@ export async function CmsPage({ locale, slug }: CmsPageProps) {
       <PageBlocks
         blocks={page.blocks}
         locale={locale}
-        contactEmail={shell.contactEmail}
-        profileLinks={shell.profileLinks}
         siteName={shell.siteName}
       />
     </div>

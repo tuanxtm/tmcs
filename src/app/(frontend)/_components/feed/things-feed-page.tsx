@@ -54,10 +54,6 @@ const { Page: ThingsFeedPage, generateMetadata: generateThingsFeedMetadata } =
           cursorPopup={adapter.defaultCursorPopup}
           cursorPopupEmpty={adapter.defaultCursorPopupEmpty}
           cursorPopupItem={adapter.defaultCursorPopupItem}
-          contact={{
-            email: shell.contactEmail,
-            links: shell.profileLinks,
-          }}
         />
       )
     },

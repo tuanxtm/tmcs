@@ -36,6 +36,7 @@ import type {
   ShortStoryCardView,
   SiteShellView,
   ThingCardView,
+  ThingPlatformLink,
   VideoCardView,
   VideoProvider,
   VideosPageView,
@@ -177,14 +178,18 @@ function toThingCard(thing: Thing): ThingCardView {
   const primaryImage = toMediaView(thing.primaryImage)
   const detailImage = toMediaView(thing.detailImage) || primaryImage
 
+  const links: ThingPlatformLink[] = (thing.links ?? []).flatMap((l) =>
+    l?.label && l?.url ? [{ label: l.label, url: l.url }] : [],
+  )
+
   return {
     id: thing.id,
     name: thing.name,
     description: thing.description ?? null,
     primaryImage,
     detailImage,
-    affiliateUrl: thing.affiliateUrl ?? null,
-    linkLabel: thing.linkLabel ?? null,
+    primaryUrl: thing.primaryUrl ?? null,
+    links,
     publishedAt: thing.publishedAt ?? null,
   }
 }
@@ -673,7 +678,7 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
  * for the next browser refresh. By default we skip the cache in development
  * so freshly seeded content is visible immediately.
  *
- * Set `CMS_CACHE_DEV=1` (or `CMS_CACHE=1`) to force the cache on in dev —
+ * Set `CMS_CACHE_DEV=1` (or `CMS_CACHE=1`) to force the cache on in dev -
  * useful for integration tests that exercise `unstable_cache` itself.
  */
 function isCacheEnabledInDev(): boolean {

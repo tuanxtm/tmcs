@@ -6,7 +6,7 @@ import {
 } from '@/app/(frontend)/_components/layout/reveal-grid-item'
 import { SectionHeader } from '@/app/(frontend)/_components/layout/section-header'
 import { ThingShowcaseTile } from '@/app/(frontend)/_components/things/thing-showcase-tile'
-import type { ThingCardView, NavChildView } from '@/app/(frontend)/_lib/types'
+import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
@@ -17,10 +17,6 @@ type ThingsGridSectionProps = {
   cursorPopup: string
   cursorPopupEmpty: string
   cursorPopupItem: string
-  contact: {
-    email: string | null
-    links: NavChildView[]
-  }
 }
 
 export function ThingsGridSection({
@@ -30,7 +26,6 @@ export function ThingsGridSection({
   cursorPopup,
   cursorPopupEmpty,
   cursorPopupItem,
-  contact,
 }: ThingsGridSectionProps) {
   const columns = useGridColumnCount({ base: 1, sm: 2, lg: 3 })
   const sectionCursor = docs.length === 0 ? cursorPopupEmpty || cursorPopup : cursorPopup
@@ -73,7 +68,6 @@ export function ThingsGridSection({
             <ThingShowcaseTile
               thing={thing}
               locale={locale}
-              contact={contact}
               cursorPopup={cursorPopupItem}
             />
           </RevealGridItem>

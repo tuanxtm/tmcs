@@ -6,7 +6,7 @@
  *
  * Local-only credentials are baked in below (see SEED_USERS).
  * Override by editing this file or extending it with env reads if needed.
- * Never use these credentials in production. Safe to re-run — upserts by stable keys.
+ * Never use these credentials in production. Safe to re-run - upserts by stable keys.
  */
 
 import 'dotenv/config'
@@ -339,15 +339,12 @@ async function upsertThingByName(
   en: {
     name: string
     description: string
-    affiliateUrl?: string | null
-    linkLabel?: string | null
+    links: ReadonlyArray<{ label: string; url: string }>
     featured?: boolean
   },
   vi: {
     name: string
     description: string
-    affiliateUrl?: string | null
-    linkLabel?: string | null
   },
   images: { primary: number; detail?: number },
   ownerId: number,
@@ -367,8 +364,7 @@ async function upsertThingByName(
     description: en.description,
     primaryImage: images.primary,
     detailImage: images.detail ?? images.primary,
-    affiliateUrl: en.affiliateUrl ?? null,
-    linkLabel: en.linkLabel ?? null,
+    links: en.links,
     featured: Boolean(en.featured),
     owner: ownerId,
     _status: 'published' as const,
@@ -401,8 +397,6 @@ async function upsertThingByName(
     data: {
       name: vi.name,
       description: vi.description,
-      affiliateUrl: vi.affiliateUrl ?? null,
-      linkLabel: vi.linkLabel ?? null,
     } as never,
     locale: 'vi',
     overrideAccess: true,
@@ -452,7 +446,7 @@ async function upsertVideoByTitle(
       data: base as never,
       locale: 'en',
       overrideAccess: true,
-      // Skip network thumbnail fetch during seed — we supply Media explicitly.
+      // Skip network thumbnail fetch during seed - we supply Media explicitly.
       context: { youtubeThumbAttempted: true, disableRevalidate: true },
     }))
 
@@ -480,7 +474,7 @@ async function upsertVideoByTitle(
 }
 
 // ---------------------------------------------------------------------------
-// Seed content — DIY projects, tech workspace, maker culture
+// Seed content - DIY projects, tech workspace, maker culture
 // ---------------------------------------------------------------------------
 
 const CATEGORY_SEEDS = [
@@ -1163,253 +1157,316 @@ const THING_SEEDS = [
     en: {
       name: 'Soldering station',
       description: 'Temperature-controlled iron for nightly repairs.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE1',
       featured: true,
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLE1' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE1' },
+        { label: 'Shopee', url: 'https://shopee.vn/soldering-station' },
+      ],
     },
     vi: {
       name: 'Trạm hàn',
       description: 'Mỏ hàn chỉnh nhiệt cho sửa chữa ban đêm.',
-      affiliateUrl: 'https://shopee.vn/soldering-station',
     },
   },
   {
     en: {
       name: 'ESD mat',
       description: 'Grounded work surface for sensitive boards.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE2',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLE2' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE2' },
+        { label: 'Shopee', url: 'https://shopee.vn/esd-mat' },
+      ],
     },
     vi: {
       name: 'Thảm ESD',
       description: 'Mặt bàn nối mass cho mạch nhạy cảm.',
-      affiliateUrl: 'https://shopee.vn/esd-mat',
     },
   },
   {
     en: {
       name: 'Helping hands',
       description: 'Third hand with magnifier for fine joints.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE3',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLE3' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE3' },
+        { label: 'Shopee', url: 'https://shopee.vn/helping-hands' },
+      ],
     },
     vi: {
       name: 'Kẹp hỗ trợ',
       description: 'Tay thứ ba kèm kính lúp cho mối hàn nhỏ.',
-      affiliateUrl: null,
     },
   },
   {
     en: {
       name: 'Digital calipers',
       description: '0.01 mm readings for enclosure fits.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE4',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLE4' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE4' },
+        { label: 'Shopee', url: 'https://shopee.vn/digital-calipers' },
+      ],
     },
     vi: {
       name: 'Thước kẹp điện tử',
       description: 'Độ chính xác 0.01 mm cho khít vỏ.',
-      affiliateUrl: 'https://shopee.vn/digital-calipers',
     },
   },
   {
     en: {
       name: 'Flush cutters',
       description: 'Clean lead trims without nicking pads.',
-      affiliateUrl: null,
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLEA' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEA' },
+        { label: 'Shopee', url: 'https://shopee.vn/flush-cutters' },
+      ],
     },
     vi: {
       name: 'Kềm cắt chân',
       description: 'Cắt chân sạch không cạo pad.',
-      affiliateUrl: null,
     },
   },
   {
     en: {
       name: 'Kapton tape',
       description: 'Heat-safe masking for rework.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE6',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLE6' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE6' },
+        { label: 'Shopee', url: 'https://shopee.vn/kapton-tape' },
+      ],
     },
     vi: {
       name: 'Băng Kapton',
       description: 'Băng chịu nhiệt cho rework.',
-      affiliateUrl: 'https://shopee.vn/kapton-tape',
     },
   },
   {
     en: {
       name: 'USB microscope',
       description: 'Inspect joints before powering up.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE7',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLE7' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE7' },
+        { label: 'Shopee', url: 'https://shopee.vn/usb-microscope' },
+      ],
     },
     vi: {
       name: 'Kính hiển vi USB',
       description: 'Kiểm mối hàn trước khi cấp nguồn.',
-      affiliateUrl: 'https://shopee.vn/usb-microscope',
     },
   },
   {
     en: {
       name: 'Bench PSU',
       description: 'Current-limited supply for first boots.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE8',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLE8' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE8' },
+        { label: 'Shopee', url: 'https://shopee.vn/bench-psu' },
+      ],
     },
     vi: {
       name: 'Nguồn bàn',
       description: 'Nguồn giới hạn dòng cho lần boot đầu.',
-      affiliateUrl: 'https://shopee.vn/bench-psu',
     },
   },
   {
     en: {
       name: 'Logic analyzer',
       description: 'Capture I2C and UART when firmware ghosts appear.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLE9',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLE9' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE9' },
+        { label: 'Shopee', url: 'https://shopee.vn/logic-analyzer' },
+      ],
     },
     vi: {
       name: 'Logic analyzer',
       description: 'Bắt I2C và UART khi firmware ma xuất hiện.',
-      affiliateUrl: 'https://shopee.vn/logic-analyzer',
     },
   },
   {
     en: {
       name: 'Wire strippers',
       description: 'Self-adjusting jaws for 30–10 AWG.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLEA',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLEW' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEW' },
+        { label: 'Shopee', url: 'https://shopee.vn/wire-strippers' },
+      ],
     },
     vi: {
       name: 'Kìm tuốt dây',
       description: 'Hàm tự chỉnh cho 30–10 AWG.',
-      affiliateUrl: 'https://shopee.vn/wire-strippers',
     },
   },
   {
     en: {
       name: 'Fume extractor',
       description: 'Carbon filter for late-night soldering.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLEB',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLEF' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEF' },
+        { label: 'Shopee', url: 'https://shopee.vn/fume-extractor' },
+      ],
     },
     vi: {
       name: 'Hút khói',
       description: 'Lọc carbon cho hàn khuya.',
-      affiliateUrl: 'https://shopee.vn/fume-extractor',
     },
   },
   {
     en: {
       name: 'Multimeter',
       description: 'True-RMS meter for AC and DC checks.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLEC',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLEM' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEM' },
+        { label: 'Shopee', url: 'https://shopee.vn/multimeter' },
+      ],
     },
     vi: {
       name: 'Đồng hồ vạn năng',
       description: 'True-RMS cho kiểm AC và DC.',
-      affiliateUrl: 'https://shopee.vn/multimeter',
     },
   },
   {
     en: {
       name: 'Hot air station',
       description: 'For QFN rework and heat-shrink.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLED',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLEH' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEH' },
+        { label: 'Shopee', url: 'https://shopee.vn/hot-air' },
+      ],
     },
     vi: {
       name: 'Trạm hơi nóng',
       description: 'Cho rework QFN và ống gen.',
-      affiliateUrl: 'https://shopee.vn/hot-air',
     },
   },
   {
     en: {
       name: 'Parts organizer',
       description: 'Labeled bins so SMD resistors stay findable.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLEE',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLEP' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEP' },
+        { label: 'Shopee', url: 'https://shopee.vn/parts-organizer' },
+      ],
     },
     vi: {
       name: 'Hộp linh kiện',
       description: 'Ngăn có nhãn để điện trở SMD luôn tìm được.',
-      affiliateUrl: 'https://shopee.vn/parts-organizer',
     },
   },
   {
     en: {
       name: 'Raspberry Pi 5',
       description: 'Tiny single-board computer for homelab services.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPL15',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPL15' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE15' },
+        { label: 'Shopee', url: 'https://shopee.vn/raspberry-pi-5' },
+      ],
     },
     vi: {
       name: 'Raspberry Pi 5',
       description: 'Máy tính nhúng nhỏ cho dịch vụ homelab.',
-      affiliateUrl: 'https://shopee.vn/raspberry-pi-5',
     },
   },
   {
     en: {
       name: 'Mesh router',
       description: 'Tri-band mesh for sane Wi-Fi across a small apartment.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLMR',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLMR' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE1' },
+        { label: 'Shopee', url: 'https://shopee.vn/mesh-router' },
+      ],
     },
     vi: {
       name: 'Router mesh',
       description: 'Mesh ba băng tần cho Wi-Fi căn hộ nhỏ ổn định.',
-      affiliateUrl: 'https://shopee.vn/mesh-router',
     },
   },
   {
     en: {
       name: 'Bench grinder',
       description: 'Compact 8-inch grinder for reshaping tool bits.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLGR',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLGR' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEG' },
+        { label: 'Shopee', url: 'https://shopee.vn/bench-grinder' },
+      ],
     },
     vi: {
       name: 'Máy mài bàn',
       description: 'Máy mài 8 inch gọn nhẹ để chỉnh lại mũi dụng cụ.',
-      affiliateUrl: 'https://shopee.vn/bench-grinder',
     },
   },
   {
     en: {
       name: 'Filament dry box',
       description: 'Heated filament dry box with a humidity readout.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLFB',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLEFB' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEFB' },
+        { label: 'Shopee', url: 'https://shopee.vn/filament-dry-box' },
+      ],
     },
     vi: {
       name: 'Hộp sấy filament',
       description: 'Hộp sấy filament có đo độ ẩm hiển thị.',
-      affiliateUrl: 'https://shopee.vn/filament-dry-box',
     },
   },
   {
     en: {
       name: 'Work gloves',
       description: 'Cut-resistant gloves for routing and soldering-adjacent work.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLWG',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLWG' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEWG' },
+        { label: 'Shopee', url: 'https://shopee.vn/work-gloves' },
+      ],
     },
     vi: {
       name: 'Găng tay bảo hộ',
       description: 'Găng chống cắt cho phay và công việc cạnh hàn.',
-      affiliateUrl: 'https://shopee.vn/work-gloves',
     },
   },
   {
     en: {
       name: 'Camera microscope',
       description: 'A 4K HDMI camera microscope for fine inspection and soldering.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLCM',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLCM' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLE1' },
+        { label: 'Shopee', url: 'https://shopee.vn/camera-microscope' },
+      ],
     },
     vi: {
       name: 'Kính hiển vi camera',
       description: 'Kính hiển vi HDMI 4K kiểm tra chi tiết và hàn mịn.',
-      affiliateUrl: 'https://shopee.vn/camera-microscope',
     },
   },
   {
     en: {
       name: 'Headlamp',
       description: 'A rechargeable headlamp for dark corners and night-time soldering.',
-      affiliateUrl: 'https://www.amazon.com/dp/B08EXAMPLHL',
+      links: [
+        { label: 'Amazon', url: 'https://www.amazon.com/dp/B08EXAMPLHL' },
+        { label: 'AliExpress', url: 'https://www.aliexpress.com/item/100000EXAMPLEHL' },
+        { label: 'Shopee', url: 'https://shopee.vn/headlamp' },
+      ],
     },
     vi: {
       name: 'Đèn đeo đầu',
       description: 'Đèn đeo đầu sạc cho góc tối và hàn ban đêm.',
-      affiliateUrl: 'https://shopee.vn/headlamp',
     },
   },
 ] as const
@@ -1436,11 +1493,11 @@ const VIDEO_SEEDS = [
   },
   {
     en: {
-      title: 'Workshop reel — calipers',
+      title: 'Workshop reel - calipers',
       provider: 'instagram' as const,
       sourceUrl: 'https://www.instagram.com/reel/AbCdEfGhIjK/',
     },
-    vi: { title: 'Reel xưởng — thước kẹp' },
+    vi: { title: 'Reel xưởng - thước kẹp' },
   },
   {
     en: {
@@ -1556,11 +1613,11 @@ const VIDEO_SEEDS = [
   },
   {
     en: {
-      title: 'Repair reel — broken cable',
+      title: 'Repair reel - broken cable',
       provider: 'instagram' as const,
       sourceUrl: 'https://www.instagram.com/reel/RepA1r3elAA/',
     },
-    vi: { title: 'Reel sửa — dây đứt' },
+    vi: { title: 'Reel sửa - dây đứt' },
   },
   {
     en: {
@@ -1752,12 +1809,12 @@ async function seed() {
   for (const tag of TAG_SEEDS) {
     const doc = await upsertBySlug(payload, 'tags', tag.slug, {
       title: tag.en,
-      description: `Seed tag — ${tag.en}.`,
+      description: `Seed tag - ${tag.en}.`,
     })
     await payload.update({
       collection: 'tags',
       id: doc.id,
-      data: { title: tag.vi, description: `Thẻ mẫu — ${tag.vi}.` },
+      data: { title: tag.vi, description: `Thẻ mẫu - ${tag.vi}.` },
       locale: 'vi',
       overrideAccess: true,
     })
@@ -1767,7 +1824,7 @@ async function seed() {
   // Globals
   // Create the decoration packs BEFORE the first site-settings update so
   // `activeDecorationPack` (required) can point to a valid pack id from
-  // the start. Packs are intentionally left empty — no feed-decorations
+  // the start. Packs are intentionally left empty - no feed-decorations
   // are uploaded by the seed.
   const plantPack = await upsertPackBySlug(payload, 'plant', { title: 'Plant' })
   await upsertPackBySlug(payload, 'new-year', { title: 'New Year' })
@@ -1779,13 +1836,13 @@ async function seed() {
       activeDecorationPack: plantPack.id,
       siteName: 'tuantm',
       tagline: 'DIY builds, tech workspace, and maker notes',
-      description: 'Seed site — workshop projects, desk setups, and electronics experiments.',
+      description: 'Seed site - workshop projects, desk setups, and electronics experiments.',
       siteUrl: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
       contactEmail: ADMIN_EMAIL,
       robots: { indexSite: false },
       bio: richText(
         'Documenting builds, failures, and the tools that survive them.',
-        'Based in a small home workshop — posting maker notes and desk setups.',
+        'Based in a small home workshop - posting maker notes and desk setups.',
       ),
     },
     locale: 'en',
@@ -1797,10 +1854,10 @@ async function seed() {
     data: {
       siteName: 'tuantm',
       tagline: 'Dự án DIY, không gian tech và ghi chú maker',
-      description: 'Trang mẫu — dự án xưởng, setup bàn và thử nghiệm điện tử.',
+      description: 'Trang mẫu - dự án xưởng, setup bàn và thử nghiệm điện tử.',
       bio: richText(
         'Ghi lại bản build, thất bại và dụng cụ còn sót lại.',
-        'Từ một xưởng nhỏ tại nhà — chia sẻ ghi chú maker và setup bàn.',
+        'Từ một xưởng nhỏ tại nhà - chia sẻ ghi chú maker và setup bàn.',
       ),
     },
     locale: 'vi',
@@ -1840,9 +1897,7 @@ async function seed() {
     mediaIds.push(id)
   }
   if (mediaIds.length !== NEW_IMAGE_FILES.length) {
-    throw new Error(
-      `Expected ${NEW_IMAGE_FILES.length} seed media files, got ${mediaIds.length}.`,
-    )
+    throw new Error(`Expected ${NEW_IMAGE_FILES.length} seed media files, got ${mediaIds.length}.`)
   }
 
   // Drop posts/projects/things/videos rows that are not part of the seed
@@ -1899,7 +1954,7 @@ async function seed() {
       excerpt: `Notes from the bench on ${POST_TITLES[i].toLowerCase()}.`,
       content: richText(
         `Long-form opening paragraph for the post "${POST_TITLES[i]}". This seeded entry walks through the topic in a builder-friendly tone, mixing first-person observation with concrete technical notes so the bento feed and bilingual content paths both get exercised.`,
-        `Middle paragraph expands on the topic with concrete examples, a handful of measurements or component values, and a personal observation from the workshop — the kind of detail that makes a generic explanation feel like it was written after a real weekend of building rather than a copy-paste from a tutorial.`,
+        `Middle paragraph expands on the topic with concrete examples, a handful of measurements or component values, and a personal observation from the workshop - the kind of detail that makes a generic explanation feel like it was written after a real weekend of building rather than a copy-paste from a tutorial.`,
         `Closing paragraph wraps up with a forward-looking thought, a small caveat about what the next iteration might look like, and an invitation to share what the reader has built. Most seeded posts use this three-paragraph shape so the renderer has a realistic payload to layout.`,
       ),
       featuredImage,
@@ -1921,7 +1976,7 @@ async function seed() {
         excerpt: `Ghi chú từ bàn thợ về ${POST_TITLES_VI[i].toLowerCase()}.`,
         content: richText(
           `Đoạn mở đầu dài cho bài viết "${POST_TITLES_VI[i]}". Bài seed này đi qua chủ đề với giọng văn thân thiện với người thợ, trộn quan sát cá nhân với ghi chú kỹ thuật cụ thể để đảm bảo feed bento và luồng nội dung song ngữ đều được kiểm thử.`,
-          `Đoạn giữa mở rộng chủ đề với ví dụ thực tế, vài số đo hoặc giá trị linh kiện, và một quan sát cá nhân từ xưởng — chi tiết khiến lời giải thích chung chung cảm thấy như được viết sau một cuối tuần build thực sự thay vì sao chép từ tutorial.`,
+          `Đoạn giữa mở rộng chủ đề với ví dụ thực tế, vài số đo hoặc giá trị linh kiện, và một quan sát cá nhân từ xưởng - chi tiết khiến lời giải thích chung chung cảm thấy như được viết sau một cuối tuần build thực sự thay vì sao chép từ tutorial.`,
           `Đoạn kết khép lại với suy nghĩ hướng về phía trước, một lưu ý nhỏ về phiên bản lặp tiếp theo và lời mời chia sẻ những gì bạn đọc đã build. Hầu hết bài seed dùng khuôn ba đoạn này để renderer có payload thực tế để bố cục.`,
         ),
       },
@@ -2169,8 +2224,16 @@ async function seed() {
     {
       key: 'instagram',
       category: 'social' as const,
-      en: { label: 'Instagram', linkType: 'external' as const, url: 'https://instagram.com/tuantm' },
-      vi: { label: 'Instagram', linkType: 'external' as const, url: 'https://instagram.com/tuantm' },
+      en: {
+        label: 'Instagram',
+        linkType: 'external' as const,
+        url: 'https://instagram.com/tuantm',
+      },
+      vi: {
+        label: 'Instagram',
+        linkType: 'external' as const,
+        url: 'https://instagram.com/tuantm',
+      },
       newTab: true,
     },
     {
@@ -2329,7 +2392,7 @@ async function seed() {
     data: {
       bio: richText(
         'Documenting builds, failures, and the tools that survive them.',
-        'Based in a small home workshop — posting maker notes and desk setups.',
+        'Based in a small home workshop - posting maker notes and desk setups.',
       ),
       profileLinks: [linkIds.en.instagram, linkIds.en.youtube, linkIds.en.github],
       navigation: [
@@ -2347,7 +2410,7 @@ async function seed() {
     data: {
       bio: richText(
         'Ghi lại bản build, thất bại và dụng cụ còn sót lại.',
-        'Từ một xưởng nhỏ tại nhà — chia sẻ ghi chú maker và setup bàn.',
+        'Từ một xưởng nhỏ tại nhà - chia sẻ ghi chú maker và setup bàn.',
       ),
       profileLinks: [linkIds.vi.instagram, linkIds.vi.youtube, linkIds.vi.github],
       navigation: [

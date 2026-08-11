@@ -59,7 +59,7 @@ export type HeroView = {
   links: NavChildView[]
 }
 
-/** Slim DTO for homepage feed tiles — only fields the UI consumes. */
+/** Slim DTO for homepage feed tiles - only fields the UI consumes. */
 export type PostCardView = {
   id: number
   title: string
@@ -78,14 +78,18 @@ export type ProjectCardView = {
   image: MediaView | null
 }
 
+export type ThingPlatformLink = { label: string; url: string }
+
 export type ThingCardView = {
   id: number
   name: string
   description: string | null
   primaryImage: MediaView | null
   detailImage: MediaView | null
-  affiliateUrl: string | null
-  linkLabel: string | null
+  /** Localized primary URL - shown on the tile, opened directly if user clicks the tile card. */
+  primaryUrl: string | null
+  /** Non-localized platform links - drive the dialog buttons. */
+  links: ThingPlatformLink[]
   publishedAt: string | null
 }
 
@@ -279,7 +283,7 @@ export type LayoutFooterBlockView = {
 /**
  * Stub view types for blocks that have schema but no frontend renderer yet.
  * The frontend resolver returns `null` for these, so they never flow into the
- * page renderer — the types exist only to keep the `ResolvedBlockView` union
+ * page renderer - the types exist only to keep the `ResolvedBlockView` union
  * exhaustive when narrowing against the blockType discriminator.
  */
 export type ContentGalleryBlockView = {

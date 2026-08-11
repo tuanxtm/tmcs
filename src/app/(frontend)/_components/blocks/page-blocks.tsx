@@ -9,16 +9,13 @@ import { ScrambleHoverBlock } from '@/app/(frontend)/_components/blocks/scramble
 import { BlankSpaceBlock } from '@/app/(frontend)/_components/blocks/blank-space'
 import { FooterBlock } from '@/app/(frontend)/_components/blocks/footer'
 import { ThingsSection } from '@/app/(frontend)/_components/things/things-section'
-import type { ContactLinks } from '@/app/(frontend)/_components/things/missing-link-dialog'
-import type { NavChildView, ResolvedBlockView } from '@/app/(frontend)/_lib/types'
+import type { ResolvedBlockView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 
 type PageBlocksProps = {
   blocks: ResolvedBlockView[]
   locale: LocaleCode
   className?: string
-  contactEmail?: string | null
-  profileLinks?: NavChildView[]
   siteName: string
 }
 
@@ -49,25 +46,13 @@ function DeferredBlockPlaceholder({
       className="mx-auto my-8 max-w-3xl rounded border border-dashed border-border bg-foreground/5 px-4 py-6 text-center text-xs uppercase tracking-wide text-muted-foreground"
     >
       <span className="font-mono">{blockType}</span>
-      <span className="ml-2 text-foreground/60">— coming soon</span>
+      <span className="ml-2 text-foreground/60">- coming soon</span>
     </aside>
   )
 }
 
-export function PageBlocks({
-  blocks,
-  locale,
-  className,
-  contactEmail = null,
-  profileLinks = [],
-  siteName,
-}: PageBlocksProps) {
+export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksProps) {
   if (blocks.length === 0) return null
-
-  const contact: ContactLinks = {
-    email: contactEmail,
-    links: profileLinks,
-  }
 
   return (
     <div className={className}>
@@ -111,7 +96,6 @@ export function PageBlocks({
                   cursorPopupItem={block.cursorPopupItem}
                   cursorPopupViewAll={block.cursorPopupViewAll}
                   docs={block.docs}
-                  contact={contact}
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}
                   viewAllHref={block.viewAllHref}
@@ -210,7 +194,9 @@ export function PageBlocks({
             return wrap(<DeferredBlockPlaceholder blockType="contentGallery" blockId={block.id} />)
 
           case 'layoutRelatedItems':
-            return wrap(<DeferredBlockPlaceholder blockType="layoutRelatedItems" blockId={block.id} />)
+            return wrap(
+              <DeferredBlockPlaceholder blockType="layoutRelatedItems" blockId={block.id} />,
+            )
 
           case 'layoutTypewriter':
             return wrap(<TypewriterBlock block={block} />)

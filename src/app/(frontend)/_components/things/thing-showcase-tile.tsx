@@ -1,46 +1,58 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useReducedMotion } from 'motion/react'
-import { IconShoppingBagDiscount, IconShoppingBag } from '@tabler/icons-react'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
-import {
-  MissingLinkDialog,
-  type ContactLinks,
-} from '@/app/(frontend)/_components/things/missing-link-dialog'
+import type { MediaView } from '@/app/(frontend)/_lib/types'
+import { BuyNowDialog } from '@/app/(frontend)/_components/things/buy-now-dialog'
+import { Button } from '@/components/ui/button'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
+const BUY_LABEL: Record<LocaleCode, string> = { en: 'Buy now', vi: 'Mua ngay' }
+
 type ThingShowcaseTileProps = {
   thing: ThingCardView
   locale: LocaleCode
-  contact: ContactLinks
   cursorPopup?: string | null
   className?: string
-}
-
-const SHOP_LABEL: Record<LocaleCode, string> = {
-  en: 'Shop',
-  vi: 'Mua',
 }
 
 export function ThingShowcaseTile({
   thing,
   locale,
-  contact,
-  cursorPopup = 'shop this',
+  cursorPopup = 'buy now',
   className,
 }: ThingShowcaseTileProps) {
   const reduceMotion = useReducedMotion()
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const hasLink = Boolean(thing.affiliateUrl)
-  const label = thing.linkLabel || SHOP_LABEL[locale]
+  const [open, setOpen] = useState(false)
   const detailImage = thing.detailImage || thing.primaryImage
+  // Primary URL drives the image click target. When missing, the image stays
+  // non-interactive - the Buy now button is still the way into the dialog.
+  const primaryHref = thing.primaryUrl
 
-  const cartClass = cn(
-    'inline-flex size-4 shrink-0 items-center justify-center text-foreground transition-colors',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+  const renderImage = (media: MediaView, sizes: string, imgClassName: string) => (
+    <CmsImage media={media} sizes={sizes} className="h-full w-full" imgClassName={imgClassName} />
+  )
+
+  const wrapInLink = (media: MediaView, sizes: string, imgClassName: string) =>
+    primaryHref ? (
+      <Link
+        href={primaryHref}
+        aria-label={thing.name}
+        className="block h-full w-full focus:outline-none"
+      >
+        {renderImage(media, sizes, imgClassName)}
+      </Link>
+    ) : (
+      renderImage(media, sizes, imgClassName)
+    )
+
+  const primaryImgClass = cn(
+    'h-full w-full object-cover transition-transform duration-500',
+    !reduceMotion && 'group-hover:scale-[1.01]',
   )
 
   return (
@@ -49,69 +61,45 @@ export function ThingShowcaseTile({
       data-cursor-popup={cursorPopup || undefined}
     >
       <div className="thing-tile-split flex min-h-0 flex-1 flex-col gap-2 md:flex-row">
-        <div className="thing-tile-hero min-w-0 flex-1 overflow-hidden">
-          {thing.primaryImage ? (
-            <CmsImage
-              media={thing.primaryImage}
-              sizes="(min-width: 1024px) 22vw, (min-width: 768px) 35vw, 100vw"
-              className="h-full w-full"
-              imgClassName={cn(
-                'h-full w-full object-cover transition-transform duration-500',
-                !reduceMotion && 'group-hover:scale-[1.01]',
-              )}
-            />
-          ) : (
-            <div className="aspect-[4/5] w-full md:h-full md:aspect-auto" aria-hidden="true" />
-          )}
+        {/* Primary image - full width on mobile, left/top on larger screens */}
+        <div className="thing-tile-hero aspect-square min-w-0 flex-1 overflow-hidden">
+          {thing.primaryImage
+            ? wrapInLink(
+                thing.primaryImage,
+                '(min-width: 1024px) 22vw, (min-width: 768px) 35vw, 100vw',
+                primaryImgClass,
+              )
+            : null}
         </div>
 
+        {/* Panel: detail image, name, and Buy now button */}
         <div className="thing-tile-panel flex w-full flex-col gap-2 md:w-1/3 md:shrink-0">
           {detailImage ? (
             <div className="hidden aspect-square w-full overflow-hidden md:block">
-              <CmsImage
-                media={detailImage}
-                sizes="(min-width: 1024px) 12vw, 160px"
-                className="h-full w-full"
-                imgClassName="h-full w-full object-cover"
-              />
+              {wrapInLink(
+                detailImage,
+                '(min-width: 1024px) 12vw, 160px',
+                'h-full w-full object-cover',
+              )}
             </div>
           ) : null}
 
-          <div className="flex items-center gap-1">
-            <h3 className="min-w-0 flex-1 text-sm font-medium leading-none tracking-tight text-foreground md:text-base">
-              {thing.name}
-            </h3>
-            {hasLink ? (
-              <a
-                href={thing.affiliateUrl!}
-                target="_blank"
-                rel="sponsored noopener noreferrer"
-                className={cartClass}
-                aria-label={label}
-              >
-                <IconShoppingBagDiscount className="size-4" aria-hidden="true" />
-              </a>
-            ) : (
-              <button
-                type="button"
-                className={cartClass}
-                onClick={() => setDialogOpen(true)}
-                aria-label={label}
-              >
-                <IconShoppingBag className="size-4" aria-hidden="true" />
-              </button>
-            )}
-          </div>
+          <h4 className="text-sm font-medium leading-none tracking-tight text-foreground md:text-sm">
+            {thing.name}
+          </h4>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-auto w-full rounded-none justify-center transition-colors duration-300 hover:bg-gradient-3/50 hover:border-gradient-3/50"
+            onClick={() => setOpen(true)}
+          >
+            {BUY_LABEL[locale]}
+          </Button>
         </div>
       </div>
 
-      <MissingLinkDialog
-        open={dialogOpen}
-        onOpenChangeAction={setDialogOpen}
-        locale={locale}
-        thingName={thing.name}
-        contact={contact}
-      />
+      <BuyNowDialog open={open} onOpenChangeAction={setOpen} locale={locale} thing={thing} />
     </article>
   )
 }

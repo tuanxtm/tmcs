@@ -22,11 +22,11 @@ export const Things: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', '_status', 'featured', 'publishedAt', 'updatedAt'],
     group: 'Content',
-    description: 'Products and tools you use — affiliate links are localized (Amazon / Shopee).',
+    description: 'Products and tools you use - affiliate links are localized (Amazon / Shopee).',
   },
   versions: {
     drafts: {
-      // Autosave disabled — avoids D1 write storms while typing in Admin (Worker cost).
+      // Autosave disabled - avoids D1 write storms while typing in Admin (Worker cost).
       schedulePublish: true,
       validate: false,
     },
@@ -77,22 +77,46 @@ export const Things: CollectionConfig = {
       },
     },
     {
-      name: 'affiliateUrl',
+      name: 'links',
+      type: 'array',
+      localized: false,
+      labels: { singular: 'Platform Link', plural: 'Platform Links' },
+      admin: {
+        description: 'Links shown in the Buy now dialog.',
+      },
+      fields: [
+        {
+          name: 'label',
+          type: 'text',
+          required: true,
+          admin: { description: 'Button text (e.g. Amazon, Shopee).' },
+        },
+        {
+          name: 'url',
+          type: 'text',
+          required: true,
+          validate: validateAbsoluteHttpUrl,
+        },
+      ],
+    },
+    {
+      name: 'primaryUrl',
       type: 'text',
       localized: true,
       validate: validateAbsoluteHttpUrl,
       admin: {
-        description:
-          'Localized shop link (e.g. Amazon for English, Shopee for Vietnamese). Empty locales fall back to English, then a contact dialog.',
-      },
-    },
-    {
-      name: 'linkLabel',
-      type: 'text',
-      localized: true,
-      admin: {
-        description: 'Optional CTA label (defaults to “Shop” / “Mua”).',
-      },
+        position: 'sidebar',
+        description: 'Select a link from the array above to show on the tile.',
+        components: {
+          Field: '@/fields/arrayFieldSelect#ArrayFieldSelect',
+        },
+        arrayFieldSelect: {
+          arrayField: 'links',
+          rowFields: ['label', 'url'],
+          emptyPlaceholder: 'Add links first',
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
     },
     {
       name: 'featured',

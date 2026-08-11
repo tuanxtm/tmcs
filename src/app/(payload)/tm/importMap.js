@@ -24,7 +24,7 @@ import { AlignFeatureClient as AlignFeatureClient_e70f5e05f09f93e00b997edb1ef0c8
 import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { InlineCodeFeatureClient as InlineCodeFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { SuperscriptFeatureClient as SuperscriptFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { FooterItemSelect as FooterItemSelect_d823c8967ba3d5768a040904f612e5a9 } from '@/components/FooterItemSelect'
+import { ArrayFieldSelect as ArrayFieldSelect_d3d5a8305f808b9a45ad058da066ec02 } from '@/fields/arrayFieldSelect'
 import { default as default_68879bfd54c17be0a2cd7f9e55a993e8 } from '@/app/(payload)/_components/root/icon'
 import { default as default_65e7347612a6bf7422d6765b273eb4b7 } from '@/app/(payload)/_components/root/logo'
 import { R2ClientUploadHandler as R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d } from '@payloadcms/storage-r2/client'
@@ -58,7 +58,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#InlineCodeFeatureClient": InlineCodeFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#SuperscriptFeatureClient": SuperscriptFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "@/components/FooterItemSelect#FooterItemSelect": FooterItemSelect_d823c8967ba3d5768a040904f612e5a9,
+  "@/fields/arrayFieldSelect#ArrayFieldSelect": ArrayFieldSelect_d3d5a8305f808b9a45ad058da066ec02,
   "@/app/(payload)/_components/root/icon#default": default_68879bfd54c17be0a2cd7f9e55a993e8,
   "@/app/(payload)/_components/root/logo#default": default_65e7347612a6bf7422d6765b273eb4b7,
   "@payloadcms/storage-r2/client#R2ClientUploadHandler": R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d,

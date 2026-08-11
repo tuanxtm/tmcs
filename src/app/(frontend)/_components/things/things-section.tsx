@@ -7,7 +7,6 @@ import {
 } from '@/app/(frontend)/_components/layout/reveal-grid-item'
 import { SectionHeader } from '@/app/(frontend)/_components/layout/section-header'
 import { ThingShowcaseTile } from '@/app/(frontend)/_components/things/thing-showcase-tile'
-import type { ContactLinks } from '@/app/(frontend)/_components/things/missing-link-dialog'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
@@ -19,7 +18,6 @@ type ThingsSectionProps = {
   heading: string
   description?: string | null
   docs: ThingCardView[]
-  contact: ContactLinks
   cursorPopup?: string | null
   cursorPopupEmpty?: string | null
   cursorPopupItem?: string | null
@@ -37,7 +35,6 @@ export function ThingsSection({
   heading,
   description,
   docs,
-  contact,
   cursorPopup,
   cursorPopupEmpty,
   cursorPopupItem,
@@ -52,9 +49,11 @@ export function ThingsSection({
     docs.length === 0 ? cursorPopupEmpty || cursorPopup || undefined : cursorPopup || undefined
 
   const descriptionNode = description ? (
-    <p className="px-2 pb-3 text-xs leading-relaxed text-muted-foreground">
-      {description}
-    </p>
+    <div className="px-2 pt-2 pb-4 w-full grid md:grid-cols-3 grid-cols-1 ">
+      <p className="col-span-1 md:col-span-2 text-[13px] leading-none tracking-tight text-foreground/80 lowercase">
+        {description}
+      </p>
+    </div>
   ) : null
 
   if (docs.length === 0) {
@@ -96,12 +95,7 @@ export function ThingsSection({
             columns={columns}
             className="things-grid-item"
           >
-            <ThingShowcaseTile
-              thing={thing}
-              locale={locale}
-              contact={contact}
-              cursorPopup={cursorPopupItem}
-            />
+            <ThingShowcaseTile thing={thing} locale={locale} cursorPopup={cursorPopupItem} />
           </RevealGridItem>
         ))}
 

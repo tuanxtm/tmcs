@@ -394,7 +394,7 @@ export interface Post {
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls — only available for latest published.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
@@ -735,7 +735,7 @@ export interface Page {
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls — only available for latest published.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
@@ -1043,7 +1043,7 @@ export interface Project {
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls — only available for latest published.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
@@ -1275,7 +1275,7 @@ export interface Project {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Products and tools you use — affiliate links are localized (Amazon / Shopee).
+ * Products and tools you use - affiliate links are localized (Amazon / Shopee).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "things".
@@ -1296,13 +1296,22 @@ export interface Thing {
    */
   detailImage?: (number | null) | Media;
   /**
-   * Localized shop link (e.g. Amazon for English, Shopee for Vietnamese). Empty locales fall back to English, then a contact dialog.
+   * Links shown in the Buy now dialog.
    */
-  affiliateUrl?: string | null;
+  links?:
+    | {
+        /**
+         * Button text (e.g. Amazon, Shopee).
+         */
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
-   * Optional CTA label (defaults to “Shop” / “Mua”).
+   * Select a link from the array above to show on the tile.
    */
-  linkLabel?: string | null;
+  primaryUrl?: string | null;
   featured?: boolean | null;
   /**
    * Set automatically on first publish. Managers may override.
@@ -1323,7 +1332,7 @@ export interface Thing {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Social video links. Cards show R2 thumbnails only — YouTube can auto-import a thumb on save; other platforms need a manual upload.
+ * Social video links. Cards show R2 thumbnails only - YouTube can auto-import a thumb on save; other platforms need a manual upload.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "videos".
@@ -1369,7 +1378,7 @@ export interface ShortStory {
   id: number;
   title: string;
   /**
-   * Keep this short — it appears inside a compact feed tile.
+   * Keep this short - it appears inside a compact feed tile.
    */
   content: {
     root: {
@@ -2229,8 +2238,14 @@ export interface ThingsSelect<T extends boolean = true> {
   description?: T;
   primaryImage?: T;
   detailImage?: T;
-  affiliateUrl?: T;
-  linkLabel?: T;
+  links?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  primaryUrl?: T;
   featured?: T;
   publishedAt?: T;
   owner?: T;

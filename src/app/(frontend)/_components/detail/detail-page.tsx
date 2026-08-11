@@ -23,8 +23,8 @@ export const dynamic = 'force-dynamic'
  * Shared detail page shell for Posts and Projects.
  *
  * The hero is rendered by `<DetailHero>`; the body is rich text. Categories
- * are dropped from the headline meta — they live as subtle chrome around the
- * hero rather than competing with the title — and re-mounted under the page
+ * are dropped from the headline meta - they live as subtle chrome around the
+ * hero rather than competing with the title - and re-mounted under the page
  * shell since the title is the primary focus.
  *
  * View Transitions:
@@ -43,7 +43,9 @@ export async function DetailPage({ view, locale, imageKey }: DetailPageProps) {
   const shell = await getSiteShell(locale)
   const image: MediaView | null =
     'featuredImage' in view
-      ? (imageKey === 'featuredImage' ? view.featuredImage : null)
+      ? imageKey === 'featuredImage'
+        ? view.featuredImage
+        : null
       : imageKey === 'coverImage'
         ? view.coverImage
         : null
@@ -52,11 +54,7 @@ export async function DetailPage({ view, locale, imageKey }: DetailPageProps) {
 
   return (
     <div>
-      <SiteHeader
-        siteName={shell.siteName}
-        locale={locale}
-        navigation={shell.navigation}
-      />
+      <SiteHeader siteName={shell.siteName} locale={locale} navigation={shell.navigation} />
       <ViewTransition
         enter={{
           'nav-forward': 'slide-from-right',
@@ -88,8 +86,6 @@ export async function DetailPage({ view, locale, imageKey }: DetailPageProps) {
             <PageBlocks
               blocks={view.blocks}
               locale={locale}
-              contactEmail={shell.contactEmail}
-              profileLinks={shell.profileLinks}
               siteName={shell.siteName}
               className="px-6 pb-12"
             />

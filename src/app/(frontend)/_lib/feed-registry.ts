@@ -192,8 +192,8 @@ async function loadThings(args: {
     description: true,
     primaryImage: true,
     detailImage: true,
-    affiliateUrl: true,
-    linkLabel: true,
+    primaryUrl: true,
+    links: true,
     publishedAt: true,
   } as const
 
