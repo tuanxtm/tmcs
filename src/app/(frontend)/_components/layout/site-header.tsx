@@ -24,7 +24,7 @@ export function SiteHeader({ siteName, locale, navigation }: SiteHeaderProps) {
   useEffect(() => {
     const hero = document.getElementById(HERO_ID)
     if (!hero) {
-      // No hero block on this route — reveal controls on first scroll.
+      // No hero block on this route - reveal controls on first scroll.
       const onScroll = () => setPastHero(window.scrollY > FALLBACK_SCROLL_THRESHOLD)
       onScroll()
       window.addEventListener('scroll', onScroll, { passive: true })
@@ -32,12 +32,12 @@ export function SiteHeader({ siteName, locale, navigation }: SiteHeaderProps) {
     }
 
     // Reveal controls when the hero starts being hidden behind the sticky
-    // header — not only after it has fully scrolled past the viewport top.
+    // header - not only after it has fully scrolled past the viewport top.
     // Otherwise the hero text bleeds through the still-transparent header
     // and crosses the nav links on its way out.
     // `BLUR_LEAD_PX` starts the backdrop transition a bit early so it is
     // well underway (or finished) by the time the hero text actually
-    // reaches the header line — tune up if the cross-through still flashes.
+    // reaches the header line - tune up if the cross-through still flashes.
     const BLUR_LEAD_PX = 48
     let frame = 0
     const check = () => {
@@ -78,7 +78,7 @@ export function SiteHeader({ siteName, locale, navigation }: SiteHeaderProps) {
             tabIndex={pastHero ? 0 : -1}
             aria-hidden={pastHero ? undefined : true}
             className={cn(
-              'inline-flex min-h-11 items-center text-xs font-bold lowercase text-foreground transition-[opacity,transform] duration-300 ease-out',
+              'inline-flex min-h-11 items-center text-[13px] tracking-tight font-bold lowercase text-foreground transition-[opacity,transform] duration-300 ease-out',
               pastHero ? 'opacity-100' : 'pointer-events-none opacity-0',
             )}
           >

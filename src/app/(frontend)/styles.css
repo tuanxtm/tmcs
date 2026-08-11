@@ -10,7 +10,7 @@
   --gradient-4: oklch(0.8671 0.0704 133.59);
   --background: oklch(0.9604 0.0011 197.14);
   --secondary-background: oklch(0.9515 0.0067 97.35);
-  --foreground: oklch(0.2273 0.0038 286.09);
+  --foreground: oklch(0.2273 0.0038 286.09 / 0.9);
   --card: oklch(0.995 0.001 95);
   --card-foreground: oklch(0.1668 0.0084 296.92);
   --popover: oklch(0.995 0.001 95);
@@ -37,7 +37,7 @@
   --page-gutter: var(--scrollbar-size);
   --fold-height: 100dvh;
   --hero-fold-height: calc(var(--fold-height) - (2 * var(--header-height)));
-  /* Pencil sketch lines — mostly straight, more graphite grit. Tune these */
+  /* Pencil sketch lines - mostly straight, more graphite grit. Tune these */
   --sketch-color: color-mix(in oklch, var(--foreground) 52%, transparent);
   --sketch-weight: 3px;
   --sketch-tile: 32px;
@@ -89,7 +89,7 @@
   }
 
   html {
-    /* Native smooth scroll fights Lenis — Lenis owns wheel inertia. */
+    /* Native smooth scroll fights Lenis - Lenis owns wheel inertia. */
     @apply antialiased;
   }
 
@@ -112,7 +112,7 @@
   }
 }
 
-/* Scrollbar — outside @layer so Chromium picks up webkit rules.
+/* Scrollbar - outside @layer so Chromium picks up webkit rules.
    Do NOT set scrollbar-width/color on Chromium: those force the native
    (rounded + arrows) scrollbar and ignore ::-webkit-scrollbar. */
 html {
@@ -172,7 +172,7 @@ body::-webkit-scrollbar-corner {
     max-width: none;
     padding-inline: var(--page-gutter);
     container-type: inline-size;
-    /* Footer decoration chrome — 4-up editorial grid column width */
+    /* Footer decoration chrome - 4-up editorial grid column width */
     --bento-cols: 4;
     --bento-tile: calc(100cqw / var(--bento-cols));
   }
@@ -197,7 +197,7 @@ body::-webkit-scrollbar-corner {
     align-items: center;
     padding-inline: 0.5rem;
     overflow: hidden;
-    /* Fixed height — half the site header. No shrink animation: a height
+    /* Fixed height - half the site header. No shrink animation: a height
        transition on a sticky element invalidates the entire sticky containing
        block on every frame and compounds Lenis over-target momentum. */
     height: calc(var(--header-height) / 2);
@@ -268,11 +268,11 @@ body::-webkit-scrollbar-corner {
 }
 
 /*
-  Pencil sketch lines — vertical rails/separators + dash-t/dash-b horizontals.
+  Pencil sketch lines - vertical rails/separators + dash-t/dash-b horizontals.
   Tune: --sketch-color, --sketch-weight, --sketch-tile
 */
 
-/* Full-height column rules — same mask technique as .dash-l / .dash-rail. */
+/* Full-height column rules - same mask technique as .dash-l / .dash-rail. */
 .feed-grid-rules {
   pointer-events: none;
   position: absolute;
@@ -368,7 +368,7 @@ body::-webkit-scrollbar-corner {
   }
 }
 
-/* Don't force position on .dash-b — sticky headers need position: sticky. */
+/* Don't force position on .dash-b - sticky headers need position: sticky. */
 .dash-b:not(.sticky) {
   position: relative;
 }
@@ -477,7 +477,7 @@ button,
   touch-action: manipulation;
 }
 
-/* Boot splash — first visit / hard reload only (layout-mounted client overlay). */
+/* Boot splash - first visit / hard reload only (layout-mounted client overlay). */
 .boot-splash {
   position: fixed;
   inset: 0;
@@ -527,7 +527,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   }
 }
 
-/* Atmospheric background — fades + sharpens in once on mount. */
+/* Atmospheric background - fades + sharpens in once on mount. */
 @keyframes boot-bg-fade-in {
   from {
     opacity: 0;
@@ -558,7 +558,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   }
 }
 
-/* View Transitions — recipes for <ViewTransition> classes used by the frontend.
+/* View Transitions - recipes for <ViewTransition> classes used by the frontend.
    See .agents/skills/vercel-react-view-transitions/AGENTS.md for the source. */
 :root {
   --vt-duration-exit: 150ms;
@@ -566,7 +566,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   --vt-duration-move: 400ms;
 }
 
-/* Shared element morph — smooth blur during the image morph between feed card
+/* Shared element morph - smooth blur during the image morph between feed card
    and detail hero. The image-pair blur sells the size change without flicker. */
 ::view-transition-group(.morph) {
   animation-duration: var(--vt-duration-move);
@@ -582,7 +582,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   }
 }
 
-/* Directional navigation slides — used alongside addTransitionType on router
+/* Directional navigation slides - used alongside addTransitionType on router
    pushes. 'nav-forward' = page coming in from the right (push). 'nav-back' =
    page coming in from the left (browser history push). */
 ::view-transition-new(.slide-from-right) {
@@ -641,7 +641,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   animation: var(--vt-duration-exit) ease-in both fade reverse;
 }
 
-/* Reduced motion — collapse every view transition to a snap. Users with
+/* Reduced motion - collapse every view transition to a snap. Users with
    prefers-reduced-motion must still see the new page, just instantly. */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),

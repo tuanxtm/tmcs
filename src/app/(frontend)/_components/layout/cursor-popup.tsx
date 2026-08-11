@@ -102,20 +102,20 @@ export function CursorPopup() {
         return
       }
 
-      // Already visible with this label — keep tracking only.
+      // Already visible with this label - keep tracking only.
       if (shownLabelRef.current === next) return
 
       // Already waiting to show this label.
       if (pendingLabelRef.current === next) return
 
-      // Switching sections while already visible — reveal immediately.
+      // Switching sections while already visible - reveal immediately.
       if (shownLabelRef.current) {
         clearShowTimer()
         showLabel(next)
         return
       }
 
-      // First appear — wait before revealing.
+      // First appear - wait before revealing.
       clearShowTimer()
       pendingLabelRef.current = next
       showTimerRef.current = setTimeout(() => {
@@ -151,7 +151,7 @@ export function CursorPopup() {
           {visible && label ? (
             <motion.div
               key={label}
-              className="overflow-hidden py-0.5 px-1 whitespace-nowrap text-xs tracking-tight bg-gradient-3/80 leading-none"
+              className="overflow-hidden py-0.5 px-1 font-medium whitespace-nowrap text-xs text-foreground mix-blend-difference bg-gradient-to-r from-gradient-3/90 to-gradient-3/80 tracking-tight leading-none"
               initial={reduceMotion ? false : { clipPath: 'inset(0 50% 0 50%)' }}
               animate={{ clipPath: 'inset(0 0% 0 0%)' }}
               exit={reduceMotion ? undefined : { clipPath: 'inset(0 50% 0 50%)' }}

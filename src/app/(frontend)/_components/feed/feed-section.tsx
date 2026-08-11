@@ -136,8 +136,8 @@ export function FeedSection(props: FeedSectionProps) {
     docs.length === 0 ? cursorPopupEmpty || cursorPopup || undefined : cursorPopup || undefined
 
   const descriptionNode = description ? (
-    <div className="px-2 pb-2 w-full grid md:grid-cols-2 grid-cols-1 ">
-      <p className="text-xs tracking-[-0.01em] leading-relaxed text-muted-foreground font-medium">
+    <div className="px-2 pt-2 pb-4 w-full grid md:grid-cols-2 grid-cols-1 ">
+      <p className="col-span-1 md:col-span-2 text-[13px] tracking-tight leading-none text-foreground/80 lowercase">
         {description}
       </p>
     </div>
@@ -219,7 +219,7 @@ export function FeedSection(props: FeedSectionProps) {
             aria-live="polite"
             className="text-xs uppercase tracking-wide text-muted-foreground"
           >
-            {isPending ? 'Loading…' : hasNextPage ? 'Scroll for more' : 'End of feed'}
+            {isPending ? 'Loading…' : hasNextPage ? 'There are more ...' : 'End of feed'}
           </p>
           {error ? (
             <div className="flex flex-wrap items-center justify-center gap-3">

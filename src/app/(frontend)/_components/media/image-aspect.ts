@@ -35,15 +35,19 @@ export function getImageAspect(image: MediaView | null | undefined): ImageAspect
   const variant: HeroVariant = ratio > 1 ? 'overlay' : 'split'
 
   const aspectClass =
-    ratio > 1.7
+    ratio > 1.78
       ? 'aspect-video' // 16:9 wide landscape
-      : ratio > 1.3
-        ? 'aspect-[5/4]' // mild landscape
-        : ratio > 0.9
-          ? 'aspect-square' // 1:1
-          : ratio > 0.7
-            ? 'aspect-[4/5]' // 4:5 portrait
-            : 'aspect-[3/4]' // 3:4 tall portrait
+      : ratio > 1.45
+        ? 'aspect-[4/3]' // 4:3 landscape
+        : ratio > 1.2
+          ? 'aspect-[5/4]' // 5:4 mild landscape
+          : ratio > 0.95
+            ? 'aspect-square' // 1:1
+            : ratio > 0.7
+              ? 'aspect-[4/5]' // 4:5 portrait
+              : ratio > 0.55
+                ? 'aspect-[3/4]' // 3:4 portrait
+                : 'aspect-[9/16]' // 9:16 tall portrait
 
   return { ratio, variant, aspectClass }
 }

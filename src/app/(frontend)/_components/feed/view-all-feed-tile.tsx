@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { IconArrowRight } from '@tabler/icons-react'
+import { IconArrowNarrowRight } from '@tabler/icons-react'
 
 import { cn } from '@/lib/utils'
 
@@ -24,11 +24,11 @@ export function ViewAllFeedTile({ href, label, cursorPopup, className }: ViewAll
       )}
       data-cursor-popup={cursorPopup || label.toLowerCase()}
     >
-      <div className="absolute bottom-2 right-2 flex gap-1">
-        <span className="text-xs font-medium tracking-tight text-foreground">
+      <div className="absolute bottom-2 right-2 flex gap-1 items-center">
+        <span className="text-md lowercase font-medium tracking-tight text-foreground/90 leading-none">
           {label}
         </span>
-        <IconArrowRight className="size-4 text-foreground" />
+        <IconArrowNarrowRight className="pt-0.5 size-6 text-foreground/90" />
       </div>
     </Link>
   )

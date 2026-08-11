@@ -52,6 +52,15 @@ const PROVIDER_LABEL: Record<VideoCardView['provider'], string> = {
   other: 'Video',
 }
 
+// YouTube embeds are 16:9 natively; TikTok / Instagram / generic video reels
+// are vertical. 3:4 keeps the panel tall without forcing full 9:16 cropping.
+const VIDEO_CARD_ASPECT: Record<VideoCardView['provider'], string> = {
+  youtube: 'aspect-video',
+  tiktok: 'aspect-[3/4]',
+  instagram: 'aspect-[3/4]',
+  other: 'aspect-[3/4]',
+}
+
 export function VideoFeedCard({
   doc,
   locale,
@@ -74,7 +83,12 @@ export function VideoFeedCard({
   }, [doc.id, isYouTube, onActivateYouTube])
 
   const media = (
-    <div className="video-card-media relative aspect-video w-full overflow-hidden bg-foreground/5">
+    <div
+      className={cn(
+        'video-card-media relative w-full overflow-hidden bg-foreground/5',
+        VIDEO_CARD_ASPECT[doc.provider],
+      )}
+    >
       {isPlaying && doc.youtubeId ? (
         <iframe
           title={doc.title}
