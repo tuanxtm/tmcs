@@ -24,7 +24,7 @@ export const Videos: CollectionConfig = {
     defaultColumns: ['title', 'provider', '_status', 'featured', 'publishedAt', 'updatedAt'],
     group: 'Content',
     description:
-      'Social video links. Cards show R2 thumbnails only — YouTube can auto-import a thumb on save; other platforms need a manual upload.',
+      'Social video links. Cards show R2 thumbnails only - YouTube can auto-import a thumb on save; other platforms need a manual upload.',
   },
   versions: {
     drafts: {

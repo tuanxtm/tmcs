@@ -163,7 +163,7 @@ export function BootRevealContent({
   )
 }
 
-/** Structural chrome (rails) — same beat as page content. */
+/** Structural chrome (rails) - same beat as page content. */
 export function BootRevealChrome({ children }: { children: React.ReactNode }) {
   const {
     state: { phase },
@@ -186,7 +186,7 @@ export function BootRevealChrome({ children }: { children: React.ReactNode }) {
   )
 }
 
-/** Atmospheric background (ColorBends) — last beat on the timeline. */
+/** Atmospheric background (ColorBends) - last beat on the timeline. */
 export function BootRevealEffect({ children }: { children: React.ReactNode }) {
   const {
     state: { phase },
@@ -205,7 +205,7 @@ export function BootRevealEffect({ children }: { children: React.ReactNode }) {
   )
 }
 
-/** Client-only compound alias. Server Components must import named exports —
+/** Client-only compound alias. Server Components must import named exports -
  *  RSC cannot resolve `BootReveal.Provider` as a client reference. */
 export const BootReveal = {
   Provider: BootRevealProvider,

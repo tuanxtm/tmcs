@@ -9,10 +9,7 @@ import {
 } from '@/access'
 import { ownerField, publishedAtField, translationReadyField } from '@/fields/common'
 import { assignOwner, preventCreatorPublish, setPublishedAt } from '@/hooks'
-import {
-  revalidateShortStories,
-  revalidateShortStoriesDelete,
-} from '@/hooks/revalidateFrontend'
+import { revalidateShortStories, revalidateShortStoriesDelete } from '@/hooks/revalidateFrontend'
 import { validateAbsoluteHttpUrl } from '@/lib/url'
 
 export const ShortStories: CollectionConfig = {
@@ -29,7 +26,7 @@ export const ShortStories: CollectionConfig = {
   },
   versions: {
     drafts: {
-      // Autosave disabled — avoids D1 write storms while typing in Admin (Worker cost).
+      // Autosave disabled - avoids D1 write storms while typing in Admin (Worker cost).
       schedulePublish: true,
       validate: false,
     },
@@ -60,7 +57,7 @@ export const ShortStories: CollectionConfig = {
       localized: true,
       required: true,
       admin: {
-        description: 'Keep this short — it appears inside a compact feed tile.',
+        description: 'Keep this short - it appears inside a compact feed tile.',
       },
     },
     {

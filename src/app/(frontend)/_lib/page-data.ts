@@ -57,13 +57,11 @@ type PageLayoutBlock = NonNullable<Page['layout']>[number]
 /**
  * Layout block shape regardless of which collection the layout belongs to.
  * Posts and Projects use the same `pageBlocks` so their layouts are structurally
- * identical to `Page['layout']` — they just belong to a different collection.
+ * identical to `Page['layout']` - they just belong to a different collection.
  * We accept this union so the resolver is collection-agnostic.
  */
 type AnyLayoutBlock =
-  | PageLayoutBlock
-  | (NonNullable<Post['layout']>[number])
-  | (NonNullable<Project['layout']>[number])
+  PageLayoutBlock | NonNullable<Post['layout']>[number] | NonNullable<Project['layout']>[number]
 
 const PAGE_SELECT = {
   title: true,
@@ -302,7 +300,7 @@ async function resolveFeedSectionBlock(
         cursorPopupViewAll: null,
       }
     }
-    // things never infinite — fall through to static
+    // things never infinite - fall through to static
   }
 
   const docs = await adapter.loadCards({
@@ -484,10 +482,7 @@ export async function resolveLayoutBlocks(
   return resolved.filter((block): block is ResolvedBlockView => Boolean(block))
 }
 
-async function loadAlternateSlug(
-  pageId: number,
-  locale: LocaleCode,
-): Promise<string | null> {
+async function loadAlternateSlug(pageId: number, locale: LocaleCode): Promise<string | null> {
   const otherLocale: LocaleCode = locale === 'en' ? 'vi' : 'en'
   const payload = await getPayloadClient()
   const doc = await payload.findByID({
@@ -687,10 +682,7 @@ export function isReservedCmsPageSlug(slug: string): boolean {
   return reserved === '' || reserved === 'home' || reserved === 'homepage'
 }
 
-async function loadPageBySlug(
-  locale: LocaleCode,
-  slug: string,
-): Promise<CmsPageView | null> {
+async function loadPageBySlug(locale: LocaleCode, slug: string): Promise<CmsPageView | null> {
   const trimmed = slug.trim()
   if (!trimmed || isReservedCmsPageSlug(trimmed)) {
     return null
@@ -741,7 +733,7 @@ const getCachedHomePage = (locale: LocaleCode) =>
   })()
 
 const getCachedPageBySlug = (locale: LocaleCode, slug: string) =>
-  // Same versioning policy as `getCachedHomePage` — see lib/cache-tags.ts.
+  // Same versioning policy as `getCachedHomePage` - see lib/cache-tags.ts.
   unstable_cache(
     async () => loadPageBySlug(locale, slug),
     [`cms-page-v${CMS_CACHE_VERSION}`, locale, slug],
@@ -778,9 +770,9 @@ export const getPageBySlug = cache(
 )
 
 export function firstHeroBlock(blocks: ResolvedBlockView[]): LayoutHeroBlockView | null {
-  return blocks.find(
-    (block): block is LayoutHeroBlockView => block.blockType === 'layoutHero',
-  ) ?? null
+  return (
+    blocks.find((block): block is LayoutHeroBlockView => block.blockType === 'layoutHero') ?? null
+  )
 }
 
 // ─── Slug Dispatcher ───────────────────────────────────────────────────────────

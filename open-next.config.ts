@@ -8,7 +8,7 @@ import doShardedTagCache from '@opennextjs/cloudflare/overrides/tag-cache/do-sha
  * store on-demand revalidation tags in a sharded Durable Object so we do not
  * consume application D1 rows for cache bookkeeping.
  *
- * Time-based ISR queue is intentionally omitted — public CMS data is cached
+ * Time-based ISR queue is intentionally omitted - public CMS data is cached
  * indefinitely and invalidated via Payload afterChange/afterDelete hooks.
  *
  * One-time remote provisioning (do not run from this refactor):

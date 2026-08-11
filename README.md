@@ -1,4 +1,4 @@
-# TMCS — Portfolio + Blog (Payload CMS)
+# TMCS - Portfolio + Blog (Payload CMS)
 
 Bilingual (English / Vietnamese) Payload CMS app for a personal portfolio, blog, and project showcase. Runs as a **single Next.js app** on **Cloudflare Workers** (OpenNext) with **D1** (SQLite) and **R2** media storage.
 
@@ -44,7 +44,7 @@ See [`.env.example`](.env.example) for the full documented list.
 
 | Variable                 | Purpose                                                                        |
 | ------------------------ | ------------------------------------------------------------------------------ |
-| `PAYLOAD_SECRET`         | Payload signing/encryption (**required** — boot fails if missing)              |
+| `PAYLOAD_SECRET`         | Payload signing/encryption (**required** - boot fails if missing)              |
 | `NEXT_PUBLIC_SERVER_URL` | Canonical site URL for previews / contact origin checks                        |
 | `PAYLOAD_CSRF_ORIGINS`   | Extra Admin/API origins (comma-separated) for cookie login via alternate hosts |
 | `ALLOWED_DEV_ORIGINS`    | Optional comma-separated hosts for `next dev` behind a LAN IP / tunnel         |
@@ -187,4 +187,4 @@ See [`AGENTS.md`](AGENTS.md) and [`.agents/skills/payload/`](.agents/skills/payl
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT - see [`LICENSE`](LICENSE).

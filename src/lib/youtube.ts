@@ -1,5 +1,5 @@
 /**
- * YouTube URL helpers — parse IDs and build privacy-enhanced embed / thumbnail URLs.
+ * YouTube URL helpers - parse IDs and build privacy-enhanced embed / thumbnail URLs.
  * Used at save-time (thumbnail import) and client click-to-play (embed only).
  */
 

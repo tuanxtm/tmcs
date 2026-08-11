@@ -87,7 +87,7 @@ uniform float uAsciiCount;
 uniform float uGridOpacity;
 
 void main() {
-  // Monospace glyph cells — color sampled per cell, then masked by atlas glyph
+  // Monospace glyph cells - color sampled per cell, then masked by atlas glyph
   vec2 cellSize = vec2(uFontSize * 0.58, uFontSize);
   vec2 asciiId = floor(gl_FragCoord.xy / cellSize);
   vec2 asciiUV = fract(gl_FragCoord.xy / cellSize);
@@ -159,7 +159,7 @@ void main() {
 
   col *= uIntensity;
 
-  // Soft luminance cap — keep green readable on light backgrounds when bands stack
+  // Soft luminance cap - keep green readable on light backgrounds when bands stack
   float hot = dot(col, vec3(0.299, 0.587, 0.114));
   col *= mix(1.0, 0.72 / max(hot, 0.001), smoothstep(0.45, 0.95, hot));
   col = clamp(col, 0.0, 1.0);
@@ -288,7 +288,7 @@ export default function ColorBends({
     })
     rendererRef.current = renderer
     ;(renderer as any).outputColorSpace = (THREE as any).SRGBColorSpace
-    // Cap DPR on large/desktop displays — full 2× is expensive for a full-viewport shader.
+    // Cap DPR on large/desktop displays - full 2× is expensive for a full-viewport shader.
     const dprCap = Math.max(window.innerWidth, window.innerHeight) >= 1024 ? 1.5 : 2
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, dprCap))
     renderer.setClearColor(0x000000, transparent ? 0 : 1)

@@ -6,7 +6,7 @@
  * deserialized into the editor state by the server.
  * Only `layoutBlankSpace` remains inline-insertable. All other layout
  * blocks (including `layoutRichTextWithoutBlock` and the Content-* blocks)
- * are layout-only by design — editors place them inside `layout`, not
+ * are layout-only by design - editors place them inside `layout`, not
  * inside rich text fields.
  */
 export type InlineBlockFields = {

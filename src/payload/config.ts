@@ -92,7 +92,7 @@ export default buildConfig({
   // Empty serverURL in development so Admin uses relative URLs and works when
   // opened via localhost OR a LAN IP. A fixed serverURL (e.g. localhost) makes
   // Payload populate `csrf`, which then rejects cookies on requests that omit
-  // Origin/Sec-Fetch-Site — common for Next navigations to a network IP.
+  // Origin/Sec-Fetch-Site - common for Next navigations to a network IP.
   serverURL: isProduction ? getServerURL() : '',
   csrf: isProduction ? getTrustedOrigins() : [],
   cors: getTrustedOrigins(),
@@ -104,13 +104,13 @@ export default buildConfig({
     defaultLocale: DEFAULT_LOCALE,
     fallback: true,
   },
-  // REST/Local API only — GraphQL is unused and limited on Cloudflare Workers.
+  // REST/Local API only - GraphQL is unused and limited on Cloudflare Workers.
   graphQL: {
     disable: true,
   },
   // Jobs are queued by schedulePublish. On Cloudflare Workers they must be
   // executed by an external cron (see worker.ts + /api/cron/jobs).
-  // Do NOT enable jobs.autoRun — it requires a long-running Node process.
+  // Do NOT enable jobs.autoRun - it requires a long-running Node process.
   jobs: {
     access: {
       run: ({ req }) => {

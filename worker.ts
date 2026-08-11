@@ -7,7 +7,7 @@
  * Why this file exists:
  * - OpenNext's default worker only exports `fetch`
  * - Payload `schedulePublish` queues jobs but does not run them on Workers
- * - `jobs.autoRun` is for long-running Node servers — do not enable it here
+ * - `jobs.autoRun` is for long-running Node servers - do not enable it here
  *
  * Local testing:
  * - `wrangler dev --test-scheduled`

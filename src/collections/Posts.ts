@@ -35,7 +35,7 @@ export const Posts: CollectionConfig = {
   },
   versions: {
     drafts: {
-      // Autosave disabled — avoids D1 write storms while typing in Admin (Worker cost).
+      // Autosave disabled - avoids D1 write storms while typing in Admin (Worker cost).
       schedulePublish: true,
       validate: false,
     },

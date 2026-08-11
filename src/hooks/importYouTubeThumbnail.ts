@@ -6,7 +6,12 @@ type UploadFile = File & { data: Buffer }
 
 function relationId(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) return value
-  if (value && typeof value === 'object' && 'id' in value && typeof (value as { id: unknown }).id === 'number') {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'id' in value &&
+    typeof (value as { id: unknown }).id === 'number'
+  ) {
     return (value as { id: number }).id
   }
   return null
@@ -119,12 +124,12 @@ export const importYouTubeThumbnail: CollectionBeforeChangeHook = async ({
   if (!videoId) return data
 
   // Avoid re-fetching on every update when a previous attempt already failed and
-  // left thumbnail empty — only run when source URL changed or on create.
+  // left thumbnail empty - only run when source URL changed or on create.
   if (operation === 'update') {
     const prevUrl = typeof originalDoc?.sourceUrl === 'string' ? originalDoc.sourceUrl : ''
     if (prevUrl === sourceUrl && relationId(originalDoc?.thumbnail) == null) {
       // Allow one retry only when explicitly clearing isn't the case; skip loops.
-      // Still attempt if previous doc never had a thumbnail and URL unchanged —
+      // Still attempt if previous doc never had a thumbnail and URL unchanged -
       // editors can re-save after fixing network. Cap via context flag.
       if (req.context?.youtubeThumbAttempted) return data
     }

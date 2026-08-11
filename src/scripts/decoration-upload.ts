@@ -85,7 +85,7 @@ export async function upsertFeedDecorationFile(
 
   const localPath = path.join(process.cwd(), 'public', filename)
   const buffer = await readFile(localPath)
-  // Plain Uint8Array — Node Buffer fails Miniflare/devalue over getPlatformProxy.
+  // Plain Uint8Array - Node Buffer fails Miniflare/devalue over getPlatformProxy.
   const bytes = new Uint8Array(buffer)
   const filesize = bytes.byteLength
   // Match r2Storage default: no collection prefix → key is just the filename.

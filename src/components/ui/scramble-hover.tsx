@@ -38,7 +38,7 @@ const ScrambleHover: React.FC<ScrambleHoverProps> = ({
 
   // Effect Event: compute one scramble step. Always reads the latest props via closure,
   // and all setState calls happen from inside the setInterval callback (an external
-  // system callback) — never from a useEffect body.
+  // system callback) - never from a useEffect body.
   const tick = useEffectEvent((): boolean => {
     const textLength = text.length
 
@@ -49,13 +49,8 @@ const ScrambleHover: React.FC<ScrambleHoverProps> = ({
         case 'center': {
           const middle = Math.floor(textLength / 2)
           const offset = Math.floor(currentSize / 2)
-          const nextIndex =
-            currentSize % 2 === 0 ? middle + offset : middle - offset - 1
-          if (
-            nextIndex >= 0 &&
-            nextIndex < textLength &&
-            !revealedIndices.has(nextIndex)
-          ) {
+          const nextIndex = currentSize % 2 === 0 ? middle + offset : middle - offset - 1
+          if (nextIndex >= 0 && nextIndex < textLength && !revealedIndices.has(nextIndex)) {
             return nextIndex
           }
           for (let i = 0; i < textLength; i++) {
@@ -161,9 +156,7 @@ const ScrambleHover: React.FC<ScrambleHoverProps> = ({
           <span
             key={index}
             className={cn(
-              revealedIndices.has(index) || !isHovering
-                ? className
-                : scrambledClassName,
+              revealedIndices.has(index) || !isHovering ? className : scrambledClassName,
             )}
           >
             {char}

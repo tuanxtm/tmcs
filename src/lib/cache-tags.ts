@@ -25,6 +25,6 @@ export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS]
  *
  * Cache keys are namespaced with this version (`home-page-v{N}`). Bumping
  * it forces a fresh read for every locale on the next request. Use it
- * sparingly — tag invalidation should handle the common case.
+ * sparingly - tag invalidation should handle the common case.
  */
 export const CMS_CACHE_VERSION = 2

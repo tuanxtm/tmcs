@@ -51,7 +51,7 @@ export const linkFields: Field[] = [
  *
  * Pass `category` to restrict the picker to links tagged with that category
  * (e.g. "legal" for the footer). Without `category` the picker shows every
- * link — admins can still override the filter at the relationship level.
+ * link - admins can still override the filter at the relationship level.
  */
 export const linkPickerField = (options?: {
   name?: string
@@ -71,15 +71,13 @@ export const linkPickerField = (options?: {
     relationTo: 'links' as const,
     label: options?.label,
     admin: {
-      description:
-        options?.description ?? 'Pick one or more entries from the Links library.',
+      description: options?.description ?? 'Pick one or more entries from the Links library.',
     },
     ...filterOptions,
   }
 
   if (hasMany) {
-    const maxRows =
-      typeof options?.maxRows === 'number' ? { maxRows: options.maxRows } : {}
+    const maxRows = typeof options?.maxRows === 'number' ? { maxRows: options.maxRows } : {}
     return {
       ...base,
       hasMany: true,
@@ -147,8 +145,7 @@ export const translationReadyField = (): Field => ({
   type: 'group',
   label: 'Translation readiness',
   admin: {
-    description:
-      'Editorial signal only.',
+    description: 'Editorial signal only.',
     position: 'sidebar',
   },
   fields: [

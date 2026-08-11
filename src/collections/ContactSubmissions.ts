@@ -26,7 +26,7 @@ export const ContactSubmissions: CollectionConfig = {
     },
   },
   access: {
-    // Intentionally deny public create — use /api/contact instead.
+    // Intentionally deny public create - use /api/contact instead.
     create: () => false,
     read: contactStaffOnly,
     update: contactStaffOnly,

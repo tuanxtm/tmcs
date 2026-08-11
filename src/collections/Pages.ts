@@ -33,7 +33,7 @@ export const Pages: CollectionConfig = {
   },
   versions: {
     drafts: {
-      // Autosave disabled — avoids D1 write storms while typing in Admin (Worker cost).
+      // Autosave disabled - avoids D1 write storms while typing in Admin (Worker cost).
       schedulePublish: true,
       validate: false,
     },
@@ -93,7 +93,8 @@ export const Pages: CollectionConfig = {
               relationTo: 'media',
               label: 'Page image',
               admin: {
-                description: 'Shared page image used as the hero/backdrop and as the OG image fallback.',
+                description:
+                  'Shared page image used as the hero/backdrop and as the OG image fallback.',
               },
             },
             {

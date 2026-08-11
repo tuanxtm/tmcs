@@ -15,7 +15,7 @@ export type FeedPageView = PostsPageView | ProjectsPageView | VideosPageView
 
 /**
  * Paginated published feed via Payload Local API (keyset cursor).
- * Prefer this over a custom REST route — public CRUD remains under `(payload)/api`.
+ * Prefer this over a custom REST route - public CRUD remains under `(payload)/api`.
  * Things homepage sections are static-only and are not loaded through this action.
  */
 export async function loadFeedPage(

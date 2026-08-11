@@ -16,7 +16,7 @@ import { textStateConfig } from './textStateConfig'
  *
  * Intentionally excludes `BlocksFeature` to break the recursive schema
  * generation that happens when `BlocksFeature({ blocks: pageBlocks })` is
- * enabled at the global editor level — `pageBlocks` includes `LayoutRichTextWithoutBlock`,
+ * enabled at the global editor level - `pageBlocks` includes `LayoutRichTextWithoutBlock`,
  * whose `content` field would otherwise inherit the global editor. That
  * produces an infinite depth in the JSON schema during `generate:types`.
  *

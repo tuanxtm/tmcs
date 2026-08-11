@@ -27,7 +27,7 @@ export function detectVideoProvider(raw: string): VideoProvider | null {
 }
 
 /**
- * Field validate for Videos.sourceUrl — must be absolute http(s).
+ * Field validate for Videos.sourceUrl - must be absolute http(s).
  * Soft-checks provider when sibling `provider` is set.
  */
 export function validateVideoSourceUrl(

@@ -162,7 +162,7 @@ export const fieldAdminOnly: FieldAccess = ({ req: { user } }) => isAdmin(asUser
 export const fieldAdminOrManager: FieldAccess = ({ req: { user } }) =>
   isAdminOrManager(asUser(user))
 
-/** Users collection access — Admin only for create/delete/unlock. */
+/** Users collection access - Admin only for create/delete/unlock. */
 export const usersAdminAccess: Access = ({ req: { user } }) => isAdmin(asUser(user))
 
 export const usersReadAccess: Access = ({ req: { user } }) => {

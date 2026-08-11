@@ -15,9 +15,9 @@ Stage pending changes into small, focused commits and generate a Conventional Co
 ## When NOT to use
 
 - Nothing changed (`git status --porcelain` is empty).
-- User only wants a single commit — write one subject and stop.
-- User asked for a PR, push, branch switch, or merge — do those separately.
-- File path looks like a secret (`.env`, `*.pem`, credentials) — stop and ask the user.
+- User only wants a single commit - write one subject and stop.
+- User asked for a PR, push, branch switch, or merge - do those separately.
+- File path looks like a secret (`.env`, `*.pem`, credentials) - stop and ask the user.
 
 ## Conventions (this repo)
 
@@ -81,14 +81,14 @@ For each group, in order:
    git diff --cached --stat
    ```
 3. Pick the **type**:
-   - `feat` — new user-visible capability
-   - `fix` — bug fix
-   - `refactor` — code change that neither fixes a bug nor adds a feature
-   - `perf` — performance improvement
-   - `test` — tests only
-   - `docs` — docs only
-   - `chore` — tooling, deps, generated types, config
-   - `build`, `ci`, `style` — rare; use only when nothing else fits
+   - `feat` - new user-visible capability
+   - `fix` - bug fix
+   - `refactor` - code change that neither fixes a bug nor adds a feature
+   - `perf` - performance improvement
+   - `test` - tests only
+   - `docs` - docs only
+   - `chore` - tooling, deps, generated types, config
+   - `build`, `ci`, `style` - rare; use only when nothing else fits
 4. Write the **summary** in imperative mood, ≤ 120 chars total for the subject line.
    - Lead with the user-visible "what" if `feat`/`fix`, or the area name if `chore`/`refactor`.
    - Examples from this repo: `feat: add noise SVG for background texture and fine tuning UI/UX`, `chore: update generated Cloudflare environment types`, `feat: implement feed-packer logic for dynamic tile placement and grid management`.
@@ -145,7 +145,7 @@ Then commit. Do not pause for confirmation between commits unless a group is amb
 - Never amend a commit you didn't just make in this session.
 - Never push. Stop after the local commits and report what landed.
 - Never commit files matching `.env`, `*.pem`, `*.key`, `credentials.*`, `secrets.*`, or anything in `.gitignore` that contains credentials. If staged, `git reset HEAD` them and tell the user.
-- If a pre-commit hook fails, do **not** amend — fix the issue and make a new commit.
+- If a pre-commit hook fails, do **not** amend - fix the issue and make a new commit.
 
 ## Done means
 

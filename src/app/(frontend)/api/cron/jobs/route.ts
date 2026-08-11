@@ -58,7 +58,7 @@ async function runJobs(request: Request): Promise<Response> {
     queue: 'default',
   })
 
-  // Log counts only — never log secrets or document content.
+  // Log counts only - never log secrets or document content.
   console.log(
     JSON.stringify({
       level: 'info',

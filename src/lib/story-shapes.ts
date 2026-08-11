@@ -6,7 +6,7 @@ export const STORY_SHAPE_OPTIONS = [
   { label: '2 × 2', value: '2x2' },
 ] as const
 
-/** Decorations intentionally omit 3×1 — wide ornaments rarely read well. */
+/** Decorations intentionally omit 3×1 - wide ornaments rarely read well. */
 export const DECORATION_SHAPE_OPTIONS = [
   { label: '1 × 1', value: '1x1' },
   { label: '2 × 1', value: '2x1' },

@@ -15,7 +15,7 @@ export const LayoutRichTextWithoutBlock: Block = {
       required: true,
       localized: true,
       // Override the global editor to avoid the recursive schema when
-      // `BlocksFeature` is enabled globally — see `blockRichTextEditor`.
+      // `BlocksFeature` is enabled globally - see `blockRichTextEditor`.
       editor: blockRichTextEditor,
     },
   ],

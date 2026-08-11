@@ -10,7 +10,7 @@ import { DEFAULT_LOCALE } from '@/lib/locales'
  * request has neither `Origin` nor an allowed `Sec-Fetch-Site` (see extractJWT).
  *
  * Next.js App Router navigations to a LAN IP often arrive without those
- * headers even though the cookie is first-party — login succeeds, then /admin
+ * headers even though the cookie is first-party - login succeeds, then /admin
  * immediately bounces back to /login. Synthesize `Sec-Fetch-Site: same-origin`
  * for trusted same-host requests so CSRF still blocks real cross-site calls.
  *

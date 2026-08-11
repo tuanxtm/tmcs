@@ -8,7 +8,7 @@ import {
   creatorUser,
 } from '../helpers/seedUser'
 
-test.describe('Admin Panel — Admin role', () => {
+test.describe('Admin Panel - Admin role', () => {
   let page: Page
 
   test.beforeAll(async ({ browser }) => {
@@ -46,7 +46,7 @@ test.describe('Admin Panel — Admin role', () => {
   })
 })
 
-test.describe('Admin Panel — Manager role', () => {
+test.describe('Admin Panel - Manager role', () => {
   let page: Page
 
   test.beforeAll(async ({ browser }) => {
@@ -72,7 +72,7 @@ test.describe('Admin Panel — Manager role', () => {
   })
 })
 
-test.describe('Admin Panel — Creator role', () => {
+test.describe('Admin Panel - Creator role', () => {
   let page: Page
 
   test.beforeAll(async ({ browser }) => {

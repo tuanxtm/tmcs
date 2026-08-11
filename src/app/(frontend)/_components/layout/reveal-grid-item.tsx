@@ -7,7 +7,7 @@ import { useBootReady } from '@/app/(frontend)/_components/providers/boot-reveal
 
 /** Travel distance for the fly-up enter. */
 const FLY_Y_PX = 48
-/** Enter duration — slow enough to read as motion. */
+/** Enter duration - slow enough to read as motion. */
 const DURATION_S = 0.75
 /** Stagger between items in the same row only. */
 const ROW_STAGGER_S = 0.12
@@ -45,7 +45,7 @@ export function useGridColumnCount({ base = 1, sm, lg }: GridBreakpoints): numbe
 
 type RevealGridItemProps = {
   index: number
-  /** Current column count — used so stagger resets per row. */
+  /** Current column count - used so stagger resets per row. */
   columns: number
   className?: string
   children: ReactNode

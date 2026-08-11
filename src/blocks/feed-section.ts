@@ -59,7 +59,7 @@ export const LayoutFeedSectionBlock: Block = {
       ],
       admin: {
         description:
-          'Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls — only available for latest published.',
+          'Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published.',
         condition: (_, siblingData) => siblingData?.source === 'latest',
       },
     },

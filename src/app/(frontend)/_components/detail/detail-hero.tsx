@@ -18,7 +18,7 @@ type DetailHeroProps = {
 }
 
 /**
- * Detail hero — the image + title section that lives above the rich content.
+ * Detail hero - the image + title section that lives above the rich content.
  *
  * Layout adapts to the image's natural ratio:
  *  - Landscape (ratio > 1): full-width image with the title overlaid as a
@@ -27,7 +27,7 @@ type DetailHeroProps = {
  *    left and the title in its own reading column on the right.
  *
  * View Transitions:
- *  - The image is the shared element — it carries the same `card-image-${id}`
+ *  - The image is the shared element - it carries the same `card-image-${id}`
  *    name on both the feed card and this hero so the morph stays smooth.
  *    We apply the same aspect class on both sides so the start/end frames
  *    match.
@@ -52,9 +52,7 @@ export function DetailHero({
     <>
       {author && <span>By {author.name}</span>}
       {publishedAt && <span aria-hidden>·</span>}
-      {publishedAt && (
-        <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
-      )}
+      {publishedAt && <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>}
       {readingTime !== null && <span aria-hidden>·</span>}
       {readingTime !== null && <span>{readingTime} min read</span>}
       {tags.length > 0 && <span aria-hidden>·</span>}
@@ -62,25 +60,18 @@ export function DetailHero({
     </>
   )
 
-  // No image — fall back to a split layout with a gradient placeholder so the
+  // No image - fall back to a split layout with a gradient placeholder so the
   // title still has somewhere to live.
   if (!image) {
     return (
       <section className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-12 px-6 py-8 items-start">
-        <div
-          className={cn(
-            'w-full bg-gradient-to-b from-zinc-900 to-zinc-950',
-            aspectClass,
-          )}
-        />
+        <div className={cn('w-full bg-gradient-to-b from-zinc-900 to-zinc-950', aspectClass)} />
         <ViewTransition name={`detail-title-${id}`} enter="fade-in" default="none">
           <div className="py-4">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
               {title}
             </h1>
-            {excerpt && (
-              <p className="text-lg text-foreground/70 mb-6 max-w-xl">{excerpt}</p>
-            )}
+            {excerpt && <p className="text-lg text-foreground/70 mb-6 max-w-xl">{excerpt}</p>}
             <div className="flex flex-wrap items-center gap-3 text-sm text-foreground/60">
               {metaItems}
             </div>
@@ -94,9 +85,7 @@ export function DetailHero({
     return (
       <section className="relative w-full bg-zinc-950">
         <ViewTransition name={`card-image-${id}`} share="morph">
-          <div
-            className={cn('relative w-full overflow-hidden', aspectClass)}
-          >
+          <div className={cn('relative w-full overflow-hidden', aspectClass)}>
             <CmsImage
               media={image}
               fill
@@ -106,11 +95,7 @@ export function DetailHero({
               imgClassName="object-cover"
             />
             <div className="absolute inset-x-0 bottom-0 pointer-events-none bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 sm:p-8 md:p-12">
-              <ViewTransition
-                name={`detail-title-${id}`}
-                enter="fade-in"
-                default="none"
-              >
+              <ViewTransition name={`detail-title-${id}`} enter="fade-in" default="none">
                 <div className="max-w-3xl text-foreground">
                   <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold leading-tight mb-4">
                     {title}
@@ -127,7 +112,7 @@ export function DetailHero({
     )
   }
 
-  // Portrait / square — side-by-side.
+  // Portrait / square - side-by-side.
   return (
     <section className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-12 px-6 py-8 items-start">
       <ViewTransition name={`card-image-${id}`} share="morph">
@@ -152,9 +137,7 @@ export function DetailHero({
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
             {title}
           </h1>
-          {excerpt && (
-            <p className="text-lg text-foreground/70 mb-6 max-w-xl">{excerpt}</p>
-          )}
+          {excerpt && <p className="text-lg text-foreground/70 mb-6 max-w-xl">{excerpt}</p>}
           <div className="flex flex-wrap items-center gap-3 text-sm text-foreground/60">
             {metaItems}
           </div>

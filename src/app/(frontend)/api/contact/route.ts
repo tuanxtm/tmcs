@@ -21,7 +21,7 @@ type ContactBody = {
   locale?: unknown
   sourcePage?: unknown
   consent?: unknown
-  /** Honeypot — must be empty. Real browsers leave this blank. */
+  /** Honeypot - must be empty. Real browsers leave this blank. */
   website?: unknown
   /** Client-side form open timestamp (ms). */
   openedAt?: unknown
@@ -149,7 +149,7 @@ export async function POST(request: Request): Promise<Response> {
   })
 
   if (recent.totalDocs > 0) {
-    // Generic success — do not aid enumeration
+    // Generic success - do not aid enumeration
     return Response.json({ ok: true })
   }
 

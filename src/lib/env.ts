@@ -54,7 +54,7 @@ export const getOptionalEnv = (name: string, fallback = ''): string =>
 
 /**
  * Payload signing/encryption secret.
- * Required always — never fall back to an empty string.
+ * Required always - never fall back to an empty string.
  */
 export const getPayloadSecret = (): string => getRequiredEnv('PAYLOAD_SECRET')
 

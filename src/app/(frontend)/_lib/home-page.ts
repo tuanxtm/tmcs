@@ -1,5 +1,5 @@
 /**
- * Home page loader — re-exports the shared page-data module.
+ * Home page loader - re-exports the shared page-data module.
  * Prefer importing from `page-data` for new code.
  */
 export {
