@@ -112,8 +112,8 @@ test.describe('Frontend homepage', () => {
   test('desktop feed grids use four columns', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
-    const grid = page.locator('[data-feed-type="projects"] .feed-grid')
-    if ((await page.locator('[data-feed-type="projects"] .feed-grid-item').count()) === 0) {
+    const grid = page.locator('[data-feed-type="projects"] [data-grid="feed"]')
+    if ((await page.locator('[data-feed-type="projects"] [data-feed-grid-item]').count()) === 0) {
       test.skip()
       return
     }
@@ -125,7 +125,7 @@ test.describe('Frontend homepage', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
 
-    const images = page.locator('[data-feed-type="projects"] .feed-grid-item img')
+    const images = page.locator('[data-feed-type="projects"] [data-feed-grid-item] img')
     if ((await images.count()) === 0) {
       test.skip()
       return
@@ -153,8 +153,8 @@ test.describe('Frontend homepage', () => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('http://localhost:3000/')
 
-    const grid = page.locator('[data-feed-type="projects"] .feed-grid')
-    if ((await page.locator('[data-feed-type="projects"] .feed-grid-item').count()) === 0) {
+    const grid = page.locator('[data-feed-type="projects"] [data-grid="feed"]')
+    if ((await page.locator('[data-feed-type="projects"] [data-feed-grid-item]').count()) === 0) {
       test.skip()
       return
     }
@@ -165,7 +165,7 @@ test.describe('Frontend homepage', () => {
 
   test('feed tile titles remain accessible to assistive tech', async ({ page }) => {
     await page.goto('http://localhost:3000/')
-    const tile = page.locator('[data-feed-type="projects"] .feed-grid-item').first()
+    const tile = page.locator('[data-feed-type="projects"] [data-feed-grid-item]').first()
     if ((await tile.count()) === 0) {
       test.skip()
       return
@@ -207,7 +207,7 @@ test.describe('Frontend homepage', () => {
 
   test('posts section shows view all tile after feed items', async ({ page }) => {
     await page.goto('http://localhost:3000/')
-    const items = page.locator('[data-feed-type="posts"] .feed-grid-item')
+    const items = page.locator('[data-feed-type="posts"] [data-feed-grid-item]')
     const count = await items.count()
     if (count === 0) {
       test.skip()
@@ -222,7 +222,7 @@ test.describe('Frontend homepage', () => {
 
   test('projects section shows view all tile after feed items', async ({ page }) => {
     await page.goto('http://localhost:3000/')
-    const items = page.locator('[data-feed-type="projects"] .feed-grid-item')
+    const items = page.locator('[data-feed-type="projects"] [data-feed-grid-item]')
     const count = await items.count()
     if (count === 0) {
       test.skip()
@@ -264,7 +264,7 @@ test.describe('Frontend homepage', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/posts')
 
-    const items = page.locator('[data-feed-type="posts"] .feed-grid-item')
+    const items = page.locator('[data-feed-type="posts"] [data-feed-grid-item]')
     const initialCount = await items.count()
     if (initialCount === 0) {
       test.skip()
