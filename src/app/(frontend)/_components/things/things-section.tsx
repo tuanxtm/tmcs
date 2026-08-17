@@ -1,5 +1,6 @@
 'use client'
 
+import { ThingsGrid } from '@/app/(frontend)/_components/layout/things-grid'
 import { ViewAllFeedTile } from '@/app/(frontend)/_components/feed/view-all-feed-tile'
 import {
   RevealGridItem,
@@ -9,7 +10,6 @@ import { SectionHeader } from '@/app/(frontend)/_components/layout/section-heade
 import { ThingShowcaseTile } from '@/app/(frontend)/_components/things/thing-showcase-tile'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
-import { cn } from '@/lib/utils'
 
 type ThingsSectionProps = {
   locale: LocaleCode
@@ -65,7 +65,7 @@ export function ThingsSection({
         data-cursor-popup={sectionCursor}
         className={className}
       >
-        <SectionHeader id={headingId}>{heading}</SectionHeader>
+        <SectionHeader id={headingId} heading={heading} />
         {descriptionNode}
       </section>
     )
@@ -79,21 +79,17 @@ export function ThingsSection({
       data-cursor-popup={sectionCursor}
       className={className}
     >
-      <SectionHeader id={headingId}>{heading}</SectionHeader>
+      <SectionHeader id={headingId} heading={heading} />
       {descriptionNode}
 
-      <div className={cn('things-grid dash-t dash-b')}>
-        <div className="things-grid-rules" aria-hidden="true">
-          <span className="things-grid-rule" />
-          <span className="things-grid-rule" />
-        </div>
-
+      <ThingsGrid>
         {docs.map((thing, index) => (
           <RevealGridItem
             key={thing.id}
             index={index}
             columns={columns}
-            className="things-grid-item"
+            dataAttributes={{ 'data-things-grid-item': true }}
+            className="relative z-0 min-w-0"
           >
             <ThingShowcaseTile thing={thing} locale={locale} cursorPopup={cursorPopupItem} />
           </RevealGridItem>
@@ -103,7 +99,8 @@ export function ThingsSection({
           <RevealGridItem
             index={docs.length}
             columns={columns}
-            className="things-grid-item self-stretch"
+            dataAttributes={{ 'data-things-grid-item': true }}
+            className="relative z-0 min-w-0 self-stretch"
           >
             <ViewAllFeedTile
               href={viewAllHref}
@@ -112,7 +109,7 @@ export function ThingsSection({
             />
           </RevealGridItem>
         ) : null}
-      </div>
+      </ThingsGrid>
     </section>
   )
 }

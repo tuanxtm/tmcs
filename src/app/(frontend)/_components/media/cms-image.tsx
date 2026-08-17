@@ -1,9 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-
 import { cn } from '@/lib/utils'
-
 import type { MediaView } from '@/app/(frontend)/_lib/types'
 
 type CmsImageProps = {

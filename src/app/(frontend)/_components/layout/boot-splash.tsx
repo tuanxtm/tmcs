@@ -32,7 +32,7 @@ function visualWidth(value: string): number {
   for (const { segment } of graphemeSegmenter.segment(value)) {
     width += /\p{Extended_Pictographic}/u.test(segment) ? 2 : 1
   }
-  return width
+  return width - 1
 }
 
 function consoleBarSlots(greeting: string): number {
@@ -167,7 +167,7 @@ export function BootSplash({ locale }: { locale: LocaleCode }) {
                 <p
                   ref={barRef}
                   aria-hidden="true"
-                  className="boot-splash-bar font-mono text-sm lowercase tracking-normal text-foreground/90 whitespace-pre"
+                  className="boot-splash-bar font-mono text-sm lowercase tracking-[0.01em] text-primary/90 whitespace-pre"
                 >
                   {barText(0, slotCount)}
                 </p>

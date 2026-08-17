@@ -8,14 +8,15 @@
   --gradient-2: oklch(0.6788 0.1119 133.94);
   --gradient-3: oklch(0.7508 0.1058 133.58);
   --gradient-4: oklch(0.8671 0.0704 133.59);
-  --background: oklch(0.9604 0.0011 197.14);
-  --secondary-background: oklch(0.9515 0.0067 97.35);
-  --foreground: oklch(0.2273 0.0038 286.09 / 0.9);
+  --background: oklch(0.9702 0 0);
+  --secondary-background: oklch(0.9249 0 0);
+  --inverted-background: oklch(0.3867 0 0);
+  --foreground: oklch(0 0 0);
   --card: oklch(0.995 0.001 95);
   --card-foreground: oklch(0.1668 0.0084 296.92);
   --popover: oklch(0.995 0.001 95);
   --popover-foreground: oklch(0.1668 0.0084 296.92);
-  --primary: oklch(0.7508 0.1058 133.58);
+  --primary: oklch(0.3867 0 0 / 0.8);
   --primary-foreground: oklch(0.1668 0.0084 296.92);
   --secondary: oklch(0.95 0.004 95);
   --secondary-foreground: oklch(0.5007 0.0047 286.23);
@@ -27,25 +28,24 @@
   --accent-foreground: oklch(0.22 0.01 95);
   --destructive: oklch(0.55 0.2 25);
   --border: oklch(0.82 0.01 95);
-  --border-dashed: oklch(0.74 0.012 95);
+  --border-dashed: color-mix(in oklch, var(--primary) 50%, transparent);
+  --border-dotted: color-mix(in oklch, var(--primary) 50%, transparent);
+  --dash-width: 2px;
+  --dash-length: 8px;
+  --dash-gap: 4px;
+  --dot-size: 0.65px; /* 0.5px */ /* (TODO): Decide later on this one*/
+  --dot-gap: 3px; /* 2px */ /* (TODO): Decide later on this one*/
   --input: oklch(0.82 0.01 95);
   --ring: oklch(0.35 0.02 95);
   --radius: 0.25rem;
-  --panel: oklch(0.992 0.001 95 / 0.86);
   --header-height: 3rem;
+  --section-header-height: calc(var(--header-height) / 2);
   --scrollbar-size: 10px;
   --page-gutter: var(--scrollbar-size);
   --fold-height: 100dvh;
   --hero-fold-height: calc(var(--fold-height) - (2 * var(--header-height)));
-  /* Pencil sketch lines - mostly straight, more graphite grit. Tune these */
-  --sketch-color: color-mix(in oklch, var(--foreground) 52%, transparent);
-  --sketch-weight: 3px;
-  --sketch-tile: 32px;
-  --rail: var(--sketch-color);
-  /* Straight strokes + soft parallels + grain dash for pencil texture */
-  --sketch-h: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='6' viewBox='0 0 64 6' fill='none'%3E%3Cline x1='0' y1='3' x2='64' y2='3' stroke='%23000' stroke-width='1.3' stroke-opacity='.72'/%3E%3Cline x1='0' y1='2.45' x2='64' y2='2.45' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='0' y1='3.55' x2='64' y2='3.55' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='0' y1='3' x2='64' y2='3' stroke='%23000' stroke-width='2' stroke-opacity='.18' stroke-dasharray='1.1 1.4 .5 1.9 .8 1.2 .4 1.6 1.3 1'/%3E%3C/svg%3E");
-  --sketch-v: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='64' viewBox='0 0 6 64' fill='none'%3E%3Cline x1='3' y1='0' x2='3' y2='64' stroke='%23000' stroke-width='1.3' stroke-opacity='.72'/%3E%3Cline x1='2.45' y1='0' x2='2.45' y2='64' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='3.55' y1='0' x2='3.55' y2='64' stroke='%23000' stroke-width='.55' stroke-opacity='.28'/%3E%3Cline x1='3' y1='0' x2='3' y2='64' stroke='%23000' stroke-width='2' stroke-opacity='.18' stroke-dasharray='1.1 1.4 .5 1.9 .8 1.2 .4 1.6 1.3 1'/%3E%3C/svg%3E");
   --font-serif: var(--font-fanwood), ui-serif, Georgia, serif;
+  --font-mono: var(--font-departure-mono), ui-monospace, monospace;
 }
 
 @theme inline {
@@ -55,6 +55,7 @@
   --color-gradient-4: var(--gradient-4);
   --color-background: var(--background);
   --color-secondary-background: var(--secondary-background);
+  --color-inverted-background: var(--inverted-background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -78,8 +79,8 @@
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
   --radius-xl: calc(var(--radius) + 6px);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-departure-mono), ui-monospace, monospace;
   --font-serif: var(--font-fanwood), ui-serif, Georgia, serif;
 }
 
@@ -108,7 +109,7 @@
   a:focus-visible,
   button:focus-visible,
   [role='button']:focus-visible {
-    @apply outline-2 outline-offset-2 outline-ring;
+    @apply outline-ring outline-2 outline-offset-2;
   }
 }
 
@@ -146,7 +147,7 @@ body::-webkit-scrollbar-track {
 
 html::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklch, var(--foreground) 52%, transparent);
+  background-color: color-mix(in oklch, var(--foreground) 20%, transparent);
   border: 0;
   border-radius: 0;
   box-shadow: none;
@@ -162,19 +163,27 @@ body::-webkit-scrollbar-corner {
 @supports (-moz-appearance: none) {
   html {
     scrollbar-width: thin;
-    scrollbar-color: var(--background) var(--foreground);
+    scrollbar-color: color-mix(in oklch, var(--foreground) 20%, transparent) var(--background);
   }
 }
 
 @layer utilities {
   .page-frame {
     @apply relative mx-auto w-full;
-    max-width: none;
-    padding-inline: var(--page-gutter);
+    max-width: 93%;
     container-type: inline-size;
-    /* Footer decoration chrome - 4-up editorial grid column width */
-    --bento-cols: 4;
-    --bento-tile: calc(100cqw / var(--bento-cols));
+  }
+
+  @media (min-width: 768px) {
+    .page-frame {
+      max-width: 90vw;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .page-frame {
+      max-width: 87vw;
+    }
   }
 
   @media (max-width: 1023px) {
@@ -189,286 +198,296 @@ body::-webkit-scrollbar-corner {
     }
   }
 
-  .section-header {
-    position: sticky;
-    top: var(--header-height);
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    padding-inline: 0.5rem;
-    overflow: hidden;
-    /* Fixed height - half the site header. No shrink animation: a height
-       transition on a sticky element invalidates the entire sticky containing
-       block on every frame and compounds Lenis over-target momentum. */
-    height: calc(var(--header-height) / 2);
-    min-height: calc(var(--header-height) / 2);
+  /* Reusable dashed borders. Real 1px CSS dashed border using --border-dashed
+     (which points at --foreground), so they match the rest of the chrome. */
+  .dash,
+  .dash-t,
+  .dash-b,
+  .dash-l,
+  .dash-r,
+  .dash-x,
+  .dash-y {
+    border-style: dashed;
+    border-width: 0;
+    border-color: var(--border-dashed);
   }
 
-  .feed-grid {
+  .dash {
+    border-width: var(--dash-width);
+  }
+
+  .dash-t {
+    border-top-width: var(--dash-width);
+  }
+
+  .dash-b {
+    border-bottom-width: var(--dash-width);
+  }
+
+  .dash-l {
+    border-left-width: var(--dash-width);
+  }
+
+  .dash-r {
+    border-right-width: var(--dash-width);
+  }
+
+  .dash-x {
+    border-left-width: var(--dash-width);
+    border-right-width: var(--dash-width);
+  }
+
+  .dash-y {
+    border-top-width: var(--dash-width);
+    border-bottom-width: var(--dash-width);
+  }
+
+  /* Reusable dotted borders. Native 1px CSS dotted border using --border-dotted
+     so they match the rest of the chrome. Dots inherit --dot-size for spacing. */
+  .dot,
+  .dot-t,
+  .dot-b,
+  .dot-l,
+  .dot-r,
+  .dot-x,
+  .dot-y {
+    border-style: dotted;
+    border-width: 0;
+    border-color: var(--border-dotted);
+  }
+
+  .dot {
+    border-width: calc(var(--dot-size) * 2);
+  }
+
+  .dot-t {
+    border-top-width: calc(var(--dot-size) * 2);
+  }
+
+  .dot-b {
+    border-bottom-width: calc(var(--dot-size) * 2);
+  }
+
+  .dot-l {
+    border-left-width: calc(var(--dot-size) * 2);
+  }
+
+  .dot-r {
+    border-right-width: calc(var(--dot-size) * 2);
+  }
+
+  .dot-x {
+    border-left-width: calc(var(--dot-size) * 2);
+    border-right-width: calc(var(--dot-size) * 2);
+  }
+
+  .dot-y {
+    border-top-width: calc(var(--dot-size) * 2);
+    border-bottom-width: calc(var(--dot-size) * 2);
+  }
+
+  /* Tunable dashed borders. Uses background-image gradients so segment
+     length and gap are controllable via --dash-length / --dash-gap.
+     Render an inline gradient line that sits exactly on each edge. */
+  .dash-line,
+  .dash-line-t,
+  .dash-line-b,
+  .dash-line-l,
+  .dash-line-r,
+  .dash-line-x,
+  .dash-line-y {
     position: relative;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
-    column-gap: 0;
-    row-gap: 1.5rem;
-    padding-bottom: 1.5rem;
-    width: 100%;
   }
 
-  @media (min-width: 1024px) {
-    .feed-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
+  .dash-line::before,
+  .dash-line-t::before,
+  .dash-line-b::after,
+  .dash-line-l::before,
+  .dash-line-r::after,
+  .dash-line-x::before,
+  .dash-line-x::after,
+  .dash-line-y::before,
+  .dash-line-y::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    background-image: linear-gradient(
+      to right,
+      var(--border-dashed) 0 var(--dash-length),
+      transparent var(--dash-length) calc(var(--dash-length) + var(--dash-gap))
+    );
+    background-size: calc(var(--dash-length) + var(--dash-gap)) 100%;
+    background-repeat: repeat-x;
   }
 
-  .feed-grid-item {
+  .dash-line-l::before,
+  .dash-line-r::after,
+  .dash-line-x::before,
+  .dash-line-x::after {
+    background-image: linear-gradient(
+      to bottom,
+      var(--border-dashed) 0 var(--dash-length),
+      transparent var(--dash-length) calc(var(--dash-length) + var(--dash-gap))
+    );
+    background-size: 100% calc(var(--dash-length) + var(--dash-gap));
+    background-repeat: repeat-y;
+  }
+
+  .dash-line::before,
+  .dash-line-t::before,
+  .dash-line-b::after,
+  .dash-line-y::before,
+  .dash-line-y::after {
+    left: 0;
+    right: 0;
+    height: var(--dash-width);
+  }
+
+  .dash-line::before,
+  .dash-line-t::before,
+  .dash-line-y::before {
+    top: 0;
+  }
+
+  .dash-line-b::after,
+  .dash-line-y::after {
+    bottom: 0;
+  }
+
+  .dash-line-l::before,
+  .dash-line-r::after,
+  .dash-line-x::before,
+  .dash-line-x::after {
+    top: 0;
+    bottom: 0;
+    width: var(--dash-width);
+  }
+
+  .dash-line-l::before,
+  .dash-line-x::before {
+    left: 0;
+  }
+
+  .dash-line-r::after,
+  .dash-line-x::after {
+    right: 0;
+  }
+
+  /* Tunable dotted borders. Renders round dots via radial-gradient so
+     dot diameter and spacing are controllable via --dot-size / --dot-gap.
+     Unlike the native .dot utility (which browser-spaces itself), this
+     variant produces evenly-spaced circles that align to the edge. */
+  .dot-line,
+  .dot-line-t,
+  .dot-line-b,
+  .dot-line-l,
+  .dot-line-r,
+  .dot-line-x,
+  .dot-line-y {
     position: relative;
-    z-index: 0;
-    min-width: 0;
   }
 
-  .things-grid {
+  .dot-line::before,
+  .dot-line-t::before,
+  .dot-line-b::after,
+  .dot-line-l::before,
+  .dot-line-r::after,
+  .dot-line-x::before,
+  .dot-line-x::after,
+  .dot-line-y::before,
+  .dot-line-y::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    background-image: radial-gradient(
+      circle,
+      var(--border-dotted) var(--dot-size),
+      transparent calc(var(--dot-size) + 0.5px)
+    );
+    background-size: calc(var(--dot-size) + var(--dot-gap)) 100%;
+    background-repeat: repeat-x;
+  }
+
+  .dot-line-l::before,
+  .dot-line-r::after,
+  .dot-line-x::before,
+  .dot-line-x::after {
+    background-image: radial-gradient(
+      circle,
+      var(--border-dotted) var(--dot-size),
+      transparent calc(var(--dot-size) + 0.5px)
+    );
+    background-size: 100% calc(var(--dot-size) + var(--dot-gap));
+    background-repeat: repeat-y;
+  }
+
+  .dot-line::before,
+  .dot-line-t::before,
+  .dot-line-b::after,
+  .dot-line-y::before,
+  .dot-line-y::after {
+    left: 0;
+    right: 0;
+    height: calc(var(--dot-size) * 2);
+  }
+
+  .dot-line::before,
+  .dot-line-t::before,
+  .dot-line-y::before {
+    top: 0;
+  }
+
+  .dot-line-b::after,
+  .dot-line-y::after {
+    bottom: 0;
+  }
+
+  .dot-line-l::before,
+  .dot-line-r::after,
+  .dot-line-x::before,
+  .dot-line-x::after {
+    top: 0;
+    bottom: 0;
+    width: calc(var(--dot-size) * 2);
+  }
+
+  .dot-line-l::before,
+  .dot-line-x::before {
+    left: 0;
+  }
+
+  .dot-line-r::after,
+  .dot-line-x::after {
+    right: 0;
+  }
+
+  /* Procedural noise overlay. Drop `.noise` onto any container to layer a
+     tiled grain on top of its background. Direct children paint above the
+     noise because the overlay sits at z-index: -1 inside a new stacking
+     context (isolation: isolate). Tunable per-element via:
+       --noise-opacity (0-1, default 0.5)
+       --noise-size    (tile size, default 200px)
+       --noise-blend   (mix-blend-mode, default overlay) */
+  .noise {
+    --noise-opacity: 0.5;
+    --noise-size: 200px;
+    --noise-blend: overlay;
     position: relative;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: stretch;
-    column-gap: 0;
-    row-gap: 1.5rem;
-    padding-bottom: 1.5rem;
-    width: 100%;
+    isolation: isolate;
   }
 
-  @media (min-width: 1024px) {
-    .things-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+  .noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    background-size: var(--noise-size) var(--noise-size);
+    background-repeat: repeat;
+    opacity: var(--noise-opacity);
+    mix-blend-mode: var(--noise-blend);
   }
-
-  .things-grid-item {
-    position: relative;
-    z-index: 0;
-    min-width: 0;
-  }
-
-  .page-label {
-    @apply text-[0.6875rem] uppercase tracking-[0.18em] text-muted-foreground;
-  }
-
-  .display-title {
-    font-size: clamp(2.25rem, 5vw, 4.5rem);
-    line-height: 1.05;
-    letter-spacing: -0.03em;
-    font-weight: 560;
-  }
-
-  .panel-surface {
-    background: var(--panel);
-    backdrop-filter: blur(12px);
-  }
-}
-
-/*
-  Pencil sketch lines - vertical rails/separators + dash-t/dash-b horizontals.
-  Tune: --sketch-color, --sketch-weight, --sketch-tile
-*/
-
-/* Full-height column rules - same mask technique as .dash-l / .dash-rail. */
-.feed-grid-rules {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-.feed-grid-rule {
-  display: none;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: var(--sketch-weight);
-  transform: translateX(-50%);
-  background-color: var(--sketch-color);
-  -webkit-mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
-  mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
-}
-
-@media (min-width: 640px) and (max-width: 1023px) {
-  .feed-grid-rule:nth-child(1) {
-    display: block;
-    left: 50%;
-  }
-}
-
-@media (max-width: 639px) {
-  .feed-grid-rule:nth-child(1) {
-    display: block;
-    left: 50%;
-  }
-}
-
-@media (min-width: 1024px) {
-  .feed-grid-rule:nth-child(1) {
-    display: block;
-    left: 25%;
-  }
-
-  .feed-grid-rule:nth-child(2) {
-    display: block;
-    left: 50%;
-  }
-
-  .feed-grid-rule:nth-child(3) {
-    display: block;
-    left: 75%;
-  }
-}
-
-.things-grid-rules {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-.things-grid-rule {
-  display: none;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: var(--sketch-weight);
-  transform: translateX(-50%);
-  background-color: var(--sketch-color);
-  -webkit-mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
-  mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
-}
-
-@media (min-width: 640px) and (max-width: 1023px) {
-  .things-grid-rule:nth-child(1) {
-    display: block;
-    left: 50%;
-  }
-}
-
-@media (max-width: 639px) {
-  .things-grid-rule:nth-child(1) {
-    display: block;
-    left: 50%;
-  }
-}
-
-@media (min-width: 1024px) {
-  .things-grid-rule:nth-child(1) {
-    display: block;
-    left: 33.333%;
-  }
-
-  .things-grid-rule:nth-child(2) {
-    display: block;
-    left: 66.666%;
-  }
-}
-
-/* Don't force position on .dash-b - sticky headers need position: sticky. */
-.dash-b:not(.sticky) {
-  position: relative;
-}
-
-.dash-b::after {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: var(--sketch-weight);
-  transform: translateY(50%);
-  background-color: var(--sketch-color);
-  -webkit-mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
-  mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
-}
-
-.dash-t {
-  position: relative;
-}
-
-.dash-t::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: var(--sketch-weight);
-  transform: translateY(-50%);
-  background-color: var(--sketch-color);
-  -webkit-mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
-  mask: var(--sketch-h) left center / var(--sketch-tile) var(--sketch-weight) repeat-x;
-}
-
-.dash-l {
-  position: relative;
-}
-
-.dash-l::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: var(--sketch-weight);
-  transform: translateX(-50%);
-  background-color: var(--sketch-color);
-  -webkit-mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
-  mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
-}
-
-.dash-box {
-  position: relative;
-}
-
-.dash-box::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border-radius: inherit;
-  background-color: var(--sketch-color);
-  -webkit-mask-image: var(--sketch-v), var(--sketch-v);
-  mask-image: var(--sketch-v), var(--sketch-v);
-  -webkit-mask-size:
-    var(--sketch-weight) var(--sketch-tile),
-    var(--sketch-weight) var(--sketch-tile);
-  mask-size:
-    var(--sketch-weight) var(--sketch-tile),
-    var(--sketch-weight) var(--sketch-tile);
-  -webkit-mask-position:
-    top left,
-    top right;
-  mask-position:
-    top left,
-    top right;
-  -webkit-mask-repeat: repeat-y, repeat-y;
-  mask-repeat: repeat-y, repeat-y;
-}
-
-.dash-rail {
-  width: var(--sketch-weight);
-  background-color: var(--rail);
-  -webkit-mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
-  mask: var(--sketch-v) center top / var(--sketch-weight) var(--sketch-tile) repeat-y;
-}
-
-.dash-rail-left {
-  transform: translateX(-50%);
-}
-
-.dash-rail-right {
-  transform: translateX(50%);
 }
 
 a,
@@ -566,22 +585,6 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   --vt-duration-move: 400ms;
 }
 
-/* Shared element morph - smooth blur during the image morph between feed card
-   and detail hero. The image-pair blur sells the size change without flicker. */
-::view-transition-group(.morph) {
-  animation-duration: var(--vt-duration-move);
-}
-
-::view-transition-image-pair(.morph) {
-  animation-name: via-blur;
-}
-
-@keyframes via-blur {
-  30% {
-    filter: blur(3px);
-  }
-}
-
 /* Directional navigation slides - used alongside addTransitionType on router
    pushes. 'nav-forward' = page coming in from the right (push). 'nav-back' =
    page coming in from the left (browser history push). */
@@ -650,4 +653,19 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
     animation-duration: 0s !important;
     animation-delay: 0s !important;
   }
+}
+
+/* Stretch the barcode SVG to fill its parent so it spans the
+   full width of the section header's grid cell at every breakpoint.
+   The SVG attribute is set in the component via the ref callback on
+   the wrapper, since preserveAspectRatio is not a CSS property.
+   Bar fill comes from --primary so the barcode follows the theme. */
+[data-barcode-stretch='true'] > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+[data-barcode-stretch='true'] > svg g {
+  fill: var(--primary);
 }

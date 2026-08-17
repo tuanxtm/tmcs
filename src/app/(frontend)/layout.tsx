@@ -1,4 +1,5 @@
-import { Fanwood_Text, Geist, Geist_Mono } from 'next/font/google'
+import { Fanwood_Text, Inter } from 'next/font/google'
+import localFont from 'next/font/local'
 import { headers } from 'next/headers'
 import type { Metadata } from 'next'
 
@@ -16,15 +17,9 @@ import { MotionProvider } from '@/app/(frontend)/_components/providers/motion-pr
 
 import './styles.css'
 
-const geistSans = Geist({
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-geist-sans',
-})
-
-const geistMono = Geist_Mono({
-  subsets: ['latin'],
-  variable: '--font-geist-mono',
+  variable: '--font-inter',
 })
 
 const fanwoodText = Fanwood_Text({
@@ -32,6 +27,12 @@ const fanwoodText = Fanwood_Text({
   weight: '400',
   style: ['normal', 'italic'],
   variable: '--font-fanwood',
+})
+
+const departureMono = localFont({
+  src: '../../assets/fonts/DepartureMono.woff2',
+  variable: '--font-departure-mono',
+  display: 'swap',
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -62,7 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} ${fanwoodText.variable}`}
+      className={`${inter.variable} ${fanwoodText.variable} ${departureMono.variable}`}
     >
       <body className="relative min-h-dvh text-foreground">
         <MotionProvider>

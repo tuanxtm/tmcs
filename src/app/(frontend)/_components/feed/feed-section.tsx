@@ -135,14 +135,6 @@ export function FeedSection(props: FeedSectionProps) {
   const sectionCursor =
     docs.length === 0 ? cursorPopupEmpty || cursorPopup || undefined : cursorPopup || undefined
 
-  const descriptionNode = description ? (
-    <div className="px-2 pt-2 pb-4 w-full grid md:grid-cols-2 grid-cols-1 ">
-      <p className="col-span-1 md:col-span-2 text-[13px] tracking-tight leading-none text-foreground/80 lowercase">
-        {description}
-      </p>
-    </div>
-  ) : null
-
   if (docs.length === 0) {
     return (
       <section
@@ -152,8 +144,7 @@ export function FeedSection(props: FeedSectionProps) {
         data-cursor-popup={sectionCursor}
         className={className}
       >
-        <SectionHeader id={headingId}>{heading}</SectionHeader>
-        {descriptionNode}
+        <SectionHeader id={headingId} heading={heading} description={description} />
       </section>
     )
   }
@@ -164,10 +155,12 @@ export function FeedSection(props: FeedSectionProps) {
       aria-labelledby={headingId}
       data-feed-type={feedType}
       data-cursor-popup={sectionCursor}
-      className={className}
+      className={cn(
+        'border-l-primary dash-line-b border-l-3 md:border-l-4 lg:border-l-5',
+        className,
+      )}
     >
-      <SectionHeader id={headingId}>{heading}</SectionHeader>
-      {descriptionNode}
+      <SectionHeader id={headingId} heading={heading} description={description} />
 
       <FeedGrid>
         {docs.map((doc, index) => (
@@ -175,7 +168,8 @@ export function FeedSection(props: FeedSectionProps) {
             key={doc.id}
             index={index}
             columns={columns}
-            className={cn('feed-grid-item')}
+            dataAttributes={{ 'data-feed-grid-item': true }}
+            className={cn('relative z-0 min-w-0')}
           >
             {feedType === 'videos' ? (
               <VideoFeedCard
@@ -200,7 +194,8 @@ export function FeedSection(props: FeedSectionProps) {
           <RevealGridItem
             index={docs.length}
             columns={columns}
-            className={cn('feed-grid-item self-stretch')}
+            dataAttributes={{ 'data-feed-grid-item': true }}
+            className={cn('relative z-0 min-w-0 self-stretch')}
           >
             <ViewAllFeedTile
               href={viewAllHref}
@@ -212,18 +207,18 @@ export function FeedSection(props: FeedSectionProps) {
       </FeedGrid>
 
       {pagination === 'infinite' ? (
-        <div className="flex min-h-[var(--header-height)] flex-col items-center justify-center gap-3 px-2 py-4">
+        <div className="bg-background flex min-h-(--header-height) flex-col items-center justify-center gap-3 px-1.5 py-4">
           <div ref={sentinelRef} className="h-1 w-full" aria-hidden="true" />
           <p
             role="status"
             aria-live="polite"
-            className="text-xs uppercase tracking-wide text-muted-foreground"
+            className="text-muted-foreground text-xs tracking-wide uppercase"
           >
             {isPending ? 'Loading…' : hasNextPage ? 'There are more ...' : 'End of feed'}
           </p>
           {error ? (
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <p role="alert" className="text-xs text-destructive">
+              <p role="alert" className="text-destructive text-xs">
                 {error}
               </p>
               <Button

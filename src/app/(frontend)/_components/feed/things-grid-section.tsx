@@ -1,5 +1,6 @@
 'use client'
 
+import { ThingsGrid } from '@/app/(frontend)/_components/layout/things-grid'
 import {
   RevealGridItem,
   useGridColumnCount,
@@ -8,7 +9,6 @@ import { SectionHeader } from '@/app/(frontend)/_components/layout/section-heade
 import { ThingShowcaseTile } from '@/app/(frontend)/_components/things/thing-showcase-tile'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
-import { cn } from '@/lib/utils'
 
 type ThingsGridSectionProps = {
   locale: LocaleCode
@@ -38,7 +38,7 @@ export function ThingsGridSection({
         data-feed-type="things"
         data-cursor-popup={sectionCursor}
       >
-        <SectionHeader id="things-feed-heading">{heading}</SectionHeader>
+        <SectionHeader id="things-feed-heading" heading={heading} />
       </section>
     )
   }
@@ -50,20 +50,16 @@ export function ThingsGridSection({
       data-feed-type="things"
       data-cursor-popup={sectionCursor}
     >
-      <SectionHeader id="things-feed-heading">{heading}</SectionHeader>
+      <SectionHeader id="things-feed-heading" heading={heading} />
 
-      <div className={cn('things-grid dash-t dash-b')}>
-        <div className="things-grid-rules" aria-hidden="true">
-          <span className="things-grid-rule" />
-          <span className="things-grid-rule" />
-        </div>
-
+      <ThingsGrid>
         {docs.map((thing, index) => (
           <RevealGridItem
             key={thing.id}
             index={index}
             columns={columns}
-            className="things-grid-item"
+            dataAttributes={{ 'data-things-grid-item': true }}
+            className="relative z-0 min-w-0"
           >
             <ThingShowcaseTile
               thing={thing}
@@ -72,7 +68,7 @@ export function ThingsGridSection({
             />
           </RevealGridItem>
         ))}
-      </div>
+      </ThingsGrid>
     </section>
   )
 }

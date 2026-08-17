@@ -21,7 +21,7 @@ type GridBreakpoints = {
   lg: number
 }
 
-/** Matches feed-grid / things-grid CSS breakpoints. */
+/** Matches FeedGrid / ThingsGrid wrapper breakpoints. */
 export function useGridColumnCount({ base = 1, sm, lg }: GridBreakpoints): number {
   const [columns, setColumns] = useState(base)
 
@@ -49,13 +49,21 @@ type RevealGridItemProps = {
   columns: number
   className?: string
   children: ReactNode
+  /** Forwarded as `data-*` attributes on the wrapper. */
+  dataAttributes?: Record<`data-${string}`, string | boolean | number | undefined>
 }
 
 /**
  * Fly-up enter when the item’s row first enters the viewport.
  * Stagger is within-row only (index % columns), not across the whole grid.
  */
-export function RevealGridItem({ index, columns, className, children }: RevealGridItemProps) {
+export function RevealGridItem({
+  index,
+  columns,
+  className,
+  children,
+  dataAttributes,
+}: RevealGridItemProps) {
   const ref = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion()
   const bootReady = useBootReady()
@@ -69,6 +77,7 @@ export function RevealGridItem({ index, columns, className, children }: RevealGr
     <motion.div
       ref={ref}
       className={className}
+      {...dataAttributes}
       initial={reduceMotion ? false : { opacity: 0, y: FLY_Y_PX }}
       animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: FLY_Y_PX }}
       transition={{

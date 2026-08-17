@@ -10,7 +10,7 @@ export const REVEAL_EASE = 'easeIn'
 
 const BOOT_READY_CLASS = 'boot-ready'
 
-type BootPhase = 'idle' | 'splash' | 'content' | 'background' | 'ready'
+type BootPhase = 'idle' | 'splash' | 'content' | 'ready'
 
 type BootRevealState = {
   phase: BootPhase
@@ -19,7 +19,6 @@ type BootRevealState = {
 type BootRevealActions = {
   startSplash: () => void
   revealContent: () => void
-  revealBackground: () => void
   finish: () => void
 }
 
@@ -70,7 +69,7 @@ export function useBootReveal() {
 }
 
 function isBootReadyPhase(phase: BootPhase) {
-  return phase === 'content' || phase === 'background' || phase === 'ready'
+  return phase === 'content' || phase === 'ready'
 }
 
 export function BootRevealProvider({ children }: { children: React.ReactNode }) {
@@ -111,19 +110,15 @@ export function BootRevealProvider({ children }: { children: React.ReactNode }) 
     setPhase(reduceMotion ? 'ready' : 'content')
   }, [reduceMotion])
 
-  const revealBackground = useCallback(() => {
-    setPhase((current) => (current === 'content' ? 'background' : current))
-  }, [])
-
   const finish = useCallback(() => {
-    setPhase((current) => (current === 'background' ? 'ready' : current))
+    setPhase((current) => (current === 'content' ? 'ready' : current))
   }, [])
 
   return (
     <BootRevealContext
       value={{
         state: { phase },
-        actions: { startSplash, revealContent, revealBackground, finish },
+        actions: { startSplash, revealContent, finish },
       }}
     >
       {children}
@@ -140,7 +135,7 @@ export function BootRevealContent({
 }) {
   const {
     state: { phase },
-    actions: { revealBackground },
+    actions: { finish },
   } = useBootReveal()
   const reduceMotion = useReducedMotion()
   const visible = isBootReadyPhase(phase)
@@ -155,7 +150,7 @@ export function BootRevealContent({
         ease: REVEAL_EASE,
       }}
       onAnimationComplete={() => {
-        if (phase === 'content') revealBackground()
+        if (phase === 'content') finish()
       }}
     >
       {children}
@@ -186,32 +181,12 @@ export function BootRevealChrome({ children }: { children: React.ReactNode }) {
   )
 }
 
-/** Atmospheric background (ColorBends) - last beat on the timeline. */
-export function BootRevealEffect({ children }: { children: React.ReactNode }) {
-  const {
-    state: { phase },
-  } = useBootReveal()
-  const visible = phase === 'idle' || phase === 'background' || phase === 'ready'
-
-  return (
-    <div
-      className="h-full w-full"
-      style={{
-        opacity: visible ? 1 : 0,
-      }}
-    >
-      {children}
-    </div>
-  )
-}
-
 /** Client-only compound alias. Server Components must import named exports -
  *  RSC cannot resolve `BootReveal.Provider` as a client reference. */
 export const BootReveal = {
   Provider: BootRevealProvider,
   Content: BootRevealContent,
   Chrome: BootRevealChrome,
-  Effect: BootRevealEffect,
   use: useBootReveal,
   useReady: useBootReady,
 }

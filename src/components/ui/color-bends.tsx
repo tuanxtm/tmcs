@@ -26,10 +26,14 @@ type ColorBendsProps = {
   timeOffset?: number
   /** Opacity of horizontal rules under each ASCII row (0 = off). */
   gridOpacity?: number
+  /** Overall character opacity (0–1). */
+  opacity?: number
+  /** Scroll progress (0–1) added to time offset. */
+  scrollProgress?: number
 }
 
 const MAX_COLORS = 8 as const
-const ASCII_CHARS = '.:-=+*1#0%@'
+const ASCII_CHARS = '.:-=+*>?1#0%@'
 
 const createAsciiAtlas = (chars = ASCII_CHARS) => {
   const cellW = 40
@@ -47,7 +51,7 @@ const createAsciiAtlas = (chars = ASCII_CHARS) => {
   ctx.textBaseline = 'middle'
   const rootStyle = getComputedStyle(document.documentElement)
   const mono =
-    rootStyle.getPropertyValue('--font-geist-mono').trim() ||
+    rootStyle.getPropertyValue('--font-departure-mono').trim() ||
     'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
   // If bold is needed, use `bold ${Math.floor(cellH * 1.05)}px ${mono}`
   ctx.font = `${Math.floor(cellH * 1.05)}px ${mono}`
@@ -85,6 +89,7 @@ uniform float uFontSize;
 uniform sampler2D uAsciiAtlas;
 uniform float uAsciiCount;
 uniform float uGridOpacity;
+uniform float uOpacity;
 
 void main() {
   // Monospace glyph cells - color sampled per cell, then masked by atlas glyph
@@ -192,7 +197,7 @@ void main() {
   // Premultiplied: glyphs over faint ruled lines
   vec3 outRgb = rgb + ruleCol * ruleA * (1.0 - cover);
   float outA = cover + ruleA * (1.0 - cover);
-  gl_FragColor = vec4(outRgb, outA);
+  gl_FragColor = vec4(outRgb, outA * uOpacity);
 }
 `
 
@@ -222,6 +227,8 @@ export default function ColorBends({
   fontSize = 12,
   timeOffset = 0,
   gridOpacity = 0.18,
+  opacity = 1,
+  scrollProgress = 0,
 }: ColorBendsProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
@@ -236,6 +243,8 @@ export default function ColorBends({
   const pointerTargetRef = useRef<THREE.Vector2>(new THREE.Vector2(0, 0))
   const pointerCurrentRef = useRef<THREE.Vector2>(new THREE.Vector2(0, 0))
   const pointerSmoothRef = useRef<number>(8)
+  const opacityRef = useRef<number>(opacity)
+  const scrollProgressRef = useRef<number>(scrollProgress)
 
   useEffect(() => {
     const container = containerRef.current!
@@ -272,6 +281,7 @@ export default function ColorBends({
         uAsciiAtlas: { value: asciiAtlas.texture },
         uAsciiCount: { value: asciiAtlas.count },
         uGridOpacity: { value: gridOpacity },
+        uOpacity: { value: opacity },
       },
       premultipliedAlpha: true,
       transparent: true,
@@ -328,7 +338,7 @@ export default function ColorBends({
       }
 
       const dt = clock.getDelta()
-      const elapsed = clock.elapsedTime + timeOffsetRef.current
+      const elapsed = clock.elapsedTime + timeOffsetRef.current + scrollProgressRef.current
       material.uniforms.uTime.value = elapsed
 
       const deg = (rotationRef.current % 360) + autoRotateRef.current * elapsed
@@ -362,11 +372,18 @@ export default function ColorBends({
     }
 
     document.addEventListener('visibilitychange', onVisibility)
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+      scrollProgressRef.current = maxScroll > 0 ? (scrollY / maxScroll) * 5 : 0
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
     if (running) startLoop()
 
     return () => {
       running = false
       document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('scroll', handleScroll)
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
       rafRef.current = null
       if (resizeObserverRef.current) resizeObserverRef.current.disconnect()
@@ -392,6 +409,7 @@ export default function ColorBends({
     autoRotateRef.current = autoRotate
     fontSizeRef.current = fontSize
     timeOffsetRef.current = timeOffset
+    opacityRef.current = opacity
     material.uniforms.uSpeed.value = speed
     material.uniforms.uScale.value = scale
     material.uniforms.uFrequency.value = frequency
@@ -404,6 +422,7 @@ export default function ColorBends({
     material.uniforms.uBandWidth.value = bandWidth
     material.uniforms.uFontSize.value = fontSize * (renderer?.getPixelRatio() ?? 1)
     material.uniforms.uGridOpacity.value = gridOpacity
+    material.uniforms.uOpacity.value = opacity
 
     const toVec3 = (hex: string) => {
       const h = hex.replace('#', '').trim()
@@ -451,6 +470,7 @@ export default function ColorBends({
     fontSize,
     timeOffset,
     gridOpacity,
+    opacity,
   ])
 
   useEffect(() => {
