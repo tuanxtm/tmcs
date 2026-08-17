@@ -348,12 +348,11 @@ export interface Post {
   layout?:
     | (
         | {
-            /**
-             * Small label above the title (e.g. “Hero”).
-             */
-            label?: string | null;
+            labelTitle?: string | null;
             title: string;
+            labelTagline?: string | null;
             tagline?: string | null;
+            labelBio?: string | null;
             bio?: {
               root: {
                 type: string;
@@ -370,10 +369,16 @@ export interface Post {
               [k: string]: unknown;
             } | null;
             heroImage?: (number | null) | Media;
+            labelSocialLinks?: string | null;
             /**
-             * Pick links from the Links library.
+             * Pick social links from the Links library.
              */
-            links?: (number | Link)[] | null;
+            socialLinks?: (number | Link)[] | null;
+            labelOtherLinks?: string | null;
+            /**
+             * Pick other links from the Links library.
+             */
+            otherLinks?: (number | Link)[] | null;
             /**
              * Cursor popup text while hovering this section.
              */
@@ -689,12 +694,11 @@ export interface Page {
   layout?:
     | (
         | {
-            /**
-             * Small label above the title (e.g. “Hero”).
-             */
-            label?: string | null;
+            labelTitle?: string | null;
             title: string;
+            labelTagline?: string | null;
             tagline?: string | null;
+            labelBio?: string | null;
             bio?: {
               root: {
                 type: string;
@@ -711,10 +715,16 @@ export interface Page {
               [k: string]: unknown;
             } | null;
             heroImage?: (number | null) | Media;
+            labelSocialLinks?: string | null;
             /**
-             * Pick links from the Links library.
+             * Pick social links from the Links library.
              */
-            links?: (number | Link)[] | null;
+            socialLinks?: (number | Link)[] | null;
+            labelOtherLinks?: string | null;
+            /**
+             * Pick other links from the Links library.
+             */
+            otherLinks?: (number | Link)[] | null;
             /**
              * Cursor popup text while hovering this section.
              */
@@ -997,12 +1007,11 @@ export interface Project {
   layout?:
     | (
         | {
-            /**
-             * Small label above the title (e.g. “Hero”).
-             */
-            label?: string | null;
+            labelTitle?: string | null;
             title: string;
+            labelTagline?: string | null;
             tagline?: string | null;
+            labelBio?: string | null;
             bio?: {
               root: {
                 type: string;
@@ -1019,10 +1028,16 @@ export interface Project {
               [k: string]: unknown;
             } | null;
             heroImage?: (number | null) | Media;
+            labelSocialLinks?: string | null;
             /**
-             * Pick links from the Links library.
+             * Pick social links from the Links library.
              */
-            links?: (number | Link)[] | null;
+            socialLinks?: (number | Link)[] | null;
+            labelOtherLinks?: string | null;
+            /**
+             * Pick other links from the Links library.
+             */
+            otherLinks?: (number | Link)[] | null;
             /**
              * Cursor popup text while hovering this section.
              */
@@ -1864,12 +1879,17 @@ export interface PostsSelect<T extends boolean = true> {
         layoutHero?:
           | T
           | {
-              label?: T;
+              labelTitle?: T;
               title?: T;
+              labelTagline?: T;
               tagline?: T;
+              labelBio?: T;
               bio?: T;
               heroImage?: T;
-              links?: T;
+              labelSocialLinks?: T;
+              socialLinks?: T;
+              labelOtherLinks?: T;
+              otherLinks?: T;
               cursorPopup?: T;
               id?: T;
               blockName?: T;
@@ -2093,12 +2113,17 @@ export interface ProjectsSelect<T extends boolean = true> {
         layoutHero?:
           | T
           | {
-              label?: T;
+              labelTitle?: T;
               title?: T;
+              labelTagline?: T;
               tagline?: T;
+              labelBio?: T;
               bio?: T;
               heroImage?: T;
-              links?: T;
+              labelSocialLinks?: T;
+              socialLinks?: T;
+              labelOtherLinks?: T;
+              otherLinks?: T;
               cursorPopup?: T;
               id?: T;
               blockName?: T;
@@ -2295,12 +2320,17 @@ export interface PagesSelect<T extends boolean = true> {
         layoutHero?:
           | T
           | {
-              label?: T;
+              labelTitle?: T;
               title?: T;
+              labelTagline?: T;
               tagline?: T;
+              labelBio?: T;
               bio?: T;
               heroImage?: T;
-              links?: T;
+              labelSocialLinks?: T;
+              socialLinks?: T;
+              labelOtherLinks?: T;
+              otherLinks?: T;
               cursorPopup?: T;
               id?: T;
               blockName?: T;

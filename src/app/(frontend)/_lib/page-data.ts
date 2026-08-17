@@ -184,16 +184,24 @@ async function resolveLayoutHeroBlock(
   locale: LocaleCode,
   index: number,
 ): Promise<LayoutHeroBlockView> {
-  const links = await resolveLinkIds(block.links, locale, `hero-${index}-link`)
+  const [socialLinks, otherLinks] = await Promise.all([
+    resolveLinkIds(block.socialLinks, locale, `hero-${index}-social`),
+    resolveLinkIds(block.otherLinks, locale, `hero-${index}-other`),
+  ])
   return {
     blockType: 'layoutHero',
     id: blockId(block, `hero-${index}`),
-    label: block.label ?? null,
+    labelTitle: block.labelTitle ?? null,
     title: block.title,
+    labelTagline: block.labelTagline ?? null,
     tagline: block.tagline ?? null,
+    labelBio: block.labelBio ?? null,
     bio: (block.bio as DefaultTypedEditorState | null | undefined) ?? null,
     heroImage: toMediaView(block.heroImage),
-    links,
+    labelSocialLinks: block.labelSocialLinks ?? null,
+    socialLinks,
+    labelOtherLinks: block.labelOtherLinks ?? null,
+    otherLinks,
     cursorPopup: block.cursorPopup ?? 'scroll down',
   }
 }
@@ -543,12 +551,17 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
     {
       blockType: 'layoutHero',
       id: 'fallback-hero',
-      label: 'Hero',
+      labelTitle: null,
       title: hero.siteName,
+      labelTagline: null,
       tagline: hero.tagline,
+      labelBio: null,
       bio: hero.bio,
       heroImage: hero.coverImage,
-      links: hero.links,
+      labelSocialLinks: null,
+      socialLinks: hero.links,
+      labelOtherLinks: null,
+      otherLinks: [],
       cursorPopup: 'scroll down',
     },
     {

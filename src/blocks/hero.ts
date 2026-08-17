@@ -11,12 +11,10 @@ export const LayoutHeroBlock: Block = {
   },
   fields: [
     {
-      name: 'label',
+      name: 'labelTitle',
+      label: 'Label title',
       type: 'text',
       localized: true,
-      admin: {
-        description: 'Small label above the title (e.g. “Hero”).',
-      },
     },
     {
       name: 'title',
@@ -25,7 +23,18 @@ export const LayoutHeroBlock: Block = {
       required: true,
     },
     {
+      name: 'labelTagline',
+      label: 'Label tagline',
+      type: 'text',
+      localized: true,
+    },
+    {
       name: 'tagline',
+      type: 'text',
+      localized: true,
+    },
+    {
+      name: 'labelBio',
       type: 'text',
       localized: true,
     },
@@ -41,12 +50,29 @@ export const LayoutHeroBlock: Block = {
       relationTo: 'media',
       label: 'Hero image',
     },
+    {
+      name: 'labelSocialLinks',
+      type: 'text',
+      localized: true,
+    },
     linkPickerField({
-      name: 'links',
-      label: 'Links',
-      description: 'Pick links from the Links library.',
+      name: 'socialLinks',
+      label: 'Social links',
+      description: 'Pick social links from the Links library.',
       hasMany: true,
-      maxRows: 8,
+      maxRows: 5,
+    }),
+    {
+      name: 'labelOtherLinks',
+      type: 'text',
+      localized: true,
+    },
+    linkPickerField({
+      name: 'otherLinks',
+      label: 'Other links',
+      description: 'Pick other links from the Links library.',
+      hasMany: true,
+      maxRows: 5,
     }),
     {
       name: 'cursorPopup',

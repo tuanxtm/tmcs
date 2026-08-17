@@ -191,12 +191,17 @@ export type PageSeoView = {
 export type LayoutHeroBlockView = {
   blockType: 'layoutHero'
   id: string
-  label: string | null
+  labelTitle: string | null
   title: string
+  labelTagline: string | null
   tagline: string | null
+  labelBio: string | null
   bio: DefaultTypedEditorState | null
   heroImage: MediaView | null
-  links: NavChildView[]
+  labelSocialLinks: string | null
+  socialLinks: NavChildView[]
+  labelOtherLinks: string | null
+  otherLinks: NavChildView[]
   cursorPopup: string | null
 }
 
