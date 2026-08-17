@@ -6,6 +6,7 @@ import type { MediaView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
 
 type DetailHeroProps = {
+  slug: string
   id: number
   title: string
   excerpt: string | null
@@ -27,15 +28,17 @@ type DetailHeroProps = {
  *    left and the title in its own reading column on the right.
  *
  * View Transitions:
- *  - The image is the shared element - it carries the same `card-image-${id}`
+ *  - The image is the shared element - it carries the same `card-image-${slug}`
  *    name on both the feed card and this hero so the morph stays smooth.
  *    We apply the same aspect class on both sides so the start/end frames
- *    match.
+ *    match. slug is globally unique across all feed types so there are no
+ *    collisions when multiple feed sections render on the same page.
  *  - The title uses a separate `detail-title-${id}` boundary with a fade-in
  *    so it appears cleanly after the image morph completes (and never gets
  *    scaled/rastered along with the image).
  */
 export function DetailHero({
+  slug,
   id,
   title,
   excerpt,
@@ -47,6 +50,9 @@ export function DetailHero({
   priority = true,
 }: DetailHeroProps) {
   const { variant, aspectClass } = getImageAspect(image)
+
+  // slug is globally unique; falls back to id for draft/unpublished items.
+  const imageVtName = slug ? `card-image-${slug}` : `card-image-${id}`
 
   const metaItems = (
     <>
@@ -64,15 +70,15 @@ export function DetailHero({
   // title still has somewhere to live.
   if (!image) {
     return (
-      <section className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-12 px-6 py-8 items-start">
-        <div className={cn('w-full bg-gradient-to-b from-zinc-900 to-zinc-950', aspectClass)} />
+      <section className="grid grid-cols-1 items-start gap-6 px-6 py-8 md:grid-cols-[auto_1fr] md:gap-12">
+        <div className={cn('w-full bg-linear-to-b from-zinc-900 to-zinc-950', aspectClass)} />
         <ViewTransition name={`detail-title-${id}`} enter="fade-in" default="none">
           <div className="py-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
+            <h1 className="text-foreground mb-4 text-3xl leading-tight font-bold sm:text-4xl md:text-5xl">
               {title}
             </h1>
-            {excerpt && <p className="text-lg text-foreground/70 mb-6 max-w-xl">{excerpt}</p>}
-            <div className="flex flex-wrap items-center gap-3 text-sm text-foreground/60">
+            {excerpt && <p className="text-foreground/70 mb-6 max-w-xl text-lg">{excerpt}</p>}
+            <div className="text-foreground/60 flex flex-wrap items-center gap-3 text-sm">
               {metaItems}
             </div>
           </div>
@@ -84,23 +90,23 @@ export function DetailHero({
   if (variant === 'overlay') {
     return (
       <section className="relative w-full bg-zinc-950">
-        <ViewTransition name={`card-image-${id}`} share="morph">
+        <ViewTransition name={imageVtName} share="morph">
           <div className={cn('relative w-full overflow-hidden', aspectClass)}>
             <CmsImage
               media={image}
               fill
               sizes="100vw"
               priority={priority}
-              className="w-full h-full"
+              className="h-full w-full"
               imgClassName="object-cover"
             />
-            <div className="absolute inset-x-0 bottom-0 pointer-events-none bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 sm:p-8 md:p-12">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-6 sm:p-8 md:p-12">
               <ViewTransition name={`detail-title-${id}`} enter="fade-in" default="none">
-                <div className="max-w-3xl text-foreground">
-                  <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold leading-tight mb-4">
+                <div className="text-foreground max-w-3xl">
+                  <h1 className="mb-4 text-3xl leading-tight font-bold sm:text-5xl md:text-6xl">
                     {title}
                   </h1>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-foreground/80">
+                  <div className="text-foreground/80 flex flex-wrap items-center gap-3 text-sm">
                     {metaItems}
                   </div>
                 </div>
@@ -114,11 +120,11 @@ export function DetailHero({
 
   // Portrait / square - side-by-side.
   return (
-    <section className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-12 px-6 py-8 items-start">
-      <ViewTransition name={`card-image-${id}`} share="morph">
+    <section className="grid grid-cols-1 items-start gap-6 px-6 py-8 md:grid-cols-[auto_1fr] md:gap-12">
+      <ViewTransition name={imageVtName} share="morph">
         <div
           className={cn(
-            'relative w-full md:w-auto md:max-h-[80dvh] md:max-w-[55vw] overflow-hidden bg-zinc-950',
+            'relative w-full overflow-hidden bg-zinc-950 md:max-h-[80dvh] md:w-auto md:max-w-[55vw]',
             aspectClass,
           )}
         >
@@ -127,18 +133,18 @@ export function DetailHero({
             fill
             sizes="(min-width: 768px) 55vw, 100vw"
             priority={priority}
-            className="w-full h-full"
+            className="h-full w-full"
             imgClassName="object-cover"
           />
         </div>
       </ViewTransition>
       <ViewTransition name={`detail-title-${id}`} enter="fade-in" default="none">
         <div className="py-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
+          <h1 className="text-foreground mb-4 text-3xl leading-tight font-bold sm:text-4xl md:text-5xl">
             {title}
           </h1>
-          {excerpt && <p className="text-lg text-foreground/70 mb-6 max-w-xl">{excerpt}</p>}
-          <div className="flex flex-wrap items-center gap-3 text-sm text-foreground/60">
+          {excerpt && <p className="text-foreground/70 mb-6 max-w-xl text-lg">{excerpt}</p>}
+          <div className="text-foreground/60 flex flex-wrap items-center gap-3 text-sm">
             {metaItems}
           </div>
         </div>

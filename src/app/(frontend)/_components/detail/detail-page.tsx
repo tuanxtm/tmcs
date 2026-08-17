@@ -70,6 +70,7 @@ export async function DetailPage({ view, locale, imageKey }: DetailPageProps) {
       >
         <article>
           <DetailHero
+            slug={view.slug}
             id={view.id}
             title={view.title}
             excerpt={excerpt}

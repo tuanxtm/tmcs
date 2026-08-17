@@ -62,6 +62,7 @@ export type HeroView = {
 /** Slim DTO for homepage feed tiles - only fields the UI consumes. */
 export type PostCardView = {
   id: number
+  slug: string | null
   title: string
   /** Present only when a public post detail route exists. */
   href: string | null
@@ -71,6 +72,7 @@ export type PostCardView = {
 
 export type ProjectCardView = {
   id: number
+  slug: string | null
   title: string
   /** Present only when a public project detail route exists. */
   href: string | null
@@ -82,6 +84,9 @@ export type ThingPlatformLink = { label: string; url: string }
 
 export type ThingCardView = {
   id: number
+  /** Stable identifier for the ViewTransition name. Things have no detail route,
+   * so slug is null — FeedCard falls back to id for the morph name. */
+  slug: string | null
   name: string
   description: string | null
   primaryImage: MediaView | null
@@ -97,6 +102,9 @@ export type VideoProvider = 'youtube' | 'tiktok' | 'instagram' | 'other'
 
 export type VideoCardView = {
   id: number
+  /** Stable identifier for the ViewTransition name. Videos have no detail route,
+   * so slug is null — FeedCard falls back to id for the morph name. */
+  slug: string | null
   title: string
   provider: VideoProvider
   sourceUrl: string

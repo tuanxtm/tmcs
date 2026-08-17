@@ -154,6 +154,7 @@ function toPostCard(post: Post, locale: LocaleCode): PostCardView {
 
   return {
     id: post.id,
+    slug,
     title: post.title,
     href: slug ? pageHref(locale, slug) : null,
     publishedAt: post.publishedAt ?? null,
@@ -167,6 +168,7 @@ function toProjectCard(project: Project, locale: LocaleCode): ProjectCardView {
 
   return {
     id: project.id,
+    slug,
     title: project.title,
     href: slug ? pageHref(locale, slug) : null,
     publishedAt: project.publishedAt ?? null,
@@ -184,6 +186,7 @@ function toThingCard(thing: Thing): ThingCardView {
 
   return {
     id: thing.id,
+    slug: null,
     name: thing.name,
     description: thing.description ?? null,
     primaryImage,
@@ -208,6 +211,7 @@ function toVideoCard(video: Video): VideoCardView {
 
   return {
     id: video.id,
+    slug: null,
     title: video.title,
     provider,
     sourceUrl,
