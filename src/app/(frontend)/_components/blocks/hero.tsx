@@ -4,7 +4,6 @@ import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import { trimUrlScheme } from '@/app/(frontend)/_lib/social-icons'
 import type { LayoutHeroBlockView, NavChildView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
-import Threads from '@/components/ui/threads'
 
 type HeroProps = {
   hero: LayoutHeroBlockView
@@ -74,19 +73,7 @@ export function Hero({ hero, className }: HeroProps) {
     >
       <div className="flex h-full w-full flex-col-reverse items-stretch justify-between md:flex-row">
         <div className="relative isolate min-h-0 flex-1 overflow-hidden">
-          <Threads
-            color={[1, 1, 1]}
-            amplitude={0.7}
-            distance={0.7}
-            speed={0.05}
-            enableMouseInteraction={false}
-            className={cn(
-              'pointer-events-none absolute inset-0 z-0 opacity-80',
-              'pl-2 md:pl-3 lg:pl-4',
-              className,
-            )}
-          />
-          <div className={cn('relative z-10 h-full overflow-y-auto', 'p-2 md:p-3 lg:p-4')}>
+          <div className={cn('relative z-10 h-full overflow-y-auto', 'px-2 py-4 md:p-3 lg:p-4')}>
             <div className="grid grid-cols-2 gap-x-16 gap-y-4 md:gap-y-8 lg:gap-x-8 lg:gap-y-16">
               <FieldRow label={hero.labelTitle}>
                 <h1
@@ -134,8 +121,8 @@ export function Hero({ hero, className }: HeroProps) {
         <div
           className={cn(
             'relative overflow-hidden md:h-full',
-            'h-40 w-full md:w-1/3 lg:w-1/4',
-            'pl-2 md:pl-1.5 lg:pl-2.5',
+            'h-40 w-full md:w-[calc(1/3*100%-1rem)] lg:w-[calc(1/4*100%-1rem)]',
+            'max-sm:pl-2',
             className,
           )}
         >
