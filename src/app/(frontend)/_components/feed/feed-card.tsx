@@ -1,13 +1,15 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
+import { useState } from 'react'
 import { ViewTransition } from 'react'
 import { useReducedMotion } from 'motion/react'
 
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
-import type { PostCardView, ProjectCardView } from '@/app/(frontend)/_lib/types'
+import type { FeedDecorationView, PostCardView, ProjectCardView } from '@/app/(frontend)/_lib/types'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import { getImageAspect } from '@/app/(frontend)/_components/media/image-aspect'
 
@@ -16,6 +18,7 @@ type FeedCardProps = {
   locale: LocaleCode
   className?: string
   cursorPopup?: string | null
+  decorations?: FeedDecorationView[]
 }
 
 const dateFormatters: Record<LocaleCode, Intl.DateTimeFormat> = {
@@ -42,9 +45,24 @@ function formatDate(value: string | null, locale: LocaleCode): string | null {
   }
 }
 
-export function FeedCard({ doc, locale, className, cursorPopup = 'view details' }: FeedCardProps) {
+// Stable per-card deco pick: same id always picks the same decoration,
+// and the choice is stable across renders so React doesn't re-render the
+// decoration image. Defined at module scope so it isn't recreated per render.
+function pickDecoration(
+  decorations: FeedDecorationView[] | undefined,
+  docId: number,
+): FeedDecorationView | null {
+  if (!decorations?.length) return null
+  return decorations[Math.abs(docId) % decorations.length] ?? null
+}
+
+export function FeedCard({ doc, locale, className, cursorPopup = 'view details', decorations }: FeedCardProps) {
   const reduceMotion = useReducedMotion()
   const dateLabel = formatDate(doc.publishedAt, locale)
+  // Lazy state init picks the deco on first render only. The decoration image
+  // itself is loaded by next/image (lazy by default), so nothing deco-related
+  // ships in the initial HTML payload.
+  const [deco] = useState(() => pickDecoration(decorations, doc.id))
 
   // slug is globally unique across all feed types (posts, projects). Use it for
   // the shared-element VT name so multiple sections on the same page don't collide.
@@ -68,12 +86,18 @@ export function FeedCard({ doc, locale, className, cursorPopup = 'view details' 
             !reduceMotion && 'group-hover:scale-[1.01] group-focus-visible:scale-[1.01]',
           )}
         />
+      ) : deco ? (
+        <Image
+          src={deco.imageUrl}
+          fill
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          className="object-contain"
+          alt=""
+          aria-hidden="true"
+        />
       ) : (
         <div
-          className={cn(
-            'flex aspect-square w-full items-center justify-center backdrop-blur-lg',
-            'bg-white/80 backdrop-blur-lg',
-          )}
+          className="flex aspect-square w-full items-center justify-center bg-white/80"
           aria-hidden="true"
         />
       )}

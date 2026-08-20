@@ -14,9 +14,11 @@ import {
   type FeedSourceMode,
 } from '@/app/(frontend)/_lib/feed-registry'
 import {
+  getFeedDecorations,
   getHero,
   getPostsPage,
   getProjectsPage,
+  getSiteShell,
   getVideosPage,
   loadShortStoryTexts,
   toMediaView,
@@ -248,6 +250,35 @@ async function resolveFeedSectionBlock(
       ? resolvePageHref((block as { viewAllPage?: unknown }).viewAllPage, locale)
       : null
 
+  // Fetch shell (needed for decorations + metadata) in parallel with the docs
+  // load and the decorations lookup. Decorations depend on the resolved
+  // shell, so we chain the lookup off `shellPromise`; everything else kicks
+  // off in parallel and we await once.
+  const shellPromise = getSiteShell(locale)
+  const decorationsPromise = shellPromise.then((s) =>
+    s.activeDecorationPackId ? getFeedDecorations(s.activeDecorationPackId) : undefined,
+  )
+  const docsPromise =
+    pagination === 'infinite'
+      ? feedType === 'posts'
+        ? getPostsPage(locale, null)
+        : feedType === 'projects'
+          ? getProjectsPage(locale, null)
+          : feedType === 'videos'
+            ? getVideosPage(locale, null)
+            : adapter.loadCards({ locale, source, limit, manualIds })
+      : adapter.loadCards({ locale, source, limit, manualIds })
+
+  const [shell, docsResult, decorations] = await Promise.all([
+    shellPromise,
+    docsPromise,
+    decorationsPromise,
+  ])
+  // Infinite pages return `{ docs, nextCursor, hasNextPage }`; static returns
+  // the card array directly. `Array.isArray` discriminates the two without a
+  // runtime `'docs' in ...` probe.
+  const docs: unknown[] = Array.isArray(docsResult) ? docsResult : docsResult.docs
+
   const base = {
     blockType: 'layoutFeedSection' as const,
     id: blockId(block, `feed-${feedType}-${index}`),
@@ -263,11 +294,12 @@ async function resolveFeedSectionBlock(
     cursorPopupViewAll: showViewAll
       ? (block.cursorPopupViewAll ?? adapter.defaultCursorPopupViewAll)
       : null,
+    decorations,
   }
 
   if (pagination === 'infinite') {
+    const page = docsResult as { docs: unknown[]; nextCursor: string | null; hasNextPage: boolean }
     if (feedType === 'posts') {
-      const page = await getPostsPage(locale, null)
       return {
         ...base,
         feedType: 'posts',
@@ -281,7 +313,6 @@ async function resolveFeedSectionBlock(
       }
     }
     if (feedType === 'projects') {
-      const page = await getProjectsPage(locale, null)
       return {
         ...base,
         feedType: 'projects',
@@ -295,7 +326,6 @@ async function resolveFeedSectionBlock(
       }
     }
     if (feedType === 'videos') {
-      const page = await getVideosPage(locale, null)
       return {
         ...base,
         feedType: 'videos',
@@ -308,15 +338,7 @@ async function resolveFeedSectionBlock(
         cursorPopupViewAll: null,
       }
     }
-    // things never infinite - fall through to static
   }
-
-  const docs = await adapter.loadCards({
-    locale,
-    source,
-    limit,
-    manualIds,
-  })
 
   if (feedType === 'posts') {
     return {
@@ -525,7 +547,14 @@ function toCmsPageView(
 }
 
 async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> {
-  const [hero, projects, posts, things, videos] = await Promise.all([
+  // Start shell early so the decorations lookup can chain off it. Both
+  // promises resolve in parallel with the rest of the array - previously
+  // decorations was awaited serially after the Promise.all below.
+  const shellPromise = getSiteShell(locale)
+  const decorationsPromise = shellPromise.then((s) =>
+    s.activeDecorationPackId ? getFeedDecorations(s.activeDecorationPackId) : undefined,
+  )
+  const [hero, projects, posts, things, videos, shell, decorations] = await Promise.all([
     getHero(locale),
     getProjectsPage(locale, null),
     getPostsPage(locale, null),
@@ -541,6 +570,9 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       limit: 11,
       manualIds: [],
     }),
+    shellPromise,
+    // Shared across every fallback section; same array is passed to all four.
+    decorationsPromise,
   ])
 
   if (process.env.NODE_ENV !== 'production') {
@@ -581,6 +613,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.projects.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.projects.defaultCursorPopupItem,
       cursorPopupViewAll: FEED_SOURCE_REGISTRY.projects.defaultCursorPopupViewAll,
+      decorations,
     },
     {
       blockType: 'layoutFeedSection',
@@ -599,6 +632,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.posts.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.posts.defaultCursorPopupItem,
       cursorPopupViewAll: FEED_SOURCE_REGISTRY.posts.defaultCursorPopupViewAll,
+      decorations,
     },
     {
       blockType: 'layoutFeedSection',
@@ -617,6 +651,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.things.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.things.defaultCursorPopupItem,
       cursorPopupViewAll: null,
+      decorations,
     },
     {
       blockType: 'layoutFeedSection',
@@ -635,6 +670,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.videos.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.videos.defaultCursorPopupItem,
       cursorPopupViewAll: null,
+      decorations,
     },
   ]
 

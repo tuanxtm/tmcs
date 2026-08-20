@@ -13,6 +13,7 @@ import {
 import { SectionHeader } from '@/app/(frontend)/_components/layout/section-header'
 import { loadFeedPage } from '@/app/(frontend)/_lib/actions'
 import type {
+  FeedDecorationView,
   FeedPaginationMode,
   FeedType,
   PostCardView,
@@ -42,6 +43,7 @@ type FeedSectionBaseProps = {
   viewAllLabel?: string | null
   viewAllHref?: string | null
   className?: string
+  decorations?: FeedDecorationView[]
 }
 
 type FeedSectionProps =
@@ -78,6 +80,7 @@ export function FeedSection(props: FeedSectionProps) {
     feedType,
     docs: initialDocs,
     className,
+    decorations,
   } = props
 
   const [docs, setDocs] = useState<FeedCardDoc[]>(initialDocs)
@@ -144,7 +147,7 @@ export function FeedSection(props: FeedSectionProps) {
         data-cursor-popup={sectionCursor}
         className={className}
       >
-        <SectionHeader id={headingId} heading={heading} description={description} />
+        <SectionHeader id={headingId} heading={heading} />
       </section>
     )
   }
@@ -160,7 +163,7 @@ export function FeedSection(props: FeedSectionProps) {
         className,
       )}
     >
-      <SectionHeader id={headingId} heading={heading} description={description} />
+      <SectionHeader id={headingId} heading={heading} />
 
       <FeedGrid>
         {docs.map((doc, index) => (
@@ -172,6 +175,10 @@ export function FeedSection(props: FeedSectionProps) {
             className={cn('relative z-0 min-w-0')}
           >
             {feedType === 'videos' ? (
+              // Videos intentionally skip the decoration fallback - the
+              // YouTube icon placeholder communicates "video tile" more
+              // clearly than an ornament would, and video cards always
+              // carry a thumbnail in practice.
               <VideoFeedCard
                 doc={doc as VideoCardView}
                 locale={locale}
@@ -185,6 +192,7 @@ export function FeedSection(props: FeedSectionProps) {
                 doc={doc as PostCardView | ProjectCardView}
                 locale={locale}
                 cursorPopup={cursorPopupItem}
+                decorations={decorations}
               />
             )}
           </RevealGridItem>

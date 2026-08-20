@@ -616,7 +616,9 @@ export const getHero = cache(async (locale: LocaleCode): Promise<HeroView> => {
 export const getFeedDecorations = cache(async (packId: number): Promise<FeedDecorationView[]> => {
   if (!packId) return []
 
-  const pack = await getCachedDecorationPack(packId)
+  const pack = shouldUseCache()
+    ? await getCachedDecorationPack(packId)
+    : await loadDecorationPack(packId)
   if (!pack?.items?.length) return []
 
   return pack.items

@@ -2629,7 +2629,7 @@ export interface SiteSetting {
       }[]
     | null;
   /**
-   * Which decoration pack fills leftover bento gaps and supplies the footer SVG via its footer item.
+   * Which decoration pack to display on the site.
    */
   activeDecorationPack: number | DecorationPack;
   analytics?: {

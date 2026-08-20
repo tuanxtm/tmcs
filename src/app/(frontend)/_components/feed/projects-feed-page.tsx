@@ -9,7 +9,7 @@ const { Page: ProjectsFeedPage, generateMetadata: generateProjectsFeedMetadata }
     label: 'Projects',
     feedType: 'projects',
     loadFeed: (locale) => getProjectsPage(locale, null),
-    renderFeed: ({ locale, feed, adapter }) => {
+    renderFeed: ({ locale, feed, adapter, decorations }) => {
       const { docs, nextCursor, hasNextPage } = feed as ProjectsPageView
       return (
         <FeedSection
@@ -27,6 +27,7 @@ const { Page: ProjectsFeedPage, generateMetadata: generateProjectsFeedMetadata }
           showViewAll={false}
           feedType="projects"
           docs={docs}
+          decorations={decorations}
         />
       )
     },

@@ -231,6 +231,8 @@ type FeedSectionBase = {
   cursorPopupEmpty: string | null
   cursorPopupItem: string | null
   cursorPopupViewAll: string | null
+  /** Decoration images from the active decoration pack. */
+  decorations?: FeedDecorationView[]
 }
 
 export type FeedSectionBlockView =

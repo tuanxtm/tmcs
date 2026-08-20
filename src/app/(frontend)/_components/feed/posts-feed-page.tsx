@@ -9,7 +9,7 @@ const { Page: PostsFeedPage, generateMetadata: generatePostsFeedMetadata } =
     label: 'Posts',
     feedType: 'posts',
     loadFeed: (locale) => getPostsPage(locale, null),
-    renderFeed: ({ locale, feed, adapter }) => {
+    renderFeed: ({ locale, feed, adapter, decorations }) => {
       const { docs, nextCursor, hasNextPage } = feed as PostsPageView
       return (
         <FeedSection
@@ -27,6 +27,7 @@ const { Page: PostsFeedPage, generateMetadata: generatePostsFeedMetadata } =
           showViewAll={false}
           feedType="posts"
           docs={docs}
+          decorations={decorations}
         />
       )
     },

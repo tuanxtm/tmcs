@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 
-import { getSiteShell } from '@/app/(frontend)/_lib/cms'
+import { getFeedDecorations, getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
 import { getPageBySlug } from '@/app/(frontend)/_lib/page-data'
 import { FEED_SOURCE_REGISTRY } from '@/app/(frontend)/_lib/feed-registry'
-import type { FeedType } from '@/app/(frontend)/_lib/types'
+import type { FeedDecorationView, FeedType } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 
 type FeedPageShellOptions = {
@@ -23,6 +23,7 @@ type FeedPageShellOptions = {
     feed: unknown
     shell: SiteShell
     adapter: (typeof FEED_SOURCE_REGISTRY)[FeedType]
+    decorations?: FeedDecorationView[]
   }) => React.ReactNode
 }
 
@@ -86,6 +87,10 @@ export function createFeedPageShell({
       loadFeed(locale),
     ])
 
+    const decorations = shell.activeDecorationPackId
+      ? await getFeedDecorations(shell.activeDecorationPackId)
+      : undefined
+
     if (page) {
       return (
         <div>
@@ -102,7 +107,7 @@ export function createFeedPageShell({
     return (
       <div>
         <SiteHeader siteName={shell.siteName} locale={locale} navigation={shell.navigation} />
-        {renderFeed({ locale, feed, shell, adapter })}
+        {renderFeed({ locale, feed, shell, adapter, decorations })}
       </div>
     )
   }

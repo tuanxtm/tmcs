@@ -139,12 +139,12 @@ export const SiteSettings: GlobalConfig = {
           fields: [
             {
               name: 'activeDecorationPack',
+              label: 'Active decoration pack',
               type: 'relationship',
               relationTo: 'decoration-packs',
               required: true,
               admin: {
-                description:
-                  'Which decoration pack fills leftover bento gaps and supplies the footer SVG via its footer item.',
+                description: 'Which decoration pack to display on the site.',
               },
             },
           ],

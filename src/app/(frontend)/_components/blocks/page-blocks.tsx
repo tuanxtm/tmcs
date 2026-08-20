@@ -41,10 +41,10 @@ function DeferredBlockPlaceholder({
     <aside
       id={`block-${blockId}`}
       aria-label={`${blockType} (placeholder)`}
-      className="mx-auto my-8 max-w-3xl rounded border border-dashed border-border bg-foreground/5 px-4 py-6 text-center text-xs uppercase tracking-wide text-muted-foreground"
+      className="border-border bg-foreground/5 text-muted-foreground mx-auto my-8 max-w-3xl rounded border border-dashed px-4 py-6 text-center text-xs tracking-wide uppercase"
     >
       <span className="font-mono">{blockType}</span>
-      <span className="ml-2 text-foreground/60">- coming soon</span>
+      <span className="text-foreground/60 ml-2">- coming soon</span>
     </aside>
   )
 }
@@ -113,6 +113,7 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}
                   viewAllHref={block.viewAllHref}
+                  decorations={block.decorations}
                 />
               )
             }
@@ -138,6 +139,7 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}
                   viewAllHref={block.viewAllHref}
+                  decorations={block.decorations}
                 />
               )
             }
@@ -162,6 +164,7 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
                 showViewAll={block.showViewAll}
                 viewAllLabel={block.viewAllLabel}
                 viewAllHref={block.viewAllHref}
+                decorations={block.decorations}
               />
             )
           }
@@ -171,7 +174,7 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
               <section key={block.id} className="px-4 py-8">
                 <CmsRichText
                   data={block.content}
-                  className="mx-auto max-w-3xl text-sm leading-relaxed text-foreground"
+                  className="text-foreground mx-auto max-w-3xl text-sm leading-relaxed"
                 />
               </section>
             )
@@ -180,11 +183,21 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
             return <ContentMediaBlock key={block.id} block={block} />
 
           case 'contentGallery':
-            return <DeferredBlockPlaceholder key={block.id} blockType="contentGallery" blockId={block.id} />
+            return (
+              <DeferredBlockPlaceholder
+                key={block.id}
+                blockType="contentGallery"
+                blockId={block.id}
+              />
+            )
 
           case 'layoutRelatedItems':
             return (
-              <DeferredBlockPlaceholder key={block.id} blockType="layoutRelatedItems" blockId={block.id} />
+              <DeferredBlockPlaceholder
+                key={block.id}
+                blockType="layoutRelatedItems"
+                blockId={block.id}
+              />
             )
 
           case 'layoutTypewriter':
@@ -197,7 +210,7 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
             return <BlankSpaceBlock key={block.id} block={block} />
 
           case 'layoutFooter':
-            return <FooterBlock key={block.id} block={block} siteName={siteName} />
+            return <FooterBlock key={block.id} block={block} locale={locale} siteName={siteName} />
 
           default: {
             if (process.env.NODE_ENV !== 'production') {
