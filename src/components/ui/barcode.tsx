@@ -1,4 +1,4 @@
-import React from 'react'
+import { vietnameseToAscii } from '@/lib/vietnamese'
 
 type BarcodeProps = {
   value: string
@@ -186,7 +186,11 @@ export function Barcode({
   className,
 }: BarcodeProps) {
   const height = 100
-  const sequence = encodeAutoCODE128(value)
+  // CODE128 only supports ASCII 32-127; strip Vietnamese diacritics so the
+  // encoded payload matches what the caller typed instead of silently dropping
+  // non-ASCII letters.
+  const asciiValue = vietnameseToAscii(value)
+  const sequence = encodeAutoCODE128(asciiValue)
 
   if (sequence.length === 0) return null
 
