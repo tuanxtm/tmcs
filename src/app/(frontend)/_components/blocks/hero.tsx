@@ -44,7 +44,7 @@ function LinkList({ links, variant }: { links: NavChildView[]; variant: LinkList
               target={link.newTab ? '_blank' : undefined}
               rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
               className="text-foreground focus-visible:ring-ring flex items-center gap-1 focus-visible:ring-2 focus-visible:outline-none md:gap-2"
-              data-cursor-popup={'->'}
+              data-cursor-popup={''}
             >
               <span className="text-primary hover:text-foreground font-mono text-xs md:text-base">
                 &gt;
@@ -129,7 +129,8 @@ export function Hero({ hero, className }: HeroProps) {
         <div
           className={cn(
             'relative overflow-hidden md:h-full',
-            'h-40 w-full md:w-[calc(1/3*100%-1rem)] lg:w-[calc(1/4*100%-1rem)]',
+            // Minus 20px and 40px to match width with the 4th item in the grid
+            'h-40 w-full md:w-[calc((100%-20px)/3)] lg:w-[calc((100%-40px)/4)]',
             'max-sm:pl-2',
             className,
           )}
