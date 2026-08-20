@@ -32,7 +32,7 @@ export function SiteHeader({ siteName, locale, navigation, className }: SiteHead
           className,
         )}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <Link href={homeHref(locale)}>
             <Image
               src="/logo.svg"

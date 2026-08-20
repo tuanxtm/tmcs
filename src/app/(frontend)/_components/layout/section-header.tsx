@@ -17,7 +17,6 @@ export function SectionHeader({ id, heading, description, className }: SectionHe
           'ml-2 grid items-center md:ml-3 lg:ml-4',
           'grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
           'gap-x-1 lg:gap-x-2',
-          'dash-line-b [--dash-gap:2px] [--dash-length:3px] [--dash-width:1px]',
         )}
         data-stuck="false"
       >
@@ -34,7 +33,7 @@ export function SectionHeader({ id, heading, description, className }: SectionHe
         <div className="h-[1em] w-full md:col-start-3 md:col-end-4 lg:col-start-4 lg:col-end-5">
           <Barcode
             value={'latest ' + heading}
-            lineColor="var(--primary)"
+            lineColor="oklch(from var(--primary) l c h / 0.5)"
             quietZoneModules={0}
             className="h-full w-full"
           />

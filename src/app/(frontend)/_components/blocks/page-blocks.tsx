@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react'
-
 import { FeedSection } from '@/app/(frontend)/_components/feed/feed-section'
 import { Hero } from '@/app/(frontend)/_components/blocks/hero'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
@@ -56,16 +54,7 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
 
   return (
     <div className={className}>
-      {blocks.map((block, index) => {
-        const previous = index > 0 ? blocks[index - 1] : null
-        // Preserve first-fold budget: no 3rem gap between hero and the following section.
-        const spaced = index > 0 && previous?.blockType !== 'layoutHero'
-        const wrap = (node: ReactNode) => (
-          <div key={block.id} className={spaced ? 'mt-12' : undefined}>
-            {node}
-          </div>
-        )
-
+      {blocks.map((block) => {
         switch (block.blockType) {
           case 'layoutHero':
             return <Hero key={block.id} hero={block} />
@@ -83,7 +72,7 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
             ].join(':')
 
             if (block.feedType === 'things') {
-              return wrap(
+              return (
                 <ThingsSection
                   key={feedKey}
                   locale={locale}
@@ -99,12 +88,12 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}
                   viewAllHref={block.viewAllHref}
-                />,
+                />
               )
             }
 
             if (block.feedType === 'posts') {
-              return wrap(
+              return (
                 <FeedSection
                   key={feedKey}
                   locale={locale}
@@ -124,12 +113,12 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}
                   viewAllHref={block.viewAllHref}
-                />,
+                />
               )
             }
 
             if (block.feedType === 'videos') {
-              return wrap(
+              return (
                 <FeedSection
                   key={feedKey}
                   locale={locale}
@@ -149,11 +138,11 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}
                   viewAllHref={block.viewAllHref}
-                />,
+                />
               )
             }
 
-            return wrap(
+            return (
               <FeedSection
                 key={feedKey}
                 locale={locale}
@@ -173,42 +162,42 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
                 showViewAll={block.showViewAll}
                 viewAllLabel={block.viewAllLabel}
                 viewAllHref={block.viewAllHref}
-              />,
+              />
             )
           }
 
           case 'layoutRichTextWithoutBlock':
-            return wrap(
-              <section className="px-4 py-8">
+            return (
+              <section key={block.id} className="px-4 py-8">
                 <CmsRichText
                   data={block.content}
                   className="mx-auto max-w-3xl text-sm leading-relaxed text-foreground"
                 />
-              </section>,
+              </section>
             )
 
           case 'contentMedia':
-            return wrap(<ContentMediaBlock block={block} />)
+            return <ContentMediaBlock key={block.id} block={block} />
 
           case 'contentGallery':
-            return wrap(<DeferredBlockPlaceholder blockType="contentGallery" blockId={block.id} />)
+            return <DeferredBlockPlaceholder key={block.id} blockType="contentGallery" blockId={block.id} />
 
           case 'layoutRelatedItems':
-            return wrap(
-              <DeferredBlockPlaceholder blockType="layoutRelatedItems" blockId={block.id} />,
+            return (
+              <DeferredBlockPlaceholder key={block.id} blockType="layoutRelatedItems" blockId={block.id} />
             )
 
           case 'layoutTypewriter':
-            return wrap(<TypewriterBlock block={block} />)
+            return <TypewriterBlock key={block.id} block={block} />
 
           case 'layoutScrambleHover':
-            return wrap(<ScrambleHoverBlock block={block} />)
+            return <ScrambleHoverBlock key={block.id} block={block} />
 
           case 'layoutBlankSpace':
-            return wrap(<BlankSpaceBlock block={block} />)
+            return <BlankSpaceBlock key={block.id} block={block} />
 
           case 'layoutFooter':
-            return wrap(<FooterBlock block={block} siteName={siteName} />)
+            return <FooterBlock key={block.id} block={block} siteName={siteName} />
 
           default: {
             if (process.env.NODE_ENV !== 'production') {
