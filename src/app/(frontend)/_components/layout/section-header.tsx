@@ -4,11 +4,10 @@ import { Barcode } from '@/components/ui/barcode'
 type SectionHeaderProps = {
   id: string
   heading: string
-  description?: string | null
   className?: string
 }
 
-export function SectionHeader({ id, heading, description, className }: SectionHeaderProps) {
+export function SectionHeader({ id, heading, className }: SectionHeaderProps) {
   return (
     <div className={cn('bg-background', className)}>
       <div
@@ -33,7 +32,7 @@ export function SectionHeader({ id, heading, description, className }: SectionHe
         <div className="h-[1em] w-full md:col-start-3 md:col-end-4 lg:col-start-4 lg:col-end-5">
           <Barcode
             value={'latest ' + heading}
-            lineColor="oklch(from var(--primary) l c h / 0.5)"
+            lineColor="oklch(from var(--primary) l c h / 0.7)"
             quietZoneModules={0}
             className="h-full w-full"
           />

@@ -44,9 +44,17 @@ function LinkList({ links, variant }: { links: NavChildView[]; variant: LinkList
               target={link.newTab ? '_blank' : undefined}
               rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
               className="text-foreground focus-visible:ring-ring flex items-center gap-1 focus-visible:ring-2 focus-visible:outline-none md:gap-2"
+              data-cursor-popup={'->'}
             >
-              <span className="text-muted-foreground font-mono text-xs md:text-base">&gt;</span>
-              <span className="text-sm font-medium tracking-tight lowercase md:text-base lg:text-lg">
+              <span className="text-primary hover:text-foreground font-mono text-xs md:text-base">
+                &gt;
+              </span>
+              <span
+                className={cn(
+                  'text-sm font-medium tracking-tight lowercase md:text-base lg:text-lg',
+                  'hover:text-primary',
+                )}
+              >
                 {display}
               </span>
             </Link>

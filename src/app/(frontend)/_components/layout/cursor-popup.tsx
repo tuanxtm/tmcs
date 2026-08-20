@@ -9,6 +9,7 @@ import {
   useReducedMotion,
   useSpring,
 } from 'motion/react'
+import { cn } from '@/lib/utils'
 
 const CURSOR_ATTR = 'data-cursor-popup'
 const OFFSET_X = 16
@@ -143,15 +144,18 @@ export function CursorPopup() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[60] hidden md:block"
+      className="pointer-events-none fixed inset-0 z-60 hidden md:block"
       data-cursor-popup-root
     >
-      <motion.div className="absolute left-0 top-0 will-change-transform" style={{ transform }}>
+      <motion.div className="absolute top-0 left-0 will-change-transform" style={{ transform }}>
         <AnimatePresence mode="wait">
           {visible && label ? (
             <motion.div
               key={label}
-              className="overflow-hidden py-0.5 px-1 font-medium whitespace-nowrap text-xs text-foreground mix-blend-difference bg-gradient-to-r from-gradient-3/90 to-gradient-3/80 tracking-tight leading-none"
+              className={cn(
+                'text-background overflow-hidden text-xs leading-none font-medium tracking-tight whitespace-nowrap',
+                'bg-primary px-1 py-0.5',
+              )}
               initial={reduceMotion ? false : { clipPath: 'inset(0 50% 0 50%)' }}
               animate={{ clipPath: 'inset(0 0% 0 0%)' }}
               exit={reduceMotion ? undefined : { clipPath: 'inset(0 50% 0 50%)' }}

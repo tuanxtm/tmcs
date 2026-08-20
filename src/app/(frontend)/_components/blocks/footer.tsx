@@ -65,7 +65,9 @@ export function FooterBlock({ block, siteName, locale }: FooterBlockProps) {
             'dash-line-t',
           )}
         >
-          <p className="text-foreground pt-0.5 text-sm leading-none font-medium">{copyright}</p>
+          <p className="text-foreground pt-0.5 text-xs leading-none font-medium md:text-sm">
+            {copyright}
+          </p>
           <Link href={homeHref(locale)}>
             <Image
               src="/logo.svg"
