@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useState } from 'react'
 import { ViewTransition } from 'react'
 import { useReducedMotion } from 'motion/react'
@@ -56,7 +55,13 @@ function pickDecoration(
   return decorations[Math.abs(docId) % decorations.length] ?? null
 }
 
-export function FeedCard({ doc, locale, className, cursorPopup = 'view details', decorations }: FeedCardProps) {
+export function FeedCard({
+  doc,
+  locale,
+  className,
+  cursorPopup = 'view details',
+  decorations,
+}: FeedCardProps) {
   const reduceMotion = useReducedMotion()
   const dateLabel = formatDate(doc.publishedAt, locale)
   // Lazy state init picks the deco on first render only. The decoration image
@@ -74,7 +79,7 @@ export function FeedCard({ doc, locale, className, cursorPopup = 'view details',
   const { aspectClass } = getImageAspect(doc.image)
 
   const imageContent = (
-    <div className={cn('relative w-full overflow-hidden', aspectClass)}>
+    <div className={cn('bg-primary/4 relative w-full overflow-hidden', aspectClass)}>
       {doc.image ? (
         <CmsImage
           media={doc.image}
@@ -87,13 +92,20 @@ export function FeedCard({ doc, locale, className, cursorPopup = 'view details',
           )}
         />
       ) : deco ? (
-        <Image
-          src={deco.imageUrl}
-          fill
-          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className="object-contain"
-          alt=""
+        <div
+          className="relative h-full w-full overflow-hidden"
           aria-hidden="true"
+          style={{
+            WebkitMaskImage: `url("${deco.imageUrl}")`,
+            maskImage: `url("${deco.imageUrl}")`,
+            WebkitMaskSize: 'contain',
+            maskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            maskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            maskPosition: 'center',
+            backgroundColor: 'var(--primary)',
+          }}
         />
       ) : (
         <div
