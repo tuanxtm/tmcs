@@ -55,27 +55,50 @@ export function FeedCard({ doc, locale, className, cursorPopup = 'view details' 
   // morph between them has matching start/end frames.
   const { aspectClass } = getImageAspect(doc.image)
 
-  const imageContent = doc.image ? (
-    <div className={cn('relative w-full overflow-hidden bg-zinc-950', aspectClass)}>
-      <CmsImage
-        media={doc.image}
-        fill
-        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-        className="w-full h-full"
-        imgClassName={cn(
-          'object-cover transition-transform duration-500',
-          !reduceMotion && 'group-hover:scale-[1.01] group-focus-visible:scale-[1.01]',
-        )}
-      />
-      <span className="absolute top-0 right-0 font-mono text-[0.625rem] uppercase tracking-tight leading-none mix-blend-difference text-white max-sm:hidden">
-        {dateLabel || 'Draft'}
-      </span>
+  const imageContent = (
+    <div className={cn('relative w-full overflow-hidden', aspectClass)}>
+      {doc.image ? (
+        <CmsImage
+          media={doc.image}
+          fill
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          className="h-full w-full"
+          imgClassName={cn(
+            'object-cover transition-transform duration-500',
+            !reduceMotion && 'group-hover:scale-[1.01] group-focus-visible:scale-[1.01]',
+          )}
+        />
+      ) : (
+        <div
+          className={cn(
+            'flex aspect-square w-full items-center justify-center backdrop-blur-lg',
+            'bg-white/80 backdrop-blur-lg',
+          )}
+          aria-hidden="true"
+        />
+      )}
+      {dateLabel &&
+        (() => {
+          const parts = dateLabel.split('/')
+          return (
+            <div
+              className={cn(
+                'absolute top-0 right-0 flex flex-col items-center',
+                'bg-background text-primary/80 font-mono text-[0.5rem] md:text-[0.625rem]',
+                'pl-px md:pl-0.5',
+                'leading-tight tracking-tight',
+                parts[0] === '0' && 'text-foreground/40',
+              )}
+            >
+              <span>{parts[0]}</span>
+              <span className="rotate-45">/</span>
+              <span>{parts[1]}</span>
+              <span className="rotate-45">/</span>
+              <span>{parts[2]}</span>
+            </div>
+          )
+        })()}
     </div>
-  ) : (
-    <div
-      className="flex aspect-4/3 w-full items-center justify-center bg-foreground/5 backdrop-blur-sm"
-      aria-hidden="true"
-    />
   )
 
   const imageWrapper = vtName ? (
@@ -87,11 +110,17 @@ export function FeedCard({ doc, locale, className, cursorPopup = 'view details' 
   )
 
   const body = (
-    <div className="flex flex-col gap-1 max-sm:gap-0.5">
-      {imageWrapper}
-
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-medium leading-none tracking-tight text-foreground md:text-base max-sm:hidden">
+    <div className="flex flex-col">
+      <div className="flex h-full flex-col gap-1 md:gap-1.5 lg:gap-2">
+        <div className="h-full w-full object-cover">{imageWrapper}</div>
+        <h3
+          className={cn(
+            'text-foreground text-xs leading-none font-medium tracking-tight md:text-sm lg:text-base',
+            'lowercase',
+            'border-primary/50 border-l-2 md:border-l-3 lg:border-l-4',
+            'pl-0.5 md:pl-1 lg:pl-2',
+          )}
+        >
           {doc.title}
         </h3>
       </div>

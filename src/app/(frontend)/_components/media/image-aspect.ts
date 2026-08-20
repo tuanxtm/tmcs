@@ -28,7 +28,7 @@ export type ImageAspect = {
  */
 export function getImageAspect(image: MediaView | null | undefined): ImageAspect {
   if (!image?.width || !image.height) {
-    return { ratio: 16 / 9, variant: 'overlay', aspectClass: 'aspect-video' }
+    return { ratio: 1 / 1, variant: 'overlay', aspectClass: 'aspect-square' }
   }
 
   const ratio = image.width / image.height
