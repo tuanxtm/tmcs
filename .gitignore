@@ -19,6 +19,8 @@
 # next.js
 /.next/
 /out/
+next-env.d.ts
+.next-dev.log
 
 # production
 /build
@@ -26,6 +28,7 @@
 # misc
 .DS_Store
 *.pem
+.tmp_logs/
 
 # debug
 npm-debug.log*
@@ -41,7 +44,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # uploads
 /media
