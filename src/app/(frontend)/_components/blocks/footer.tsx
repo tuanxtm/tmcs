@@ -1,3 +1,4 @@
+import { cacheLife } from 'next/cache'
 import Link from 'next/link'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import type { LayoutFooterBlockView } from '@/app/(frontend)/_lib/types'
@@ -12,8 +13,14 @@ type FooterBlockProps = {
   locale: LocaleCode
 }
 
-export function FooterBlock({ block, siteName, locale }: FooterBlockProps) {
-  const currentYear = new Date().getFullYear()
+async function getCurrentYear(): Promise<number> {
+  'use cache'
+  cacheLife('max')
+  return new Date().getFullYear()
+}
+
+export async function FooterBlock({ block, siteName, locale }: FooterBlockProps) {
+  const currentYear = await getCurrentYear()
   const copyright = (block.copyright ?? `© ${currentYear} ${siteName}`).replace(
     '{{year}}',
     String(currentYear),
@@ -27,7 +34,6 @@ export function FooterBlock({ block, siteName, locale }: FooterBlockProps) {
           'h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
           'bg-background',
           'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
-          'mb-4 md:mb-8 lg:mb-16',
         )}
       >
         <div className="flex h-full w-full flex-1 flex-col">

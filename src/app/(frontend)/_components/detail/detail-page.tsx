@@ -3,7 +3,6 @@ import { ViewTransition } from 'react'
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { DetailHero } from '@/app/(frontend)/_components/detail/detail-hero'
-import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
 import { getSiteShell } from '@/app/(frontend)/_lib/cms'
 import type { LocaleCode } from '@/lib/locales'
 
@@ -16,8 +15,6 @@ type DetailPageProps = {
   /** Which field on the view holds the hero image. */
   imageKey: 'featuredImage' | 'coverImage'
 }
-
-export const dynamic = 'force-dynamic'
 
 /**
  * Shared detail page shell for Posts and Projects.
@@ -53,9 +50,7 @@ export async function DetailPage({ view, locale, imageKey }: DetailPageProps) {
   const readingTime = 'readingTime' in view ? view.readingTime : null
 
   return (
-    <div>
-      <SiteHeader siteName={shell.siteName} locale={locale} navigation={shell.navigation} />
-      <ViewTransition
+    <ViewTransition
         enter={{
           'nav-forward': 'slide-from-right',
           'nav-back': 'slide-from-left',
@@ -93,6 +88,5 @@ export async function DetailPage({ view, locale, imageKey }: DetailPageProps) {
           ) : null}
         </article>
       </ViewTransition>
-    </div>
   )
 }

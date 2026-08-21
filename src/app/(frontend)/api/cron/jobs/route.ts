@@ -3,8 +3,6 @@ import config from '@payload-config'
 
 import { constantTimeEqual } from '@/lib/crypto'
 
-export const runtime = 'nodejs'
-
 /**
  * Protected jobs runner for Cloudflare Cron / scheduled publishing.
  *

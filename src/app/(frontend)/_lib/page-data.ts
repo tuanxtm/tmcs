@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { unstable_cache } from 'next/cache'
+import { cacheLife, cacheTag } from 'next/cache'
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 import { getPayload } from 'payload'
 
@@ -767,54 +767,54 @@ async function loadPageBySlug(locale: LocaleCode, slug: string): Promise<CmsPage
   return toCmsPageView(page, blocks, alternateSlug)
 }
 
-const getCachedHomePage = (locale: LocaleCode) =>
+async function cachedLoadHomePage(locale: LocaleCode): Promise<HomePageView> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(
+    CACHE_TAGS.pages,
+    CACHE_TAGS.posts,
+    CACHE_TAGS.projects,
+    CACHE_TAGS.things,
+    CACHE_TAGS.videos,
+    CACHE_TAGS.media,
+  )
   // Cache key is namespaced by `CMS_CACHE_VERSION` so shape-changing edits
   // can invalidate everything via a constant bump (see lib/cache-tags.ts).
-  unstable_cache(async () => loadHomePage(locale), [`home-page-v${CMS_CACHE_VERSION}`, locale], {
-    tags: [
-      CACHE_TAGS.pages,
-      CACHE_TAGS.posts,
-      CACHE_TAGS.projects,
-      CACHE_TAGS.things,
-      CACHE_TAGS.videos,
-      CACHE_TAGS.media,
-    ],
-  })()
+  // Under `"use cache"` the args (locale) form the key automatically; the
+  // version bump is folded into `cacheTag` via the `pages` tag plus the
+  // shape-changes themselves. Cache lifetime: days.
+  return loadHomePage(locale)
+}
 
-const getCachedPageBySlug = (locale: LocaleCode, slug: string) =>
-  // Same versioning policy as `getCachedHomePage` - see lib/cache-tags.ts.
-  unstable_cache(
-    async () => loadPageBySlug(locale, slug),
-    [`cms-page-v${CMS_CACHE_VERSION}`, locale, slug],
-    {
-      tags: [
-        CACHE_TAGS.pages,
-        CACHE_TAGS.posts,
-        CACHE_TAGS.projects,
-        CACHE_TAGS.things,
-        CACHE_TAGS.videos,
-        CACHE_TAGS.media,
-      ],
-    },
-  )()
+async function cachedLoadPageBySlug(
+  locale: LocaleCode,
+  slug: string,
+): Promise<CmsPageView | null> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(
+    CACHE_TAGS.pages,
+    CACHE_TAGS.posts,
+    CACHE_TAGS.projects,
+    CACHE_TAGS.things,
+    CACHE_TAGS.videos,
+    CACHE_TAGS.media,
+  )
+  // Same versioning policy as `cachedLoadHomePage` - see lib/cache-tags.ts.
+  return loadPageBySlug(locale, slug)
+}
 
 export const getHomePage = cache(async (locale: LocaleCode): Promise<HomePageView> => {
-  // Seed/admin updates outside a Next request cannot revalidateTag; skip the
-  // durable data cache in development so layout fixes show up immediately.
-  if (process.env.NODE_ENV !== 'production') {
-    return loadHomePage(locale)
-  }
-  return getCachedHomePage(locale)
+  // Always go through the `'use cache'` boundary so the home page is
+  // prerenderable. `cachedLoadHomePage` carries the `use cache` directive.
+  return cachedLoadHomePage(locale)
 })
 
 export const getPageBySlug = cache(
   async (locale: LocaleCode, slug: string): Promise<CmsPageView | null> => {
-    // Seed/admin updates outside a Next request cannot revalidateTag; skip the
-    // durable data cache in development so slug fixes show up immediately.
-    if (process.env.NODE_ENV !== 'production') {
-      return loadPageBySlug(locale, slug)
-    }
-    return getCachedPageBySlug(locale, slug)
+    // Always go through the `'use cache'` boundary so `[slug]` routes are
+    // prerenderable. `cachedLoadPageBySlug` carries the `use cache` directive.
+    return cachedLoadPageBySlug(locale, slug)
   },
 )
 
@@ -910,21 +910,27 @@ function toPostDetailView(post: Post, blocks: ResolvedBlockView[]): PostDetailVi
   }
 }
 
-/** Load a post by slug. Returns null if the slug is not reserved for posts. */
-export async function getPostBySlug(
-  locale: LocaleCode,
-  slug: string,
-): Promise<PostDetailView | null> {
-  const resolved = await resolveSlug(locale, slug)
-  if (!resolved || resolved.collection !== 'posts') return null
+/**
+ * Load a post by slug. Returns null if the slug is not reserved for posts.
+ *
+ * Wrapped in `React.cache()` so `generateMetadata` and the page body share
+ * one fetch + layout resolution per request. Not wrapped in `'use cache'`:
+ * detail routes need to participate in draft-mode revalidation when that
+ * lands, and a long-lived `'use cache'` here would mask fresh content.
+ */
+export const getPostBySlug = cache(
+  async (locale: LocaleCode, slug: string): Promise<PostDetailView | null> => {
+    const resolved = await resolveSlug(locale, slug)
+    if (!resolved || resolved.collection !== 'posts') return null
 
-  const post = await loadPostBySlug(locale, slug)
-  if (!post) return null
+    const post = await loadPostBySlug(locale, slug)
+    if (!post) return null
 
-  const [blocks] = await Promise.all([resolveLayoutBlocks(post.layout ?? [], locale)])
+    const blocks = await resolveLayoutBlocks(post.layout ?? [], locale)
 
-  return toPostDetailView(post, blocks)
-}
+    return toPostDetailView(post, blocks)
+  },
+)
 
 function toProjectDetailView(project: Project, blocks: ResolvedBlockView[]): ProjectDetailView {
   return {
@@ -965,18 +971,24 @@ function toProjectDetailView(project: Project, blocks: ResolvedBlockView[]): Pro
   }
 }
 
-/** Load a project by slug. Returns null if the slug is not reserved for projects. */
-export async function getProjectBySlug(
-  locale: LocaleCode,
-  slug: string,
-): Promise<ProjectDetailView | null> {
-  const resolved = await resolveSlug(locale, slug)
-  if (!resolved || resolved.collection !== 'projects') return null
+/**
+ * Load a project by slug. Returns null if the slug is not reserved for projects.
+ *
+ * Wrapped in `React.cache()` so `generateMetadata` and the page body share
+ * one fetch + layout resolution per request. Not wrapped in `'use cache'`:
+ * detail routes need to participate in draft-mode revalidation when that
+ * lands, and a long-lived `'use cache'` here would mask fresh content.
+ */
+export const getProjectBySlug = cache(
+  async (locale: LocaleCode, slug: string): Promise<ProjectDetailView | null> => {
+    const resolved = await resolveSlug(locale, slug)
+    if (!resolved || resolved.collection !== 'projects') return null
 
-  const project = await loadProjectBySlug(locale, slug)
-  if (!project) return null
+    const project = await loadProjectBySlug(locale, slug)
+    if (!project) return null
 
-  const [blocks] = await Promise.all([resolveLayoutBlocks(project.layout ?? [], locale)])
+    const blocks = await resolveLayoutBlocks(project.layout ?? [], locale)
 
-  return toProjectDetailView(project, blocks)
-}
+    return toProjectDetailView(project, blocks)
+  },
+)

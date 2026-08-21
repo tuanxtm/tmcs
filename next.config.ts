@@ -19,13 +19,18 @@ function getAllowedDevOrigins(): string[] {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // View Transitions API - opt-in via experimental flag. `<Link transitionTypes>`
-  // and `<ViewTransition>` work automatically. `useEffectEvent` / Suspense /
-  // `next/dynamic` already pass through. Browser support: Chromium 111+, Firefox
-  // 144+, Safari 18.2+ - graceful fallback is the default cross-fade.
-  experimental: {
-    viewTransition: true,
-  },
+  // View Transitions API is enabled by default in the App Router on
+  // Next.js 16.3+. `<Link transitionTypes>` and `<ViewTransition>` work
+  // automatically. Browser support: Chromium 111+, Firefox 144+,
+  // Safari 18.2+ - graceful fallback is the default cross-fade.
+  //
+  // Cache Components replaces the legacy `dynamic`/`revalidate`/`fetchCache`
+  // route segment configs. Every page is dynamic by default; static shells are
+  // produced only when data reads are wrapped in `"use cache"` and request-time
+  // reads (`headers()`, `cookies()`, `await params`, `await searchParams`) are
+  // pushed into a `<Suspense>` boundary. See:
+  // https://nextjs.org/docs/app/guides/migrating-to-cache-components
+  cacheComponents: true,
   // React Compiler is built into Next.js 16 - runs in the SWC pipeline before
   // OpenNext bundles the output for Cloudflare Workers, so no runtime support
   // is required in workerd.

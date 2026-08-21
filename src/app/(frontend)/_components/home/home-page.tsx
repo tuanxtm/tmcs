@@ -1,13 +1,10 @@
 import type { Metadata } from 'next'
 
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
-import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
 import { getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { firstHeroBlock, getHomePage } from '@/app/(frontend)/_lib/home-page'
 import { homeHref } from '@/app/(frontend)/_lib/locale'
 import type { LocaleCode } from '@/lib/locales'
-
-export const dynamic = 'force-dynamic'
 
 type HomePageProps = {
   locale: LocaleCode
@@ -77,13 +74,10 @@ export async function HomePage({ locale }: HomePageProps) {
   const [shell, home] = await Promise.all([getSiteShell(locale), getHomePage(locale)])
 
   return (
-    <div>
-      <SiteHeader siteName={shell.siteName} locale={locale} navigation={shell.navigation} />
-      <PageBlocks
-        blocks={home.blocks}
-        locale={locale}
-        siteName={shell.siteName}
-      />
-    </div>
+    <PageBlocks
+      blocks={home.blocks}
+      locale={locale}
+      siteName={shell.siteName}
+    />
   )
 }

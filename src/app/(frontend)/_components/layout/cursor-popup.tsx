@@ -154,7 +154,7 @@ export function CursorPopup() {
               key={label}
               className={cn(
                 'text-background overflow-hidden text-xs leading-none font-medium tracking-tight whitespace-nowrap',
-                'bg-primary px-1 pt-0.5 pb-0.75',
+                'bg-primary px-1 py-0.5',
               )}
               initial={reduceMotion ? false : { clipPath: 'inset(0 50% 0 50%)' }}
               animate={{ clipPath: 'inset(0 0% 0 0%)' }}

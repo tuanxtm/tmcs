@@ -2,13 +2,10 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
-import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
 import { getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { firstHeroBlock, getPageBySlug, isReservedCmsPageSlug } from '@/app/(frontend)/_lib/page-data'
 import { homeHref, pageHref } from '@/app/(frontend)/_lib/locale'
 import type { LocaleCode } from '@/lib/locales'
-
-export const dynamic = 'force-dynamic'
 
 type CmsPageProps = {
   locale: LocaleCode
@@ -96,14 +93,11 @@ export async function CmsPage({ locale, slug }: CmsPageProps) {
   if (!page) notFound()
 
   return (
-    <div>
-      <SiteHeader siteName={shell.siteName} locale={locale} navigation={shell.navigation} />
-      <PageBlocks
-        blocks={page.blocks}
-        locale={locale}
-        siteName={shell.siteName}
-      />
-    </div>
+    <PageBlocks
+      blocks={page.blocks}
+      locale={locale}
+      siteName={shell.siteName}
+    />
   )
 }
 

@@ -14,8 +14,6 @@ import {
   resolveSlug,
 } from '@/app/(frontend)/_lib/page-data'
 
-export const dynamic = 'force-dynamic'
-
 type PageProps = {
   params: Promise<{ slug: string }>
 }

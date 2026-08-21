@@ -17,19 +17,12 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ siteName, locale, navigation, className }: SiteHeaderProps) {
   return (
-    <header
-      className={cn(
-        'bg-background dash-line-b fixed inset-x-0 top-0',
-        'mt-4 md:mt-8 lg:mt-16',
-        className,
-      )}
-    >
+    <header className={cn('bg-background dash-line-b', className)}>
       <div
         className={cn(
           'bg-background relative flex h-(--header-height) min-h-(--header-height) items-center justify-between',
           'px-2 md:px-3 lg:px-4',
           'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
-          className,
         )}
       >
         <div className="flex items-center">

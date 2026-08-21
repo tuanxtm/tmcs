@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { unstable_cache } from 'next/cache'
+import { cacheLife, cacheTag } from 'next/cache'
 import { getPayload } from 'payload'
 
 import { CACHE_TAGS } from '@/lib/cache-tags'
@@ -338,10 +338,12 @@ async function loadDecorationPack(packId: number): Promise<SlimDecorationPack | 
   }
 }
 
-const getCachedDecorationPack = (packId: number) =>
-  unstable_cache(async () => loadDecorationPack(packId), ['decoration-pack', String(packId)], {
-    tags: [CACHE_TAGS.decorationPacks],
-  })()
+async function cachedLoadDecorationPack(packId: number): Promise<SlimDecorationPack | null> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.decorationPacks)
+  return loadDecorationPack(packId)
+}
 
 async function loadSiteSettings(locale: LocaleCode) {
   const payload = await getPayloadClient()
@@ -353,10 +355,17 @@ async function loadSiteSettings(locale: LocaleCode) {
   })
 }
 
-const getCachedSiteSettings = (locale: LocaleCode) =>
-  unstable_cache(async () => loadSiteSettings(locale), ['site-settings', locale], {
-    tags: [CACHE_TAGS.siteShell, CACHE_TAGS.media, CACHE_TAGS.decorationPacks, CACHE_TAGS.links],
-  })()
+async function cachedLoadSiteSettings(locale: LocaleCode) {
+  'use cache'
+  cacheLife('days')
+  cacheTag(
+    CACHE_TAGS.siteShell,
+    CACHE_TAGS.media,
+    CACHE_TAGS.decorationPacks,
+    CACHE_TAGS.links,
+  )
+  return loadSiteSettings(locale)
+}
 
 async function loadPostsPage(locale: LocaleCode, cursorRaw: string | null): Promise<PostsPageView> {
   const payload = await getPayloadClient()
@@ -409,12 +418,15 @@ async function loadPostsPage(locale: LocaleCode, cursorRaw: string | null): Prom
   }
 }
 
-const getCachedPostsPage = (locale: LocaleCode, cursorRaw: string | null) =>
-  unstable_cache(
-    async () => loadPostsPage(locale, cursorRaw),
-    ['posts-page', locale, cursorRaw ?? 'start', String(POSTS_PAGE_SIZE)],
-    { tags: [CACHE_TAGS.posts, CACHE_TAGS.media] },
-  )()
+async function cachedLoadPostsPage(
+  locale: LocaleCode,
+  cursorRaw: string | null,
+): Promise<PostsPageView> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.posts, CACHE_TAGS.media)
+  return loadPostsPage(locale, cursorRaw)
+}
 
 async function loadProjectsPage(
   locale: LocaleCode,
@@ -471,12 +483,15 @@ async function loadProjectsPage(
   }
 }
 
-const getCachedProjectsPage = (locale: LocaleCode, cursorRaw: string | null) =>
-  unstable_cache(
-    async () => loadProjectsPage(locale, cursorRaw),
-    ['projects-page', locale, cursorRaw ?? 'start', String(PROJECTS_PAGE_SIZE)],
-    { tags: [CACHE_TAGS.projects, CACHE_TAGS.media] },
-  )()
+async function cachedLoadProjectsPage(
+  locale: LocaleCode,
+  cursorRaw: string | null,
+): Promise<ProjectsPageView> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.projects, CACHE_TAGS.media)
+  return loadProjectsPage(locale, cursorRaw)
+}
 
 async function loadVideosPage(
   locale: LocaleCode,
@@ -534,12 +549,15 @@ async function loadVideosPage(
   }
 }
 
-const getCachedVideosPage = (locale: LocaleCode, cursorRaw: string | null) =>
-  unstable_cache(
-    async () => loadVideosPage(locale, cursorRaw),
-    ['videos-page', locale, cursorRaw ?? 'start', String(VIDEOS_PAGE_SIZE)],
-    { tags: [CACHE_TAGS.videos, CACHE_TAGS.media] },
-  )()
+async function cachedLoadVideosPage(
+  locale: LocaleCode,
+  cursorRaw: string | null,
+): Promise<VideosPageView> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.videos, CACHE_TAGS.media)
+  return loadVideosPage(locale, cursorRaw)
+}
 
 async function loadShortStories(locale: LocaleCode): Promise<ShortStoryCardView[]> {
   const payload = await getPayloadClient()
@@ -563,10 +581,12 @@ async function loadShortStories(locale: LocaleCode): Promise<ShortStoryCardView[
   return result.docs.map((story) => toShortStoryCard(story as ShortStory, locale))
 }
 
-const getCachedShortStories = (locale: LocaleCode) =>
-  unstable_cache(async () => loadShortStories(locale), ['short-stories', locale], {
-    tags: [CACHE_TAGS.shortStories],
-  })()
+async function cachedLoadShortStories(locale: LocaleCode): Promise<ShortStoryCardView[]> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.shortStories)
+  return loadShortStories(locale)
+}
 
 async function loadShortStoryTextsInner(locale: LocaleCode, ids: number[]): Promise<string[]> {
   if (ids.length === 0) return []
@@ -598,7 +618,7 @@ async function loadShortStoryTextsInner(locale: LocaleCode, ids: number[]): Prom
 }
 
 export const getHero = cache(async (locale: LocaleCode): Promise<HeroView> => {
-  const siteSettings = await getCachedSiteSettings(locale)
+  const siteSettings = await cachedLoadSiteSettings(locale)
 
   const links = (siteSettings.profileLinks || [])
     .map((link, index) => toLinkChild(link, locale, index, `profile-link-${index}`))
@@ -616,9 +636,7 @@ export const getHero = cache(async (locale: LocaleCode): Promise<HeroView> => {
 export const getFeedDecorations = cache(async (packId: number): Promise<FeedDecorationView[]> => {
   if (!packId) return []
 
-  const pack = shouldUseCache()
-    ? await getCachedDecorationPack(packId)
-    : await loadDecorationPack(packId)
+  const pack = await cachedLoadDecorationPack(packId)
   if (!pack?.items?.length) return []
 
   return pack.items
@@ -628,7 +646,7 @@ export const getFeedDecorations = cache(async (packId: number): Promise<FeedDeco
 })
 
 export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellView> => {
-  const siteSettings = await getCachedSiteSettings(locale)
+  const siteSettings = await cachedLoadSiteSettings(locale)
 
   const packId = packIdFromValue(siteSettings.activeDecorationPack)
 
@@ -675,68 +693,41 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
   }
 })
 
-/**
- * Decide whether to skip the durable data cache (`unstable_cache`) on this
- * request.
- *
- * `next dev` writes `unstable_cache` entries to the in-memory cache, so seed
- * runs that happen outside a Next request (CLI / Local API) leave stale rows
- * for the next browser refresh. By default we skip the cache in development
- * so freshly seeded content is visible immediately.
- *
- * Set `CMS_CACHE_DEV=1` (or `CMS_CACHE=1`) to force the cache on in dev -
- * useful for integration tests that exercise `unstable_cache` itself.
- */
-function isCacheEnabledInDev(): boolean {
-  return process.env.CMS_CACHE === '1' || process.env.CMS_CACHE_DEV === '1'
-}
-
-export function shouldUseCache(): boolean {
-  if (process.env.NODE_ENV === 'production') return true
-  return isCacheEnabledInDev()
-}
-
 export const getPostsPage = cache(
   async (locale: LocaleCode, cursor: string | null = null): Promise<PostsPageView> => {
-    if (!shouldUseCache()) {
-      return loadPostsPage(locale, cursor)
-    }
-    return getCachedPostsPage(locale, cursor)
+    return cachedLoadPostsPage(locale, cursor)
   },
 )
 
 export const getProjectsPage = cache(
   async (locale: LocaleCode, cursor: string | null = null): Promise<ProjectsPageView> => {
-    if (!shouldUseCache()) {
-      return loadProjectsPage(locale, cursor)
-    }
-    return getCachedProjectsPage(locale, cursor)
+    return cachedLoadProjectsPage(locale, cursor)
   },
 )
 
 export const getVideosPage = cache(
   async (locale: LocaleCode, cursor: string | null = null): Promise<VideosPageView> => {
-    if (!shouldUseCache()) {
-      return loadVideosPage(locale, cursor)
-    }
-    return getCachedVideosPage(locale, cursor)
+    return cachedLoadVideosPage(locale, cursor)
   },
 )
 
 export const getShortStories = cache(async (locale: LocaleCode): Promise<ShortStoryCardView[]> => {
-  return getCachedShortStories(locale)
+  return cachedLoadShortStories(locale)
 })
+
+async function cachedLoadShortStoryTexts(
+  locale: LocaleCode,
+  ids: number[],
+): Promise<string[]> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.shortStories)
+  return loadShortStoryTextsInner(locale, ids)
+}
 
 export const loadShortStoryTexts = cache(
   async (locale: LocaleCode, ids: number[]): Promise<string[]> => {
     if (ids.length === 0) return []
-    const key = [...ids].sort((a, b) => a - b).join(',')
-    return unstable_cache(
-      async () => loadShortStoryTextsInner(locale, ids),
-      ['short-story-texts', locale, key],
-      {
-        tags: [CACHE_TAGS.shortStories],
-      },
-    )()
+    return cachedLoadShortStoryTexts(locale, ids)
   },
 )

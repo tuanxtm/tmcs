@@ -30,16 +30,15 @@ export function ViewAllFeedTile({ href, label, cursorPopup, className }: ViewAll
           quietZoneModules={0}
         />
       </div>
-      <div className="bg-background absolute right-0 bottom-0 flex items-center gap-1 px-1">
+      <div className="bg-background absolute right-0 bottom-0 flex items-center">
         <span
           className={cn(
             'text-foreground/90 leading-none font-medium tracking-tight lowercase',
-            'text-xs md:text-sm lg:text-base',
+            'px-1 text-xs md:text-sm lg:text-base',
           )}
         >
           {label}
         </span>
-        <span className="font-mono text-[0.625rem] md:text-xs lg:text-sm">&gt;</span>
       </div>
     </Link>
   )

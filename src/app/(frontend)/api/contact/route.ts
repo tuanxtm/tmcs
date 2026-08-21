@@ -6,8 +6,6 @@ import { CONTACT_CATEGORY_VALUES, type ContactCategory } from '@/lib/contact'
 import { getContactHashSecret, getServerURL } from '@/lib/env'
 import { isLocaleCode } from '@/lib/locales'
 
-export const runtime = 'nodejs'
-
 const MAX_BODY_BYTES = 8 * 1024 // 8KB
 const MIN_SUBMIT_MS = 1500
 const DEDUPE_WINDOW_MS = 60_000
