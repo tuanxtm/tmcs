@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "next-cache-components-adoption": {
+      "source": "vercel/next.js",
+      "sourceType": "github",
+      "skillPath": "skills/next-cache-components-adoption/SKILL.md",
+      "computedHash": "6d524a264593332461b73c4d7468d681569c2dc5a1e9d38aa6d5eaebcc3e85ee"
+    },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
