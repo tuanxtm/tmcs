@@ -17,13 +17,39 @@ export const LayoutFooterBlock: Block = {
       editor: slimRichTextEditor,
       label: 'Text',
     },
+    {
+      name: 'labelSocialLinks',
+      type: 'text',
+      localized: true,
+    },
     linkPickerField({
-      name: 'legalLinks',
-      label: 'Legal links',
-      description: 'Pick legal links from the Links library.',
+      name: 'socialLinks',
+      label: 'Social links',
+      description: 'Pick social links from the Links library.',
       hasMany: true,
-      category: 'legal',
+      maxRows: 5,
     }),
+    {
+      name: 'labelOtherLinks',
+      type: 'text',
+      localized: true,
+    },
+    linkPickerField({
+      name: 'otherLinks',
+      label: 'Other links',
+      description: 'Pick other links from the Links library.',
+      hasMany: true,
+      maxRows: 5,
+    }),
+    {
+      name: 'cursorPopup',
+      type: 'text',
+      localized: true,
+      defaultValue: 'footer',
+      admin: {
+        description: 'Cursor popup text while hovering this section.',
+      },
+    },
     {
       name: 'copyright',
       type: 'text',

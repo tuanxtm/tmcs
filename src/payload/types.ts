@@ -559,10 +559,20 @@ export interface Post {
               };
               [k: string]: unknown;
             } | null;
+            labelSocialLinks?: string | null;
             /**
-             * Pick legal links from the Links library.
+             * Pick social links from the Links library.
              */
-            legalLinks?: (number | Link)[] | null;
+            socialLinks?: (number | Link)[] | null;
+            labelOtherLinks?: string | null;
+            /**
+             * Pick other links from the Links library.
+             */
+            otherLinks?: (number | Link)[] | null;
+            /**
+             * Cursor popup text while hovering this section.
+             */
+            cursorPopup?: string | null;
             /**
              * Use {{year}} as a placeholder for the current year in the frontend.
              */
@@ -905,10 +915,20 @@ export interface Page {
               };
               [k: string]: unknown;
             } | null;
+            labelSocialLinks?: string | null;
             /**
-             * Pick legal links from the Links library.
+             * Pick social links from the Links library.
              */
-            legalLinks?: (number | Link)[] | null;
+            socialLinks?: (number | Link)[] | null;
+            labelOtherLinks?: string | null;
+            /**
+             * Pick other links from the Links library.
+             */
+            otherLinks?: (number | Link)[] | null;
+            /**
+             * Cursor popup text while hovering this section.
+             */
+            cursorPopup?: string | null;
             /**
              * Use {{year}} as a placeholder for the current year in the frontend.
              */
@@ -1218,10 +1238,20 @@ export interface Project {
               };
               [k: string]: unknown;
             } | null;
+            labelSocialLinks?: string | null;
             /**
-             * Pick legal links from the Links library.
+             * Pick social links from the Links library.
              */
-            legalLinks?: (number | Link)[] | null;
+            socialLinks?: (number | Link)[] | null;
+            labelOtherLinks?: string | null;
+            /**
+             * Pick other links from the Links library.
+             */
+            otherLinks?: (number | Link)[] | null;
+            /**
+             * Cursor popup text while hovering this section.
+             */
+            cursorPopup?: string | null;
             /**
              * Use {{year}} as a placeholder for the current year in the frontend.
              */
@@ -1986,7 +2016,11 @@ export interface PostsSelect<T extends boolean = true> {
           | T
           | {
               footerText?: T;
-              legalLinks?: T;
+              labelSocialLinks?: T;
+              socialLinks?: T;
+              labelOtherLinks?: T;
+              otherLinks?: T;
+              cursorPopup?: T;
               copyright?: T;
               id?: T;
               blockName?: T;
@@ -2220,7 +2254,11 @@ export interface ProjectsSelect<T extends boolean = true> {
           | T
           | {
               footerText?: T;
-              legalLinks?: T;
+              labelSocialLinks?: T;
+              socialLinks?: T;
+              labelOtherLinks?: T;
+              otherLinks?: T;
+              cursorPopup?: T;
               copyright?: T;
               id?: T;
               blockName?: T;
@@ -2427,7 +2465,11 @@ export interface PagesSelect<T extends boolean = true> {
           | T
           | {
               footerText?: T;
-              legalLinks?: T;
+              labelSocialLinks?: T;
+              socialLinks?: T;
+              labelOtherLinks?: T;
+              otherLinks?: T;
+              cursorPopup?: T;
               copyright?: T;
               id?: T;
               blockName?: T;
