@@ -1,9 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useId, useState } from 'react'
 import { useReducedMotion } from 'motion/react'
 import { IconBrandYoutube, IconPlayerPlay } from '@tabler/icons-react'
-
+import { IconExternalLink } from '@tabler/icons-react'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import type { VideoCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
@@ -18,7 +19,7 @@ type VideoFeedCardProps = {
   cursorPopup?: string | null
   /** Currently playing video id in the section (YouTube only). */
   activeYouTubeId: number | null
-  onActivateYouTube: (id: number | null) => void
+  onActivateYouTubeAction: (id: number | null) => void
 }
 
 const dateFormatters: Record<LocaleCode, Intl.DateTimeFormat> = {
@@ -68,7 +69,7 @@ export function VideoFeedCard({
   className,
   cursorPopup = 'play',
   activeYouTubeId,
-  onActivateYouTube,
+  onActivateYouTubeAction,
 }: VideoFeedCardProps) {
   const reduceMotion = useReducedMotion()
   const titleId = useId()
@@ -79,13 +80,13 @@ export function VideoFeedCard({
 
   const playYouTube = useCallback(() => {
     if (!isYouTube) return
-    onActivateYouTube(doc.id)
-  }, [doc.id, isYouTube, onActivateYouTube])
+    onActivateYouTubeAction(doc.id)
+  }, [doc.id, isYouTube, onActivateYouTubeAction])
 
   const media = (
     <div
       className={cn(
-        'video-card-media relative w-full overflow-hidden bg-foreground/5',
+        'video-card-media bg-foreground/5 relative w-full overflow-hidden',
         VIDEO_CARD_ASPECT[doc.provider],
       )}
     >
@@ -114,14 +115,14 @@ export function VideoFeedCard({
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-              <IconBrandYoutube className="size-8 text-muted-foreground" />
+              <IconBrandYoutube className="text-muted-foreground size-8" />
             </div>
           )}
           <span
             className="pointer-events-none absolute inset-0 flex items-center justify-center"
             aria-hidden="true"
           >
-            <span className="flex size-11 items-center justify-center rounded-full bg-background/85 text-foreground shadow-sm">
+            <span className="bg-background/85 text-foreground flex size-11 items-center justify-center rounded-full shadow-sm">
               <IconPlayerPlay className="size-5 translate-x-px" />
             </span>
           </span>
@@ -131,18 +132,30 @@ export function VideoFeedCard({
   )
 
   const meta = (
-    <div className="flex flex-col gap-1">
-      <span className="font-mono text-[0.625rem] uppercase tracking-tight leading-none text-secondary-foreground">
-        {PROVIDER_LABEL[doc.provider]}
-        {dateLabel ? ` · ${dateLabel}` : ''}
-      </span>
-      <h3
-        id={titleId}
-        className="text-sm font-medium leading-none tracking-tight text-foreground md:text-base"
-      >
-        {doc.title}
-      </h3>
-    </div>
+    <span
+      className={cn(
+        'text-primary font-mono text-[0.625rem] leading-none tracking-tight uppercase',
+        'absolute top-0 left-0',
+        'bg-background pr-0.5 pb-0.5',
+      )}
+    >
+      {PROVIDER_LABEL[doc.provider]}
+      {dateLabel ? ` · ${dateLabel}` : ''}
+    </span>
+  )
+
+  const title = (
+    <h3
+      id={titleId}
+      className={cn(
+        'text-foreground text-xs leading-none font-medium tracking-tight md:text-sm lg:text-base',
+        'lowercase',
+        'border-primary/50 border-l-2 md:border-l-3 lg:border-l-4',
+        'pl-0.5 md:pl-1 lg:pl-2',
+      )}
+    >
+      {doc.title}
+    </h3>
   )
 
   const shellClass = cn(
@@ -154,7 +167,7 @@ export function VideoFeedCard({
   if (isYouTube) {
     return (
       <article className={shellClass} data-cursor-popup={cursorPopup || undefined}>
-        <div className="flex flex-col gap-1 p-2">
+        <div className="flex flex-col gap-1 md:gap-1.5 lg:gap-2">
           {isPlaying ? (
             media
           ) : (
@@ -165,18 +178,26 @@ export function VideoFeedCard({
               aria-labelledby={titleId}
             >
               {media}
+              {meta}
             </button>
           )}
-          {meta}
+          {title}
           {isPlaying ? (
-            <a
+            <Link
               href={doc.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[0.625rem] uppercase tracking-wide text-muted-foreground underline-offset-2 hover:underline"
+              className={cn(
+                'text-primary flex items-center gap-1 text-sm tracking-tight lowercase underline-offset-2 hover:underline',
+                'font-medium',
+                'border-primary/50 border-l-2 md:border-l-3 lg:border-l-4',
+                'pl-0.5 md:pl-1 lg:pl-2',
+              )}
+              data-cursor-popup={undefined}
             >
-              Open on YouTube
-            </a>
+              View on YouTube
+              <IconExternalLink className="text-primary size-4" />
+            </Link>
           ) : null}
         </div>
       </article>
@@ -192,9 +213,10 @@ export function VideoFeedCard({
         className="block focus:outline-none"
         aria-labelledby={titleId}
       >
-        <div className="flex flex-col gap-1 p-2">
+        <div className="flex flex-col gap-1 md:gap-1.5 lg:gap-2">
           {media}
           {meta}
+          {title}
         </div>
       </a>
     </article>

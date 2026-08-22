@@ -120,10 +120,10 @@ export function FeedCard({
             <div
               className={cn(
                 'absolute top-0 right-0 flex flex-col items-center',
-                'bg-background text-primary/80 font-mono text-[0.5rem] md:text-[0.625rem]',
+                'bg-background text-primary font-mono text-[0.5rem] md:text-[0.625rem]',
                 'pl-px md:pl-0.5',
                 'leading-tight tracking-tight',
-                parts[0] === '0' && 'text-foreground/40',
+                parts[0] === '0' && 'text-primary',
               )}
             >
               <span>{parts[0]}</span>

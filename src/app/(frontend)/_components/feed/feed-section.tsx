@@ -185,7 +185,7 @@ export function FeedSection(props: FeedSectionProps) {
                 index={index}
                 cursorPopup={cursorPopupItem}
                 activeYouTubeId={activeYouTubeId}
-                onActivateYouTube={setActiveYouTubeId}
+                onActivateYouTubeAction={setActiveYouTubeId}
               />
             ) : (
               <FeedCard
