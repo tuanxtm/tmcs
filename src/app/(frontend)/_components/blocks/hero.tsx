@@ -52,7 +52,7 @@ function LinkList({ links, variant }: { links: NavChildView[]; variant: LinkList
               <span
                 className={cn(
                   'text-sm font-medium tracking-tight lowercase md:text-base lg:text-lg',
-                  'hover:text-primary',
+                  'hover:text-primary transition-colors duration-300',
                 )}
               >
                 {display}

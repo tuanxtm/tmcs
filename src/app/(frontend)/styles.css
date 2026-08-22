@@ -42,7 +42,7 @@
   --section-header-height: calc(var(--header-height) / 2);
   --scrollbar-size: 10px;
   --page-gutter: var(--scrollbar-size);
-  --fold-height: 100dvh;
+  --fold-height: 100lvh;
   --hero-fold-height: calc(var(--fold-height) - (2 * var(--header-height)));
   --font-serif: var(--font-fanwood), ui-serif, Georgia, serif;
   --font-mono: var(--font-departure-mono), ui-monospace, monospace;
