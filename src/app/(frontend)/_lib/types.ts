@@ -291,7 +291,12 @@ export type LayoutFooterBlockView = {
   blockType: 'layoutFooter'
   id: string
   footerText: DefaultTypedEditorState | null
-  legalLinks: NavChildView[]
+  labelSocialLinks: string | null
+  socialLinks: NavChildView[]
+  labelOtherLinks: string | null
+  otherLinks: NavChildView[]
+  cursorPopup: string | null
+  footerDecoration: FeedDecorationView | null
   copyright: string | null
 }
 

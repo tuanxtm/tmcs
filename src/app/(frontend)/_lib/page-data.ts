@@ -14,7 +14,9 @@ import {
   type FeedSourceMode,
 } from '@/app/(frontend)/_lib/feed-registry'
 import {
+  getActiveFooterItemId,
   getFeedDecorations,
+  getFooterDecoration,
   getHero,
   getPostsPage,
   getProjectsPage,
@@ -457,13 +459,32 @@ async function resolveFooterBlock(
   locale: LocaleCode,
   index: number,
 ): Promise<LayoutFooterBlockView> {
-  const legalLinks = await resolveLinkIds(block.legalLinks, locale, `footer-${index}-legal`)
+  // Start the link resolution, the shell, and (via shell) the active pack's
+  // footerItem + decoration lookup all in parallel. Each step only depends
+  // on the previous one, so Promise.all above gives us one round trip.
+  const shellPromise = getSiteShell(locale)
+  const [socialLinks, otherLinks, shell] = await Promise.all([
+    resolveLinkIds(block.socialLinks, locale, `footer-${index}-social`),
+    resolveLinkIds(block.otherLinks, locale, `footer-${index}-other`),
+    shellPromise,
+  ])
+
+  const footerItemId = await getActiveFooterItemId(shell.activeDecorationPackId)
+  const footerDecoration = await getFooterDecoration(
+    shell.activeDecorationPackId,
+    footerItemId,
+  )
 
   return {
     blockType: 'layoutFooter',
     id: blockId(block, `footer-${index}`),
     footerText: (block.footerText as DefaultTypedEditorState | null | undefined) ?? null,
-    legalLinks,
+    labelSocialLinks: block.labelSocialLinks ?? null,
+    socialLinks,
+    labelOtherLinks: block.labelOtherLinks ?? null,
+    otherLinks,
+    cursorPopup: block.cursorPopup ?? 'footer',
+    footerDecoration,
     copyright: block.copyright ?? null,
   }
 }

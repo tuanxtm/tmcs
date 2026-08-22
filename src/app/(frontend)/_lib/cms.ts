@@ -645,6 +645,42 @@ export const getFeedDecorations = cache(async (packId: number): Promise<FeedDeco
     .slice(0, FEED_DECORATIONS_POOL_LIMIT)
 })
 
+/**
+ * Resolve the single Feed decoration selected by the active decoration pack's
+ * `footerItem` row id. Returns null when no pack is active, the pack has no
+ * footer item, or the referenced row is missing/has no image.
+ *
+ * Cached per pack id + footer item id pair via `React.cache()` so the home,
+ * feed, and detail pages share a single Payload read per request when the
+ * footer block is rendered more than once.
+ */
+export const getFooterDecoration = cache(
+  async (packId: number, footerItemId: string | null): Promise<FeedDecorationView | null> => {
+    if (!packId || !footerItemId) return null
+    const pack = await cachedLoadDecorationPack(packId)
+    if (!pack?.items?.length) return null
+    const item = pack.items.find((row) => row?.id === footerItemId)
+    if (!item) return null
+    return toFeedDecorationView(pack.id, item)
+  },
+)
+
+/**
+ * Resolve the active decoration pack's `footerItem` row id for a locale.
+ * Returns null when no pack is active or the pack does not nominate a
+ * footer item. Reads through `cachedLoadDecorationPack` so the same
+ * `'use cache'` boundary + tag invalidation applies as for the rest of
+ * the decoration pipeline.
+ */
+export const getActiveFooterItemId = cache(
+  async (packId: number): Promise<string | null> => {
+    if (!packId) return null
+    const pack = await cachedLoadDecorationPack(packId)
+    const raw = pack?.footerItem
+    return typeof raw === 'string' && raw.length > 0 ? raw : null
+  },
+)
+
 export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellView> => {
   const siteSettings = await cachedLoadSiteSettings(locale)
 
