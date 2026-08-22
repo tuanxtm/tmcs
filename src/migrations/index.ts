@@ -4,6 +4,7 @@ import * as migration_20260810_033116_add_thing_links_array from './20260810_033
 import * as migration_20260810_045307_things_affiliate_url_rename from './20260810_045307_things_affiliate_url_rename';
 import * as migration_20260815_032145_hero_blocks_redesign from './20260815_032145_hero_blocks_redesign';
 import * as migration_20260822_120000_footer_block_redesign from './20260822_120000_footer_block_redesign';
+import * as migration_20260822_130000_replace_generate_slug_with_slug_lock from './20260822_130000_replace_generate_slug_with_slug_lock';
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20260822_120000_footer_block_redesign.up,
     down: migration_20260822_120000_footer_block_redesign.down,
     name: '20260822_120000_footer_block_redesign'
+  },
+  {
+    up: migration_20260822_130000_replace_generate_slug_with_slug_lock.up,
+    down: migration_20260822_130000_replace_generate_slug_with_slug_lock.down,
+    name: '20260822_130000_replace_generate_slug_with_slug_lock',
   },
 ];

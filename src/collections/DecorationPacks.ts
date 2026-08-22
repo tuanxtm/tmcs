@@ -1,7 +1,7 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
-import { slugField } from 'payload'
 
 import { adminOrManager, anyone } from '@/access'
+import { slugField } from '@/fields/slug'
 import {
   revalidateDecorationPacks,
   revalidateDecorationPacksDelete,
@@ -66,11 +66,7 @@ export const DecorationPacks: CollectionConfig = {
         description: 'Admin label (e.g. Plant, New Year).',
       },
     },
-    slugField({
-      name: 'slug',
-      useAsSlug: 'title',
-      required: true,
-    }),
+    ...slugField({ useAsSlug: 'title', required: true }),
     {
       name: 'items',
       type: 'array',

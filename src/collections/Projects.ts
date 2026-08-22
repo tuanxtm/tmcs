@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { slugField } from 'payload'
 
 import {
   canCreateOwnedContent,
@@ -11,6 +10,7 @@ import {
 import { pageBlocks } from '@/blocks'
 import { ownerField, publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
+import { slugField } from '@/fields/slug'
 import { assignOwner, preventCreatorPublish, setPublishedAt } from '@/hooks'
 import { revalidateProjects, revalidateProjectsDelete } from '@/hooks/revalidateFrontend'
 import { deleteSlugReservations, upsertSlugReservations } from '@/hooks/slugReservations'
@@ -81,12 +81,7 @@ export const Projects: CollectionConfig = {
               required: true,
               localized: true,
             },
-            slugField({
-              name: 'slug',
-              useAsSlug: 'title',
-              localized: true,
-              required: true,
-            }),
+            ...slugField({ useAsSlug: 'title', localized: true, required: true }),
             {
               name: 'summary',
               type: 'textarea',

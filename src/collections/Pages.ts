@@ -1,10 +1,10 @@
 import type { CollectionConfig } from 'payload'
-import { slugField } from 'payload'
 
 import { adminOrManager, publishedOrStaff } from '@/access'
 import { pageBlocks } from '@/blocks'
 import { publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
+import { slugField } from '@/fields/slug'
 import { setPublishedAt, validateHomePage } from '@/hooks'
 import { revalidatePages, revalidatePagesDelete } from '@/hooks/revalidateFrontend'
 import {
@@ -76,12 +76,7 @@ export const Pages: CollectionConfig = {
               required: true,
               localized: true,
             },
-            slugField({
-              name: 'slug',
-              useAsSlug: 'title',
-              localized: true,
-              required: true,
-            }),
+            ...slugField({ useAsSlug: 'title', localized: true, required: true }),
             {
               name: 'summary',
               type: 'textarea',

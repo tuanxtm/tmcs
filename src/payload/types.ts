@@ -279,11 +279,8 @@ export interface Author {
 export interface Category {
   id: number;
   title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
   slug: string;
+  slugLock?: boolean | null;
   description?: string | null;
   /**
    * Optional hex color, e.g. #3366FF
@@ -301,11 +298,8 @@ export interface Category {
 export interface Tag {
   id: number;
   title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
   slug: string;
+  slugLock?: boolean | null;
   description?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -317,11 +311,8 @@ export interface Tag {
 export interface Post {
   id: number;
   title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
   slug: string;
+  slugLock?: boolean | null;
   /**
    * Short summary used in listings and SEO fallbacks.
    */
@@ -691,11 +682,8 @@ export interface Link {
 export interface Page {
   id: number;
   title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
   slug: string;
+  slugLock?: boolean | null;
   summary?: string | null;
   /**
    * Shared page image used as the hero/backdrop and as the OG image fallback.
@@ -999,11 +987,8 @@ export interface Page {
 export interface Project {
   id: number;
   title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
   slug: string;
+  slugLock?: boolean | null;
   summary: string;
   featuredImage?: (number | null) | Media;
   content?: {
@@ -1507,11 +1492,8 @@ export interface DecorationPack {
    * Admin label (e.g. Plant, New Year).
    */
   title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
   slug: string;
+  slugLock?: boolean | null;
   /**
    * Ornaments in this pack. Upload WebP images; they are stored as Feed decorations.
    */
@@ -1871,8 +1853,8 @@ export interface AuthorsSelect<T extends boolean = true> {
  */
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
-  generateSlug?: T;
   slug?: T;
+  slugLock?: T;
   description?: T;
   color?: T;
   icon?: T;
@@ -1886,8 +1868,8 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface TagsSelect<T extends boolean = true> {
   title?: T;
-  generateSlug?: T;
   slug?: T;
+  slugLock?: T;
   description?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1898,8 +1880,8 @@ export interface TagsSelect<T extends boolean = true> {
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
-  generateSlug?: T;
   slug?: T;
+  slugLock?: T;
   excerpt?: T;
   featuredImage?: T;
   content?: T;
@@ -2116,8 +2098,8 @@ export interface FeedDecorationsSelect<T extends boolean = true> {
  */
 export interface DecorationPacksSelect<T extends boolean = true> {
   title?: T;
-  generateSlug?: T;
   slug?: T;
+  slugLock?: T;
   items?:
     | T
     | {
@@ -2136,8 +2118,8 @@ export interface DecorationPacksSelect<T extends boolean = true> {
  */
 export interface ProjectsSelect<T extends boolean = true> {
   title?: T;
-  generateSlug?: T;
   slug?: T;
+  slugLock?: T;
   summary?: T;
   featuredImage?: T;
   content?: T;
@@ -2348,8 +2330,8 @@ export interface VideosSelect<T extends boolean = true> {
  */
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
-  generateSlug?: T;
   slug?: T;
+  slugLock?: T;
   summary?: T;
   pageImage?: T;
   layout?:

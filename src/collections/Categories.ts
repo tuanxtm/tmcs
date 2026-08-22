@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
-import { slugField } from 'payload'
 
 import { adminOrManager, anyone } from '@/access'
+import { slugField } from '@/fields/slug'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -27,12 +27,7 @@ export const Categories: CollectionConfig = {
       required: true,
       localized: true,
     },
-    slugField({
-      name: 'slug',
-      useAsSlug: 'title',
-      localized: true,
-      required: true,
-    }),
+    ...slugField({ useAsSlug: 'title', localized: true, required: true }),
     {
       name: 'description',
       type: 'textarea',
