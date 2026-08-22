@@ -8,9 +8,10 @@ export function ThingsGrid({ children, className, ...props }: ThingsGridProps) {
     <div
       data-grid="things"
       className={cn(
-        'relative grid w-full grid-cols-2 items-stretch gap-x-0 gap-y-6 pb-6',
+        'relative grid w-full items-stretch gap-x-0 gap-y-2 pb-6',
+        'bg-background',
         'max-sm:gap-y-1 max-sm:pb-1',
-        'lg:grid-cols-3',
+        'grid-cols-2 lg:grid-cols-3',
         className,
       )}
       {...props}

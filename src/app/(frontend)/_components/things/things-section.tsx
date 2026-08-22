@@ -48,14 +48,6 @@ export function ThingsSection({
   const sectionCursor =
     docs.length === 0 ? cursorPopupEmpty || cursorPopup || undefined : cursorPopup || undefined
 
-  const descriptionNode = description ? (
-    <div className="px-2 pt-2 pb-4 w-full grid md:grid-cols-3 grid-cols-1 ">
-      <p className="col-span-1 md:col-span-2 text-[13px] leading-none tracking-tight text-foreground/80 lowercase">
-        {description}
-      </p>
-    </div>
-  ) : null
-
   if (docs.length === 0) {
     return (
       <section
@@ -66,7 +58,6 @@ export function ThingsSection({
         className={className}
       >
         <SectionHeader id={headingId} heading={heading} />
-        {descriptionNode}
       </section>
     )
   }
@@ -80,7 +71,6 @@ export function ThingsSection({
       className={className}
     >
       <SectionHeader id={headingId} heading={heading} />
-      {descriptionNode}
 
       <ThingsGrid>
         {docs.map((thing, index) => (
