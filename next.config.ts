@@ -19,11 +19,6 @@ function getAllowedDevOrigins(): string[] {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // View Transitions API is enabled by default in the App Router on
-  // Next.js 16.3+. `<Link transitionTypes>` and `<ViewTransition>` work
-  // automatically. Browser support: Chromium 111+, Firefox 144+,
-  // Safari 18.2+ - graceful fallback is the default cross-fade.
-  //
   // Cache Components replaces the legacy `dynamic`/`revalidate`/`fetchCache`
   // route segment configs. Every page is dynamic by default; static shells are
   // produced only when data reads are wrapped in `"use cache"` and request-time

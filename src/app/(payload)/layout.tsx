@@ -9,9 +9,9 @@ import React from 'react'
 import { importMap } from './tm/importMap.js'
 import './custom.scss'
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// Cache Components adoption. Waiting for PayloadCMS to adopt it.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
+export const instant = false
 
 type Args = {
   children: React.ReactNode
