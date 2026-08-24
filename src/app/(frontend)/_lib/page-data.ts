@@ -22,11 +22,13 @@ import {
   getProjectsPage,
   getSiteShell,
   getVideosPage,
+  loadPostBySlug,
+  loadProjectBySlug,
+  loadThingBySlug,
   loadShortStoryTexts,
   toMediaView,
 } from '@/app/(frontend)/_lib/cms'
 import { resolveCmsLink, resolvePageHref } from '@/app/(frontend)/_lib/links'
-import { loadPostBySlug, loadProjectBySlug } from '@/app/(frontend)/_lib/cms'
 import type {
   CmsPageView,
   ContentMediaBlockView,
@@ -46,6 +48,7 @@ import type {
   ProjectDetailView,
   ResolvedBlockView,
   ThingCardView,
+  ThingDetailView,
   VideoCardView,
 } from '@/app/(frontend)/_lib/types'
 import { CACHE_TAGS, CMS_CACHE_VERSION } from '@/lib/cache-tags'
@@ -848,7 +851,7 @@ export function firstHeroBlock(blocks: ResolvedBlockView[]): LayoutHeroBlockView
 // ─── Slug Dispatcher ───────────────────────────────────────────────────────────
 
 type SlugReservation = {
-  collection: 'pages' | 'posts' | 'projects'
+  collection: 'pages' | 'posts' | 'projects' | 'things'
   contentId: number
 }
 
@@ -871,7 +874,7 @@ async function loadSlugReservation(
   } | null
   if (!result) return null
   return {
-    collection: result.collection as 'pages' | 'posts' | 'projects',
+    collection: result.collection as 'pages' | 'posts' | 'projects' | 'things',
     contentId: result.content_id,
   }
 }
@@ -886,7 +889,7 @@ export const resolveSlug = cache(
   async (
     locale: LocaleCode,
     slug: string,
-  ): Promise<{ collection: 'pages' | 'posts' | 'projects'; contentId: number } | null> => {
+  ): Promise<{ collection: 'pages' | 'posts' | 'projects' | 'things'; contentId: number } | null> => {
     return loadSlugReservation(locale, slug)
   },
 )
@@ -1011,5 +1014,46 @@ export const getProjectBySlug = cache(
     const blocks = await resolveLayoutBlocks(project.layout ?? [], locale)
 
     return toProjectDetailView(project, blocks)
+  },
+)
+
+/**
+ * Load a Thing by slug. Returns null if the slug is not reserved for things.
+ * Returns the primaryUrl needed for the redirect.
+ *
+ * Wrapped in `React.cache()` so `generateMetadata` and the page body share
+ * one fetch per request. Not wrapped in `'use cache'` because redirect
+ * targets should reflect the latest published state.
+ */
+export const getThingBySlug = cache(
+  async (locale: LocaleCode, slug: string): Promise<ThingDetailView | null> => {
+    const resolved = await resolveSlug(locale, slug)
+    if (!resolved || resolved.collection !== 'things') return null
+
+    const thing = await loadThingBySlug(locale, slug)
+    if (!thing) return null
+
+    const primaryUrl =
+      typeof thing.primaryUrl === 'string'
+        ? thing.primaryUrl
+        : (thing.primaryUrl as Record<string, string> | null)?.[locale] ?? null
+
+    const links: ThingDetailView['links'] = ((thing.links as ThingDetailView['links']) || []).map(
+      (l: unknown) => l as ThingDetailView['links'][number],
+    )
+
+    return {
+      id: thing.id as number,
+      slug:
+        typeof thing.slug === 'string'
+          ? thing.slug
+          : (thing.slug as Record<string, string>)?.[locale] ?? '',
+      name:
+        typeof thing.name === 'string'
+          ? thing.name
+          : (thing.name as Record<string, string>)?.[locale] ?? '',
+      primaryUrl,
+      links,
+    }
   },
 )

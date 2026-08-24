@@ -287,6 +287,34 @@ async function loadProjectBySlug(locale: LocaleCode, slug: string): Promise<Proj
 
 export { loadProjectBySlug }
 
+async function loadThingBySlug(
+  locale: LocaleCode,
+  slug: string,
+): Promise<Record<string, unknown> | null> {
+  const payload = await getPayloadClient()
+  const { docs } = await payload.find({
+    collection: 'things',
+    locale,
+    fallbackLocale: false,
+    where: {
+      and: [publishedStatusWhere, { slug: { equals: slug } }, { slug: { exists: true } }],
+    },
+    limit: 1,
+    depth: 2,
+    overrideAccess: false,
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      primaryUrl: true,
+      links: true,
+    },
+  })
+  return (docs[0] as unknown as Record<string, unknown> | undefined) ?? null
+}
+
+export { loadThingBySlug }
+
 function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCardView {
   let href: string | null = null
   let newTab = false

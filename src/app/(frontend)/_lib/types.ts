@@ -98,6 +98,15 @@ export type ThingCardView = {
   publishedAt: string | null
 }
 
+/** DTO for Things redirect route — only fields needed for the redirect. */
+export type ThingDetailView = {
+  id: number
+  slug: string
+  name: string
+  primaryUrl: string | null
+  links: ThingPlatformLink[]
+}
+
 export type VideoProvider = 'youtube' | 'tiktok' | 'instagram' | 'other'
 
 export type VideoCardView = {

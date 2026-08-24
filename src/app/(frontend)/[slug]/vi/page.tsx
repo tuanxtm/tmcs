@@ -23,53 +23,53 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params
   if (isReservedPageSlug(slug)) return { title: 'Not found' }
 
-  const resolved = await resolveSlug('en', slug)
+  const resolved = await resolveSlug('vi', slug)
   if (!resolved) return { title: 'Not found' }
 
   if (resolved.collection === 'posts') {
-    const post = await getPostBySlug('en', slug)
+    const post = await getPostBySlug('vi', slug)
     if (!post) return { title: 'Not found' }
-    return generateDetailMetadata(post, 'en', 'featuredImage')
+    return generateDetailMetadata(post, 'vi', 'featuredImage')
   }
 
   if (resolved.collection === 'projects') {
-    const project = await getProjectBySlug('en', slug)
+    const project = await getProjectBySlug('vi', slug)
     if (!project) return { title: 'Not found' }
-    return generateDetailMetadata(project, 'en', 'coverImage')
+    return generateDetailMetadata(project, 'vi', 'coverImage')
   }
 
   if (resolved.collection === 'things') {
     return { title: 'Redirecting...' }
   }
 
-  return generateCmsPageMetadata('en', slug)
+  return generateCmsPageMetadata('vi', slug)
 }
 
-export default async function EnglishCmsPage({ params }: PageProps) {
+export default async function VietnameseCmsPage({ params }: PageProps) {
   const { slug } = await params
   if (isReservedPageSlug(slug)) notFound()
 
-  const resolved = await resolveSlug('en', slug)
+  const resolved = await resolveSlug('vi', slug)
   if (!resolved) notFound()
 
   if (resolved.collection === 'posts') {
-    const post = await getPostBySlug('en', slug)
+    const post = await getPostBySlug('vi', slug)
     if (!post) notFound()
-    return <DetailPage view={post} locale="en" imageKey="featuredImage" />
+    return <DetailPage view={post} locale="vi" imageKey="featuredImage" />
   }
 
   if (resolved.collection === 'projects') {
-    const project = await getProjectBySlug('en', slug)
+    const project = await getProjectBySlug('vi', slug)
     if (!project) notFound()
-    return <DetailPage view={project} locale="en" imageKey="coverImage" />
+    return <DetailPage view={project} locale="vi" imageKey="coverImage" />
   }
 
   if (resolved.collection === 'things') {
-    const thing = await getThingBySlug('en', slug)
+    const thing = await getThingBySlug('vi', slug)
     if (!thing) notFound()
     if (!thing.primaryUrl) notFound()
     redirect(thing.primaryUrl)
   }
 
-  return <CmsPage locale="en" slug={slug} />
+  return <CmsPage locale="vi" slug={slug} />
 }
