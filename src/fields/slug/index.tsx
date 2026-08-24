@@ -1,6 +1,7 @@
 import type { CheckboxField, TextField } from 'payload'
 
-import { formatSlugHook } from '@/hooks/slugFieldHook'
+import type { ReservedCollection } from '@/hooks/slugReservations'
+import { checkSlugConflictHook, formatSlugHook } from '@/hooks/slugFieldHook'
 
 type TextFieldSingle = Extract<TextField, { hasMany?: false | undefined }>
 type FieldOverrides = {
@@ -18,6 +19,11 @@ type Args = {
   localized?: boolean
   /** Whether the slug field is required. */
   required?: boolean
+  /**
+   * Collection slug this slug lives on. Required to wire the cross-collection
+   * conflict check against `slug_reservations`.
+   */
+  collectionSlug: ReservedCollection
   /** Granular overrides applied last. */
   overrides?: FieldOverrides
 }
@@ -29,13 +35,14 @@ type Args = {
  * so we can:
  * - strip Vietnamese diacritics via `vietnameseToAscii`
  * - render a custom Admin field component with a lock toggle
- * - keep the field fully under our control (no upstream experimental API)
+ * - cross-check the slug against the `slug_reservations` table and reject
+ *   duplicates already owned by another collection in the same locale
  *
  * Returns a `[TextField, CheckboxField]` tuple - spread both into your
  * collection's `fields` array.
  */
-export const slugField = (args: Args = {}): [TextField, CheckboxField] => {
-  const { useAsSlug = 'title', localized, required, overrides } = args
+export const slugField = (args: Args): [TextField, CheckboxField] => {
+  const { useAsSlug = 'title', localized, required, collectionSlug, overrides } = args
   const { field: fieldOverrides, checkbox: checkboxOverrides } = overrides ?? {}
 
   const checkboxField: CheckboxField = {
@@ -62,8 +69,12 @@ export const slugField = (args: Args = {}): [TextField, CheckboxField] => {
     localized,
     required,
     hooks: {
-      // Field hook keeps API/CLI/seed writes in sync with the title.
-      beforeValidate: [formatSlugHook(useAsSlug, checkboxField.name)],
+      // Order matters: format first so the conflict check sees the final slug
+      // value, then check against the reservations table.
+      beforeValidate: [
+        formatSlugHook(useAsSlug, checkboxField.name),
+        checkSlugConflictHook(collectionSlug),
+      ],
     },
     admin: {
       position: 'sidebar',

@@ -1,4 +1,9 @@
-import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
+import type {
+  CollectionAfterChangeHook,
+  CollectionAfterDeleteHook,
+  CollectionBeforeChangeHook,
+  CollectionConfig,
+} from 'payload'
 
 import { adminOrManager, anyone } from '@/access'
 import { slugField } from '@/fields/slug'
@@ -6,6 +11,7 @@ import {
   revalidateDecorationPacks,
   revalidateDecorationPacksDelete,
 } from '@/hooks/revalidateFrontend'
+import { deleteSlugReservations, upsertSlugReservations } from '@/hooks/slugReservations'
 
 const clearStaleFooterItem: CollectionBeforeChangeHook = ({ data }) => {
   if (!data) return data
@@ -33,6 +39,20 @@ const clearStaleFooterItem: CollectionBeforeChangeHook = ({ data }) => {
   return data
 }
 
+const reserveSlug: CollectionAfterChangeHook = async ({ doc, operation, req }) => {
+  if (operation === 'create' || operation === 'update') {
+    await upsertSlugReservations(
+      req.payload,
+      'decoration-packs',
+      doc as { id: number; slug?: unknown },
+    )
+  }
+}
+
+const releaseSlug: CollectionAfterDeleteHook = async ({ doc, req }) => {
+  await deleteSlugReservations(req.payload, 'decoration-packs', doc as { id: number })
+}
+
 export const DecorationPacks: CollectionConfig = {
   slug: 'decoration-packs',
   labels: {
@@ -54,8 +74,8 @@ export const DecorationPacks: CollectionConfig = {
   },
   hooks: {
     beforeChange: [clearStaleFooterItem],
-    afterChange: [revalidateDecorationPacks],
-    afterDelete: [revalidateDecorationPacksDelete],
+    afterChange: [revalidateDecorationPacks, reserveSlug],
+    afterDelete: [revalidateDecorationPacksDelete, releaseSlug],
   },
   fields: [
     {
@@ -66,7 +86,11 @@ export const DecorationPacks: CollectionConfig = {
         description: 'Admin label (e.g. Plant, New Year).',
       },
     },
-    ...slugField({ useAsSlug: 'title', required: true }),
+    ...slugField({
+      useAsSlug: 'title',
+      required: true,
+      collectionSlug: 'decoration-packs',
+    }),
     {
       name: 'items',
       type: 'array',

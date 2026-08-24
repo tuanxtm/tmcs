@@ -81,7 +81,12 @@ export const Projects: CollectionConfig = {
               required: true,
               localized: true,
             },
-            ...slugField({ useAsSlug: 'title', localized: true, required: true }),
+            ...slugField({
+              useAsSlug: 'title',
+              localized: true,
+              required: true,
+              collectionSlug: 'projects',
+            }),
             {
               name: 'summary',
               type: 'textarea',

@@ -5,10 +5,47 @@ import type { Payload } from 'payload'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type D1Database = any
 
+export type ReservedCollection =
+  | 'pages'
+  | 'posts'
+  | 'projects'
+  | 'tags'
+  | 'categories'
+  | 'decoration-packs'
+  | 'things'
+
 type Locale = 'en' | 'vi'
+
+const LOCALES: Locale[] = ['en', 'vi']
 
 function getD1(payload: Payload): D1Database {
   return payload.db.binding
+}
+
+/**
+ * Pull every localized slug string out of a doc's `slug` field. Handles both
+ * the localized shape (`{ en, vi }`) and the plain string shape used by
+ * non-localized collections like `decoration-packs`. Empty / missing values
+ * are skipped.
+ */
+function collectLocales(slugValue: unknown): Array<{ locale: Locale; slug: string }> {
+  if (typeof slugValue === 'string' && slugValue.length > 0) {
+    // Non-localized slug - register under both locales so the cross-collection
+    // lookup shape stays uniform. The reservation is keyed by (collection,
+    // locale, slug), so this does not collide with anything.
+    return LOCALES.map((locale) => ({ locale, slug: slugValue }))
+  }
+  if (slugValue && typeof slugValue === 'object') {
+    const out: Array<{ locale: Locale; slug: string }> = []
+    for (const locale of LOCALES) {
+      const value = (slugValue as Record<string, unknown>)[locale]
+      if (typeof value === 'string' && value.length > 0) {
+        out.push({ locale, slug: value })
+      }
+    }
+    return out
+  }
+  return []
 }
 
 /**
@@ -17,27 +54,23 @@ function getD1(payload: Payload): D1Database {
  */
 export async function upsertSlugReservations(
   payload: Payload,
-  collection: 'pages' | 'posts' | 'projects',
+  collection: ReservedCollection,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   doc: { id: number; slug?: any },
 ): Promise<void> {
   const db = getD1(payload)
 
-  const slugValue = doc.slug
+  const entries = collectLocales(doc.slug)
+  if (entries.length === 0) return
 
-  const locales: Locale[] = ['en', 'vi']
-  for (const locale of locales) {
-    const slug = typeof slugValue === 'object' ? (slugValue as Record<string, string>)?.[locale] : slugValue
-    if (!slug) continue
+  const stmt = db.prepare(
+    `INSERT INTO slug_reservations (locale, slug, collection, content_id)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(collection, locale, slug) DO UPDATE SET content_id = excluded.content_id`,
+  )
 
-    const stmt = db
-      .prepare(
-        `INSERT INTO slug_reservations (locale, slug, collection, content_id)
-         VALUES (?, ?, ?, ?)
-         ON CONFLICT(collection, locale, slug) DO UPDATE SET content_id = excluded.content_id`,
-      )
-      .bind(locale, slug, collection, doc.id)
-    await stmt.run()
+  for (const { locale, slug } of entries) {
+    await stmt.bind(locale, slug, collection, doc.id).run()
   }
 }
 
@@ -47,7 +80,7 @@ export async function upsertSlugReservations(
  */
 export async function deleteSlugReservations(
   payload: Payload,
-  collection: 'pages' | 'posts' | 'projects',
+  collection: ReservedCollection,
   doc: { id: number },
 ): Promise<void> {
   const db = getD1(payload)
@@ -58,37 +91,38 @@ export async function deleteSlugReservations(
 }
 
 /**
- * Check if a proposed slug is already reserved by another collection.
- * Returns the conflicting collection name, or null if free.
+ * Check if a proposed slug is already reserved by another collection in the
+ * given locale. Returns the conflicting collection name, or null if free.
+ *
+ * `selfId` is supplied on the `update` operation so that an existing row's
+ * own reservation doesn't count as a conflict against itself.
  */
 export async function checkSlugReservationConflict(
   payload: Payload,
   locale: Locale,
   slug: string,
-  selfCollection: 'pages' | 'posts' | 'projects',
+  selfCollection: ReservedCollection,
   selfId?: number,
-): Promise<string | null> {
+): Promise<ReservedCollection | null> {
   const db = getD1(payload)
 
-  let stmt
-  if (selfId) {
-    stmt = db
-      .prepare(
-        `SELECT collection FROM slug_reservations
-         WHERE locale = ? AND slug = ? AND collection != ? AND content_id != ?
-         LIMIT 1`,
-      )
-      .bind(locale, slug, selfCollection, selfId)
-  } else {
-    stmt = db
-      .prepare(
-        `SELECT collection FROM slug_reservations
-         WHERE locale = ? AND slug = ? AND collection != ?
-         LIMIT 1`,
-      )
-      .bind(locale, slug, selfCollection)
-  }
+  const stmt = selfId
+    ? db
+        .prepare(
+          `SELECT collection FROM slug_reservations
+           WHERE locale = ? AND slug = ? AND collection != ? AND content_id != ?
+           LIMIT 1`,
+        )
+        .bind(locale, slug, selfCollection, selfId)
+    : db
+        .prepare(
+          `SELECT collection FROM slug_reservations
+           WHERE locale = ? AND slug = ? AND collection != ?
+           LIMIT 1`,
+        )
+        .bind(locale, slug, selfCollection)
 
   const result = (await stmt.first()) as { collection: string } | null
-  return result?.collection ?? null
+  if (!result) return null
+  return result.collection as ReservedCollection
 }

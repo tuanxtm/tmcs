@@ -8,7 +8,9 @@ import {
   publishedOrOwned,
 } from '@/access'
 import { ownerField, publishedAtField, translationReadyField } from '@/fields/common'
+import { slugField } from '@/fields/slug'
 import { assignOwner, preventCreatorPublish, setPublishedAt } from '@/hooks'
+import { upsertSlugReservations, deleteSlugReservations } from '@/hooks/slugReservations'
 import { revalidateThings, revalidateThingsDelete } from '@/hooks/revalidateFrontend'
 import { validateAbsoluteHttpUrl } from '@/lib/url'
 
@@ -41,8 +43,24 @@ export const Things: CollectionConfig = {
   },
   hooks: {
     beforeChange: [assignOwner, preventCreatorPublish, setPublishedAt],
-    afterChange: [revalidateThings],
-    afterDelete: [revalidateThingsDelete],
+    afterChange: [
+      revalidateThings,
+      async ({ doc, operation, req }) => {
+        if (operation === 'create' || operation === 'update') {
+          await upsertSlugReservations(
+            req.payload,
+            'things',
+            doc as { id: number; slug?: unknown },
+          )
+        }
+      },
+    ],
+    afterDelete: [
+      revalidateThingsDelete,
+      async ({ doc, req }) => {
+        await deleteSlugReservations(req.payload, 'things', doc as { id: number })
+      },
+    ],
   },
   fields: [
     {
@@ -51,6 +69,12 @@ export const Things: CollectionConfig = {
       required: true,
       localized: true,
     },
+    ...slugField({
+      useAsSlug: 'name',
+      localized: true,
+      required: true,
+      collectionSlug: 'things',
+    }),
     {
       name: 'description',
       type: 'textarea',

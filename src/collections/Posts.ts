@@ -78,7 +78,12 @@ export const Posts: CollectionConfig = {
               required: true,
               localized: true,
             },
-            ...slugField({ useAsSlug: 'title', localized: true, required: true }),
+            ...slugField({
+              useAsSlug: 'title',
+              localized: true,
+              required: true,
+              collectionSlug: 'posts',
+            }),
             {
               name: 'excerpt',
               type: 'textarea',

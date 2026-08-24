@@ -7,11 +7,7 @@ import { seoFields } from '@/fields/seoFields'
 import { slugField } from '@/fields/slug'
 import { setPublishedAt, validateHomePage } from '@/hooks'
 import { revalidatePages, revalidatePagesDelete } from '@/hooks/revalidateFrontend'
-import {
-  checkSlugReservationConflict,
-  deleteSlugReservations,
-  upsertSlugReservations,
-} from '@/hooks/slugReservations'
+import { deleteSlugReservations, upsertSlugReservations } from '@/hooks/slugReservations'
 import { buildPreviewUrl } from '@/lib/preview'
 
 export const Pages: CollectionConfig = {
@@ -76,7 +72,12 @@ export const Pages: CollectionConfig = {
               required: true,
               localized: true,
             },
-            ...slugField({ useAsSlug: 'title', localized: true, required: true }),
+            ...slugField({
+              useAsSlug: 'title',
+              localized: true,
+              required: true,
+              collectionSlug: 'pages',
+            }),
             {
               name: 'summary',
               type: 'textarea',

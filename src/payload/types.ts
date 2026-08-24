@@ -1313,6 +1313,8 @@ export interface Project {
 export interface Thing {
   id: number;
   name: string;
+  slug: string;
+  slugLock?: boolean | null;
   /**
    * Short blurb shown in the Things showcase panel.
    */
@@ -2280,6 +2282,8 @@ export interface ProjectsSelect<T extends boolean = true> {
  */
 export interface ThingsSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
+  slugLock?: T;
   description?: T;
   primaryImage?: T;
   detailImage?: T;
