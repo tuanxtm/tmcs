@@ -19,6 +19,20 @@ Stage pending changes into small, focused commits and generate a Conventional Co
 - User asked for a PR, push, branch switch, or merge - do those separately.
 - File path looks like a secret (`.env`, `*.pem`, credentials) - stop and ask the user.
 
+## Directories to skip
+
+Auto-generated output directories do not contain application logic or meaningful diffs. Do not stage changes from these directories:
+
+- `graphify-out/` - knowledge graph output
+- `.next/` - Next.js build output
+- `.output/` - OpenNext/worker output
+- `node_modules/` - managed by package manager
+- `dist/`, `build/`, `.sst/` - build artifacts
+- `.cache/`, `.turbo/` - cache directories
+- `coverage/` - test coverage output
+
+If changes in these directories are accidentally staged, unstage them and report to the user.
+
 ## Conventions (this repo)
 
 - Type prefixes used in history: `feat:`, `chore:`, `test:`, `fix:`, `refactor:`, `docs:`, `perf:`, `style:`, `build:`, `ci:`.

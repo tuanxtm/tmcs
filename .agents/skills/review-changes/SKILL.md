@@ -105,6 +105,20 @@ Apply repository guidance in addition to general review rules. In particular:
 - After Payload schema changes, require generated Payload types and import map to be updated.
 - Match project conventions and avoid unrelated cleanup.
 
+## Directories to skip
+
+Auto-generated output directories do not contain application logic, credentials, or performance-critical code. Skip deep review of these directories:
+
+- `graphify-out/` - knowledge graph output
+- `.next/` - Next.js build output
+- `.output/` - OpenNext/worker output
+- `node_modules/` - managed by package manager
+- `dist/`, `build/`, `.sst/` - build artifacts
+- `.cache/`, `.turbo/` - cache directories
+- `coverage/` - test coverage output
+
+For these directories: check only for accidental secrets, unexpected large diffs, or removal of previously-tracked files. Do not flag style, lint, or minor churn within these directories.
+
 ## Performance standard
 
 Performance findings must be material and evidence-based. Estimate or demonstrate the extra work, request, render, memory, or transfer cost when possible. Prefer safe optimizations that preserve behavior. If optimization adds caching, concurrency, client work, or semantic change, verify its invalidation, error handling, consistency, and access-control implications.
