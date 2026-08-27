@@ -12,7 +12,7 @@ export default async function NotFound() {
     locale === 'vi' ? '404. trang này không tồn tại.' : "404. this page doesn't exist."
   const description =
     locale === 'vi'
-      ? 'bạn có biết thứ gì khác tồn tại không ?\nnhững ý tưởng tuyệt vời,\ndự án lớn tiếp theo trong đầu bạn,\nthứ mà bạn luôn muốn xây dựng,\nhãy hướng dẫn bạn trở về,\nđể tìm ra những gì bạn đang tìm kiếm.'
+      ? 'bạn có biết thứ gì khác tồn tại không ?\nnhững ý tưởng tuyệt vời,\nnhững dự án lớn,\nnhững thứ mà bạn luôn muốn làm,\nvề trang chủ nhé,\nmong rằng bạn sẽ tìm thấy thứ bạn cần tìm.'
       : "but you know what does ?\nthat brilliant idea floating in your mind,\nthe next big project in your head,\nthe thing you've always wanted to build,\nlet's go back,\nand find what you're looking for."
   const backLabel = locale === 'vi' ? 'Trở về trang chủ' : 'Go back home'
 
@@ -89,7 +89,7 @@ export default async function NotFound() {
           )}
         >
           <div
-            className={cn('flex h-full w-full items-center justify-center', 'font-mono')}
+            className={cn('flex h-full w-full items-center justify-center py-4', 'font-mono')}
             aria-hidden="true"
           >
             <span className="text-primary font-mono text-[clamp(6rem,20vw,8rem)] leading-none">

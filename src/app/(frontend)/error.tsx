@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect } from 'react'
 
+import { useLocale } from '@/app/(frontend)/_components/providers/locale'
 import { homeHref } from '@/app/(frontend)/_lib/locale'
 import { cn } from '@/lib/utils'
 
@@ -13,9 +14,19 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const locale = useLocale()
+
   useEffect(() => {
     console.error(error)
   }, [error])
+
+  const heading = locale === 'vi' ? '500. có lỗi xảy ra.' : '500. something went wrong.'
+  const description =
+    locale === 'vi'
+      ? 'không thể tải trang này.\nvui lòng thử lại.'
+      : 'the page could not be loaded.\nplease try again.'
+  const retryLabel = locale === 'vi' ? 'Thử lại' : 'try again'
+  const homeLabel = locale === 'vi' ? 'Trở về trang chủ' : 'back home'
 
   return (
     <section
@@ -38,19 +49,19 @@ export default function Error({
           >
             <div
               className={cn(
-                'mx-auto flex h-full flex-col items-start justify-center gap-4 py-2 text-center',
+                'mx-auto flex h-full flex-col items-start justify-center gap-8 py-2 text-center',
               )}
             >
               <h1
                 id="error-heading"
                 className="text-primary text-sm font-medium whitespace-pre-wrap md:text-base lg:text-lg"
               >
-                something went wrong.
+                {heading}
               </h1>
               <p className="text-primary mb-1 text-left text-sm font-medium whitespace-pre-wrap md:text-base lg:text-lg">
-                the page could not be loaded.{'\n'}please try again.
+                {description}
               </p>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-8">
                 <button
                   type="button"
                   onClick={reset}
@@ -74,11 +85,11 @@ export default function Error({
                       'hover:text-foreground hover:underline hover:underline-offset-4',
                     )}
                   >
-                    try again
+                    {retryLabel}
                   </span>
                 </button>
                 <Link
-                  href={homeHref('en')}
+                  href={homeHref(locale)}
                   className={cn(
                     'inline-flex items-center justify-center gap-1',
                     'focus-visible:ring-ring transition-colors focus-visible:ring-2 focus-visible:outline-none',
@@ -99,7 +110,7 @@ export default function Error({
                       'hover:text-foreground hover:underline hover:underline-offset-4',
                     )}
                   >
-                    back home
+                    {homeLabel}
                   </span>
                 </Link>
               </div>
@@ -115,10 +126,10 @@ export default function Error({
           )}
         >
           <div
-            className={cn('flex h-full w-full items-center justify-center', 'font-mono')}
+            className={cn('flex h-full w-full items-center justify-center py-4', 'font-mono')}
             aria-hidden="true"
           >
-            <span className="text-primary font-mono text-[clamp(6rem,20vw,8rem)] leading-none">
+            <span className="text-primary font-mono text-[clamp(6rem,18vw,8rem)] leading-none">
               <span className="inline md:block">5</span>
               <span className="inline md:block">0</span>
               <span className="inline md:block">0</span>
