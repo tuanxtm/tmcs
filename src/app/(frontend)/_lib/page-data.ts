@@ -251,9 +251,11 @@ async function resolveFeedSectionBlock(
       : (block as { showViewAll?: boolean | null }).showViewAll !== false
 
   const viewAllHref =
-    showViewAll && 'viewAllPage' in block
+    showViewAll && 'viewAllPage' in block && block.viewAllPage != null
       ? resolvePageHref((block as { viewAllPage?: unknown }).viewAllPage, locale)
-      : null
+      : showViewAll
+        ? `/${locale === 'vi' ? 'vi/' : ''}${feedType}`
+        : null
 
   // Fetch shell (needed for decorations + metadata) in parallel with the docs
   // load and the decorations lookup. Decorations depend on the resolved
@@ -669,7 +671,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       nextCursor: null,
       hasNextPage: false,
       showViewAll: false,
-      viewAllLabel: null,
+      viewAllLabel: FEED_SOURCE_REGISTRY.things.defaultViewAllLabel,
       viewAllHref: null,
       cursorPopup: FEED_SOURCE_REGISTRY.things.defaultCursorPopup,
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.things.defaultCursorPopupEmpty,
@@ -688,7 +690,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       nextCursor: null,
       hasNextPage: false,
       showViewAll: false,
-      viewAllLabel: null,
+      viewAllLabel: FEED_SOURCE_REGISTRY.videos.defaultViewAllLabel,
       viewAllHref: null,
       cursorPopup: FEED_SOURCE_REGISTRY.videos.defaultCursorPopup,
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.videos.defaultCursorPopupEmpty,

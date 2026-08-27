@@ -234,7 +234,7 @@ type FeedSectionBase = {
   nextCursor: string | null
   hasNextPage: boolean
   showViewAll: boolean
-  viewAllLabel: string | null
+  viewAllLabel: Record<LocaleCode, string> | string | null
   viewAllHref: string | null
   cursorPopup: string | null
   cursorPopupEmpty: string | null

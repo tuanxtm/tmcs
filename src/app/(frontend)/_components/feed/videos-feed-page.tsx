@@ -24,7 +24,6 @@ const { Page: VideosFeedPage, generateMetadata: generateVideosFeedMetadata } =
           pagination="infinite"
           nextCursor={nextCursor}
           hasNextPage={hasNextPage}
-          showViewAll={false}
           feedType="videos"
           docs={docs}
           decorations={decorations}

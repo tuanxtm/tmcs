@@ -7,8 +7,8 @@ import { useBootReady } from '@/app/(frontend)/_components/providers/boot-reveal
 
 /** Travel distance for the fly-up enter. */
 const FLY_Y_PX = 48
-/** Enter duration - slow enough to read as motion. */
-const DURATION_S = 0.75
+/** Enter duration - slow enough to read as motion and let the tail settle. */
+const DURATION_S = 1.1
 /** Stagger between items in the same row only. */
 const ROW_STAGGER_S = 0.12
 
@@ -82,7 +82,8 @@ export function RevealGridItem({
       animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: FLY_Y_PX }}
       transition={{
         duration: reduceMotion ? 0.05 : DURATION_S,
-        ease: [0.22, 1, 0.36, 1],
+        // ease-out-expo-ish: fast start, long tail so the card settles slowly.
+        ease: [0.16, 1, 0.3, 1],
         delay: show && !reduceMotion ? colIndex * ROW_STAGGER_S : 0,
       }}
     >

@@ -1,5 +1,6 @@
 import type { LayoutBlankSpaceBlockView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
+import { Scales } from '@/components/ui/scales'
 
 type BlankSpaceBlockProps = {
   block: LayoutBlankSpaceBlockView
@@ -16,9 +17,11 @@ export function BlankSpaceBlock({ block }: BlankSpaceBlockProps) {
       aria-hidden="true"
       style={{ height: block.height }}
       className={cn(
-        'bg-background dash-line-b',
+        'relative bg-background dash-line-b',
         'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
       )}
-    />
+    >
+      <Scales />
+    </section>
   )
 }

@@ -27,7 +27,7 @@ export function CmsImage({
 
   if (fill) {
     return (
-      <div className={cn('relative overflow-hidden', className)} style={style}>
+      <div className={cn('absolute inset-0 overflow-hidden', className)} style={style}>
         <Image
           src={media.url}
           alt={media.alt}

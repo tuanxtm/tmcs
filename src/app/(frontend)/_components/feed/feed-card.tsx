@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { useState } from 'react'
+import Link from 'next/link'
 import { ViewTransition } from 'react'
 import { useReducedMotion } from 'motion/react'
 
@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import type { FeedDecorationView, PostCardView, ProjectCardView } from '@/app/(frontend)/_lib/types'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import { getImageAspect } from '@/app/(frontend)/_components/media/image-aspect'
+import { formatDate } from '@/app/(frontend)/_lib/formatters'
 
 type FeedCardProps = {
   doc: PostCardView | ProjectCardView
@@ -18,30 +19,6 @@ type FeedCardProps = {
   className?: string
   cursorPopup?: string | null
   decorations?: FeedDecorationView[]
-}
-
-const dateFormatters: Record<LocaleCode, Intl.DateTimeFormat> = {
-  en: new Intl.DateTimeFormat('en-US', {
-    timeZone: 'UTC',
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-  }),
-  vi: new Intl.DateTimeFormat('vi-VN', {
-    timeZone: 'UTC',
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-  }),
-}
-
-function formatDate(value: string | null, locale: LocaleCode): string | null {
-  if (!value) return null
-  try {
-    return dateFormatters[locale].format(new Date(value))
-  } catch {
-    return null
-  }
 }
 
 // Stable per-card deco pick: same id always picks the same decoration,
@@ -154,7 +131,7 @@ export function FeedCard({
             'text-foreground text-xs leading-none font-medium tracking-tight md:text-sm lg:text-base',
             'lowercase',
             'border-primary/50 border-l-2 md:border-l-3 lg:border-l-4',
-            'pl-0.5 md:pl-1 lg:pl-2',
+            'pl-0.75 md:pl-1 lg:pl-2',
           )}
         >
           {doc.title}

@@ -7,7 +7,6 @@ import {
   IconBrandShopee,
   IconShoppingBag,
   IconShoppingBagCheck,
-  IconX,
 } from '@tabler/icons-react'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import { Button } from '@/components/ui/button'
@@ -93,41 +92,49 @@ export function BuyNowDialog({
     <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent
         showCloseButton={false}
-        className="rounded-none sm:max-w-md flex flex-col bg-transparent border-none p-2 gap-2"
+        className="flex flex-col gap-2 rounded-none border-none bg-transparent p-2 sm:max-w-md"
       >
-        <div className="flex w-full justify-end">
+        <div className="mb-1 flex w-full justify-end">
           <DialogClose asChild>
             <Button
               variant="ghost"
-              size="icon-xs"
-              aria-label={copy.close}
-              className="rounded-none border-none text-white/60 hover:bg-transparent hover:text-white/80"
+              className="rounded-none border-none p-0 font-mono text-white/60 uppercase hover:bg-transparent hover:text-white/80"
             >
-              <IconX aria-hidden="true" className="size-5" />
+              <p>Close</p>
             </Button>
           </DialogClose>
         </div>
 
-        <div className="flex flex-col gap-2 bg-background p-2">
+        <div className="bg-background flex flex-col gap-3 p-3">
           {image ? (
-            <CmsImage
-              media={image}
-              sizes="(min-width: 640px) 360px, 80vw"
-              className="aspect-square w-full"
-              imgClassName="h-full w-full object-cover"
-            />
+            <div className="group/image relative aspect-square w-full overflow-hidden">
+              <CmsImage
+                media={image}
+                sizes="(min-width: 640px) 360px, 80vw"
+                className="object-cover"
+                imgClassName="h-full w-full transition-opacity duration-300 group-hover/image:opacity-0"
+              />
+              {thing.detailImage && thing.detailImage !== image && (
+                <CmsImage
+                  media={thing.detailImage}
+                  sizes="(min-width: 640px) 360px, 80vw"
+                  className="absolute inset-0 object-cover opacity-0 transition-opacity duration-300 group-hover/image:opacity-100"
+                  imgClassName="h-full w-full"
+                />
+              )}
+            </div>
           ) : null}
 
-          <DialogTitle className="text-lg font-medium leading-none">{thing.name}</DialogTitle>
+          <DialogTitle className="text-lg leading-none font-medium">{thing.name}</DialogTitle>
 
           {thing.description ? (
-            <DialogDescription className="text-sm text-foreground/90">
+            <DialogDescription className="text-primary text-sm">
               {thing.description}
             </DialogDescription>
           ) : null}
 
           {thing.links.length > 0 ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {thing.links.map((link, i) => {
                 const PlatformIcon = getPlatformIcon(link.url)
                 return (
@@ -135,7 +142,7 @@ export function BuyNowDialog({
                     key={i}
                     asChild
                     variant="outline"
-                    className="w-full rounded-none justify-center"
+                    className="w-full justify-center rounded-none"
                   >
                     <a href={link.url} target="_blank" rel="sponsored noopener noreferrer">
                       <PlatformIcon aria-hidden="true" className="size-4" />

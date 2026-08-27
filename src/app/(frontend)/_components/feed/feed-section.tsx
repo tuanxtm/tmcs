@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 
 import { FeedCard } from '@/app/(frontend)/_components/feed/feed-card'
 import { VideoFeedCard } from '@/app/(frontend)/_components/feed/video-feed-card'
-import { ViewAllFeedTile } from '@/app/(frontend)/_components/feed/view-all-feed-tile'
+import { ViewAllFeedCard } from '@/app/(frontend)/_components/feed/view-all-feed-card'
 import { FeedGrid } from '@/app/(frontend)/_components/layout/feed-grid'
 import {
   RevealGridItem,
@@ -40,7 +40,7 @@ type FeedSectionBaseProps = {
   nextCursor?: string | null
   hasNextPage?: boolean
   showViewAll?: boolean
-  viewAllLabel?: string | null
+  viewAllLabel?: Record<LocaleCode, string> | string | null
   viewAllHref?: string | null
   className?: string
   decorations?: FeedDecorationView[]
@@ -205,10 +205,14 @@ export function FeedSection(props: FeedSectionProps) {
             dataAttributes={{ 'data-feed-grid-item': true }}
             className={cn('relative z-0 min-w-0 self-stretch')}
           >
-            <ViewAllFeedTile
-              href={viewAllHref}
-              label={viewAllLabel}
-              cursorPopup={cursorPopupViewAll || viewAllLabel.toLowerCase()}
+            <ViewAllFeedCard
+              href={viewAllHref!}
+              label={
+                typeof viewAllLabel === 'string'
+                  ? viewAllLabel
+                  : viewAllLabel?.[locale] ?? viewAllLabel?.['en'] ?? ''
+              }
+              cursorPopup={cursorPopupViewAll || undefined}
             />
           </RevealGridItem>
         ) : null}
@@ -242,6 +246,7 @@ export function FeedSection(props: FeedSectionProps) {
           ) : null}
         </div>
       ) : null}
+      <div className="bg-background h-(--header-height)"></div>
     </section>
   )
 }

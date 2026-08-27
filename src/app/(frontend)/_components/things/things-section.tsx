@@ -1,15 +1,16 @@
 'use client'
 
 import { ThingsGrid } from '@/app/(frontend)/_components/layout/things-grid'
-import { ViewAllFeedTile } from '@/app/(frontend)/_components/feed/view-all-feed-tile'
 import {
   RevealGridItem,
   useGridColumnCount,
 } from '@/app/(frontend)/_components/layout/reveal-grid-item'
+import { ViewAllFeedCard } from '@/app/(frontend)/_components/feed/view-all-feed-card'
 import { SectionHeader } from '@/app/(frontend)/_components/layout/section-header'
-import { ThingShowcaseTile } from '@/app/(frontend)/_components/things/thing-showcase-tile'
+import { ThingCard } from '@/app/(frontend)/_components/things/thing-card'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
+import { cn } from '@/lib/utils'
 
 type ThingsSectionProps = {
   locale: LocaleCode
@@ -23,7 +24,7 @@ type ThingsSectionProps = {
   cursorPopupItem?: string | null
   cursorPopupViewAll?: string | null
   showViewAll?: boolean
-  viewAllLabel?: string | null
+  viewAllLabel?: Record<LocaleCode, string> | string | null
   viewAllHref?: string | null
   className?: string
 }
@@ -68,7 +69,10 @@ export function ThingsSection({
       aria-labelledby={headingId}
       data-feed-type="things"
       data-cursor-popup={sectionCursor}
-      className={className}
+      className={cn(
+        className,
+        'border-l-primary dash-line-b border-l-3 md:border-l-4 lg:border-l-5',
+      )}
     >
       <SectionHeader id={headingId} heading={heading} />
 
@@ -79,9 +83,9 @@ export function ThingsSection({
             index={index}
             columns={columns}
             dataAttributes={{ 'data-things-grid-item': true }}
-            className="relative z-0 min-w-0"
+            className={cn('relative z-0 min-w-0 self-stretch')}
           >
-            <ThingShowcaseTile thing={thing} locale={locale} cursorPopup={cursorPopupItem} />
+            <ThingCard thing={thing} locale={locale} index={index} cursorPopup={cursorPopupItem} />
           </RevealGridItem>
         ))}
 
@@ -90,16 +94,21 @@ export function ThingsSection({
             index={docs.length}
             columns={columns}
             dataAttributes={{ 'data-things-grid-item': true }}
-            className="relative z-0 min-w-0 self-stretch"
+            className={cn('relative z-0 min-w-0 self-stretch')}
           >
-            <ViewAllFeedTile
-              href={viewAllHref}
-              label={viewAllLabel}
-              cursorPopup={cursorPopupViewAll || viewAllLabel.toLowerCase()}
+            <ViewAllFeedCard
+              href={viewAllHref!}
+              label={
+                typeof viewAllLabel === 'string'
+                  ? viewAllLabel
+                  : viewAllLabel?.[locale] ?? viewAllLabel?.['en'] ?? ''
+              }
+              cursorPopup={cursorPopupViewAll || undefined}
             />
           </RevealGridItem>
         ) : null}
       </ThingsGrid>
+      <div className="bg-background h-(--header-height)"></div>
     </section>
   )
 }

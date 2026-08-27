@@ -32,7 +32,7 @@ type FeedCardMap = {
 }
 
 type FeedSourceAdapter<T extends FeedType> = {
-  defaultViewAllLabel: string
+  defaultViewAllLabel: Record<LocaleCode, string>
   defaultCursorPopup: string
   defaultCursorPopupEmpty: string
   defaultCursorPopupItem: string
@@ -256,7 +256,7 @@ async function loadVideos(args: {
 
 export const FEED_SOURCE_REGISTRY: { [K in FeedType]: FeedSourceAdapter<K> } = {
   posts: {
-    defaultViewAllLabel: 'View all posts',
+    defaultViewAllLabel: { en: 'View all posts', vi: 'Xem tất cả bài viết' },
     defaultCursorPopup: 'explore posts',
     defaultCursorPopupEmpty: 'nothing here yet',
     defaultCursorPopupItem: 'view details',
@@ -265,7 +265,7 @@ export const FEED_SOURCE_REGISTRY: { [K in FeedType]: FeedSourceAdapter<K> } = {
     loadCards: loadPosts,
   },
   projects: {
-    defaultViewAllLabel: 'View all projects',
+    defaultViewAllLabel: { en: 'View all projects', vi: 'Xem tất cả dự án' },
     defaultCursorPopup: "cool projects, isn't it ?",
     defaultCursorPopupEmpty: 'nothing here yet',
     defaultCursorPopupItem: 'view details',
@@ -274,7 +274,7 @@ export const FEED_SOURCE_REGISTRY: { [K in FeedType]: FeedSourceAdapter<K> } = {
     loadCards: loadProjects,
   },
   things: {
-    defaultViewAllLabel: 'View all things',
+    defaultViewAllLabel: { en: 'View all things', vi: 'Xem tất cả món đồ' },
     defaultCursorPopup: 'tools & gear',
     defaultCursorPopupEmpty: 'nothing here yet',
     defaultCursorPopupItem: 'shop this',
@@ -283,7 +283,7 @@ export const FEED_SOURCE_REGISTRY: { [K in FeedType]: FeedSourceAdapter<K> } = {
     loadCards: loadThings,
   },
   videos: {
-    defaultViewAllLabel: 'View all videos',
+    defaultViewAllLabel: { en: 'View all videos', vi: 'Xem tất cả videos' },
     defaultCursorPopup: 'watch',
     defaultCursorPopupEmpty: 'nothing here yet',
     defaultCursorPopupItem: 'play',

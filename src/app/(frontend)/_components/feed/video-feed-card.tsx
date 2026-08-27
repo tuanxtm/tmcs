@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { useCallback, useId, useState } from 'react'
+import { useCallback, useId } from 'react'
 import { useReducedMotion } from 'motion/react'
 import { IconBrandYoutube, IconPlayerPlay } from '@tabler/icons-react'
 import { IconExternalLink } from '@tabler/icons-react'
@@ -10,6 +11,7 @@ import type { VideoCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { youtubeEmbedUrl } from '@/lib/youtube'
 import { cn } from '@/lib/utils'
+import { formatDate } from '@/app/(frontend)/_lib/formatters'
 
 type VideoFeedCardProps = {
   doc: VideoCardView
@@ -20,30 +22,6 @@ type VideoFeedCardProps = {
   /** Currently playing video id in the section (YouTube only). */
   activeYouTubeId: number | null
   onActivateYouTubeAction: (id: number | null) => void
-}
-
-const dateFormatters: Record<LocaleCode, Intl.DateTimeFormat> = {
-  en: new Intl.DateTimeFormat('en-US', {
-    timeZone: 'UTC',
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-  }),
-  vi: new Intl.DateTimeFormat('vi-VN', {
-    timeZone: 'UTC',
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-  }),
-}
-
-function formatDate(value: string | null, locale: LocaleCode): string | null {
-  if (!value) return null
-  try {
-    return dateFormatters[locale].format(new Date(value))
-  } catch {
-    return null
-  }
 }
 
 const PROVIDER_LABEL: Record<VideoCardView['provider'], string> = {
@@ -134,7 +112,7 @@ export function VideoFeedCard({
   const meta = (
     <span
       className={cn(
-        'text-primary font-mono text-[0.625rem] leading-none tracking-tight uppercase',
+        'text-primary font-mono text-[0.5rem] leading-none tracking-tight uppercase md:text-[0.625rem]',
         'absolute top-0 left-0',
         'bg-background pr-0.5 pb-0.5',
       )}
@@ -151,7 +129,7 @@ export function VideoFeedCard({
         'text-foreground text-xs leading-none font-medium tracking-tight md:text-sm lg:text-base',
         'lowercase',
         'border-primary/50 border-l-2 md:border-l-3 lg:border-l-4',
-        'pl-0.5 md:pl-1 lg:pl-2',
+        'pl-0.75 md:pl-1 lg:pl-2',
       )}
     >
       {doc.title}
