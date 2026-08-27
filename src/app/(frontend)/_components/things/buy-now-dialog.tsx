@@ -100,7 +100,7 @@ export function BuyNowDialog({
               variant="ghost"
               className="rounded-none border-none p-0 font-mono text-white/60 uppercase hover:bg-transparent hover:text-white/80"
             >
-              <p>Close</p>
+              <p>{copy.close}</p>
             </Button>
           </DialogClose>
         </div>

@@ -34,7 +34,6 @@ export function ThingsSection({
   sectionId,
   headingId,
   heading,
-  description,
   docs,
   cursorPopup,
   cursorPopupEmpty,
@@ -101,7 +100,7 @@ export function ThingsSection({
               label={
                 typeof viewAllLabel === 'string'
                   ? viewAllLabel
-                  : viewAllLabel?.[locale] ?? viewAllLabel?.['en'] ?? ''
+                  : (viewAllLabel?.[locale] ?? viewAllLabel?.['en'] ?? '')
               }
               cursorPopup={cursorPopupViewAll || undefined}
             />
