@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
+import { FieldRow } from '@/app/(frontend)/_components/layout/field-row'
 import { trimUrlScheme } from '@/app/(frontend)/_lib/social-icons'
 import type { LayoutHeroBlockView, NavChildView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
@@ -8,25 +9,6 @@ import { cn } from '@/lib/utils'
 type HeroProps = {
   hero: LayoutHeroBlockView
   className?: string
-}
-
-type FieldRowProps = {
-  label: string | null
-  className?: string
-  children: React.ReactNode
-}
-
-function FieldRow({ label, className, children }: FieldRowProps) {
-  return (
-    <div className={cn('flex flex-col', className)}>
-      {label ? (
-        <p className="text-muted-foreground/80 font-mono text-[0.625rem] tracking-tight uppercase md:text-xs">
-          {label}
-        </p>
-      ) : null}
-      <div className="text-foreground text-base lowercase">{children}</div>
-    </div>
-  )
 }
 
 type LinkListVariant = 'social' | 'destination'

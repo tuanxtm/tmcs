@@ -1,166 +1,123 @@
-import { ViewTransition } from 'react'
-
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import { getImageAspect } from '@/app/(frontend)/_components/media/image-aspect'
+import { FieldRow } from '@/app/(frontend)/_components/layout/field-row'
 import type { MediaView } from '@/app/(frontend)/_lib/types'
+import { Scales } from '@/components/ui/scales'
 import { cn } from '@/lib/utils'
 
 type DetailHeroProps = {
-  slug: string
-  id: number
   title: string
-  excerpt: string | null
   image: MediaView | null
-  publishedAt: string | null
-  author: { name: string } | null
-  readingTime: number | null
-  tags: { name: string }[]
   priority?: boolean
 }
 
 /**
- * Detail hero - the image + title section that lives above the rich content.
+ * Detail hero - mirrors the home `Hero` block token-for-token.
  *
- * Layout adapts to the image's natural ratio:
- *  - Landscape (ratio > 1): full-width image with the title overlaid as a
- *    gradient at the bottom (Shadwell-style).
- *  - Portrait / square (ratio <= 1): side-by-side grid with the image on the
- *    left and the title in its own reading column on the right.
+ * Outer chrome, padding, gaps, and image-cell dimensions are identical to
+ * `src/app/(frontend)/_components/blocks/hero.tsx` so the section above the
+ * fold reads as a continuation of the home page:
+ *  - `min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]`
+ *  - `dash-line-b`, `border-l-primary border-l-3 md:border-l-4 lg:border-l-5`
+ *  - `pt-2 md:pt-1 md:pb-1.5` vertical padding
  *
- * View Transitions:
- *  - The image is the shared element - it carries the same `card-image-${slug}`
- *    name on both the feed card and this hero so the morph stays smooth.
- *    We apply the same aspect class on both sides so the start/end frames
- *    match. slug is globally unique across all feed types so there are no
- *    collisions when multiple feed sections render on the same page.
- *  - The title uses a separate `detail-title-${id}` boundary with a fade-in
- *    so it appears cleanly after the image morph completes (and never gets
- *    scaled/rastered along with the image).
+ * Layout:
+ *  - Left column wraps the title in the same `FieldRow` chrome (label +
+ *    lowercase value, uppercase mono label) so the typographic rhythm matches
+ *    the home hero.
+ *  - Right column sits behind a `<Scales />` pattern. The image renders in the
+ *    same aspect-class box as the feed card (`getImageAspect`, `object-cover`).
+ *    The box is height-bound (`h-full w-auto max-w-full`) and centered, so the
+ *    image scales to fit inside the cell instead of overflowing or letterboxing.
  */
-export function DetailHero({
-  slug,
-  id,
-  title,
-  excerpt,
-  image,
-  publishedAt,
-  author,
-  readingTime,
-  tags,
-  priority = true,
-}: DetailHeroProps) {
-  const { variant, aspectClass } = getImageAspect(image)
+export function DetailHero({ title, image, priority = true }: DetailHeroProps) {
+  // Same aspect class as the feed card (see getImageAspect) so the detail
+  // page can mount the hero at the same dimensions as the originating card.
+  // The box is height-bound and centered so the image always fits inside the cell.
+  const { aspectClass } = getImageAspect(image)
 
-  // slug is globally unique; falls back to id for draft/unpublished items.
-  const imageVtName = slug ? `card-image-${slug}` : `card-image-${id}`
-
-  const metaItems = (
-    <>
-      {author && <span>By {author.name}</span>}
-      {publishedAt && <span aria-hidden>·</span>}
-      {publishedAt && <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>}
-      {readingTime !== null && <span aria-hidden>·</span>}
-      {readingTime !== null && <span>{readingTime} min read</span>}
-      {tags.length > 0 && <span aria-hidden>·</span>}
-      {tags.length > 0 && <span>{tags.map((t) => t.name).join(', ')}</span>}
-    </>
-  )
-
-  // No image - fall back to a split layout with a gradient placeholder so the
-  // title still has somewhere to live.
   if (!image) {
     return (
-      <section className="grid grid-cols-1 items-start gap-6 px-6 py-8 md:grid-cols-[auto_1fr] md:gap-12">
-        <div className={cn('w-full bg-linear-to-b from-zinc-900 to-zinc-950', aspectClass)} />
-        <ViewTransition name={`detail-title-${id}`} enter="fade-in" default="none">
-          <div className="py-4">
-            <h1 className="text-foreground mb-4 text-3xl leading-tight font-bold sm:text-4xl md:text-5xl">
-              {title}
-            </h1>
-            {excerpt && <p className="text-foreground/70 mb-6 max-w-xl text-lg">{excerpt}</p>}
-            <div className="text-foreground/60 flex flex-wrap items-center gap-3 text-sm">
-              {metaItems}
-            </div>
-          </div>
-        </ViewTransition>
-      </section>
-    )
-  }
-
-  if (variant === 'overlay') {
-    return (
-      <section className="relative w-full bg-zinc-950">
-        <ViewTransition name={imageVtName} share="morph">
-          <div className={cn('relative w-full overflow-hidden', aspectClass)}>
-            <CmsImage
-              media={image}
-              fill
-              sizes="100vw"
-              priority={priority}
-              className="h-full w-full"
-              imgClassName="object-cover"
-            />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-6 sm:p-8 md:p-12">
-              <ViewTransition name={`detail-title-${id}`} enter="fade-in" default="none">
-                <div className="text-foreground max-w-3xl">
-                  <h1 className="mb-4 text-3xl leading-tight font-bold sm:text-5xl md:text-6xl">
+      <section
+        id="detail-hero"
+        className={cn(
+          'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
+          'bg-background dash-line-b',
+          'pt-2 md:pt-1 md:pb-1.5',
+          'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
+        )}
+      >
+        <div className="flex h-full w-full flex-col-reverse items-stretch justify-between md:flex-row">
+          <div className="relative isolate min-h-0 flex-1 overflow-hidden">
+            <div className={cn('relative z-10 h-full overflow-y-auto', 'px-2 py-4 md:p-3 lg:p-4')}>
+              <div className="grid grid-cols-2 gap-x-16 gap-y-4 md:gap-y-8 lg:gap-x-8 lg:gap-y-16">
+                <FieldRow label="title">
+                  <h1 className="text-foreground text-sm font-medium md:text-base lg:text-lg">
                     {title}
                   </h1>
-                  <div className="text-foreground/80 flex flex-wrap items-center gap-3 text-sm">
-                    {metaItems}
-                  </div>
-                </div>
-              </ViewTransition>
+                </FieldRow>
+                <div aria-hidden="true" />
+              </div>
             </div>
           </div>
-        </ViewTransition>
+          <div
+            className={cn(
+              'relative overflow-hidden md:h-full',
+              'h-40 w-full md:w-[calc((100%-20px)/3)] lg:w-[calc((100%-40px)/4)]',
+              'max-sm:pl-2',
+            )}
+            aria-hidden="true"
+          />
+        </div>
       </section>
     )
   }
 
-  // Portrait / square - side-by-side.
   return (
-    <section className="grid grid-cols-1 items-start gap-6 px-6 py-8 md:grid-cols-[auto_1fr] md:gap-12">
-      <ViewTransition name={imageVtName} share="morph">
-        <div
-          className={cn(
-            'relative w-full overflow-hidden bg-zinc-950 md:max-h-[80dvh] md:w-auto md:max-w-[55vw]',
-            aspectClass,
-          )}
-        >
-          <CmsImage
-            media={image}
-            fill
-            sizes="(min-width: 768px) 55vw, 100vw"
-            priority={priority}
-            className="h-full w-full"
-            imgClassName="object-cover"
-          />
-        </div>
-      </ViewTransition>
-      <ViewTransition name={`detail-title-${id}`} enter="fade-in" default="none">
-        <div className="py-4">
-          <h1 className="text-foreground mb-4 text-3xl leading-tight font-bold sm:text-4xl md:text-5xl">
-            {title}
-          </h1>
-          {excerpt && <p className="text-foreground/70 mb-6 max-w-xl text-lg">{excerpt}</p>}
-          <div className="text-foreground/60 flex flex-wrap items-center gap-3 text-sm">
-            {metaItems}
+    <section
+      id="detail-hero"
+      className={cn(
+        'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
+        'bg-background dash-line-b',
+        'pt-2 md:pt-1 md:pb-1.5',
+        'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
+      )}
+    >
+      <div className="flex h-full w-full flex-col-reverse items-stretch justify-between md:flex-row">
+        <div className="relative isolate min-h-0 flex-1 overflow-hidden">
+          <div className={cn('relative z-10 h-full overflow-y-auto', 'px-2 py-4 md:p-3 lg:p-4')}>
+            <div className="relative h-full w-full">
+              <FieldRow label={'PROJECT'} className="absolute bottom-0 left-0">
+                <h1
+                  className={cn('text-foreground text-sm font-medium md:text-base lg:text-3xl')}
+                >
+                  {title}
+                </h1>
+              </FieldRow>
+            </div>
           </div>
         </div>
-      </ViewTransition>
+        <div
+          className={cn(
+            'relative overflow-hidden md:h-full',
+            'h-40 w-full md:w-1/2',
+            'max-sm:pl-2',
+          )}
+        >
+          <Scales className="text-primary" />
+          <div className="relative z-10 flex h-full w-full items-center justify-center p-2 md:p-3 lg:p-4">
+            <div className={cn('relative h-full w-auto max-w-full overflow-hidden', aspectClass)}>
+              <CmsImage
+                media={image}
+                sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
+                priority={priority}
+                fill
+                imgClassName="object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   )
-}
-
-function formatDate(dateStr: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  } catch {
-    return dateStr
-  }
 }

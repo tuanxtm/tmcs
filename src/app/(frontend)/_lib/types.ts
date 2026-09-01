@@ -150,6 +150,12 @@ export type PostsPageView = {
   hasNextPage: boolean
 }
 
+export type DetailAuthorView = {
+  name: string
+  jobTitle: string | null
+  avatar: MediaView | null
+}
+
 export type PostDetailView = {
   id: number
   title: string
@@ -161,7 +167,7 @@ export type PostDetailView = {
   featuredImage: MediaView | null
   publishedAt: string | null
   readingTime: number | null
-  author: { name: string } | null
+  author: DetailAuthorView | null
   categories: { name: string }[]
   tags: { name: string }[]
   seo: PageSeoView
@@ -177,7 +183,7 @@ export type ProjectDetailView = {
   blocks: ResolvedBlockView[]
   coverImage: MediaView | null
   publishedAt: string | null
-  author: { name: string } | null
+  author: DetailAuthorView | null
   categories: { name: string }[]
   tags: { name: string }[]
   seo: PageSeoView

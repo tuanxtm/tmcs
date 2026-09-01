@@ -32,6 +32,7 @@ import { resolveCmsLink, resolvePageHref } from '@/app/(frontend)/_lib/links'
 import type {
   CmsPageView,
   ContentMediaBlockView,
+  DetailAuthorView,
   FeedSectionBlockView,
   FeedType,
   HomePageView,
@@ -183,6 +184,26 @@ function toPageSeo(page: Page) {
     canonicalUrl: page.seo?.canonicalUrl ?? null,
     noIndex: Boolean(page.seo?.noIndex),
     noFollow: Boolean(page.seo?.noFollow),
+  }
+}
+
+/**
+ * Map a Payload `authors` relation to the slim frontend `DetailAuthorView`.
+ *
+ * Authors use `displayName` as their title field (not the default `title`),
+ * so we prefer that and fall back to `title` for forward-compatibility. The
+ * avatar upload resolves inline at `depth: 2`, so `toMediaView` handles it
+ * the same way as a post's `featuredImage`.
+ */
+function toAuthor(author: unknown): DetailAuthorView | null {
+  if (!author || typeof author !== 'object') return null
+  const a = author as { displayName?: unknown; title?: unknown; jobTitle?: unknown; avatar?: unknown }
+  const name = String(a.displayName ?? a.title ?? '').trim()
+  if (!name) return null
+  return {
+    name,
+    jobTitle: typeof a.jobTitle === 'string' && a.jobTitle.length > 0 ? a.jobTitle : null,
+    avatar: toMediaView(a.avatar),
   }
 }
 
@@ -931,10 +952,7 @@ function toPostDetailView(post: Post, blocks: ResolvedBlockView[]): PostDetailVi
     featuredImage: toMediaView(post.featuredImage),
     publishedAt: post.publishedAt ?? null,
     readingTime: post.readingTime ?? null,
-    author:
-      post.author && typeof post.author === 'object' && 'title' in post.author
-        ? { name: String((post.author as { title?: unknown }).title) || 'Unknown' }
-        : null,
+    author: toAuthor(post.author),
     categories: (post.categories || [])
       .map((c) =>
         typeof c === 'object' && c && 'title' in c
@@ -992,10 +1010,7 @@ function toProjectDetailView(project: Project, blocks: ResolvedBlockView[]): Pro
     blocks,
     coverImage: toMediaView(project.featuredImage),
     publishedAt: project.publishedAt ?? null,
-    author:
-      project.author && typeof project.author === 'object' && 'title' in project.author
-        ? { name: String((project.author as { title?: unknown }).title) || 'Unknown' }
-        : null,
+    author: toAuthor(project.author),
     categories: (project.categories || [])
       .map((c) =>
         typeof c === 'object' && c && 'title' in c
