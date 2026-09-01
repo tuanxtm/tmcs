@@ -17,7 +17,10 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ siteName, locale, navigation, className }: SiteHeaderProps) {
   return (
-    <header className={cn('bg-background dash-line-b', className)}>
+    <header
+      className={cn('bg-background dash-line-b', className)}
+      style={{ viewTransitionName: 'site-header' }}
+    >
       <div
         className={cn(
           'bg-background relative flex h-(--header-height) min-h-(--header-height) items-center justify-between',
@@ -36,7 +39,7 @@ export function SiteHeader({ siteName, locale, navigation, className }: SiteHead
             />
           </Link>
         </div>
-        <HeaderNav items={navigation} />
+        <HeaderNav items={navigation} siteName={siteName} locale={locale} />
       </div>
     </header>
   )
