@@ -9,6 +9,8 @@ alwaysApply: true
 
 2. Next.js: ALWAYS read docs before coding. Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated - the docs are the source of truth.
 
+3. English is the only language in this project. Thinking and outputting in English ONLY.
+
 ## Core principles
 
 - **Simplicity**: Use the simplest solution that works, don't overcomplicate things, don't overengineer, don't over thinking.
@@ -36,7 +38,7 @@ TMCS is a **single** Next.js + Payload app (not a multi-package monorepo) target
 | `src/hooks/`                       | Slug reservations, YouTube thumbnail import, frontend revalidation             |
 | `src/blocks/`                      | Page layout blocks                                                             |
 | `src/components/`                  | Shared React components (UI primitives, frontend widgets)                      |
-| `src/lib/`                         | Roles, locales, env, crypto, reading time, payload queries, cache tags        |
+| `src/lib/`                         | Roles, locales, env, crypto, reading time, payload queries, cache tags         |
 | `src/migrations/`                  | D1 migrations (pass `prodMigrations` in adapter)                               |
 | `src/backup_migrations/`           | Snapshot of migrations kept as a safety net (not consumed by Payload)          |
 | `src/scripts/`                     | `seed.ts` (idempotent local seed), `local-reset.ts`, `decoration-upload.ts`    |
