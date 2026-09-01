@@ -1,23 +1,23 @@
-# Graph Report - tmcs  (2026-09-01)
+# Graph Report - tmcs  (2026-08-25)
 
 ## Corpus Check
-- 337 files · ~781,817 words
+- 330 files · ~779,968 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3073 nodes · 4613 edges · 259 communities (102 shown, 157 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 227 edges (avg confidence: 0.84)
+- 3038 nodes · 4512 edges · 264 communities (106 shown, 158 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 230 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `db907bcc`
+- Built from commit: `e4238a14`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - cloudflare-env.d.ts
-- home-page.tsx
-- actions.ts
+- getSiteShell
+- locales.ts
 - seed.ts
 - ServiceWorkerGlobalScope
 - Event
@@ -33,9 +33,9 @@
 - locale.ts
 - boot-reveal.tsx
 - access/index.ts
-- collections/index.ts
+- (frontend)/layout.tsx
 - scripts
-- header-nav.tsx
+- feed-section.tsx
 - NEW_IMAGE_FILES seed list
 - graphify Skill
 - devDependencies
@@ -49,12 +49,12 @@
 - buy-now-dialog.tsx
 - Console
 - contact/route.ts
-- detail-hero.tsx
+- feed-card.tsx
 - social-video-url.ts
 - TransformStream
 - URL
 - revalidateFrontend.ts
-- Things.ts
+- collections/index.ts
 - next-cache-components-adoption
 - config.ts
 - Review Changes
@@ -63,7 +63,7 @@
 - URLSearchParams
 - package.json
 - View Transitions in Next.js
-- getSiteShell
+- detail-page.tsx
 - feed-registry.ts
 - Section: Re-render Optimization (rerender)
 - Payload Field Types Reference
@@ -78,7 +78,7 @@
 - Body
 - FormData
 - URLPattern
-- page-blocks.tsx
+- footer.tsx
 - Section: Rendering Performance (rendering)
 - Payload Access Control Reference
 - Hoist Static JSX Elements
@@ -102,7 +102,7 @@
 - R2Bucket
 - SqlStorageCursor
 - Vectorize
-- feed-section.tsx
+- video-feed-card.tsx
 - DurableObjectNamespace
 - ReadableStreamBYOBReader
 - VectorizeIndex
@@ -122,7 +122,7 @@
 - ReadableStreamDefaultReader
 - TextDecoder
 - jobs/route.ts
-- hooks/index.ts
+- cursor-popup.tsx
 - Payload Querying Reference
 - AiGateway
 - Comment
@@ -224,7 +224,7 @@
 - tw-animate-css
 - @types/node
 - @types/react
-- things-feed-page.tsx
+- typescript
 - @vitejs/plugin-react
 - wrangler
 - postcss.config.mjs
@@ -235,14 +235,18 @@
 - Defer Non-Critical Third-Party Libraries
 - Parallel Data Fetching with Component Composition
 - Web Interface Guidelines
-- ContactSubmissions.ts
+- barcode.tsx
 - ExtendableEvent
-- prettier-plugin-tailwindcss
+- boot-splash.tsx
 - React Composition Patterns
 - Implementation Workflow
+- locale-aware-shell.tsx
+- (frontend)/not-found.tsx
 - dev-only validation sweep
+- SiteSettings.ts
 - React Best Practices
 - per-page decisions: removing `instant = false`
+- readingTime.ts
 - 6720x3780 VP8 WebP Asset
 - Grass Landscape 16:9 Image
 - Night 2x3 WebP Image
@@ -265,18 +269,19 @@
 - js-request-idle-callback.md
 - rerender-memo-with-default-value.md
 - vercel-react-best-practices/rules/_template.md
+- Config
 
 ## God Nodes (most connected - your core abstractions)
-1. `cn()` - 90 edges
-2. `LocaleCode` - 28 edges
-3. `scripts` - 27 edges
-4. `getSiteShell` - 27 edges
-5. `Event` - 25 edges
+1. `cn()` - 77 edges
+2. `scripts` - 27 edges
+3. `getSiteShell` - 27 edges
+4. `Event` - 25 edges
+5. `LocaleCode` - 25 edges
 6. `Console` - 21 edges
 7. `React Best Practices AGENTS.md` - 21 edges
-8. `homeHref()` - 19 edges
-9. `compilerOptions` - 18 edges
-10. `next-cache-components-adoption` - 18 edges
+8. `compilerOptions` - 18 edges
+9. `next-cache-components-adoption` - 18 edges
+10. `asUser()` - 17 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Vertical 9:16 portrait WebP (3384x6016, 97KB)` --semantically_similar_to--> `Vertical aspect ratios in video feed card (TikTok/Instagram 3:4)`  [INFERRED] [semantically similar]
@@ -325,19 +330,19 @@
 - **Decorative WebP Image Set Seeded to CMS** — src_assets_images_orange_3x4_webp_image_asset, src_scripts_seed_ts_new_image_files, src_scripts_seed_ts_seed_script [INFERRED 0.85]
 - **leaf_4x3.webp seed pipeline (asset -> NEW_IMAGE_FILES -> mediaIds loop -> upsertSeedMedia -> media collection)** — src_assets_images_leaf_4x3_webp, src_scripts_seed_new_image_files, src_scripts_seed_mediaids_loop, src_scripts_seed_upsertseedmedia [INFERRED 0.95]
 
-## Communities (259 total, 157 thin omitted)
+## Communities (264 total, 158 thin omitted)
 
 ### Community 0 - "cloudflare-env.d.ts"
 Cohesion: 0.00
 Nodes (612): Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input, Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output, Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch, Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse, Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response, Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Input, Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode, Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1 (+604 more)
 
-### Community 1 - "home-page.tsx"
-Cohesion: 0.27
-Nodes (6): generateHomeMetadata(), HomePage(), HomePageProps, PageTransition(), generateMetadata(), generateMetadata()
+### Community 1 - "getSiteShell"
+Cohesion: 0.17
+Nodes (16): PageBlocks(), sectionDomIds(), FeedPage(), generateMetadata(), generateHomeMetadata(), HomePage(), HomePageProps, CmsPage() (+8 more)
 
-### Community 2 - "actions.ts"
+### Community 2 - "locales.ts"
 Cohesion: 0.07
-Nodes (17): { Page: PostsFeedPage, generateMetadata: generatePostsFeedMetadata }, { Page: ProjectsFeedPage, generateMetadata: generateProjectsFeedMetadata }, { Page: VideosFeedPage, generateMetadata: generateVideosFeedMetadata }, FeedPageView, loadFeedPage(), loadPostsPage(), loadProjectsPage(), cachedLoadPostsPage() (+9 more)
+Nodes (10): createFeedPageShell(), FeedPageShellOptions, SiteShell, FeedPageView, FeedDecorationView, FeedType, PostsPageView, ProjectsPageView (+2 more)
 
 ### Community 3 - "seed.ts"
 Cohesion: 0.06
@@ -352,64 +357,64 @@ Cohesion: 0.06
 Nodes (6): CloseEvent, CustomEvent, ErrorEvent, Event, MessageEvent, PromiseRejectionEvent
 
 ### Community 6 - "page-data.ts"
-Cohesion: 0.10
-Nodes (43): cachedLoadDecorationPack(), getActiveFooterItemId, getFeedDecorations, getFooterDecoration, isMedia(), loadShortStoryTexts, toMediaView(), isFeedPaginationMode() (+35 more)
+Cohesion: 0.09
+Nodes (46): isMedia(), loadShortStoryTexts, toMediaView(), toPostCard(), toProjectCard(), toThingCard(), FeedPaginationMode, FeedSourceMode (+38 more)
 
 ### Community 7 - "payload/types.ts"
-Cohesion: 0.05
-Nodes (44): Auth, Author, AuthorsSelect, CategoriesSelect, Category, CollectionsWidget, Config, ContactSubmission (+36 more)
+Cohesion: 0.04
+Nodes (47): Auth, Author, AuthorsSelect, CategoriesSelect, Category, CollectionsWidget, ContactSubmission, ContactSubmissionsSelect (+39 more)
 
 ### Community 8 - "dependencies"
 Cohesion: 0.04
-Nodes (47): class-variance-authority, clsx, cross-env, dotenv, graphql, lenis, motion, ogl (+39 more)
+Nodes (45): class-variance-authority, clsx, cross-env, dotenv, graphql, lenis, motion, ogl (+37 more)
 
 ### Community 9 - "cms.ts"
-Cohesion: 0.07
-Nodes (48): cachedLoadPostBySlug(), cachedLoadProjectBySlug(), cachedLoadShortStories(), cachedLoadShortStoryTexts(), cachedLoadSiteSettings(), cachedLoadThingBySlug(), FEED_DECORATIONS_POOL_LIMIT, FEED_POOL_LIMIT (+40 more)
+Cohesion: 0.06
+Nodes (59): { Page: PostsFeedPage, generateMetadata: generatePostsFeedMetadata }, { Page: ProjectsFeedPage, generateMetadata: generateProjectsFeedMetadata }, { Page: VideosFeedPage, generateMetadata: generateVideosFeedMetadata }, loadFeedPage(), loadPostsPage(), loadProjectsPage(), cachedLoadDecorationPack(), cachedLoadPostsPage() (+51 more)
 
 ### Community 10 - "Payload CMS Field Types Reference"
 Cohesion: 0.06
 Nodes (42): Payload CMS Collections Reference, Globals (single-instance GlobalConfig with upload + array fields), Live Preview pattern (livePreview + preview), Media Upload Collection (imageSizes, focalPoint, crop, adminThumbnail), Posts CollectionConfig (basic), Users Auth Collection (token, verify, maxLoginAttempts, useAPIKey), Versioning & Drafts (versions.drafts, autosave, schedulePublish), Payload CMS Field Types Reference (+34 more)
 
 ### Community 11 - "importMap.js"
-Cohesion: 0.08
-Nodes (20): Icon(), Icon(), Args, instant, importMap, Args, Args, instant (+12 more)
+Cohesion: 0.11
+Nodes (11): Icon(), Icon(), Args, instant, importMap, Args, Args, instant (+3 more)
 
 ### Community 12 - "TMCS - Portfolio + Blog (Payload CMS)"
 Cohesion: 0.11
 Nodes (23): Big Schema Change Workflow (drop DB, clear migrations except slug_reservations, regenerate, re-seed), Core Principles (simplicity, consistency, modularity, reusability, maintainability, scalability, performance), Local API overrideAccess:false with user, Localization Rules (en default + fallback, vi, _status document-level, translationReady.vi flag), Next.js Docs Requirement (read node_modules/next/dist/docs/ before coding), Payload CMS Skill Reference (.agents/skills/payload/), Project Backend Map (src/payload/config.ts, collections, globals, access, fields, hooks, blocks, components, lib, migrations, scripts, proxy, api), Scheduled Publishing Rule (no jobs.autoRun on Workers, cron -> worker.ts -> /api/cron/jobs) (+15 more)
 
 ### Community 13 - "_lib/types.ts"
-Cohesion: 0.06
-Nodes (31): ScrambleHoverBlockProps, TypewriterBlock(), TypewriterBlockProps, CmsPageView, ContentGalleryBlockView, DetailAuthorView, FeedSectionBase, FeedSectionBlockView (+23 more)
+Cohesion: 0.08
+Nodes (27): BlankSpaceBlock(), BlankSpaceBlockProps, ContentMediaBlock(), PageBlocksProps, ScrambleHoverBlock(), ScrambleHoverBlockProps, TypewriterBlock(), TypewriterBlockProps (+19 more)
 
 ### Community 14 - "compilerOptions"
 Cohesion: 0.06
 Nodes (33): DOM, DOM.Iterable, ES2022, .next/dev/types/**/*.ts, next-env.d.ts, .next/types/**/*.ts, node_modules, ./src/payload/config.ts (+25 more)
 
 ### Community 15 - "locale.ts"
-Cohesion: 0.13
-Nodes (22): HeaderNav(), SiteHeader(), SiteHeaderProps, LocaleContext, LocaleContextValue, LocaleProvider(), LocaleProviderProps, useLocale() (+14 more)
+Cohesion: 0.30
+Nodes (11): cmsPageCanonicalPath(), Error(), CmsLinkInput, getPageSlug(), resolveCmsLink(), ResolvedLink, resolvePageHref(), homeHref() (+3 more)
 
 ### Community 16 - "boot-reveal.tsx"
-Cohesion: 0.05
-Nodes (48): Background(), barText(), BootSplash(), consoleBarSlots(), easeOutCubic(), graphemeSegmenter, GREETINGS, STATUS (+40 more)
+Cohesion: 0.16
+Nodes (18): BootPhase, bootReadyListeners, BootRevealActions, BootRevealChrome(), BootRevealContent(), BootRevealContext, BootRevealContextValue, BootRevealProvider() (+10 more)
 
 ### Community 17 - "access/index.ts"
-Cohesion: 0.22
-Nodes (25): AccessUser, adminOrManager(), approvedOrStaff(), asUser(), canCreateOwnedContent(), canDeleteOwnedContent(), canReadOwnVersions(), canUpdateOwnedContent() (+17 more)
+Cohesion: 0.18
+Nodes (29): AccessUser, adminOrManager(), approvedOrStaff(), asUser(), canCreateOwnedContent(), canDeleteOwnedContent(), canReadOwnVersions(), canUpdateOwnedContent() (+21 more)
 
-### Community 18 - "collections/index.ts"
-Cohesion: 0.16
-Nodes (14): pageBlocks, Authors, Categories, Pages, Posts, Projects, Videos, setReadingTime() (+6 more)
+### Community 18 - "(frontend)/layout.tsx"
+Cohesion: 0.20
+Nodes (7): LENIS_OPTIONS, LenisProvider(), MotionProvider(), departureMono, fanwoodText, generateMetadata(), inter
 
 ### Community 19 - "scripts"
 Cohesion: 0.07
 Nodes (27): scripts, build, deploy, deploy:app, deploy:database, dev, devsafe, format (+19 more)
 
-### Community 20 - "header-nav.tsx"
-Cohesion: 0.16
-Nodes (14): HeaderNavProps, NavList(), NavListProps, externalLinkProps(), LinkLike, Drawer(), DrawerClose(), DrawerContent() (+6 more)
+### Community 20 - "feed-section.tsx"
+Cohesion: 0.13
+Nodes (19): FeedCardDoc, FeedSection(), FeedSectionBaseProps, FeedSectionProps, ViewAllFeedTile(), ViewAllFeedTileProps, FeedGrid(), FeedGridProps (+11 more)
 
 ### Community 21 - "NEW_IMAGE_FILES seed list"
 Cohesion: 0.09
@@ -436,48 +441,48 @@ Cohesion: 0.09
 Nodes (22): aliases, components, hooks, lib, ui, utils, iconLibrary, menuAccent (+14 more)
 
 ### Community 27 - "slugReservations.ts"
-Cohesion: 0.12
-Nodes (27): releaseSlug(), reserveSlug(), DecorationPacks, releaseSlug(), reserveSlug(), releaseSlug(), reserveSlug(), Tags (+19 more)
+Cohesion: 0.11
+Nodes (28): anyone(), Categories, releaseSlug(), reserveSlug(), DecorationPacks, releaseSlug(), reserveSlug(), releaseSlug() (+20 more)
 
 ### Community 28 - "cn"
-Cohesion: 0.08
-Nodes (34): BlankSpaceBlock(), BlankSpaceBlockProps, ViewAllFeedCard(), ViewAllFeedCardProps, FeedGrid(), FeedGridProps, SectionHeader(), SectionHeaderProps (+26 more)
+Cohesion: 0.09
+Nodes (32): getIsDesktopServerSnapshot(), getIsDesktopSnapshot(), HeaderNav(), HeaderNavProps, NavList(), NavListProps, subscribeDesktopMedia(), SiteHeader() (+24 more)
 
 ### Community 29 - "Patterns and Guidelines"
 Cohesion: 0.12
 Nodes (15): Animation Timing, Card Expand/Collapse with `startTransition`, Cross-Fade Without Remount, Exclude Elements with `useOptimistic`, Floating Elements, Isolate Elements from Parent Animations, Patterns and Guidelines, Persistent Layout Elements (+7 more)
 
 ### Community 30 - "blocks/index.ts"
-Cohesion: 0.12
-Nodes (14): LayoutBlankSpaceBlock, ContentGalleryBlock, ContentMediaBlock, LayoutFeedSectionBlock, LayoutFooterBlock, LayoutHeroBlock, LayoutRelatedItemsBlock, LayoutRichTextWithoutBlock (+6 more)
+Cohesion: 0.11
+Nodes (15): LayoutBlankSpaceBlock, ContentGalleryBlock, ContentMediaBlock, LayoutFeedSectionBlock, LayoutFooterBlock, LayoutHeroBlock, pageBlocks, LayoutRelatedItemsBlock (+7 more)
 
 ### Community 31 - "buy-now-dialog.tsx"
-Cohesion: 0.13
-Nodes (18): BuyNowDialog(), COPY, getPlatformIcon(), TablerIcon, BUY_LABEL, DETAIL_LABEL, ThingCard(), ThingCardProps (+10 more)
+Cohesion: 0.14
+Nodes (17): BuyNowDialog(), COPY, getPlatformIcon(), TablerIcon, BUY_LABEL, ThingShowcaseTile(), ThingShowcaseTileProps, Button() (+9 more)
 
 ### Community 33 - "contact/route.ts"
-Cohesion: 0.26
-Nodes (11): ContactBody, isNonEmptyString(), isValidEmail(), POST(), hashWithSecret(), getContactHashSecret(), getCronSecret(), getPayloadSecret() (+3 more)
+Cohesion: 0.16
+Nodes (16): ContactBody, isNonEmptyString(), isValidEmail(), POST(), ContactSubmissions, CONTACT_CATEGORIES, CONTACT_CATEGORY_VALUES, ContactCategory (+8 more)
 
-### Community 34 - "detail-hero.tsx"
-Cohesion: 0.19
-Nodes (11): ContentMediaBlock(), ContentMediaBlockProps, DetailHero(), DetailHeroProps, CmsImage(), CmsImageProps, getImageAspect(), HeroVariant (+3 more)
+### Community 34 - "feed-card.tsx"
+Cohesion: 0.14
+Nodes (18): ContentMediaBlockProps, DetailHero(), DetailHeroProps, formatDate(), dateFormatters, FeedCard(), FeedCardProps, formatDate() (+10 more)
 
 ### Community 35 - "social-video-url.ts"
-Cohesion: 0.20
-Nodes (17): createMediaFromBuffer(), fetchYouTubeThumbnail(), importYouTubeThumbnail(), relationId(), UploadFile, detectVideoProvider(), hostOf(), INSTAGRAM_HOSTS (+9 more)
+Cohesion: 0.21
+Nodes (16): createMediaFromBuffer(), fetchYouTubeThumbnail(), importYouTubeThumbnail(), relationId(), UploadFile, detectVideoProvider(), hostOf(), INSTAGRAM_HOSTS (+8 more)
 
 ### Community 36 - "TransformStream"
 Cohesion: 0.10
 Nodes (7): CompressionStream, DecompressionStream, FixedLengthStream, IdentityTransformStream, TextDecoderStream, TextEncoderStream, TransformStream
 
 ### Community 38 - "revalidateFrontend.ts"
-Cohesion: 0.13
-Nodes (23): anyone(), canDeleteOwnMedia, FeedDecorations, Links, Media, createCollectionRevalidateDeleteHook(), createCollectionRevalidateHook(), createGlobalRevalidateHook() (+15 more)
+Cohesion: 0.11
+Nodes (25): canDeleteOwnMedia, FeedDecorations, Links, Media, createCollectionRevalidateDeleteHook(), createCollectionRevalidateHook(), createGlobalRevalidateHook(), isPublishedStatus() (+17 more)
 
-### Community 39 - "Things.ts"
-Cohesion: 0.17
-Nodes (18): fieldAdminOrManager(), ShortStories, Things, linkFields, ownerField(), publishedAtField(), socialLinkFields, translationReadyField() (+10 more)
+### Community 39 - "collections/index.ts"
+Cohesion: 0.12
+Nodes (31): Authors, Pages, Posts, Projects, ShortStories, Things, Videos, linkFields (+23 more)
 
 ### Community 40 - "next-cache-components-adoption"
 Cohesion: 0.18
@@ -488,8 +493,8 @@ Cohesion: 0.12
 Nodes (12): GET, OPTIONS, POST, collections, globals, SiteSettings, LOCALES, cloudflareLogger (+4 more)
 
 ### Community 42 - "Review Changes"
-Cohesion: 0.12
-Nodes (15): 1. Establish the review scope, 2. Understand the change, 3. Review every file, Completion checklist, Component composition, Directories to skip, Finding quality, Functional correctness (+7 more)
+Cohesion: 0.13
+Nodes (14): 1. Establish the review scope, 2. Understand the change, 3. Review every file, Completion checklist, Component composition, Finding quality, Functional correctness, Output format (+6 more)
 
 ### Community 43 - "CSS Animation Recipes"
 Cohesion: 0.13
@@ -507,13 +512,13 @@ Nodes (15): PAYLOAD_SECRET, cloudflare, bindings, description, engines, bun, nod
 Cohesion: 0.15
 Nodes (12): Layout-Level ViewTransition, `loading.tsx` as Suspense Boundary, Next.js Implementation Additions, Programmatic Navigation, Same-Route Dynamic Segment Transitions, Server Components, Server-Side Filtering with `router.replace`, Setup (+4 more)
 
-### Community 48 - "getSiteShell"
-Cohesion: 0.15
-Nodes (31): DetailImageKey, generateDetailMetadata(), DetailPage(), DetailPageProps, createFeedPageShell(), FeedPage(), generateMetadata(), CmsPage() (+23 more)
+### Community 48 - "detail-page.tsx"
+Cohesion: 0.25
+Nodes (21): DetailImageKey, generateDetailMetadata(), DetailPage(), DetailPageProps, generateCmsPageMetadata(), isReservedPageSlug(), getPostBySlug, getProjectBySlug (+13 more)
 
 ### Community 49 - "feed-registry.ts"
-Cohesion: 0.19
-Nodes (19): toPostCard(), toProjectCard(), toThingCard(), clampLimit(), FeedCardMap, FeedPaginationMode, FeedSourceAdapter, FeedSourceMode (+11 more)
+Cohesion: 0.15
+Nodes (16): loadThingsFeed, loadThingsFeedCached(), { Page: ThingsFeedPage, generateMetadata: generateThingsFeedMetadata }, clampLimit(), FEED_SOURCE_REGISTRY, FeedCardMap, FeedSourceAdapter, getPayloadClient (+8 more)
 
 ### Community 50 - "Section: Re-render Optimization (rerender)"
 Cohesion: 0.16
@@ -539,9 +544,9 @@ Nodes (13): React View Transitions Skill, addTransitionType, ::view-transition C
 Cohesion: 0.15
 Nodes (3): Body, Request, Response
 
-### Community 63 - "page-blocks.tsx"
-Cohesion: 0.06
-Nodes (38): FooterBlock(), FooterBlockProps, FooterDecoration(), FooterLinkList(), FooterLinkListProps, getCurrentYear(), Hero(), HeroProps (+30 more)
+### Community 63 - "footer.tsx"
+Cohesion: 0.09
+Nodes (27): FooterBlock(), FooterBlockProps, FooterDecoration(), FooterLinkList(), FooterLinkListProps, getCurrentYear(), FieldRow(), FieldRowProps (+19 more)
 
 ### Community 64 - "Section: Rendering Performance (rendering)"
 Cohesion: 0.17
@@ -583,9 +588,9 @@ Nodes (10): 3.1 Authenticate Server Actions Like API Routes, 3.2 Avoid Duplicate
 Cohesion: 0.22
 Nodes (3): ByteLengthQueuingStrategy, CountQueuingStrategy, QueuingStrategy
 
-### Community 87 - "feed-section.tsx"
-Cohesion: 0.12
-Nodes (22): FeedCard(), FeedCardProps, pickDecoration(), FeedPageShellOptions, SiteShell, FeedCardDoc, FeedSectionBaseProps, FeedSectionProps (+14 more)
+### Community 87 - "video-feed-card.tsx"
+Cohesion: 0.24
+Nodes (8): dateFormatters, formatDate(), PROVIDER_LABEL, VIDEO_CARD_ASPECT, VideoFeedCard(), VideoFeedCardProps, VideoCardView, youtubeEmbedUrl()
 
 ### Community 92 - ".prettierrc.json"
 Cohesion: 0.29
@@ -619,9 +624,9 @@ Nodes (6): Vercel Composition Patterns AGENTS.md (compiled), Vercel Composition 
 Cohesion: 0.60
 Nodes (4): GET(), POST(), runJobs(), constantTimeEqual()
 
-### Community 107 - "hooks/index.ts"
-Cohesion: 0.23
-Nodes (11): Users, assignOwner(), assignUploadedBy(), asUser(), LayoutBlock, preventCreatorPublish(), preventLastAdminDelete(), preventSelfRoleEscalation() (+3 more)
+### Community 107 - "cursor-popup.tsx"
+Cohesion: 0.60
+Nodes (5): CursorPopup(), getFinePointerServerSnapshot(), getFinePointerSnapshot(), labelFromPoint(), subscribeFinePointer()
 
 ### Community 108 - "Payload Querying Reference"
 Cohesion: 0.40
@@ -667,17 +672,17 @@ Nodes (3): BasicImageTransformations, RequestInitCfPropertiesImage, RequestInitC
 Cohesion: 1.00
 Nodes (3): com_9x16.webp (clock tower photograph, 2268x4032), Communication tower with clock face and broadcast antenna, Sunlit summer foliage backdrop scene
 
-### Community 209 - "things-feed-page.tsx"
-Cohesion: 0.22
-Nodes (4): loadThingsFeed, loadThingsFeedCached(), { Page: ThingsFeedPage, generateMetadata: generateThingsFeedMetadata }, ThingCardView
-
-### Community 222 - "ContactSubmissions.ts"
-Cohesion: 0.33
-Nodes (5): ContactSubmissions, CONTACT_CATEGORIES, CONTACT_CATEGORY_VALUES, ContactCategory, LOCALE_CODES
+### Community 222 - "barcode.tsx"
+Cohesion: 0.24
+Nodes (9): Barcode(), BarcodeProps, encodeAutoCODE128(), PATTERNS, SlugComponent(), SlugComponentClientProps, formatSlug(), DIACRITIC_MAP (+1 more)
 
 ### Community 223 - "ExtendableEvent"
 Cohesion: 0.17
 Nodes (6): EmailEvent, ExtendableEvent, FetchEvent, QueueEvent, ScheduledEvent, TailEvent
+
+### Community 224 - "boot-splash.tsx"
+Cohesion: 0.25
+Nodes (10): barText(), BootSplash(), consoleBarSlots(), easeOutCubic(), graphemeSegmenter, GREETINGS, STATUS, visualWidth() (+2 more)
 
 ### Community 225 - "React Composition Patterns"
 Cohesion: 0.20
@@ -687,9 +692,21 @@ Nodes (9): Component Architecture (CRITICAL), Core Principles, Creating a New Ru
 Cohesion: 0.20
 Nodes (9): Common Mistakes, Implementation Workflow, Step 1: Audit the App, Step 2: Add CSS Recipes, Step 3: Isolate Persistent Elements, Step 4: Add Directional Page Transitions, Step 5: Add Suspense Reveals, Step 6: Add Shared Element Transitions (+1 more)
 
+### Community 227 - "locale-aware-shell.tsx"
+Cohesion: 0.24
+Nodes (6): Background(), LocaleContext, LocaleContextValue, LocaleProvider(), LocaleProviderProps, DEFAULT_LOCALE
+
+### Community 228 - "(frontend)/not-found.tsx"
+Cohesion: 0.36
+Nodes (6): LocaleAwareShell(), LocaleMeta(), parseLocale(), readActiveLocale, SITE_LOCALE_HEADER, NotFound()
+
 ### Community 229 - "dev-only validation sweep"
 Cohesion: 0.29
 Nodes (6): dev-only validation sweep, gotchas, the loop, what the build misses, when this shrinks, when to run it
+
+### Community 230 - "SiteSettings.ts"
+Cohesion: 0.62
+Nodes (4): fieldAdminOrManager(), seoFields(), revalidateSiteShellGlobal, validateAbsoluteHttpUrl()
 
 ### Community 231 - "React Best Practices"
 Cohesion: 0.33
@@ -698,6 +715,10 @@ Nodes (5): Creating a New Rule, Getting Started, React Best Practices, Rule File
 ### Community 232 - "per-page decisions: removing `instant = false`"
 Cohesion: 0.40
 Nodes (4): deciding what to do with a blocking read, per-page decisions: removing `instant = false`, security gates and other code you can't infer, when to leave a Block in place
+
+### Community 233 - "readingTime.ts"
+Cohesion: 0.50
+Nodes (4): collectText(), LexicalNode, LexicalRoot, lexicalToPlainText()
 
 ## Ambiguous Edges - Review These
 - `Animation priority order (shared, suspense, list, state, route)` → `Animation priority order (shared, suspense, list, state, route)`  [AMBIGUOUS]
@@ -710,9 +731,9 @@ Nodes (4): deciding what to do with a blocking read, per-page decisions: removin
   .agents/skills/next-cache-components-adoption/SKILL.md · relation: semantically_similar_to
 
 ## Knowledge Gaps
-- **1150 isolated node(s):** `~/.local/share/pipx/venvs/graphifyy/bin/python`, `singleQuote`, `trailingComma`, `printWidth`, `semi` (+1145 more)
+- **1147 isolated node(s):** `~/.local/share/pipx/venvs/graphifyy/bin/python`, `singleQuote`, `trailingComma`, `printWidth`, `semi` (+1142 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **157 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **158 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -726,7 +747,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **What is the exact relationship between `<Suspense> boundary placement` and `<Suspense> boundary placement`?**
   _Edge tagged AMBIGUOUS (relation: semantically_similar_to) - confidence is low._
 - **Why does `FormData` connect `FormData` to `cloudflare-env.d.ts`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **Why does `Console` connect `Console` to `cloudflare-env.d.ts`?**
   _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Why does `Event` connect `Event` to `cloudflare-env.d.ts`, `ExtendableEvent`?**
