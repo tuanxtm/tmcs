@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { PageTransition } from '@/app/(frontend)/_components/layout/page-transition'
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
 import { getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { firstHeroBlock, getPageBySlug, isReservedCmsPageSlug } from '@/app/(frontend)/_lib/page-data'
@@ -93,11 +94,13 @@ export async function CmsPage({ locale, slug }: CmsPageProps) {
   if (!page) notFound()
 
   return (
-    <PageBlocks
-      blocks={page.blocks}
-      locale={locale}
-      siteName={shell.siteName}
-    />
+    <PageTransition>
+      <PageBlocks
+        blocks={page.blocks}
+        locale={locale}
+        siteName={shell.siteName}
+      />
+    </PageTransition>
   )
 }
 

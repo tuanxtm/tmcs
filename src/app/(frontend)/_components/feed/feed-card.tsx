@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ViewTransition } from 'react'
 import { useReducedMotion } from 'motion/react'
 
 import type { LocaleCode } from '@/lib/locales'
@@ -46,13 +45,8 @@ export function FeedCard({
   // ships in the initial HTML payload.
   const [deco] = useState(() => pickDecoration(decorations, doc.id))
 
-  // slug is globally unique across all feed types (posts, projects). Use it for
-  // the shared-element VT name so multiple sections on the same page don't collide.
-  // Falls back to doc.id if slug is null (e.g. unpublished drafts).
-  const vtName = doc.slug ? `card-image-${doc.slug}` : null
-
-  // Same aspect class on the feed card image and the detail hero image, so the
-  // morph between them has matching start/end frames.
+  // Same aspect class on the feed card image and the detail hero image so the
+  // detail page can mount the hero at the same dimensions.
   const { aspectClass } = getImageAspect(doc.image)
 
   const imageContent = (
@@ -114,13 +108,7 @@ export function FeedCard({
     </div>
   )
 
-  const imageWrapper = vtName ? (
-    <ViewTransition name={vtName} share="morph" default="none">
-      {imageContent}
-    </ViewTransition>
-  ) : (
-    imageContent
-  )
+  const imageWrapper = imageContent
 
   const body = (
     <div className="flex flex-col">

@@ -15,6 +15,7 @@ export function ViewAllFeedCard({ href, label, cursorPopup, className }: ViewAll
   return (
     <Link
       href={href}
+      transitionTypes={['nav-forward']}
       className={cn(
         'group relative block aspect-square w-full outline-none',
         'cursor-pointer',

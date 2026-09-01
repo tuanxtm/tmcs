@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { PageTransition } from '@/app/(frontend)/_components/layout/page-transition'
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
 import { getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { firstHeroBlock, getHomePage } from '@/app/(frontend)/_lib/home-page'
@@ -74,10 +75,12 @@ export async function HomePage({ locale }: HomePageProps) {
   const [shell, home] = await Promise.all([getSiteShell(locale), getHomePage(locale)])
 
   return (
-    <PageBlocks
-      blocks={home.blocks}
-      locale={locale}
-      siteName={shell.siteName}
-    />
+    <PageTransition>
+      <PageBlocks
+        blocks={home.blocks}
+        locale={locale}
+        siteName={shell.siteName}
+      />
+    </PageTransition>
   )
 }

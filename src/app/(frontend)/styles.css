@@ -634,16 +634,6 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   }
 }
 
-/* Fade-in for elements that mount on the detail page (title, meta). Pair with
-   `default="none"` on the <ViewTransition> so the cross-fade doesn't fire. */
-::view-transition-new(.fade-in) {
-  animation: var(--vt-duration-enter) ease-out var(--vt-duration-exit) both fade;
-}
-
-::view-transition-old(.fade-in) {
-  animation: var(--vt-duration-exit) ease-in both fade reverse;
-}
-
 /* Reduced motion - collapse every view transition to a snap. Users with
    prefers-reduced-motion must still see the new page, just instantly. */
 @media (prefers-reduced-motion: reduce) {
@@ -653,6 +643,27 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
     animation-duration: 0s !important;
     animation-delay: 0s !important;
   }
+}
+
+/* Persistent chrome (site header) - pull it out of the page content's
+   snapshot so it stays anchored while the content slides. */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* Let clicks pass through the view-transition overlay to the live page
+   during the transition. Hit-testing still skips named participants. */
+::view-transition {
+  pointer-events: none;
 }
 
 /* Stretch the barcode SVG to fill its parent so it spans the

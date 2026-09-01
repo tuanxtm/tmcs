@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { getFeedDecorations, getSiteShell } from '@/app/(frontend)/_lib/cms'
+import { PageTransition } from '@/app/(frontend)/_components/layout/page-transition'
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
 import { getPageBySlug } from '@/app/(frontend)/_lib/page-data'
 import { FEED_SOURCE_REGISTRY } from '@/app/(frontend)/_lib/feed-registry'
@@ -92,15 +93,17 @@ export function createFeedPageShell({
 
     if (page) {
       return (
-        <PageBlocks
-          blocks={page.blocks}
-          locale={locale}
-          siteName={shell.siteName}
-        />
+        <PageTransition>
+          <PageBlocks
+            blocks={page.blocks}
+            locale={locale}
+            siteName={shell.siteName}
+          />
+        </PageTransition>
       )
     }
 
-    return renderFeed({ locale, feed, shell, adapter, decorations })
+    return <PageTransition>{renderFeed({ locale, feed, shell, adapter, decorations })}</PageTransition>
   }
 
   return { Page: FeedPage, generateMetadata }
