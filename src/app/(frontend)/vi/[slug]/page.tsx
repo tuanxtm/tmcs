@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 
 import { DetailPage } from '@/app/(frontend)/_components/detail/detail-page'
@@ -40,7 +41,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return generateCmsPageMetadata('vi', slug)
 }
 
-export default async function VietnameseCmsPage({ params }: PageProps) {
+export default function VietnameseCmsPage({ params }: PageProps) {
+  // See `[slug]/page.tsx` - wrap the slug-dependent render in <Suspense> so
+  // the page itself stays in the static shell on client navigation.
+  return (
+    <Suspense>
+      <VietnameseCmsPageBody params={params} />
+    </Suspense>
+  )
+}
+
+async function VietnameseCmsPageBody({ params }: PageProps) {
   const { slug } = await params
   if (isReservedPageSlug(slug)) notFound()
 

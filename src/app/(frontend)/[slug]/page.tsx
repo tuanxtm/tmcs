@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { notFound, redirect } from 'next/navigation'
 
 import { DetailPage } from '@/app/(frontend)/_components/detail/detail-page'
@@ -45,7 +46,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return generateCmsPageMetadata('en', slug)
 }
 
-export default async function EnglishCmsPage({ params }: PageProps) {
+export default function EnglishCmsPage({ params }: PageProps) {
+  // `await params` is runtime data; wrap the slug-dependent render in
+  // <Suspense> so the page itself stays in the static shell and the body
+  // streams into this boundary on navigation.
+  return (
+    <Suspense>
+      <EnglishCmsPageBody params={params} />
+    </Suspense>
+  )
+}
+
+async function EnglishCmsPageBody({ params }: PageProps) {
   const { slug } = await params
   if (isReservedPageSlug(slug)) notFound()
 

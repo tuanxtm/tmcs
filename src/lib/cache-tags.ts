@@ -13,6 +13,11 @@ export const CACHE_TAGS = {
   decorationPacks: 'decoration-packs',
   links: 'links',
   media: 'media',
+  // Raw D1 lookup table that backs the per-slug dispatcher on the frontend
+  // (`/[slug]`, `/vi/[slug]`, `/[slug]/vi`). Cached on the data cache so the
+  // dispatcher participates in the static shell; invalidated by the slug
+  // reservation upsert/delete hooks (see `src/hooks/slugReservations.ts`).
+  slugReservations: 'slug-reservations',
 } as const
 
 export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS]

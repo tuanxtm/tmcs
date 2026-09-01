@@ -253,7 +253,14 @@ async function loadPostBySlug(locale: LocaleCode, slug: string): Promise<Post | 
   return (docs[0] as Post | undefined) ?? null
 }
 
-export { loadPostBySlug }
+async function cachedLoadPostBySlug(locale: LocaleCode, slug: string): Promise<Post | null> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.posts, CACHE_TAGS.media)
+  return loadPostBySlug(locale, slug)
+}
+
+export { cachedLoadPostBySlug as loadPostBySlug }
 
 async function loadProjectBySlug(locale: LocaleCode, slug: string): Promise<Project | null> {
   const payload = await getPayloadClient()
@@ -285,7 +292,17 @@ async function loadProjectBySlug(locale: LocaleCode, slug: string): Promise<Proj
   return (docs[0] as Project | undefined) ?? null
 }
 
-export { loadProjectBySlug }
+async function cachedLoadProjectBySlug(
+  locale: LocaleCode,
+  slug: string,
+): Promise<Project | null> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.projects, CACHE_TAGS.media)
+  return loadProjectBySlug(locale, slug)
+}
+
+export { cachedLoadProjectBySlug as loadProjectBySlug }
 
 async function loadThingBySlug(
   locale: LocaleCode,
@@ -313,7 +330,17 @@ async function loadThingBySlug(
   return (docs[0] as unknown as Record<string, unknown> | undefined) ?? null
 }
 
-export { loadThingBySlug }
+async function cachedLoadThingBySlug(
+  locale: LocaleCode,
+  slug: string,
+): Promise<Record<string, unknown> | null> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.things, CACHE_TAGS.media)
+  return loadThingBySlug(locale, slug)
+}
+
+export { cachedLoadThingBySlug as loadThingBySlug }
 
 function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCardView {
   let href: string | null = null

@@ -882,17 +882,41 @@ async function loadSlugReservation(
 }
 
 /**
+ * Cached data-cache wrapper around `loadSlugReservation`. The raw D1 read
+ * counts as uncached I/O under Cache Components, which would block client
+ * navigations into `/[slug]` (and its locale variants) and surface as a
+ * dev-overlay blocker. Wrapping it in `'use cache'` makes the per-slug
+ * dispatcher participate in the static shell.
+ *
+ * Invalidation: `CACHE_TAGS.slugReservations` is revalidated from
+ * `src/hooks/slugReservations.ts` whenever a row is upserted or deleted, so
+ * renames / deletes / additions propagate immediately.
+ */
+async function cachedLoadSlugReservation(
+  locale: LocaleCode,
+  slug: string,
+): Promise<SlugReservation | null> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.slugReservations)
+  return loadSlugReservation(locale, slug)
+}
+
+/**
  * Resolve a slug to its collection + content ID. Returns null if not reserved.
- * Wrapped in `cache()` so repeated calls within a single request (e.g. once in
- * `generateMetadata` and once in the page render) dedupe to a single
- * `slug_reservations` lookup.
+ *
+ * `React.cache()` dedupes calls within a single request (e.g. once in
+ * `generateMetadata` and once in the page render). The underlying D1 read
+ * is also memoized across requests via `cachedLoadSlugReservation`'s
+ * `'use cache'` boundary, so repeated slug lookups don't re-hit D1 and the
+ * per-slug routes participate in the static shell.
  */
 export const resolveSlug = cache(
   async (
     locale: LocaleCode,
     slug: string,
   ): Promise<{ collection: 'pages' | 'posts' | 'projects' | 'things'; contentId: number } | null> => {
-    return loadSlugReservation(locale, slug)
+    return cachedLoadSlugReservation(locale, slug)
   },
 )
 

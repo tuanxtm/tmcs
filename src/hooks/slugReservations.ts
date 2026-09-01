@@ -1,4 +1,7 @@
 import type { Payload } from 'payload'
+import { revalidateTag } from 'next/cache'
+
+import { CACHE_TAGS } from '@/lib/cache-tags'
 
 // payload.db is the Drizzle DatabaseAdapter; the raw D1 binding (with
 // .prepare()) is at payload.db.binding. Set at adapter construction time.
@@ -20,6 +23,20 @@ const LOCALES: Locale[] = ['en', 'vi']
 
 function getD1(payload: Payload): D1Database {
   return payload.db.binding
+}
+
+/**
+ * Best-effort cache invalidation for the slug_reservations data-cache entry.
+ * Wrapped in try/catch because Payload hooks also run outside an active
+ * Next.js request (seed scripts, vitest, local CLI commands) where
+ * `revalidateTag` throws because no cache scope exists.
+ */
+function revalidateSlugReservations(): void {
+  try {
+    revalidateTag(CACHE_TAGS.slugReservations, 'max')
+  } catch {
+    // Non-request context (seed/vitest/CLI) - nothing to invalidate.
+  }
 }
 
 /**
@@ -72,6 +89,10 @@ export async function upsertSlugReservations(
   for (const { locale, slug } of entries) {
     await stmt.bind(locale, slug, collection, doc.id).run()
   }
+
+  // At least one row changed - the data-cache entry for `slug_reservations`
+  // is now stale, so invalidate it before the next request hits the route.
+  revalidateSlugReservations()
 }
 
 /**
@@ -88,6 +109,10 @@ export async function deleteSlugReservations(
     .prepare('DELETE FROM slug_reservations WHERE collection = ? AND content_id = ?')
     .bind(collection, doc.id)
   await stmt.run()
+
+  // Reservations moved or vanished - invalidate the data-cache entry so the
+  // next request can re-resolve from D1.
+  revalidateSlugReservations()
 }
 
 /**
