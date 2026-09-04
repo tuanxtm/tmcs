@@ -150,6 +150,17 @@ export const Projects: CollectionConfig = {
       defaultValue: false,
       admin: { position: 'sidebar' },
     },
+    {
+      name: 'templatePage',
+      type: 'relationship',
+      relationTo: 'pages',
+      required: true,
+      admin: {
+        position: 'sidebar',
+        description:
+          "Required: the Page used to render this Project. Design the layout with a 'Detail - Project' block to control where the body appears.",
+      },
+    },
     publishedAtField(),
     ownerField(),
     translationReadyField(),

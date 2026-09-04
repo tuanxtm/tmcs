@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { notFound, redirect } from 'next/navigation'
 
-import { DetailPage } from '@/app/(frontend)/_components/detail/detail-page'
 import { generateDetailMetadata } from '@/app/(frontend)/_components/detail/detail-metadata'
 import {
   CmsPage,
@@ -10,6 +9,7 @@ import {
   isReservedPageSlug,
 } from '@/app/(frontend)/_components/pages/cms-page'
 import {
+  getPageSlugById,
   getPostBySlug,
   getProjectBySlug,
   getThingBySlug,
@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (resolved.collection === 'posts') {
     const post = await getPostBySlug('en', slug)
     if (!post) return { title: 'Not found' }
+    // Post carries its own SEO. Template pages only adjust layout, not metadata.
     return generateDetailMetadata(post, 'en', 'featuredImage')
   }
 
@@ -67,13 +68,26 @@ async function EnglishCmsPageBody({ params }: PageProps) {
   if (resolved.collection === 'posts') {
     const post = await getPostBySlug('en', slug)
     if (!post) notFound()
-    return <DetailPage view={post} locale="en" imageKey="featuredImage" />
+
+    // `templatePage` is required on the collection, so `templatePageId` is
+    // always a number. If the page is unpublished or missing in this locale,
+    // route to a 404 - there is no fallback path anymore.
+    const templateSlug = await getPageSlugById('en', post.templatePageId)
+    if (!templateSlug) notFound()
+    return (
+      <CmsPage locale="en" slug={templateSlug} detailView={{ kind: 'post', view: post }} />
+    )
   }
 
   if (resolved.collection === 'projects') {
     const project = await getProjectBySlug('en', slug)
     if (!project) notFound()
-    return <DetailPage view={project} locale="en" imageKey="coverImage" />
+
+    const templateSlug = await getPageSlugById('en', project.templatePageId)
+    if (!templateSlug) notFound()
+    return (
+      <CmsPage locale="en" slug={templateSlug} detailView={{ kind: 'project', view: project }} />
+    )
   }
 
   if (resolved.collection === 'things') {

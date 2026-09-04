@@ -1,16 +1,25 @@
 import { describe, it, beforeAll, expect } from 'vitest'
 import type { Payload } from 'payload'
 
-import { ensureTestUsers, initPayload, richText, type TestUsers } from '../helpers/payload'
+import {
+  ensureTemplatePages,
+  ensureTestUsers,
+  initPayload,
+  richText,
+  type TestUsers,
+} from '../helpers/payload'
 
 describe('Localization', () => {
   let payload: Payload
   let users: TestUsers
   let postId: number
+let postTemplatePageId: number
 
   beforeAll(async () => {
     payload = await initPayload()
     users = await ensureTestUsers(payload)
+    const templates = await ensureTemplatePages(payload)
+    postTemplatePageId = templates.postTemplatePageId
 
     const stamp = Date.now()
     const enSlug = `bilingual-${stamp}`
@@ -25,6 +34,7 @@ describe('Localization', () => {
         excerpt: 'English excerpt',
         content: richText('English body'),
         owner: users.admin.id,
+        templatePage: postTemplatePageId,
         _status: 'published',
         translationReady: { vi: false },
         seo: {
@@ -86,6 +96,7 @@ describe('Localization', () => {
         slug: `en-only-${Date.now()}`,
         content: richText('only en'),
         owner: users.admin.id,
+        templatePage: postTemplatePageId,
         _status: 'published',
       },
       locale: 'en',

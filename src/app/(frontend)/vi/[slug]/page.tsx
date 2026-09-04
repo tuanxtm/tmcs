@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 
-import { DetailPage } from '@/app/(frontend)/_components/detail/detail-page'
 import { generateDetailMetadata } from '@/app/(frontend)/_components/detail/detail-metadata'
 import {
   CmsPage,
@@ -10,6 +9,7 @@ import {
   isReservedPageSlug,
 } from '@/app/(frontend)/_components/pages/cms-page'
 import {
+  getPageSlugById,
   getPostBySlug,
   getProjectBySlug,
   resolveSlug,
@@ -61,13 +61,23 @@ async function VietnameseCmsPageBody({ params }: PageProps) {
   if (resolved.collection === 'posts') {
     const post = await getPostBySlug('vi', slug)
     if (!post) notFound()
-    return <DetailPage view={post} locale="vi" imageKey="featuredImage" />
+
+    const templateSlug = await getPageSlugById('vi', post.templatePageId)
+    if (!templateSlug) notFound()
+    return (
+      <CmsPage locale="vi" slug={templateSlug} detailView={{ kind: 'post', view: post }} />
+    )
   }
 
   if (resolved.collection === 'projects') {
     const project = await getProjectBySlug('vi', slug)
     if (!project) notFound()
-    return <DetailPage view={project} locale="vi" imageKey="coverImage" />
+
+    const templateSlug = await getPageSlugById('vi', project.templatePageId)
+    if (!templateSlug) notFound()
+    return (
+      <CmsPage locale="vi" slug={templateSlug} detailView={{ kind: 'project', view: project }} />
+    )
   }
 
   return <CmsPage locale="vi" slug={slug} />

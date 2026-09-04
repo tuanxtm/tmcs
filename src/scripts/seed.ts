@@ -1888,6 +1888,89 @@ async function seed() {
   const tagSlugs = TAG_SEEDS.map((t) => t.slug)
   const authorIds = Object.values(authors).map((a) => a.id)
 
+  // Pre-create the two template Pages used by `templatePage`. Posts pick the
+  // post template; Projects pick the project template. A single `detailPost`
+  // / `detailProject` block sits inside each layout; the resolver binds the
+  // currently routed Post / Project at render time.
+  const postTemplatePage = await upsertBySlug(payload, 'pages', 'post-detail-default', {
+    title: 'Post Detail',
+    summary: 'Default template used to render Post detail pages.',
+    template: 'generic',
+    layout: [
+      {
+        id: 'seed-post-template-detail',
+        blockType: 'detailPost',
+      },
+    ],
+    _status: 'published',
+    publishedAt: daysAgo(150),
+    translationReady: { vi: true },
+    seo: {
+      metaTitle: 'Post',
+      metaDescription: 'Post detail template.',
+    },
+  })
+  const projectTemplatePage = await upsertBySlug(payload, 'pages', 'project-detail-default', {
+    title: 'Project Detail',
+    summary: 'Default template used to render Project detail pages.',
+    template: 'generic',
+    layout: [
+      {
+        id: 'seed-project-template-detail',
+        blockType: 'detailProject',
+      },
+    ],
+    _status: 'published',
+    publishedAt: daysAgo(150),
+    translationReady: { vi: true },
+    seo: {
+      metaTitle: 'Project',
+      metaDescription: 'Project detail template.',
+    },
+  })
+
+  await payload.update({
+    collection: 'pages',
+    id: postTemplatePage.id,
+    data: {
+      title: 'Bài viết - Chi tiết',
+      summary: 'Template mặc định dùng để hiển thị trang chi tiết bài viết.',
+      layout: [
+        {
+          id: 'seed-post-template-detail',
+          blockType: 'detailPost',
+        },
+      ],
+      seo: {
+        metaTitle: 'Bài viết',
+        metaDescription: 'Template chi tiết bài viết.',
+      },
+    },
+    locale: 'vi',
+    overrideAccess: true,
+  })
+
+  await payload.update({
+    collection: 'pages',
+    id: projectTemplatePage.id,
+    data: {
+      title: 'Dự án - Chi tiết',
+      summary: 'Template mặc định dùng để hiển thị trang chi tiết dự án.',
+      layout: [
+        {
+          id: 'seed-project-template-detail',
+          blockType: 'detailProject',
+        },
+      ],
+      seo: {
+        metaTitle: 'Dự án',
+        metaDescription: 'Template chi tiết dự án.',
+      },
+    },
+    locale: 'vi',
+    overrideAccess: true,
+  })
+
   // Pre-upload all 21 seed WebP images from src/assets/images and remember
   // their media ids. Files are picked in stable alphabetical order; the
   // collections below use `mediaIds[index]` so each item gets a unique image.
@@ -1963,6 +2046,7 @@ async function seed() {
       categories: [category],
       tags: [tagA, tagB],
       featured,
+      templatePage: postTemplatePage.id,
       _status: 'published',
       publishedAt: daysAgo(POST_TITLES.length - i),
       translationReady: { vi: true },
@@ -2018,6 +2102,7 @@ async function seed() {
       author: authors[project.authorKey].id,
       owner: admin.id,
       featured: project.featured,
+      templatePage: projectTemplatePage.id,
       _status: 'published',
       publishedAt: daysAgo((index + 1) * 14),
       translationReady: { vi: true },

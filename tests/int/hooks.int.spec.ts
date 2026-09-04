@@ -1,16 +1,25 @@
 import { describe, it, beforeAll, expect } from 'vitest'
 import type { Payload } from 'payload'
 
-import { ensureTestUsers, initPayload, richText, type TestUsers } from '../helpers/payload'
+import {
+  ensureTemplatePages,
+  ensureTestUsers,
+  initPayload,
+  richText,
+  type TestUsers,
+} from '../helpers/payload'
 import { estimateReadingMinutes } from '@/lib/readingTime'
 
 describe('Hooks and SEO', () => {
   let payload: Payload
   let users: TestUsers
+  let postTemplatePageId: number
 
   beforeAll(async () => {
     payload = await initPayload()
     users = await ensureTestUsers(payload)
+    const templates = await ensureTemplatePages(payload)
+    postTemplatePageId = templates.postTemplatePageId
   })
 
   it('estimates reading time from lexical content', () => {
@@ -27,6 +36,7 @@ describe('Hooks and SEO', () => {
         title: 'Hook Post',
         slug: `hook-post-${Date.now()}`,
         content: richText('Hello world content for reading time.'),
+        templatePage: postTemplatePageId,
         _status: 'draft',
       },
       draft: true,
@@ -48,6 +58,7 @@ describe('Hooks and SEO', () => {
         slug: `pub-date-${Date.now()}`,
         content: richText('content'),
         owner: users.admin.id,
+        templatePage: postTemplatePageId,
         _status: 'draft',
       },
       draft: true,
@@ -87,6 +98,7 @@ describe('Hooks and SEO', () => {
           slug: `bad-seo-${Date.now()}`,
           content: richText('x'),
           owner: users.admin.id,
+          templatePage: postTemplatePageId,
           _status: 'published',
           seo: {
             structuredData: {

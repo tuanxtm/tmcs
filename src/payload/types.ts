@@ -572,6 +572,16 @@ export interface Post {
             blockName?: string | null;
             blockType: 'layoutFooter';
           }
+        | {
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'detailPost';
+          }
+        | {
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'detailProject';
+          }
       )[]
     | null;
   /**
@@ -624,6 +634,10 @@ export interface Post {
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
   featured?: boolean | null;
+  /**
+   * Required: the Page used to render this Post. Design the layout with a 'Detail - Post' block to control where the body appears.
+   */
+  templatePage: number | Page;
   /**
    * Estimated minutes; calculated from content.
    */
@@ -924,6 +938,16 @@ export interface Page {
             id?: string | null;
             blockName?: string | null;
             blockType: 'layoutFooter';
+          }
+        | {
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'detailPost';
+          }
+        | {
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'detailProject';
           }
       )[]
     | null;
@@ -1245,6 +1269,16 @@ export interface Project {
             blockName?: string | null;
             blockType: 'layoutFooter';
           }
+        | {
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'detailPost';
+          }
+        | {
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'detailProject';
+          }
       )[]
     | null;
   /**
@@ -1286,6 +1320,10 @@ export interface Project {
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
   featured?: boolean | null;
+  /**
+   * Required: the Page used to render this Project. Design the layout with a 'Detail - Project' block to control where the body appears.
+   */
+  templatePage: number | Page;
   /**
    * Set automatically on first publish. Managers may override.
    */
@@ -2009,6 +2047,18 @@ export interface PostsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        detailPost?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        detailProject?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
       };
   seo?:
     | T
@@ -2034,6 +2084,7 @@ export interface PostsSelect<T extends boolean = true> {
   categories?: T;
   tags?: T;
   featured?: T;
+  templatePage?: T;
   readingTime?: T;
   publishedAt?: T;
   originalPublishedAt?: T;
@@ -2247,6 +2298,18 @@ export interface ProjectsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        detailPost?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        detailProject?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
       };
   seo?:
     | T
@@ -2265,6 +2328,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   categories?: T;
   tags?: T;
   featured?: T;
+  templatePage?: T;
   publishedAt?: T;
   owner?: T;
   translationReady?:
@@ -2457,6 +2521,18 @@ export interface PagesSelect<T extends boolean = true> {
               otherLinks?: T;
               cursorPopup?: T;
               copyright?: T;
+              id?: T;
+              blockName?: T;
+            };
+        detailPost?:
+          | T
+          | {
+              id?: T;
+              blockName?: T;
+            };
+        detailProject?:
+          | T
+          | {
               id?: T;
               blockName?: T;
             };

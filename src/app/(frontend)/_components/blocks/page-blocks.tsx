@@ -1,12 +1,15 @@
+import { BlankSpaceBlock } from '@/app/(frontend)/_components/blocks/blank-space'
+import { ContentMediaBlock } from '@/app/(frontend)/_components/blocks/content-media'
+import { DetailPostBlock } from '@/app/(frontend)/_components/blocks/detail-post'
+import { DetailProjectBlock } from '@/app/(frontend)/_components/blocks/detail-project'
 import { FeedSection } from '@/app/(frontend)/_components/feed/feed-section'
+import { FooterBlock } from '@/app/(frontend)/_components/blocks/footer'
 import { Hero } from '@/app/(frontend)/_components/blocks/hero'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
-import { ContentMediaBlock } from '@/app/(frontend)/_components/blocks/content-media'
-import { TypewriterBlock } from '@/app/(frontend)/_components/blocks/typewriter'
 import { ScrambleHoverBlock } from '@/app/(frontend)/_components/blocks/scramble-hover'
-import { BlankSpaceBlock } from '@/app/(frontend)/_components/blocks/blank-space'
-import { FooterBlock } from '@/app/(frontend)/_components/blocks/footer'
 import { ThingsSection } from '@/app/(frontend)/_components/things/things-section'
+import { TypewriterBlock } from '@/app/(frontend)/_components/blocks/typewriter'
+import type { CmsPageDetailView } from '@/app/(frontend)/_components/pages/cms-page'
 import type { ResolvedBlockView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 
@@ -15,6 +18,12 @@ type PageBlocksProps = {
   locale: LocaleCode
   className?: string
   siteName: string
+  /**
+   * Currently routed Post or Project when the surrounding layout is a
+   * template Page. Forwarded to the `Detail - Post` / `Detail - Project`
+   * block renderers so they can bind to the field-less block's view.
+   */
+  currentView?: CmsPageDetailView
 }
 
 function sectionDomIds(blockId: string) {
@@ -49,7 +58,13 @@ function DeferredBlockPlaceholder({
   )
 }
 
-export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksProps) {
+export function PageBlocks({
+  blocks,
+  locale,
+  className,
+  siteName,
+  currentView,
+}: PageBlocksProps) {
   if (blocks.length === 0) return null
 
   return (
@@ -211,6 +226,16 @@ export function PageBlocks({ blocks, locale, className, siteName }: PageBlocksPr
 
           case 'layoutFooter':
             return <FooterBlock key={block.id} block={block} locale={locale} siteName={siteName} />
+
+          case 'detailPost':
+            return currentView?.kind === 'post' ? (
+              <DetailPostBlock key={block.id} view={currentView.view} locale={locale} />
+            ) : null
+
+          case 'detailProject':
+            return currentView?.kind === 'project' ? (
+              <DetailProjectBlock key={block.id} view={currentView.view} locale={locale} />
+            ) : null
 
           default: {
             if (process.env.NODE_ENV !== 'production') {

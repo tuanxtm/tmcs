@@ -248,6 +248,7 @@ async function loadPostBySlug(locale: LocaleCode, slug: string): Promise<Post | 
       categories: true,
       tags: true,
       seo: true,
+      templatePage: true,
     },
   })
   return (docs[0] as Post | undefined) ?? null
@@ -287,6 +288,7 @@ async function loadProjectBySlug(locale: LocaleCode, slug: string): Promise<Proj
       categories: true,
       tags: true,
       seo: true,
+      templatePage: true,
     },
   })
   return (docs[0] as Project | undefined) ?? null

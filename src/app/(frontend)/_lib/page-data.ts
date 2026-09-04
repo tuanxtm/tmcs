@@ -33,6 +33,8 @@ import type {
   CmsPageView,
   ContentMediaBlockView,
   DetailAuthorView,
+  DetailPostBlockView,
+  DetailProjectBlockView,
   FeedSectionBlockView,
   FeedType,
   HomePageView,
@@ -60,7 +62,7 @@ import config from '@payload-config'
 
 const getPayloadClient = cache(async () => getPayload({ config }))
 
-type PageLayoutBlock = NonNullable<Page['layout']>[number]
+export type PageLayoutBlock = NonNullable<Page['layout']>[number]
 
 /**
  * Layout block shape regardless of which collection the layout belongs to.
@@ -68,7 +70,7 @@ type PageLayoutBlock = NonNullable<Page['layout']>[number]
  * identical to `Page['layout']` - they just belong to a different collection.
  * We accept this union so the resolver is collection-agnostic.
  */
-type AnyLayoutBlock =
+export type AnyLayoutBlock =
   PageLayoutBlock | NonNullable<Post['layout']>[number] | NonNullable<Project['layout']>[number]
 
 const PAGE_SELECT = {
@@ -515,11 +517,49 @@ async function resolveFooterBlock(
   }
 }
 
+async function resolveDetailPostBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'detailPost' }>,
+  context: { currentPostView: PostDetailView | null },
+  index: number,
+): Promise<DetailPostBlockView | null> {
+  if (!context.currentPostView) return null
+  return {
+    blockType: 'detailPost',
+    id: blockId(block, `detail-post-${index}`),
+    view: context.currentPostView,
+  }
+}
+
+async function resolveDetailProjectBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'detailProject' }>,
+  context: { currentProjectView: ProjectDetailView | null },
+  index: number,
+): Promise<DetailProjectBlockView | null> {
+  if (!context.currentProjectView) return null
+  return {
+    blockType: 'detailProject',
+    id: blockId(block, `detail-project-${index}`),
+    view: context.currentProjectView,
+  }
+}
+
+export type ResolveLayoutBlocksContext = {
+  /** Set when resolving a template Page for a routed Post. The Detail-Post
+   *  block inside the template layout binds to this view. */
+  currentPostView?: PostDetailView | null
+  /** Set when resolving a template Page for a routed Project. */
+  currentProjectView?: ProjectDetailView | null
+}
+
 export async function resolveLayoutBlocks(
   layout: AnyLayoutBlock[] | null | undefined,
   locale: LocaleCode,
+  context: ResolveLayoutBlocksContext = {},
 ): Promise<ResolvedBlockView[]> {
   if (!layout?.length) return []
+
+  const currentPostView = context.currentPostView ?? null
+  const currentProjectView = context.currentProjectView ?? null
 
   const resolved = await Promise.all(
     layout.map(async (block, index): Promise<ResolvedBlockView | null> => {
@@ -550,6 +590,10 @@ export async function resolveLayoutBlocks(
           return resolveBlankSpaceBlock(typed, index)
         case 'layoutFooter':
           return resolveFooterBlock(typed, locale, index)
+        case 'detailPost':
+          return resolveDetailPostBlock(typed, { currentPostView }, index)
+        case 'detailProject':
+          return resolveDetailProjectBlock(typed, { currentProjectView }, index)
         default:
           return null
       }
@@ -576,10 +620,75 @@ async function loadAlternateSlug(pageId: number, locale: LocaleCode): Promise<st
   return slug && slug.length > 0 ? slug : null
 }
 
+/**
+ * Extract a numeric Page ID from a relationship value that may be a raw ID
+ * (number) or a populated object { id: number }.
+ */
+function extractPageId(value: unknown): number | null {
+  if (typeof value === 'number') return value
+  if (typeof value === 'object' && value !== null && 'id' in value) {
+    const id = (value as { id: unknown }).id
+    return typeof id === 'number' ? id : null
+  }
+  return null
+}
+
+/**
+ * Get a Page's slug by its ID. Returns null if the Page does not exist in
+ * either the requested locale or the fallback ('en') locale.
+ *
+ * For Post/Project detail routes: the Post/Project itself is localized, but the
+ * template Page it references may not have a published version in the requested
+ * locale (e.g. 'vi'). We fall back to 'en' so a missing vi template does not
+ * silently 404 a vi-published Post.
+ *
+ * The per-locale fetch is wrapped in `React.cache()` so duplicate calls within
+ * the same request (e.g. once in metadata + once in render) hit the cache.
+ * The fallback logic lives outside the cache so a missed vi template does not
+ * get cached as null and block the en fallback.
+ */
+const _getPageSlugByIdForLocale = cache(
+  async (locale: LocaleCode, pageId: number): Promise<string | null> => {
+    const payload = await getPayloadClient()
+    try {
+      const doc = await payload.findByID({
+        collection: 'pages',
+        id: pageId,
+        locale,
+        fallbackLocale: false,
+        depth: 0,
+        overrideAccess: false,
+        select: { slug: true, _status: true },
+      })
+      if (!doc) return null
+      if ((doc as { _status?: string })._status !== 'published') return null
+      const slug = typeof doc.slug === 'string' ? doc.slug : null
+      return slug && slug.length > 0 ? slug : null
+    } catch {
+      return null
+    }
+  },
+)
+
+export const getPageSlugById = async (
+  locale: LocaleCode,
+  pageId: number,
+): Promise<string | null> => {
+  const slug = await _getPageSlugByIdForLocale(locale, pageId)
+  if (slug) return slug
+  if (locale === 'vi') {
+    return _getPageSlugByIdForLocale('en', pageId)
+  }
+  return null
+}
+
+export { extractPageId }
+
 function toCmsPageView(
   page: Page,
   blocks: ResolvedBlockView[],
   alternateSlug: string | null,
+  layout: AnyLayoutBlock[],
 ): CmsPageView {
   return {
     title: page.title,
@@ -588,6 +697,7 @@ function toCmsPageView(
     template: page.template,
     pageImage: toMediaView(page.pageImage),
     seo: toPageSeo(page),
+    layout,
     blocks,
     alternateSlug,
   }
@@ -737,6 +847,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       noIndex: false,
       noFollow: false,
     },
+    layout: [],
     blocks,
     alternateSlug: null,
     usedFallback: true,
@@ -768,7 +879,7 @@ async function loadHomePage(locale: LocaleCode): Promise<HomePageView> {
   ])
 
   return {
-    ...toCmsPageView(page, blocks, alternateSlug),
+    ...toCmsPageView(page, blocks, alternateSlug, page.layout ?? []),
     usedFallback: false,
   }
 }
@@ -811,7 +922,7 @@ async function loadPageBySlug(locale: LocaleCode, slug: string): Promise<CmsPage
     loadAlternateSlug(page.id, locale),
   ])
 
-  return toCmsPageView(page, blocks, alternateSlug)
+  return toCmsPageView(page, blocks, alternateSlug, page.layout ?? [])
 }
 
 async function cachedLoadHomePage(locale: LocaleCode): Promise<HomePageView> {
@@ -975,6 +1086,10 @@ function toPostDetailView(post: Post, blocks: ResolvedBlockView[]): PostDetailVi
       noIndex: Boolean(post.seo?.noIndex),
       noFollow: Boolean(post.seo?.noFollow),
     },
+    // `templatePage` is required on the collection, so the populated object
+    // is always present. The collection-level extractor is used directly -
+    // if Payload ever flips this back to optional the type narrows.
+    templatePageId: extractPageId(post.templatePage)!,
   }
 }
 
@@ -1033,6 +1148,9 @@ function toProjectDetailView(project: Project, blocks: ResolvedBlockView[]): Pro
       noIndex: Boolean(project.seo?.noIndex),
       noFollow: Boolean(project.seo?.noFollow),
     },
+    // `templatePage` is required on the collection, so the populated object
+    // is always present. See the post equivalent above for rationale.
+    templatePageId: extractPageId(project.templatePage)!,
   }
 }
 

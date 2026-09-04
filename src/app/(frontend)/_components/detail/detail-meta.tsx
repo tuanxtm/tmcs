@@ -20,7 +20,7 @@ export function DetailMeta({ view, locale, siteName }: DetailMetaProps) {
   return (
     <section
       className={cn(
-        'page-frame bg-background',
+        'bg-background',
         'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
         'dash-line-b',
       )}

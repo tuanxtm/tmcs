@@ -2,6 +2,7 @@ import { describe, it, beforeAll, expect } from 'vitest'
 import type { Payload } from 'payload'
 
 import {
+  ensureTemplatePages,
   ensureTestUsers,
   initPayload,
   richText,
@@ -12,10 +13,13 @@ import {
 describe('RBAC', () => {
   let payload: Payload
   let users: TestUsers
+  let postTemplatePageId: number
 
   beforeAll(async () => {
     payload = await initPayload()
     users = await ensureTestUsers(payload)
+    const templates = await ensureTemplatePages(payload)
+    postTemplatePageId = templates.postTemplatePageId
   })
 
   it('manager cannot create users', async () => {
@@ -54,6 +58,7 @@ describe('RBAC', () => {
         slug: `rbac-draft-${Date.now()}`,
         content: richText('draft'),
         owner: users.admin.id,
+        templatePage: postTemplatePageId,
         _status: 'draft',
       },
       draft: true,
@@ -67,6 +72,7 @@ describe('RBAC', () => {
         slug: `rbac-pub-${Date.now()}`,
         content: richText('published'),
         owner: users.admin.id,
+        templatePage: postTemplatePageId,
         _status: 'published',
       },
       overrideAccess: true,
@@ -94,6 +100,7 @@ describe('RBAC', () => {
           title: 'Creator Publish Attempt',
           slug: `creator-pub-${Date.now()}`,
           content: richText('nope'),
+          templatePage: postTemplatePageId,
           _status: 'published',
         },
         user: users.creatorA,
@@ -109,6 +116,7 @@ describe('RBAC', () => {
         title: 'Creator A Draft',
         slug: `creator-a-draft-${Date.now()}`,
         content: richText('mine'),
+        templatePage: postTemplatePageId,
         _status: 'draft',
       },
       draft: true,
@@ -125,6 +133,7 @@ describe('RBAC', () => {
         slug: `creator-b-draft-${Date.now()}`,
         content: richText('theirs'),
         owner: users.creatorB.id,
+        templatePage: postTemplatePageId,
         _status: 'draft',
       },
       draft: true,
@@ -153,6 +162,7 @@ describe('RBAC', () => {
         slug: `needs-approval-${Date.now()}`,
         content: richText('please publish'),
         owner: users.creatorA.id,
+        templatePage: postTemplatePageId,
         _status: 'draft',
       },
       draft: true,

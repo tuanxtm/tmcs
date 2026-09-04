@@ -2,6 +2,7 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import type { LocaleCode } from '@/lib/locales'
 import type { StoryShape } from '@/lib/story-shapes'
+import type { AnyLayoutBlock } from '@/app/(frontend)/_lib/page-data'
 
 export type { StoryShape }
 
@@ -171,6 +172,8 @@ export type PostDetailView = {
   categories: { name: string }[]
   tags: { name: string }[]
   seo: PageSeoView
+  /** Template Page ID for detail rendering. Always populated - `templatePage` is required on the collection. */
+  templatePageId: number
 }
 
 export type ProjectDetailView = {
@@ -187,6 +190,8 @@ export type ProjectDetailView = {
   categories: { name: string }[]
   tags: { name: string }[]
   seo: PageSeoView
+  /** Template Page ID for detail rendering. Always populated - `templatePage` is required on the collection. */
+  templatePageId: number
 }
 
 export type ProjectsPageView = {
@@ -316,6 +321,38 @@ export type LayoutFooterBlockView = {
 }
 
 /**
+ * Renders a Post using the shared `<DetailPage>` UI. The Post view is
+ * injected by the resolver at layout-resolve time from the currently routed
+ * Post (see `currentPostView` in `page-data.ts`). Field-less block;
+ * auto-binds to whichever Post is at `/[slug]`.
+ *
+ * `view` is required. The resolver returns `null` for this block when the
+ * route is not a Post template render, and `resolveLayoutBlocks` filters
+ * such blocks out before they reach the renderer.
+ */
+export type DetailPostBlockView = {
+  blockType: 'detailPost'
+  id: string
+  view: PostDetailView
+}
+
+/**
+ * Renders a Project using the shared `<DetailPage>` UI. The Project view is
+ * injected by the resolver at layout-resolve time from the currently routed
+ * Project (see `currentProjectView` in `page-data.ts`). Field-less block;
+ * auto-binds to whichever Project is at `/[slug]`.
+ *
+ * `view` is required. The resolver returns `null` for this block when the
+ * route is not a Project template render, and `resolveLayoutBlocks` filters
+ * such blocks out before they reach the renderer.
+ */
+export type DetailProjectBlockView = {
+  blockType: 'detailProject'
+  id: string
+  view: ProjectDetailView
+}
+
+/**
  * Stub view types for blocks that have schema but no frontend renderer yet.
  * The frontend resolver returns `null` for these, so they never flow into the
  * page renderer - the types exist only to keep the `ResolvedBlockView` union
@@ -342,6 +379,8 @@ export type ResolvedBlockView =
   | LayoutScrambleHoverBlockView
   | LayoutBlankSpaceBlockView
   | LayoutFooterBlockView
+  | DetailPostBlockView
+  | DetailProjectBlockView
 
 export type CmsPageView = {
   title: string
@@ -350,6 +389,14 @@ export type CmsPageView = {
   template: 'home' | 'about' | 'contact' | 'generic'
   pageImage: MediaView | null
   seo: PageSeoView
+  /**
+   * Raw layout (block descriptors as stored in the CMS). Carried alongside
+   * `blocks` so a template Page that hosts a `Detail - Post` /
+   * `Detail - Project` block can re-resolve the layout with the routed
+   * Post/Project context. Without this, the block cannot bind to the
+   * currently-routed document.
+   */
+  layout: AnyLayoutBlock[]
   blocks: ResolvedBlockView[]
   /** Alternate-locale path when a localized sibling slug exists; otherwise null. */
   alternateSlug: string | null

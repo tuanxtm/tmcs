@@ -4,13 +4,29 @@ import { notFound } from 'next/navigation'
 import { PageTransition } from '@/app/(frontend)/_components/layout/page-transition'
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
 import { getSiteShell } from '@/app/(frontend)/_lib/cms'
-import { firstHeroBlock, getPageBySlug, isReservedCmsPageSlug } from '@/app/(frontend)/_lib/page-data'
+import {
+  firstHeroBlock,
+  getPageBySlug,
+  isReservedCmsPageSlug,
+  resolveLayoutBlocks,
+} from '@/app/(frontend)/_lib/page-data'
 import { homeHref, pageHref } from '@/app/(frontend)/_lib/locale'
+import type { PostDetailView, ProjectDetailView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
+
+export type CmsPageDetailView =
+  | { kind: 'post'; view: PostDetailView }
+  | { kind: 'project'; view: ProjectDetailView }
 
 type CmsPageProps = {
   locale: LocaleCode
   slug: string
+  /**
+   * When set, the layout is rendered as a template Page for the given
+   * Post or Project. Pass through the just-loaded `*DetailView` so the
+   * `Detail - Post` / `Detail - Project` block can bind to it at render time.
+   */
+  detailView?: CmsPageDetailView
 }
 
 export async function generateCmsPageMetadata(
@@ -89,16 +105,30 @@ export async function generateCmsPageMetadata(
   }
 }
 
-export async function CmsPage({ locale, slug }: CmsPageProps) {
+export async function CmsPage({ locale, slug, detailView }: CmsPageProps) {
   const [shell, page] = await Promise.all([getSiteShell(locale), getPageBySlug(locale, slug)])
   if (!page) notFound()
+
+  // When rendering as a Post/Project template, re-resolve the template's
+  // blocks with the current-view context so the field-less `Detail - Post`
+  // / `Detail - Project` block picks up the routed document. The cached
+  // `page.blocks` were computed without context (they have no idea who
+  // routed here), so we must re-run once with the right context. React
+  // dedupes the Local API calls via the per-collection loaders inside.
+  const blocks = detailView
+    ? await resolveLayoutBlocks(page.layout, locale, {
+        currentPostView: detailView.kind === 'post' ? detailView.view : null,
+        currentProjectView: detailView.kind === 'project' ? detailView.view : null,
+      })
+    : page.blocks
 
   return (
     <PageTransition>
       <PageBlocks
-        blocks={page.blocks}
+        blocks={blocks}
         locale={locale}
         siteName={shell.siteName}
+        currentView={detailView}
       />
     </PageTransition>
   )

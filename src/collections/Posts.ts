@@ -153,6 +153,17 @@ export const Posts: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     {
+      name: 'templatePage',
+      type: 'relationship',
+      relationTo: 'pages',
+      required: true,
+      admin: {
+        position: 'sidebar',
+        description:
+          "Required: the Page used to render this Post. Design the layout with a 'Detail - Post' block to control where the body appears.",
+      },
+    },
+    {
       name: 'readingTime',
       type: 'number',
       admin: {
