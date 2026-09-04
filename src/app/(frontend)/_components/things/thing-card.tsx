@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useReducedMotion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
-import { BuyNowDialog } from '@/app/(frontend)/_components/things/buy-now-dialog'
+import { ThingDetail } from '@/app/(frontend)/_components/things/thing-detail'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
@@ -41,20 +41,11 @@ export function ThingCard({
 
   // Open the dialog without letting the click bubble to the wrapping image
   // <Link>. Without this, clicking Detail over the image would also navigate
-  // to primaryUrl, and clicking the buy <Button asChild> link would otherwise
-  // be fine but we stop propagation defensively to keep the parent link from
-  // running alongside.
+  // to primaryUrl.
   const openDialog = (event: MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
     setOpen(true)
-  }
-
-  // Same rationale for the mobile Buy <Button asChild><Link/></Button>: stop
-  // propagation so the surrounding Link or row doesn't react to the click.
-  const handleBuyClick = (event: MouseEvent) => {
-    event.preventDefault()
-    event.stopPropagation()
   }
 
   return (
@@ -137,21 +128,22 @@ export function ThingCard({
             >
               |
             </Button>
-            <Button
-              asChild
-              variant={'ghost'}
+            <Link
+              href={thing.primaryUrl ?? '#'}
+              aria-label={BUY_LABEL[locale]}
               className={cn(
                 'text-primary pointer-events-auto justify-center rounded-none border-0 font-medium mix-blend-difference',
                 'underline-offset-4 hover:underline',
                 'font-mono leading-none tracking-tight uppercase',
                 'text-[0.625rem] sm:text-[0.625rem] lg:text-xs',
                 'bg-background',
+                // Apply button-like sizing/display to the anchor directly.
+                'inline-flex shrink-0 items-center',
+                'px-2 py-1',
               )}
-              aria-label={BUY_LABEL[locale]}
-              onClick={handleBuyClick}
             >
-              <Link href={thing.primaryUrl ?? '#'}>{BUY_LABEL[locale]}</Link>
-            </Button>
+              {BUY_LABEL[locale]}
+            </Link>
           </div>
         </div>
       </div>
@@ -183,23 +175,24 @@ export function ThingCard({
           >
             |
           </Button>
-          <Button
-            asChild
-            variant={'ghost'}
+          <Link
+            href={thing.primaryUrl ?? '#'}
+            aria-label={BUY_LABEL[locale]}
             className={cn(
               'text-primary self-start rounded-none border-0 p-0 font-medium',
               'font-mono leading-none tracking-tight uppercase',
               'underline-offset-4 hover:underline',
               'h-auto text-[0.625rem]',
+              // Button-like inline-flex sizing.
+              'inline-flex shrink-0 items-center px-2 py-1',
             )}
-            onClick={handleBuyClick}
           >
-            <Link href={thing.primaryUrl ?? '#'}>{BUY_LABEL[locale]}</Link>
-          </Button>
+            {BUY_LABEL[locale]}
+          </Link>
         </div>
       </div>
 
-      <BuyNowDialog open={open} onOpenChangeAction={setOpen} locale={locale} thing={thing} />
+      <ThingDetail open={open} onOpenChangeAction={setOpen} locale={locale} thing={thing} />
     </article>
   )
 }
