@@ -1,51 +1,15 @@
-import * as migration_20260809_152450_init from './20260809_152450_init';
 import * as migration_20260809_160100_slug_reservations from './20260809_160100_slug_reservations';
-import * as migration_20260810_033116_add_thing_links_array from './20260810_033116_add_thing_links_array';
-import * as migration_20260810_045307_things_affiliate_url_rename from './20260810_045307_things_affiliate_url_rename';
-import * as migration_20260815_032145_hero_blocks_redesign from './20260815_032145_hero_blocks_redesign';
-import * as migration_20260822_120000_footer_block_redesign from './20260822_120000_footer_block_redesign';
-import * as migration_20260822_130000_replace_generate_slug_with_slug_lock from './20260822_130000_replace_generate_slug_with_slug_lock';
-import * as migration_20260824_150000_add_things_slug from './20260824_150000_add_things_slug';
+import * as migration_20260903_172000_fresh_template_required from './20260903_172000_fresh_template_required';
 
 export const migrations = [
-  {
-    up: migration_20260809_152450_init.up,
-    down: migration_20260809_152450_init.down,
-    name: '20260809_152450_init',
-  },
   {
     up: migration_20260809_160100_slug_reservations.up,
     down: migration_20260809_160100_slug_reservations.down,
     name: '20260809_160100_slug_reservations',
   },
   {
-    up: migration_20260810_033116_add_thing_links_array.up,
-    down: migration_20260810_033116_add_thing_links_array.down,
-    name: '20260810_033116_add_thing_links_array',
-  },
-  {
-    up: migration_20260810_045307_things_affiliate_url_rename.up,
-    down: migration_20260810_045307_things_affiliate_url_rename.down,
-    name: '20260810_045307_things_affiliate_url_rename',
-  },
-  {
-    up: migration_20260815_032145_hero_blocks_redesign.up,
-    down: migration_20260815_032145_hero_blocks_redesign.down,
-    name: '20260815_032145_hero_blocks_redesign'
-  },
-  {
-    up: migration_20260822_120000_footer_block_redesign.up,
-    down: migration_20260822_120000_footer_block_redesign.down,
-    name: '20260822_120000_footer_block_redesign'
-  },
-  {
-    up: migration_20260822_130000_replace_generate_slug_with_slug_lock.up,
-    down: migration_20260822_130000_replace_generate_slug_with_slug_lock.down,
-    name: '20260822_130000_replace_generate_slug_with_slug_lock',
-  },
-  {
-    up: migration_20260824_150000_add_things_slug.up,
-    down: migration_20260824_150000_add_things_slug.down,
-    name: '20260824_150000_add_things_slug',
+    up: migration_20260903_172000_fresh_template_required.up,
+    down: migration_20260903_172000_fresh_template_required.down,
+    name: '20260903_172000_fresh_template_required',
   },
 ];
