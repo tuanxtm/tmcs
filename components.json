@@ -1,6 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "radix-mira",
+  "style": "base-mira",
   "rsc": true,
   "tsx": true,
   "tailwind": {
@@ -20,8 +20,5 @@
     "ui": "@/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
-  },
-  "registries": {
-    "@react-bits": "https://reactbits.dev/r/{name}.json"
   }
 }
