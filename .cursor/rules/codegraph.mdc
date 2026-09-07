@@ -1,0 +1,48 @@
+---
+description: Use the local codegraph CLI for code intelligence. Managed user-codegraph MCP endpoint is disabled (returns 403).
+alwaysApply: true
+---
+
+# Codegraph (local CLI only)
+
+Use the local `codegraph` CLI (v1.6.0, on fnm PATH) as the **only** code-intelligence source in this project. The managed `user-codegraph` MCP endpoint is disabled (`~/.cursor/mcp.json` has an empty `mcpServers`) and has been returning `permission_denied 403`.
+
+## Primary command
+
+```bash
+codegraph explore "<query>" --path /home/tuantm/projects/tmcs
+```
+
+- Accepts a natural-language question or a bag of symbol/file names.
+- Returns verbatim, line-numbered source grouped by file, plus the call path and a blast-radius summary.
+- Treat the returned source as already Read - do **not** re-Read those files.
+
+## Other commands
+
+| Command | Purpose |
+| --- | --- |
+| `codegraph query <search>` | Search for symbols |
+| `codegraph node <name>` | One symbol's source + caller/callee trail, or read a file with line numbers |
+| `codegraph callers <symbol>` | All functions that call a symbol |
+| `codegraph callees <symbol>` | All functions a symbol calls |
+| `codegraph impact <symbol>` | What code is affected by changing a symbol |
+| `codegraph files` | Project file structure from the index |
+| `codegraph status` | Index status and statistics |
+
+## When to use
+
+BEFORE reading files to understand code, before editing a function/symbol, when investigating a bug or a flow, when surveying an area, when asked "how does X work" or "where is X defined".
+
+## Anti-patterns
+
+- Do **not** grep + Read to reconstruct what `codegraph explore` returns in one call.
+- Do **not** run `codegraph init` yourself - indexing is the user's decision. If a project is unindexed, fall back to built-in tools and mention the user can run `codegraph init`.
+- Do **not** call the managed `user-codegraph` MCP namespace - it is unauthorized in this workspace.
+
+## Staleness
+
+Index lags writes by ~1s. A tool response starting with `⚠️ Some files referenced below were edited since the last index sync…` names the files to re-Read. Files **not** in that banner are fresh - still trust codegraph.
+
+## Working directory
+
+Always pass `--path /home/tuantm/projects/tmcs` (or `--path "$PWD"` after `cd`-ing into the repo) so it picks up the existing `.codegraph/` index.

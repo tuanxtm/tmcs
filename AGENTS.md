@@ -9,7 +9,17 @@ alwaysApply: true
 
 2. Next.js: ALWAYS read docs before coding. Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated - the docs are the source of truth.
 
-3. English is the only language in this project. Thinking and outputting in English ONLY.
+3. IMPORTANT: English ONLY!
+
+## Codegraph (local CLI only)
+
+A dedicated rule lives at `.cursor/rules/codegraph.mdc` (`alwaysApply: true`). It is the single source of truth for how Cursor must use codegraph in this project. Summary:
+
+- Use the local `codegraph` CLI (v1.6.0, on fnm PATH). The managed `user-codegraph` MCP endpoint is disabled (`~/.cursor/mcp.json` has empty `mcpServers`) and returns `permission_denied 403`.
+- Primary command: `codegraph explore "<query>" --path /home/tuantm/projects/tmcs`. Treat returned source as already Read.
+- Do **not** grep + Read to reconstruct what `codegraph explore` returns in one call.
+- Do **not** run `codegraph init` (indexing is the user's decision).
+- See `.cursor/rules/codegraph.mdc` for the full guide (staleness handling, all subcommands, anti-patterns).
 
 ## Core principles
 
