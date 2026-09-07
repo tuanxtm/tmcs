@@ -54,7 +54,7 @@ import type {
   ThingDetailView,
   VideoCardView,
 } from '@/app/(frontend)/_lib/types'
-import { CACHE_TAGS, CMS_CACHE_VERSION } from '@/lib/cache-tags'
+import { CACHE_TAGS } from '@/lib/cache-tags'
 import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
 import type { Link, Page, Post, Project } from '@payload-types'
@@ -199,7 +199,12 @@ function toPageSeo(page: Page) {
  */
 function toAuthor(author: unknown): DetailAuthorView | null {
   if (!author || typeof author !== 'object') return null
-  const a = author as { displayName?: unknown; title?: unknown; jobTitle?: unknown; avatar?: unknown }
+  const a = author as {
+    displayName?: unknown
+    title?: unknown
+    jobTitle?: unknown
+    avatar?: unknown
+  }
   const name = String(a.displayName ?? a.title ?? '').trim()
   if (!name) return null
   return {
@@ -498,10 +503,7 @@ async function resolveFooterBlock(
   ])
 
   const footerItemId = await getActiveFooterItemId(shell.activeDecorationPackId)
-  const footerDecoration = await getFooterDecoration(
-    shell.activeDecorationPackId,
-    footerItemId,
-  )
+  const footerDecoration = await getFooterDecoration(shell.activeDecorationPackId, footerItemId)
 
   return {
     blockType: 'layoutFooter',
@@ -944,10 +946,7 @@ async function cachedLoadHomePage(locale: LocaleCode): Promise<HomePageView> {
   return loadHomePage(locale)
 }
 
-async function cachedLoadPageBySlug(
-  locale: LocaleCode,
-  slug: string,
-): Promise<CmsPageView | null> {
+async function cachedLoadPageBySlug(locale: LocaleCode, slug: string): Promise<CmsPageView | null> {
   'use cache'
   cacheLife('days')
   cacheTag(
@@ -1047,7 +1046,10 @@ export const resolveSlug = cache(
   async (
     locale: LocaleCode,
     slug: string,
-  ): Promise<{ collection: 'pages' | 'posts' | 'projects' | 'things'; contentId: number } | null> => {
+  ): Promise<{
+    collection: 'pages' | 'posts' | 'projects' | 'things'
+    contentId: number
+  } | null> => {
     return cachedLoadSlugReservation(locale, slug)
   },
 )
@@ -1195,7 +1197,7 @@ export const getThingBySlug = cache(
     const primaryUrl =
       typeof thing.primaryUrl === 'string'
         ? thing.primaryUrl
-        : (thing.primaryUrl as Record<string, string> | null)?.[locale] ?? null
+        : ((thing.primaryUrl as Record<string, string> | null)?.[locale] ?? null)
 
     const links: ThingDetailView['links'] = ((thing.links as ThingDetailView['links']) || []).map(
       (l: unknown) => l as ThingDetailView['links'][number],
@@ -1206,11 +1208,11 @@ export const getThingBySlug = cache(
       slug:
         typeof thing.slug === 'string'
           ? thing.slug
-          : (thing.slug as Record<string, string>)?.[locale] ?? '',
+          : ((thing.slug as Record<string, string>)?.[locale] ?? ''),
       name:
         typeof thing.name === 'string'
           ? thing.name
-          : (thing.name as Record<string, string>)?.[locale] ?? '',
+          : ((thing.name as Record<string, string>)?.[locale] ?? ''),
       primaryUrl,
       links,
     }

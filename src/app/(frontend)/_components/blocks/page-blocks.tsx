@@ -7,17 +7,21 @@ import { FooterBlock } from '@/app/(frontend)/_components/blocks/footer'
 import { Hero } from '@/app/(frontend)/_components/blocks/hero'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { ScrambleHoverBlock } from '@/app/(frontend)/_components/blocks/scramble-hover'
+import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
 import { ThingsSection } from '@/app/(frontend)/_components/things/things-section'
 import { TypewriterBlock } from '@/app/(frontend)/_components/blocks/typewriter'
 import type { CmsPageDetailView } from '@/app/(frontend)/_components/pages/cms-page'
-import type { ResolvedBlockView } from '@/app/(frontend)/_lib/types'
+import type { NavItemView, ResolvedBlockView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
+import { cn } from '@/lib/utils'
 
 type PageBlocksProps = {
   blocks: ResolvedBlockView[]
   locale: LocaleCode
   className?: string
   siteName: string
+  /** Top-level nav items rendered by the site header. */
+  navigation?: NavItemView[]
   /**
    * Currently routed Post or Project when the surrounding layout is a
    * template Page. Forwarded to the `Detail - Post` / `Detail - Project`
@@ -63,12 +67,18 @@ export function PageBlocks({
   locale,
   className,
   siteName,
+  navigation,
   currentView,
 }: PageBlocksProps) {
   if (blocks.length === 0) return null
 
   return (
-    <div className={className}>
+    <div className={cn('flex flex-col gap-y-(--section-gap-y)', className)}>
+      <SiteHeader
+        siteName={siteName}
+        locale={locale}
+        navigation={navigation ?? []}
+      />
       {blocks.map((block) => {
         switch (block.blockType) {
           case 'layoutHero':

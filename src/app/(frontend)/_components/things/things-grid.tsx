@@ -7,7 +7,7 @@ export function ThingsGrid({ children, className, ...props }: ThingsGridProps) {
     <div
       data-grid="things"
       className={cn(
-        'relative grid w-full items-stretch gap-x-1 gap-y-1 lg:gap-x-2 lg:gap-y-2',
+        'relative grid w-full items-stretch gap-x-1 gap-y-1 md:gap-x-2 lg:gap-x-3 lg:gap-y-2',
         'bg-background',
         'grid-cols-2 lg:grid-cols-3',
         'pl-2 md:pl-3 lg:pl-4',

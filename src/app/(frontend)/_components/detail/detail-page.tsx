@@ -41,7 +41,12 @@ export async function DetailPage({ view, locale, imageKey }: DetailPageProps) {
   return (
     <PageTransition>
       <DetailHero title={view.title} image={image} priority />
-      <DetailMeta view={view} locale={locale} siteName={shell.siteName} />
+      <DetailMeta
+        view={view}
+        locale={locale}
+        siteName={shell.siteName}
+        navigation={shell.navigation}
+      />
     </PageTransition>
   )
 }

@@ -159,7 +159,7 @@ export function FeedSection(props: FeedSectionProps) {
       data-feed-type={feedType}
       data-cursor-popup={sectionCursor}
       className={cn(
-        'border-l-primary dash-line-b border-l-3 md:border-l-4 lg:border-l-5',
+        'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
         className,
       )}
     >

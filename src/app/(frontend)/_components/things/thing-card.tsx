@@ -3,14 +3,13 @@
 import { useState, type MouseEvent } from 'react'
 import Link from 'next/link'
 import { useReducedMotion } from 'motion/react'
-import { Button } from '@/components/ui/button'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import { ThingDetail } from '@/app/(frontend)/_components/things/thing-detail'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
-const BUY_LABEL: Record<LocaleCode, string> = { en: 'Buy now', vi: 'Mua ngay' }
+const BUY_LABEL: Record<LocaleCode, string> = { en: 'Buy', vi: 'Mua' }
 const DETAIL_LABEL: Record<LocaleCode, string> = { en: 'Detail', vi: 'Xem thêm' }
 
 type ThingCardProps = {
@@ -54,7 +53,7 @@ export function ThingCard({
       data-cursor-popup={cursorPopup || undefined}
     >
       {/* Image — primaryUrl link wraps it on all breakpoints */}
-      <div className="relative aspect-square min-w-0 flex-1 overflow-hidden">
+      <div className="relative aspect-square min-w-0 overflow-hidden">
         {image?.url && (
           <Link
             href={thing.primaryUrl ?? '#'}
@@ -83,113 +82,40 @@ export function ThingCard({
             )}
           </Link>
         )}
-
-        {/* Desktop overlay: name + buy button over the image */}
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-50 hidden items-center justify-between md:flex lg:flex"
-          data-cursor-popup={''}
-        >
-          <h4
-            className={cn(
-              'relative inline-flex h-7 items-center self-end rounded-none leading-none font-medium tracking-tight mix-blend-difference',
-              'text-background w-full truncate text-xs sm:text-sm lg:text-base',
-            )}
-          >
-            <span
-              aria-hidden
-              className="absolute inset-0 bg-linear-to-t from-black/70 via-black/40 to-transparent mix-blend-multiply"
-            />
-            <span className="relative truncate px-2">{thing.name}</span>
-          </h4>
-
-          <div className="flex items-center">
-            <Button
-              variant={'ghost'}
-              className={cn(
-                'text-primary pointer-events-auto justify-center rounded-none border-0 font-medium mix-blend-difference',
-                'underline-offset-4 hover:underline',
-                'font-mono leading-none tracking-tight uppercase',
-                'text-[0.625rem] sm:text-[0.625rem] lg:text-xs',
-                'bg-background cursor-pointer',
-              )}
-              aria-label={DETAIL_LABEL[locale]}
-              onClick={openDialog}
-            >
-              {DETAIL_LABEL[locale]}
-            </Button>
-            <Button
-              variant={'ghost'}
-              className={cn(
-                'text-primary w-auto rounded-none border-0 p-0 font-medium',
-                'font-mono leading-none tracking-tight uppercase',
-                'h-auto text-[0.625rem]',
-                'bg-background pointer-events-none h-7',
-              )}
-            >
-              |
-            </Button>
-            <Link
-              href={thing.primaryUrl ?? '#'}
-              aria-label={BUY_LABEL[locale]}
-              className={cn(
-                'text-primary pointer-events-auto justify-center rounded-none border-0 font-medium mix-blend-difference',
-                'underline-offset-4 hover:underline',
-                'font-mono leading-none tracking-tight uppercase',
-                'text-[0.625rem] sm:text-[0.625rem] lg:text-xs',
-                'bg-background',
-                // Apply button-like sizing/display to the anchor directly.
-                'inline-flex shrink-0 items-center',
-                'px-2 py-1',
-              )}
-            >
-              {BUY_LABEL[locale]}
-            </Link>
-          </div>
-        </div>
       </div>
 
-      {/* Mobile info row: name above, buy button below */}
-      <div className="flex flex-col gap-2 py-2 md:hidden" data-cursor-popup={undefined}>
-        <h4 className="min-w-0 text-xs leading-none font-medium tracking-tight">{thing.name}</h4>
-        <div className="flex items-center gap-2">
-          <Button
-            variant={'ghost'}
-            className={cn(
-              'text-primary self-start rounded-none border-0 p-0 font-medium',
-              'underline-offset-4 hover:underline',
-              'font-mono leading-none tracking-tight uppercase',
-              'h-auto cursor-pointer text-[0.625rem]',
-            )}
-            aria-label={DETAIL_LABEL[locale]}
-            onClick={() => setOpen(true)}
-          >
-            {DETAIL_LABEL[locale]}
-          </Button>
-          <Button
-            variant={'ghost'}
-            className={cn(
-              'text-primary w-auto rounded-none border-0 p-0 font-medium',
-              'font-mono leading-none tracking-tight uppercase',
-              'h-auto text-[0.625rem]',
-            )}
-          >
-            |
-          </Button>
-          <Link
-            href={thing.primaryUrl ?? '#'}
-            aria-label={BUY_LABEL[locale]}
-            className={cn(
-              'text-primary self-start rounded-none border-0 p-0 font-medium',
-              'font-mono leading-none tracking-tight uppercase',
-              'underline-offset-4 hover:underline',
-              'h-auto text-[0.625rem]',
-              // Button-like inline-flex sizing.
-              'inline-flex shrink-0 items-center px-2 py-1',
-            )}
-          >
-            {BUY_LABEL[locale]}
-          </Link>
-        </div>
+      <div
+        className="grid shrink-0 grid-cols-2 gap-y-1 py-2 md:gap-y-1.5 md:py-3"
+        data-cursor-popup={undefined}
+      >
+        {/* Top-left: THING + #ID */}
+        <p className="text-primary/80 self-start font-mono text-xs leading-none tracking-tight uppercase md:text-sm">
+          ID #{thing.id}
+        </p>
+
+        {/* Bottom-left: thing name */}
+        <h4 className="text-foreground col-start-1 row-start-2 inline-flex items-baseline self-end text-xs leading-none font-medium tracking-tight lowercase md:text-sm">
+          {thing.name}
+        </h4>
+
+        {/* Top-right: DETAIL */}
+        <button
+          type="button"
+          onClick={openDialog}
+          aria-label={DETAIL_LABEL[locale]}
+          className="text-primary/80 col-start-2 row-start-1 inline-flex cursor-pointer items-baseline self-end justify-self-end rounded-none border-0 bg-transparent p-0 text-right font-mono text-xs leading-none tracking-tight uppercase underline-offset-4 hover:underline md:text-sm"
+        >
+          {DETAIL_LABEL[locale]}
+        </button>
+
+        {/* Bottom-right: BUY */}
+        <Link
+          href={thing.primaryUrl ?? '#'}
+          aria-label={BUY_LABEL[locale]}
+          className="text-primary/80 col-start-2 row-start-2 inline-flex cursor-pointer items-baseline self-end justify-self-end rounded-none border-0 bg-transparent p-0 text-right font-mono text-xs leading-none tracking-tight uppercase underline-offset-4 hover:underline md:text-sm"
+        >
+          {BUY_LABEL[locale]}
+        </Link>
       </div>
 
       <ThingDetail open={open} onOpenChangeAction={setOpen} locale={locale} thing={thing} />

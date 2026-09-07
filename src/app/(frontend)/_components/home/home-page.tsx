@@ -80,6 +80,7 @@ export async function HomePage({ locale }: HomePageProps) {
         blocks={home.blocks}
         locale={locale}
         siteName={shell.siteName}
+        navigation={shell.navigation}
       />
     </PageTransition>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { ThingsGrid } from '@/app/(frontend)/_components/layout/things-grid'
+import { ThingsGrid } from '@/app/(frontend)/_components/things/things-grid'
 import {
   RevealGridItem,
   useGridColumnCount,
@@ -70,7 +70,7 @@ export function ThingsSection({
       data-cursor-popup={sectionCursor}
       className={cn(
         className,
-        'border-l-primary dash-line-b border-l-3 md:border-l-4 lg:border-l-5',
+        'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
       )}
     >
       <SectionHeader id={headingId} heading={heading} />

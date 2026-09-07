@@ -17,7 +17,7 @@ export function BlankSpaceBlock({ block }: BlankSpaceBlockProps) {
       aria-hidden="true"
       style={{ height: block.height }}
       className={cn(
-        'relative bg-background dash-line-b',
+        'relative bg-background',
         'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
       )}
     >

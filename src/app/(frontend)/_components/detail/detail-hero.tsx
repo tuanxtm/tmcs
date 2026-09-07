@@ -18,8 +18,7 @@ type DetailHeroProps = {
  * `src/app/(frontend)/_components/blocks/hero.tsx` so the section above the
  * fold reads as a continuation of the home page:
  *  - `min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]`
- *  - `dash-line-b`, `border-l-primary border-l-3 md:border-l-4 lg:border-l-5`
- *  - `pt-2 md:pt-1 md:pb-1.5` vertical padding
+ *  - `pt-2 md:pt-1 md:pb-1.5`, `border-l-primary border-l-3 md:border-l-4 lg:border-l-5`
  *
  * Layout:
  *  - Left column wraps the title in the same `FieldRow` chrome (label +
@@ -42,7 +41,7 @@ export function DetailHero({ title, image, priority = true }: DetailHeroProps) {
         id="detail-hero"
         className={cn(
           'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
-          'bg-background dash-line-b',
+          'bg-background',
           'pt-2 md:pt-1 md:pb-1.5',
           'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
         )}
@@ -78,7 +77,7 @@ export function DetailHero({ title, image, priority = true }: DetailHeroProps) {
       id="detail-hero"
       className={cn(
         'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
-        'bg-background dash-line-b',
+        'bg-background',
         'pt-2 md:pt-1 md:pb-1.5',
         'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
       )}

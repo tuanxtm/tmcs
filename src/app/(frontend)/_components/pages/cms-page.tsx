@@ -128,6 +128,7 @@ export async function CmsPage({ locale, slug, detailView }: CmsPageProps) {
         blocks={blocks}
         locale={locale}
         siteName={shell.siteName}
+        navigation={shell.navigation}
         currentView={detailView}
       />
     </PageTransition>

@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { FieldRow } from '@/app/(frontend)/_components/layout/field-row'
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
-import type { PostDetailView, ProjectDetailView } from '@/app/(frontend)/_lib/types'
+import type { NavItemView, PostDetailView, ProjectDetailView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
@@ -11,9 +11,11 @@ type DetailMetaProps = {
   view: PostDetailView | ProjectDetailView
   locale: LocaleCode
   siteName: string
+  /** Top-level nav items rendered by the site header inside the nested PageBlocks. */
+  navigation: NavItemView[]
 }
 
-export function DetailMeta({ view, locale, siteName }: DetailMetaProps) {
+export function DetailMeta({ view, locale, siteName, navigation }: DetailMetaProps) {
   const readingTime = 'readingTime' in view ? view.readingTime : null
   const hasReadingTime = typeof readingTime === 'number' && readingTime > 0
 
@@ -22,7 +24,6 @@ export function DetailMeta({ view, locale, siteName }: DetailMetaProps) {
       className={cn(
         'bg-background',
         'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
-        'dash-line-b',
       )}
     >
       <div className="pt-2 md:pt-1 md:pb-1.5">
@@ -79,7 +80,7 @@ export function DetailMeta({ view, locale, siteName }: DetailMetaProps) {
                 blocks={view.blocks}
                 locale={locale}
                 siteName={siteName}
-                className="mt-6"
+                navigation={navigation}
               />
             ) : null}
           </article>

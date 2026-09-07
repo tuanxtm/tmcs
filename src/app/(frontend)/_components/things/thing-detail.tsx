@@ -65,9 +65,7 @@ export function ThingDetail({
 }) {
   const copy = COPY[locale]
   const image = thing.primaryImage || thing.detailImage
-  const hasDetailImage = Boolean(
-    thing.detailImage && (!image || thing.detailImage.id !== image.id),
-  )
+  const hasDetailImage = Boolean(thing.detailImage && (!image || thing.detailImage.id !== image.id))
   const lenis = useLenis()
   // Track whether we've paused Lenis so we only resume on the open→closed
   // transition, not on lenis-init or identity changes.
@@ -100,13 +98,9 @@ export function ThingDetail({
 
   return (
     <Drawer swipeDirection="down" open={open} onOpenChange={onOpenChangeAction}>
-      <DrawerContent
-        className="bg-background text-foreground mx-auto flex w-full flex-col overflow-hidden rounded-none border-none p-0 [--drawer-height:80dvh] md:[--drawer-height:60dvh]"
-      >
+      <DrawerContent className="bg-background text-foreground mx-auto flex w-full flex-col overflow-hidden rounded-none border-none p-0 [--drawer-height:80dvh] md:[--drawer-height:60dvh]">
         <DrawerTitle className="sr-only">{copy.thing}</DrawerTitle>
-        <DrawerDescription className="sr-only">
-          {thing.name}
-        </DrawerDescription>
+        <DrawerDescription className="sr-only">{thing.name}</DrawerDescription>
 
         {/* Close: use render to produce a bare <button> — DrawerClose renders a
             button, so wrapping it in <Button> (which also renders a button) would
@@ -117,14 +111,14 @@ export function ThingDetail({
               {...closeProps}
               type="button"
               aria-label={copy.close}
-              className="text-primary absolute top-3 right-3 z-10 cursor-pointer rounded-none border-0 bg-transparent p-0 hover:bg-transparent hover:text-primary/80"
+              className="text-primary hover:text-primary/80 absolute top-3 right-3 z-10 cursor-pointer rounded-none border-0 bg-transparent p-0 hover:bg-transparent"
             >
               <IconX aria-hidden="true" className="size-5" />
             </button>
           )}
         />
 
-        <div className="grid min-h-0 flex-1 grid-rows-[1fr_auto] overflow-y-auto md:grid-rows-1 md:grid-cols-2">
+        <div className="grid min-h-0 flex-1 grid-rows-[1fr_auto] overflow-y-auto md:grid-cols-2 md:grid-rows-1">
           {/* Image cell: full width/height of its grid track. Hover swaps the
               primary image for the detail image. */}
           {image ? (
@@ -152,9 +146,7 @@ export function ThingDetail({
               {thing.name}
             </h2>
 
-            {thing.description ? (
-              <p className="text-primary text-sm">{thing.description}</p>
-            ) : null}
+            {thing.description ? <p className="text-primary text-sm">{thing.description}</p> : null}
 
             {thing.links.length > 0 ? (
               <div className="flex flex-col gap-3">
@@ -166,7 +158,7 @@ export function ThingDetail({
                       href={link.url}
                       target="_blank"
                       rel="sponsored noopener noreferrer"
-                      className="inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none touch-manipulation focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 w-full justify-center rounded-none border-border bg-background text-foreground hover:bg-muted active:translate-y-px"
+                      className="focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 border-border bg-background text-foreground hover:bg-muted inline-flex w-full shrink-0 touch-manipulation items-center justify-center rounded-none border bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-2 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:ring-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
                     >
                       <PlatformIcon aria-hidden="true" className="size-4" />
                       {link.label}

@@ -18,7 +18,7 @@ type SiteHeaderProps = {
 export function SiteHeader({ siteName, locale, navigation, className }: SiteHeaderProps) {
   return (
     <header
-      className={cn('bg-background dash-line-b', className)}
+      className={cn('bg-background', className)}
       style={{ viewTransitionName: 'site-header' }}
     >
       <div

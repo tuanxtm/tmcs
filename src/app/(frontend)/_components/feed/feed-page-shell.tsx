@@ -98,6 +98,7 @@ export function createFeedPageShell({
             blocks={page.blocks}
             locale={locale}
             siteName={shell.siteName}
+            navigation={shell.navigation}
           />
         </PageTransition>
       )

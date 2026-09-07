@@ -29,7 +29,6 @@ export function InlineBlock({ fields }: InlineBlockProps) {
 
     default: {
       if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
         console.warn('[InlineBlock] Unsupported block type skipped.', fields)
       }
       return null
