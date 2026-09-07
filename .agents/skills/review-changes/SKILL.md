@@ -109,7 +109,6 @@ Apply repository guidance in addition to general review rules. In particular:
 
 Auto-generated output directories do not contain application logic, credentials, or performance-critical code. Skip deep review of these directories:
 
-- `graphify-out/` - knowledge graph output
 - `.next/` - Next.js build output
 - `.output/` - OpenNext/worker output
 - `node_modules/` - managed by package manager

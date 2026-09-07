@@ -23,7 +23,6 @@ Stage pending changes into small, focused commits and generate a Conventional Co
 
 Auto-generated output directories do not contain application logic or meaningful diffs. Do not stage changes from these directories:
 
-- `graphify-out/` - knowledge graph output
 - `.next/` - Next.js build output
 - `.output/` - OpenNext/worker output
 - `node_modules/` - managed by package manager
