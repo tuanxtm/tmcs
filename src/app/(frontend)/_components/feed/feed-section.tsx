@@ -1,10 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
+import Link from 'next/link'
 
 import { FeedCard } from '@/app/(frontend)/_components/feed/feed-card'
 import { VideoFeedCard } from '@/app/(frontend)/_components/feed/video-feed-card'
-import { ViewAllFeedCard } from '@/app/(frontend)/_components/feed/view-all-feed-card'
 import { FeedGrid } from '@/app/(frontend)/_components/layout/feed-grid'
 import {
   RevealGridItem,
@@ -138,6 +138,11 @@ export function FeedSection(props: FeedSectionProps) {
   const sectionCursor =
     docs.length === 0 ? cursorPopupEmpty || cursorPopup || undefined : cursorPopup || undefined
 
+  const resolvedViewAllLabel =
+    typeof viewAllLabel === 'string'
+      ? viewAllLabel
+      : (viewAllLabel?.[locale] ?? viewAllLabel?.['en'] ?? '')
+
   if (docs.length === 0) {
     return (
       <section
@@ -197,29 +202,14 @@ export function FeedSection(props: FeedSectionProps) {
             )}
           </RevealGridItem>
         ))}
-
-        {showViewAll && viewAllHref && viewAllLabel ? (
-          <RevealGridItem
-            index={docs.length}
-            columns={columns}
-            dataAttributes={{ 'data-feed-grid-item': true }}
-            className={cn('relative z-0 min-w-0 self-stretch')}
-          >
-            <ViewAllFeedCard
-              href={viewAllHref!}
-              label={
-                typeof viewAllLabel === 'string'
-                  ? viewAllLabel
-                  : viewAllLabel?.[locale] ?? viewAllLabel?.['en'] ?? ''
-              }
-              cursorPopup={cursorPopupViewAll || undefined}
-            />
-          </RevealGridItem>
-        ) : null}
       </FeedGrid>
 
       {pagination === 'infinite' ? (
-        <div className="bg-background flex min-h-(--header-height) flex-col items-center justify-center gap-3 px-1.5 py-4">
+        <div className={cn(
+          'bg-background flex min-h-(--header-height) flex-col items-center justify-center',
+          'gap-3',
+          'px-1.5 py-4',
+        )}>
           <div ref={sentinelRef} className="h-1 w-full" aria-hidden="true" />
           <p
             role="status"
@@ -246,7 +236,26 @@ export function FeedSection(props: FeedSectionProps) {
           ) : null}
         </div>
       ) : null}
-      <div className="bg-background h-(--header-height)"></div>
+      <div className={cn(
+        'bg-background',
+        'flex h-(--header-height) items-center justify-end',
+        'px-1.5 md:px-2 lg:px-3',
+      )}>
+        {showViewAll && viewAllHref && resolvedViewAllLabel ? (
+          <Link
+            href={viewAllHref}
+            transitionTypes={['nav-forward']}
+            data-cursor-popup={cursorPopupViewAll || resolvedViewAllLabel.toLowerCase()}
+            className={cn(
+              'text-foreground/90 leading-none font-medium tracking-tight lowercase',
+              'hover:text-primary transition-colors',
+              'text-xs md:text-sm lg:text-base',
+            )}
+          >
+            {resolvedViewAllLabel}
+          </Link>
+        ) : null}
+      </div>
     </section>
   )
 }

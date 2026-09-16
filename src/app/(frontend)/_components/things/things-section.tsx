@@ -1,11 +1,12 @@
 'use client'
 
+import Link from 'next/link'
+
 import { ThingsGrid } from '@/app/(frontend)/_components/things/things-grid'
 import {
   RevealGridItem,
   useGridColumnCount,
 } from '@/app/(frontend)/_components/layout/reveal-grid-item'
-import { ViewAllFeedCard } from '@/app/(frontend)/_components/feed/view-all-feed-card'
 import { SectionHeader } from '@/app/(frontend)/_components/layout/section-header'
 import { ThingCard } from '@/app/(frontend)/_components/things/thing-card'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
@@ -48,6 +49,11 @@ export function ThingsSection({
   const sectionCursor =
     docs.length === 0 ? cursorPopupEmpty || cursorPopup || undefined : cursorPopup || undefined
 
+  const resolvedViewAllLabel =
+    typeof viewAllLabel === 'string'
+      ? viewAllLabel
+      : (viewAllLabel?.[locale] ?? viewAllLabel?.['en'] ?? '')
+
   if (docs.length === 0) {
     return (
       <section
@@ -82,32 +88,35 @@ export function ThingsSection({
             index={index}
             columns={columns}
             dataAttributes={{ 'data-things-grid-item': true }}
-            className={cn('relative z-0 min-w-0 self-stretch')}
+            className={cn(
+              'relative z-0 self-stretch',
+              'min-w-0',
+            )}
           >
             <ThingCard thing={thing} locale={locale} index={index} cursorPopup={cursorPopupItem} />
           </RevealGridItem>
         ))}
-
-        {showViewAll && viewAllHref && viewAllLabel ? (
-          <RevealGridItem
-            index={docs.length}
-            columns={columns}
-            dataAttributes={{ 'data-things-grid-item': true }}
-            className={cn('relative z-0 min-w-0 self-stretch')}
-          >
-            <ViewAllFeedCard
-              href={viewAllHref!}
-              label={
-                typeof viewAllLabel === 'string'
-                  ? viewAllLabel
-                  : (viewAllLabel?.[locale] ?? viewAllLabel?.['en'] ?? '')
-              }
-              cursorPopup={cursorPopupViewAll || undefined}
-            />
-          </RevealGridItem>
-        ) : null}
       </ThingsGrid>
-      <div className="bg-background h-(--header-height)"></div>
+      <div className={cn(
+        'bg-background',
+        'flex h-(--header-height) items-center justify-end',
+        'px-1.5 md:px-2 lg:px-3',
+      )}>
+        {showViewAll && viewAllHref && resolvedViewAllLabel ? (
+          <Link
+            href={viewAllHref}
+            transitionTypes={['nav-forward']}
+            data-cursor-popup={cursorPopupViewAll || resolvedViewAllLabel.toLowerCase()}
+            className={cn(
+              'text-foreground/90 leading-none font-medium tracking-tight lowercase',
+              'hover:text-primary transition-colors',
+              'text-xs md:text-sm lg:text-base',
+            )}
+          >
+            {resolvedViewAllLabel}
+          </Link>
+        ) : null}
+      </div>
     </section>
   )
 }
