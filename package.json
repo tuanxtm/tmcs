@@ -40,6 +40,8 @@
     "@payloadcms/richtext-lexical": "3.86.0",
     "@payloadcms/storage-r2": "3.86.0",
     "@payloadcms/ui": "3.86.0",
+    "@react-three/fiber": "^9.3.0",
+    "@react-three/postprocessing": "^3.0.4",
     "@tabler/icons-react": "^3.45.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -51,11 +53,13 @@
     "next": "16.3.2",
     "ogl": "^1.0.11",
     "payload": "3.86.0",
+    "postprocessing": "^6.36.0",
     "radix-ui": "^1.6.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "shadcn": "^4.13.1",
     "tailwind-merge": "^3.6.0",
+    "three": "^0.180.0",
     "vaul": "^1.1.2"
   },
   "devDependencies": {
