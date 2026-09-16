@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils'
-import { Barcode } from '@/components/ui/barcode'
 
 type SectionHeaderProps = {
   id: string
@@ -12,31 +11,23 @@ export function SectionHeader({ id, heading, className }: SectionHeaderProps) {
     <div className={cn('bg-background', className)}>
       <div
         className={cn(
-          'h-(--header-height) bg-transparent',
+          'realtive h-(--header-height) bg-transparent',
           'ml-2 grid items-center md:ml-3 lg:ml-4',
-          'grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
+          'grid-cols-1',
           'gap-x-1 lg:gap-x-2',
         )}
         data-stuck="false"
       >
+        <div className="absolute items-start text-[10em] font-bold opacity-5">{heading}</div>
         <h2
           id={id}
           className={cn(
             'text-foreground text-sm leading-none font-medium tracking-tight lowercase md:text-base lg:text-lg',
-            'col-span-1',
             className,
           )}
         >
           {heading}
         </h2>
-        <div className="h-[1em] w-full md:col-start-3 md:col-end-4 lg:col-start-4 lg:col-end-5">
-          <Barcode
-            value={'latest ' + heading}
-            lineColor="oklch(from var(--primary) l c h / 0.7)"
-            quietZoneModules={0}
-            className="h-full w-full"
-          />
-        </div>
       </div>
     </div>
   )

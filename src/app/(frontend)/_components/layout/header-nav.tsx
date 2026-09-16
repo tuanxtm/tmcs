@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLenis } from 'lenis/react'
 import { IconChevronLeft, IconMenu2, IconX } from '@tabler/icons-react'
-import { Barcode } from '@/components/ui/barcode'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/icons/logo'
 import {
@@ -73,13 +72,16 @@ export function HeaderNav({ items, siteName, locale, className }: HeaderNavProps
               variant="ghost"
               size="icon-sm"
               aria-label="Open menu"
-              className="text-primary rounded-none border-none hover:bg-transparent hover:text-primary/80"
+              className={cn(
+                'text-primary rounded-none border-none',
+                'hover:bg-transparent hover:text-primary/80',
+              )}
             >
               <IconMenu2 aria-hidden="true" className="size-4" />
             </Button>
           )}
         />
-        <DrawerContent className="bg-background text-foreground mx-auto w-full items-center rounded-none py-5">
+        <DrawerContent className={cn('bg-background text-foreground', 'mx-auto w-full items-center rounded-none py-5')}>
           <DrawerTitle className="sr-only">Site navigation</DrawerTitle>
           <DrawerDescription className="sr-only">Primary site navigation menu</DrawerDescription>
           <DrawerChrome
@@ -103,9 +105,6 @@ export function HeaderNav({ items, siteName, locale, className }: HeaderNavProps
             targetPath={localeSwitcherTarget}
             onNavigate={closeOuter}
           />
-          <div className="text-primary mx-auto mt-5 h-4 w-20">
-            <Barcode value="DESTINATION" className="h-full w-full" />
-          </div>
         </DrawerContent>
       </Drawer>
     </div>
@@ -128,7 +127,7 @@ type DrawerChromeProps = {
 
 function DrawerChrome({ onClose, siteName, locale, closeIcon, closeLabel }: DrawerChromeProps) {
   return (
-    <div className="-mt-1 mb-5 flex flex-col items-center gap-3.5">
+    <div className={cn('-mt-1 mb-5 flex flex-col items-center', 'gap-3.5')}>
       <DrawerClose
         render={(closeProps) => (
           <Button
@@ -136,7 +135,10 @@ function DrawerChrome({ onClose, siteName, locale, closeIcon, closeLabel }: Draw
             type="button"
             variant="ghost"
             aria-label={closeLabel}
-            className="text-foreground m-0 cursor-pointer rounded-none border-0 border-none p-0 hover:bg-transparent"
+            className={cn(
+              'text-foreground m-0 cursor-pointer rounded-none border-0 border-none p-0',
+              'hover:bg-transparent',
+            )}
           >
             <span aria-hidden="true" className="text-primary flex items-center">
               {closeIcon}
@@ -251,7 +253,7 @@ function NavItemRow({ item, direction, onNavigate, locale }: NavItemRowProps) {
             </Button>
           )}
         />
-        <DrawerContent className="bg-background text-foreground mx-auto w-full items-center rounded-none py-5">
+        <DrawerContent className={cn('bg-background text-foreground', 'mx-auto w-full items-center rounded-none py-5')}>
           <DrawerTitle className="sr-only">{item.label} submenu</DrawerTitle>
           <DrawerDescription className="sr-only">
             Items belonging to {item.label}.
@@ -272,9 +274,6 @@ function NavItemRow({ item, direction, onNavigate, locale }: NavItemRowProps) {
               />
             ))}
           </ul>
-          <div className="text-primary mx-auto mt-5 h-4 w-20">
-            <Barcode value="DESTINATION" className="h-full w-full" />
-          </div>
         </DrawerContent>
       </Drawer>
     </li>
@@ -296,7 +295,11 @@ function NavChildLink({ child, onNavigate }: NavChildLinkProps) {
         {...(child.newTab || child.external
           ? {}
           : { transitionTypes: ['nav-forward'] as string[] })}
-        className="text-foreground hover:text-primary inline-flex items-center text-xl leading-none font-medium tracking-tight lowercase transition-colors"
+        className={cn(
+          'text-foreground hover:text-primary inline-flex items-center text-xl',
+          'leading-none font-medium tracking-tight lowercase',
+          'transition-colors',
+        )}
       >
         {child.label}
       </Link>
@@ -319,7 +322,11 @@ function LocaleSwitcher({ currentLocale, targetPath, onNavigate }: LocaleSwitche
       href={targetPath}
       onClick={onNavigate}
       aria-label={`Switch language to ${targetLocale.label}`}
-      className="text-foreground hover:text-primary mx-auto mt-5 items-center justify-center transition-colors"
+      className={cn(
+        'text-foreground hover:text-primary',
+        'mx-auto mt-5 items-center justify-center',
+        'transition-colors',
+      )}
     >
       <span className="text-xl leading-none font-medium tracking-tight lowercase">en/vi</span>
     </Link>
