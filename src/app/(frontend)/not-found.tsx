@@ -45,11 +45,17 @@ export default async function NotFound() {
             >
               <h1
                 id="not-found-heading"
-                className="text-primary text-sm font-medium whitespace-pre-wrap md:text-base lg:text-lg"
+                className={cn(
+                'text-primary font-medium whitespace-pre-wrap',
+                'text-sm md:text-base lg:text-lg',
+              )}
               >
                 {heading}
               </h1>
-              <p className="text-primary mb-1 text-left text-sm font-medium whitespace-pre-wrap md:text-base lg:text-lg">
+              <p className={cn(
+                'text-primary mb-1 text-left font-medium whitespace-pre-wrap',
+                'text-sm md:text-base lg:text-lg',
+              )}>
                 {description}
               </p>
               <div
@@ -92,7 +98,10 @@ export default async function NotFound() {
             className={cn('flex h-full w-full items-center justify-center py-4', 'font-mono')}
             aria-hidden="true"
           >
-            <span className="text-primary font-mono text-[clamp(6rem,20vw,8rem)] leading-none">
+            <span className={cn(
+              'text-primary font-mono leading-none',
+              'text-[clamp(6rem,20vw,8rem)]',
+            )}>
               <span className="inline md:block">4</span>
               <span className="inline md:block">0</span>
               <span className="inline md:block">4</span>

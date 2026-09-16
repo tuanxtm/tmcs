@@ -100,7 +100,10 @@ export function VideoFeedCard({
             className="pointer-events-none absolute inset-0 flex items-center justify-center"
             aria-hidden="true"
           >
-            <span className="bg-background/85 text-foreground flex size-11 items-center justify-center rounded-full shadow-sm">
+            <span className={cn(
+                  'bg-background/85 text-foreground flex size-11 items-center justify-center',
+                  'rounded-full shadow-sm',
+                )}>
               <IconPlayerPlay className="size-5 translate-x-px" />
             </span>
           </span>

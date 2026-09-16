@@ -25,10 +25,16 @@ function LinkList({ links, variant }: { links: NavChildView[]; variant: LinkList
               href={link.href}
               target={link.newTab ? '_blank' : undefined}
               rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
-              className="text-foreground focus-visible:ring-ring flex items-center gap-1 focus-visible:ring-2 focus-visible:outline-none md:gap-2"
+              className={cn(
+                'text-foreground focus-visible:ring-ring flex items-center gap-1 md:gap-2',
+                'focus-visible:ring-2 focus-visible:outline-none',
+              )}
               data-cursor-popup={''}
             >
-              <span className="text-primary hover:text-foreground font-mono text-xs md:text-base">
+              <span className={cn(
+                'text-primary hover:text-foreground font-mono',
+                'text-xs md:text-base',
+              )}>
                 &gt;
               </span>
               <span
@@ -67,7 +73,10 @@ export function Hero({ hero, className }: HeroProps) {
               <FieldRow label={hero.labelTitle}>
                 <h1
                   id="hero-heading"
-                  className="text-foreground text-sm font-medium md:text-base lg:text-lg"
+                  className={cn(
+                    'text-foreground font-medium',
+                    'text-sm md:text-base lg:text-lg',
+                  )}
                 >
                   {hero.title}
                 </h1>
@@ -75,7 +84,10 @@ export function Hero({ hero, className }: HeroProps) {
 
               {hero.tagline ? (
                 <FieldRow label={hero.labelTagline}>
-                  <p className="text-foreground text-sm font-medium md:text-base lg:text-lg">
+                  <p className={cn(
+                      'text-foreground font-medium',
+                      'text-sm md:text-base lg:text-lg',
+                    )}>
                     {hero.tagline}
                   </p>
                 </FieldRow>
@@ -87,7 +99,10 @@ export function Hero({ hero, className }: HeroProps) {
                 <FieldRow label={hero.labelBio} className="col-span-2">
                   <CmsRichText
                     data={hero.bio}
-                    className="text-foreground mb-3 text-sm font-medium md:text-base lg:text-lg"
+                    className={cn(
+                      'text-foreground mb-3 font-medium',
+                      'text-sm md:text-base lg:text-lg',
+                    )}
                   />
                 </FieldRow>
               ) : null}

@@ -23,7 +23,8 @@ export function SiteHeader({ siteName, locale, navigation, className }: SiteHead
     >
       <div
         className={cn(
-          'bg-background relative flex h-(--header-height) min-h-(--header-height) items-center justify-between',
+          'bg-background',
+          'relative flex h-(--header-height) min-h-(--header-height) items-center justify-between',
           'px-2 md:px-3 lg:px-4',
           'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
         )}

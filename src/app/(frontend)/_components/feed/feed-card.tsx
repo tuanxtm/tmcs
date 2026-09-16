@@ -80,7 +80,10 @@ export function FeedCard({
         />
       ) : (
         <div
-          className="flex aspect-square w-full items-center justify-center bg-white/80"
+          className={cn(
+            'flex aspect-square w-full items-center justify-center',
+            'bg-white/80',
+          )}
           aria-hidden="true"
         />
       )}
@@ -112,7 +115,7 @@ export function FeedCard({
 
   const body = (
     <div className="flex flex-col">
-      <div className="flex h-full flex-col gap-1 md:gap-1.5 lg:gap-2">
+      <div className={cn('flex h-full flex-col', 'gap-1 md:gap-1.5 lg:gap-2')}>
         <div className="h-full w-full object-cover">{imageWrapper}</div>
         <h3
           className={cn(

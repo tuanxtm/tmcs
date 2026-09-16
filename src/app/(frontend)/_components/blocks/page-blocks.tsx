@@ -54,7 +54,10 @@ function DeferredBlockPlaceholder({
     <aside
       id={`block-${blockId}`}
       aria-label={`${blockType} (placeholder)`}
-      className="border-border bg-foreground/5 text-muted-foreground mx-auto my-8 max-w-3xl rounded border border-dashed px-4 py-6 text-center text-xs tracking-wide uppercase"
+      className={cn(
+        'border-border bg-foreground/5 text-muted-foreground mx-auto my-8 max-w-3xl rounded border border-dashed',
+        'px-4 py-6 text-center text-xs tracking-wide uppercase',
+      )}
     >
       <span className="font-mono">{blockType}</span>
       <span className="text-foreground/60 ml-2">- coming soon</span>

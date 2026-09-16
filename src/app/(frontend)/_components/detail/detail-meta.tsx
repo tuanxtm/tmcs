@@ -72,7 +72,10 @@ export function DetailMeta({ view, locale, siteName, navigation }: DetailMetaPro
             {view.content ? (
               <CmsRichText
                 data={view.content}
-                className="text-foreground text-sm leading-relaxed md:text-base"
+                className={cn(
+              'text-foreground leading-relaxed',
+              'text-sm md:text-base',
+            )}
               />
             ) : null}
             {view.blocks.length > 0 ? (
@@ -112,7 +115,10 @@ function AuthorFieldRow({
         <span className="flex flex-col leading-tight">
           <span>{author.name}</span>
           {author.jobTitle ? (
-            <span className="text-muted-foreground/70 text-[0.75rem] tracking-tight">
+            <span className={cn(
+              'text-muted-foreground/70 tracking-tight',
+              'text-[0.75rem]',
+            )}>
               {author.jobTitle}
             </span>
           ) : null}

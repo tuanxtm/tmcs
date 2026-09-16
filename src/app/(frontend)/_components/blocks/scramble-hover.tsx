@@ -2,6 +2,7 @@
 
 import ScrambleHover from '@/components/ui/scramble-hover'
 import type { LayoutScrambleHoverBlockView } from '@/app/(frontend)/_lib/types'
+import { cn } from '@/lib/utils'
 
 type ScrambleHoverBlockProps = {
   block: LayoutScrambleHoverBlockView
@@ -25,7 +26,10 @@ export function ScrambleHoverBlock({ block }: ScrambleHoverBlockProps) {
         <ScrambleHover
           key={`${block.id}-${index}`}
           text={text}
-          className="text-xl lowercase tracking-tight leading-none font-medium max-w-4xl text-center text-foreground/50"
+          className={cn(
+          'text-xl lowercase tracking-tight leading-none font-medium max-w-4xl text-center',
+          'text-foreground/50',
+        )}
         />
       ))}
     </section>

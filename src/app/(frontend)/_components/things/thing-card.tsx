@@ -58,7 +58,10 @@ export function ThingCard({
           <Link
             href={thing.primaryUrl ?? '#'}
             aria-label={thing.name}
-            className="focus-visible:outline-ring absolute inset-0 z-10 block focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
+            className={cn(
+              'focus-visible:outline-ring absolute inset-0 z-10 block',
+              'focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2',
+            )}
           >
             <CmsImage
               media={image}
@@ -89,12 +92,18 @@ export function ThingCard({
         data-cursor-popup={undefined}
       >
         {/* Top-left: THING + #ID */}
-        <p className="text-primary/80 self-start font-mono text-xs leading-none tracking-tight uppercase md:text-sm">
+        <p className={cn(
+                'text-primary/80 self-start font-mono leading-none tracking-tight uppercase',
+                'text-xs md:text-sm',
+              )}>
           ID #{thing.id}
         </p>
 
         {/* Bottom-left: thing name */}
-        <h4 className="text-foreground col-start-1 row-start-2 inline-flex items-baseline self-end text-xs leading-none font-medium tracking-tight lowercase md:text-sm">
+        <h4 className={cn(
+                'text-foreground col-start-1 row-start-2 inline-flex items-baseline self-end leading-none font-medium tracking-tight lowercase',
+                'text-sm md:text-base',
+              )}>
           {thing.name}
         </h4>
 
@@ -103,7 +112,13 @@ export function ThingCard({
           type="button"
           onClick={openDialog}
           aria-label={DETAIL_LABEL[locale]}
-          className="text-primary/80 col-start-2 row-start-1 inline-flex cursor-pointer items-baseline self-end justify-self-end rounded-none border-0 bg-transparent p-0 text-right font-mono text-xs leading-none tracking-tight uppercase underline-offset-4 hover:underline md:text-sm"
+          className={cn(
+            'text-primary/80 col-start-2 row-start-1 inline-flex cursor-pointer items-baseline self-end justify-self-end',
+            'rounded-none border-0 bg-transparent p-0 text-right',
+            'font-mono leading-none tracking-tight uppercase underline-offset-4',
+            'hover:underline',
+            'text-xs md:text-sm',
+          )}
         >
           {DETAIL_LABEL[locale]}
         </button>
@@ -112,7 +127,13 @@ export function ThingCard({
         <Link
           href={thing.primaryUrl ?? '#'}
           aria-label={BUY_LABEL[locale]}
-          className="text-primary/80 col-start-2 row-start-2 inline-flex cursor-pointer items-baseline self-end justify-self-end rounded-none border-0 bg-transparent p-0 text-right font-mono text-xs leading-none tracking-tight uppercase underline-offset-4 hover:underline md:text-sm"
+          className={cn(
+            'text-primary/80 col-start-2 row-start-2 inline-flex cursor-pointer items-baseline self-end justify-self-end',
+            'rounded-none border-0 bg-transparent p-0 text-right',
+            'font-mono leading-none tracking-tight uppercase underline-offset-4',
+            'hover:underline',
+            'text-xs md:text-sm',
+          )}
         >
           {BUY_LABEL[locale]}
         </Link>

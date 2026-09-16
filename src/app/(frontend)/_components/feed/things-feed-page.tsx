@@ -8,7 +8,12 @@ import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import { CACHE_TAGS } from '@/lib/cache-tags'
 import type { LocaleCode } from '@/lib/locales'
 
-const THINGS_FEED_CLASSNAME = 'pl-2 md:pl-3 lg:pl-4 pt-2 md:pt-3 lg:pt-4'
+import { cn } from '@/lib/utils'
+
+const THINGS_FEED_CLASSNAME = cn(
+  'pl-2 md:pl-3 lg:pl-4',
+  'pt-2 md:pt-3 lg:pt-4',
+)
 
 const THINGS_FEED_LIMIT = 48
 

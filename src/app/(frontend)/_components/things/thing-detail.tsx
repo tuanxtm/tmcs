@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/drawer'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
+import { cn } from '@/lib/utils'
 
 const COPY = {
   en: { close: 'Close', thing: 'Thing detail' },
@@ -98,7 +99,11 @@ export function ThingDetail({
 
   return (
     <Drawer swipeDirection="down" open={open} onOpenChange={onOpenChangeAction}>
-      <DrawerContent className="bg-background text-foreground mx-auto flex w-full flex-col overflow-hidden rounded-none border-none p-0 [--drawer-height:80dvh] md:[--drawer-height:60dvh]">
+      <DrawerContent className={cn(
+        'bg-background text-foreground mx-auto flex w-full flex-col overflow-hidden',
+        'rounded-none border-none p-0',
+        '[--drawer-height:80dvh] md:[--drawer-height:60dvh]',
+      )}>
         <DrawerTitle className="sr-only">{copy.thing}</DrawerTitle>
         <DrawerDescription className="sr-only">{thing.name}</DrawerDescription>
 
@@ -111,7 +116,11 @@ export function ThingDetail({
               {...closeProps}
               type="button"
               aria-label={copy.close}
-              className="text-primary hover:text-primary/80 absolute top-3 right-3 z-10 cursor-pointer rounded-none border-0 bg-transparent p-0 hover:bg-transparent"
+              className={cn(
+                'text-primary hover:text-primary/80 absolute top-3 right-3 z-10',
+                'cursor-pointer rounded-none border-0 bg-transparent p-0',
+                'hover:bg-transparent',
+              )}
             >
               <IconX aria-hidden="true" className="size-5" />
             </button>
@@ -158,7 +167,19 @@ export function ThingDetail({
                       href={link.url}
                       target="_blank"
                       rel="sponsored noopener noreferrer"
-                      className="focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 border-border bg-background text-foreground hover:bg-muted inline-flex w-full shrink-0 touch-manipulation items-center justify-center rounded-none border bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-2 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:ring-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+                      className={cn(
+                        'focus-visible:border-ring focus-visible:ring-ring/30',
+                        'aria-invalid:border-destructive aria-invalid:ring-destructive/20',
+                        'dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40',
+                        'border-border bg-background text-foreground hover:bg-muted',
+                        'inline-flex w-full shrink-0 touch-manipulation items-center justify-center rounded-none border bg-clip-padding',
+                        'text-xs/relaxed font-medium whitespace-nowrap',
+                        'transition-all outline-none select-none',
+                        'focus-visible:ring-2 active:translate-y-px',
+                        'disabled:pointer-events-none disabled:opacity-50',
+                        'aria-invalid:ring-2',
+                        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+                      )}
                     >
                       <PlatformIcon aria-hidden="true" className="size-4" />
                       {link.label}

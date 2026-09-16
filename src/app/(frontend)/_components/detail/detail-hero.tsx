@@ -51,7 +51,10 @@ export function DetailHero({ title, image, priority = true }: DetailHeroProps) {
             <div className={cn('relative z-10 h-full overflow-y-auto', 'px-2 py-4 md:p-3 lg:p-4')}>
               <div className="grid grid-cols-2 gap-x-16 gap-y-4 md:gap-y-8 lg:gap-x-8 lg:gap-y-16">
                 <FieldRow label="title">
-                  <h1 className="text-foreground text-sm font-medium md:text-base lg:text-lg">
+                  <h1 className={cn(
+                      'text-foreground font-medium',
+                      'text-sm md:text-base lg:text-lg',
+                    )}>
                     {title}
                   </h1>
                 </FieldRow>
@@ -88,7 +91,10 @@ export function DetailHero({ title, image, priority = true }: DetailHeroProps) {
             <div className="relative h-full w-full">
               <FieldRow label={'PROJECT'} className="absolute bottom-0 left-0">
                 <h1
-                  className={cn('text-foreground text-sm font-medium md:text-base lg:text-3xl')}
+                  className={cn(
+                    'text-foreground font-medium',
+                    'text-sm md:text-base lg:text-3xl',
+                  )}
                 >
                   {title}
                 </h1>

@@ -29,7 +29,10 @@ function FooterLinkList({ label, links, variant }: FooterLinkListProps) {
   return (
     <div className="flex flex-col gap-1">
       {label ? (
-        <p className="text-muted-foreground/80 font-mono text-[0.625rem] tracking-tight uppercase md:text-xs">
+        <p className={cn(
+            'text-muted-foreground/80 font-mono tracking-tight uppercase',
+            'text-[0.625rem] md:text-xs',
+          )}>
           {label}
         </p>
       ) : null}
@@ -39,7 +42,10 @@ function FooterLinkList({ label, links, variant }: FooterLinkListProps) {
           return (
             <li key={link.id}>
               <div className="flex items-center gap-x-1">
-                <span className="text-primary hover:text-foreground font-mono text-xs md:text-base">
+                <span className={cn(
+                  'text-primary hover:text-foreground font-mono',
+                  'text-xs md:text-base',
+                )}>
                   &gt;
                 </span>
                 <Link
@@ -159,7 +165,10 @@ export async function FooterBlock({ block, siteName, locale }: FooterBlockProps)
             'dash-line-t',
           )}
         >
-          <p className="text-foreground pt-0.5 text-xs leading-none font-medium md:text-sm">
+          <p className={cn(
+              'text-foreground leading-none font-medium pt-0.5',
+              'text-xs md:text-sm',
+            )}>
             {copyright}
           </p>
           <Link href={homeHref(locale)}>
