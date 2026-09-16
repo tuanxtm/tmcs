@@ -5,7 +5,9 @@ alwaysApply: true
 
 # Codegraph (local CLI only)
 
-Use the local `codegraph` CLI (v1.6.0, on fnm PATH) as the **only** code-intelligence source in this project. The managed `user-codegraph` MCP endpoint is disabled (`~/.cursor/mcp.json` has an empty `mcpServers`) and has been returning `permission_denied 403`.
+Use the local `codegraph` CLI (v1.6.0, on fnm PATH) as the **only** code-intelligence source in this project.
+
+The managed `user-codegraph` MCP endpoint is unreachable (returns `permission_denied 403` from the China proxy on the managed remote URL). It is not configured here - both `~/.cursor/mcp.json` and `./.cursor/mcp.json` have an empty `mcpServers: {}`. Do **not** add it back, and do **not** try `codegraph install --target cursor` again - it spawns a redundant managed entry that 403s.
 
 ## Primary command
 
