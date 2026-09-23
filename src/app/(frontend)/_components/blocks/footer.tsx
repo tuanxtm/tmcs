@@ -111,8 +111,6 @@ export async function FooterBlock({ block, siteName, locale }: FooterBlockProps)
         className={cn(
           'relative flex flex-col justify-between',
           'h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
-          'bg-background',
-          'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
         )}
       >
         <div
@@ -159,10 +157,9 @@ export async function FooterBlock({ block, siteName, locale }: FooterBlockProps)
 
         <div
           className={cn(
-            'bg-background flex items-center justify-between',
+            'flex items-center justify-between',
             'h-(--header-height) min-h-(--header-height)',
             'px-2 md:px-3 lg:px-4',
-            'dash-line-t',
           )}
         >
           <p className={cn(

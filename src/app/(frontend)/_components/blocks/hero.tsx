@@ -59,8 +59,6 @@ export function Hero({ hero, className }: HeroProps) {
       id="hero"
       className={cn(
         'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
-        'bg-background',
-        'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
         className,
       )}
       aria-labelledby="hero-heading"

@@ -18,7 +18,7 @@ type DetailHeroProps = {
  * `src/app/(frontend)/_components/blocks/hero.tsx` so the section above the
  * fold reads as a continuation of the home page:
  *  - `min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]`
- *  - `pt-2 md:pt-1 md:pb-1.5`, `border-l-primary border-l-3 md:border-l-4 lg:border-l-5`
+ *  - `pt-2 md:pt-1 md:pb-1.5`
  *
  * Layout:
  *  - Left column wraps the title in the same `FieldRow` chrome (label +
@@ -43,7 +43,6 @@ export function DetailHero({ title, image, priority = true }: DetailHeroProps) {
           'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
           'bg-background',
           'pt-2 md:pt-1 md:pb-1.5',
-          'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
         )}
       >
         <div className="flex h-full w-full flex-col-reverse items-stretch justify-between md:flex-row">
@@ -79,11 +78,10 @@ export function DetailHero({ title, image, priority = true }: DetailHeroProps) {
     <section
       id="detail-hero"
       className={cn(
-        'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
-        'bg-background',
-        'pt-2 md:pt-1 md:pb-1.5',
-        'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
-      )}
+          'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
+          'bg-background',
+          'pt-2 md:pt-1 md:pb-1.5',
+        )}
     >
       <div className="flex h-full w-full flex-col-reverse items-stretch justify-between md:flex-row">
         <div className="relative isolate min-h-0 flex-1 overflow-hidden">

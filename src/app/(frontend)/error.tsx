@@ -34,7 +34,6 @@ export default function Error({
       className={cn(
         'relative flex min-h-0 flex-auto',
         'bg-background',
-        'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
       )}
       aria-labelledby="error-heading"
       data-cursor-popup={'error'}

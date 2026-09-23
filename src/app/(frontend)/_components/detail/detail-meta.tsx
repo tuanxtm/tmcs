@@ -21,10 +21,7 @@ export function DetailMeta({ view, locale, siteName, navigation }: DetailMetaPro
 
   return (
     <section
-      className={cn(
-        'bg-background',
-        'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
-      )}
+      className={cn('bg-background')}
     >
       <div className="pt-2 md:pt-1 md:pb-1.5">
         <div
