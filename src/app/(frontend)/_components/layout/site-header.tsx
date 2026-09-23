@@ -20,9 +20,9 @@ export function SiteHeader({ siteName, locale, navigation, className }: SiteHead
     <header className={className} style={{ viewTransitionName: 'site-header' }}>
       <div
         className={cn(
-          'relative flex h-(--header-height) min-h-(--header-height) items-center justify-between',
-          'px-2 md:px-3 lg:px-4',
-          'mt-2 md:mt-3 lg:mt-4',
+          'relative flex h-fit items-center justify-between',
+          'px-2 md:px-4 lg:px-5',
+          'mt-2 md:mt-4 lg:mt-5',
         )}
       >
         <div>
