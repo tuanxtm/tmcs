@@ -1,5 +1,4 @@
-import { Fanwood_Text, Inter } from 'next/font/google'
-import localFont from 'next/font/local'
+import { Bitter, Geist, IBM_Plex_Mono } from 'next/font/google'
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 
@@ -8,9 +7,7 @@ import { LocaleAwareShell } from '@/app/(frontend)/_components/layout/locale-awa
 import { LocaleMeta } from '@/app/(frontend)/_components/layout/locale-meta'
 import { LenisProvider } from '@/app/(frontend)/_components/providers/lenis-provider'
 import { MotionProvider } from '@/app/(frontend)/_components/providers/motion-provider'
-import {
-  BootRevealProvider,
-} from '@/app/(frontend)/_components/providers/boot-reveal'
+import { BootRevealProvider } from '@/app/(frontend)/_components/providers/boot-reveal'
 
 import './styles.css'
 
@@ -24,22 +21,22 @@ import './styles.css'
 // `generateMetadata()` overrides these defaults with locale-aware OG/Twitter
 // metadata of its own.
 
-const inter = Inter({
+const geist = Geist({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-geist',
 })
 
-const fanwoodText = Fanwood_Text({
+const bitter = Bitter({
   subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
-  variable: '--font-fanwood',
+  variable: '--font-bitter',
 })
 
-const departureMono = localFont({
-  src: '../../assets/fonts/DepartureMono.woff2',
-  variable: '--font-departure-mono',
-  display: 'swap',
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-ibm-plex-mono',
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -74,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fanwoodText.variable} ${departureMono.variable}`}
+      className={`${geist.variable} ${bitter.variable} ${ibmPlexMono.variable}`}
     >
       <head>
         {/* Suspense fallback intentionally empty - if `headers()` blocks,
