@@ -131,8 +131,6 @@ export function VideoFeedCard({
       className={cn(
         'text-foreground text-xs leading-none font-medium tracking-tight md:text-sm lg:text-base',
         'lowercase',
-        'border-primary/50 border-l-2 md:border-l-3 lg:border-l-4',
-        'pl-0.75 md:pl-1 lg:pl-2',
       )}
     >
       {doc.title}
@@ -171,8 +169,6 @@ export function VideoFeedCard({
               className={cn(
                 'text-primary flex items-center gap-1 text-sm tracking-tight lowercase underline-offset-2 hover:underline',
                 'font-medium',
-                'border-primary/50 border-l-2 md:border-l-3 lg:border-l-4',
-                'pl-0.5 md:pl-1 lg:pl-2',
               )}
               data-cursor-popup={undefined}
             >

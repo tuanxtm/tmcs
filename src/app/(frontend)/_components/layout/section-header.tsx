@@ -11,8 +11,8 @@ export function SectionHeader({ id, heading, className }: SectionHeaderProps) {
     <div className={cn('bg-background', className)}>
       <div
         className={cn(
-          'realtive h-(--header-height) bg-transparent',
-          'ml-2 grid items-center md:ml-3 lg:ml-4',
+        'relative h-(--header-height) bg-transparent',
+        'grid items-center',
           'grid-cols-1',
           'gap-x-1 lg:gap-x-2',
         )}

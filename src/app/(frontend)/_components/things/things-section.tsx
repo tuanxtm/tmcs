@@ -74,10 +74,7 @@ export function ThingsSection({
       aria-labelledby={headingId}
       data-feed-type="things"
       data-cursor-popup={sectionCursor}
-      className={cn(
-        className,
-        'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
-      )}
+      className={className}
     >
       <SectionHeader id={headingId} heading={heading} />
 

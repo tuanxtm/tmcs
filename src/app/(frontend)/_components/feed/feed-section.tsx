@@ -163,10 +163,7 @@ export function FeedSection(props: FeedSectionProps) {
       aria-labelledby={headingId}
       data-feed-type={feedType}
       data-cursor-popup={sectionCursor}
-      className={cn(
-        'border-l-primary border-l-3 md:border-l-4 lg:border-l-5',
-        className,
-      )}
+      className={cn(className)}
     >
       <SectionHeader id={headingId} heading={heading} />
 

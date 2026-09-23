@@ -121,8 +121,6 @@ export function FeedCard({
           className={cn(
             'text-foreground text-xs leading-none font-medium tracking-tight md:text-sm lg:text-base',
             'lowercase',
-            'border-primary/50 border-l-2 md:border-l-3 lg:border-l-4',
-            'pl-0.75 md:pl-1 lg:pl-2',
           )}
         >
           {doc.title}
