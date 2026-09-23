@@ -12,7 +12,7 @@ import {
 
 /**
  * Site header logo rendered as 3 vertical bars that fill bottom-up
- * to spell a short letter rhythm.
+ * to spell the letters in a short rhythm.
  *
  * Each letter is described as a sequence of frames. A frame lists the
  * target fill level (0 = empty, 1 = half, 2 = full) for slots 0..2.
@@ -20,6 +20,9 @@ import {
  *   t -> 0:2
  *   u -> 0:1, 1:1, 2:2
  *   a -> 0:1, 1:2
+ *   n -> 0:2, 1:1
+ *   t -> 0:2
+ *   m -> 0:2, 1:2
  *
  * The level value is the slot's raw height in "bar units" (0, 1, or 2).
  * `scaleY = level / 2` maps that onto a 0..1 vertical scale anchored
@@ -28,11 +31,11 @@ import {
 type Level = 0 | 1 | 2
 type Frame = readonly [Level, Level, Level]
 
-const LETTERS = ['t', 'u', 'a'] as const
+const LETTERS = ['t1', 'u', 'a', 'n', 't2', 'm'] as const
 type Letter = (typeof LETTERS)[number]
 
 const SEQUENCES: Record<Letter, readonly Frame[]> = {
-  t: [
+  t1: [
     [0, 0, 0],
     [2, 0, 0],
   ],
@@ -46,6 +49,20 @@ const SEQUENCES: Record<Letter, readonly Frame[]> = {
     [0, 0, 0],
     [1, 0, 0],
     [1, 2, 0],
+  ],
+  n: [
+    [0, 0, 0],
+    [2, 0, 0],
+    [2, 1, 0],
+  ],
+  t2: [
+    [0, 0, 0],
+    [2, 0, 0],
+  ],
+  m: [
+    [0, 0, 0],
+    [2, 0, 0],
+    [2, 2, 0],
   ],
 }
 
