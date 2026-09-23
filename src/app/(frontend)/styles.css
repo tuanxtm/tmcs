@@ -4,37 +4,27 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --gradient-1: oklch(0.4989 0.1064 147.66);
-  --gradient-2: oklch(0.6788 0.1119 133.94);
-  --gradient-3: oklch(0.7508 0.1058 133.58);
-  --gradient-4: oklch(0.8671 0.0704 133.59);
   --background: oklch(0.9702 0 0);
   --secondary-background: oklch(0.9249 0 0);
   --inverted-background: oklch(0.3867 0 0);
-  --foreground: oklch(0.227 0.012 270.84);
+  --foreground: oklch(0.471 0.1753 268.84);
   --card: oklch(0.995 0.001 95);
   --card-foreground: oklch(0.1668 0.0084 296.92);
   --popover: oklch(0.995 0.001 95);
   --popover-foreground: oklch(0.1668 0.0084 296.92);
-  --primary: oklch(0.4567 0 0);
-  --primary-foreground: oklch(0.1668 0.0084 296.92);
-  --secondary: oklch(0.95 0.004 95);
-  --secondary-foreground: oklch(0.5007 0.0047 286.23);
-  --hover-background: oklch(0.7508 0.1058 133.58 / 0.5);
-  --hover-foreground: oklch(0.2273 0.0038 286.09);
+  --primary: oklch(0.9702 0 0);
+  --primary-foreground: oklch(0.471 0.1753 268.84);
+  --secondary: oklch(0.4567 0 0);
+  --secondary-foreground: oklch(0.9702 0 0);
+  --hover-background: oklch(0.471 0.1753 268.84 / 0.5);
+  --hover-foreground: oklch(0.9702 0 0);
   --muted: oklch(0.945 0.004 95);
   --muted-foreground: oklch(0.48 0.01 95);
-  --accent: oklch(0.94 0.006 95);
-  --accent-foreground: oklch(0.22 0.01 95);
-  --destructive: oklch(0.55 0.2 25);
+  --accent: oklch(0.471 0.1753 268.84);
+  --accent-33: oklch(0.471 0.1753 268.84 / 0.33);
+  --accent-foreground: oklch(0.9702 0 0);
+  --destructive: oklch(0.7873 0.1603 64.69);
   --border: oklch(0.82 0.01 95);
-  --border-dashed: color-mix(in oklch, var(--primary) 50%, transparent);
-  --border-dotted: color-mix(in oklch, var(--primary) 50%, transparent);
-  --dash-width: 2px;
-  --dash-length: 8px;
-  --dash-gap: 4px;
-  --dot-size: 0.65px; /* 0.5px */ /* (TODO): Decide later on this one*/
-  --dot-gap: 3px; /* 2px */ /* (TODO): Decide later on this one*/
   --input: oklch(0.82 0.01 95);
   --ring: oklch(0.35 0.02 95);
   --radius: 0.25rem;
@@ -45,15 +35,11 @@
   --page-gutter: var(--scrollbar-size);
   --fold-height: 100lvh;
   --hero-fold-height: calc(var(--fold-height) - (2 * var(--header-height)));
-  --font-serif: var(--font-fanwood), ui-serif, Georgia, serif;
-  --font-mono: var(--font-departure-mono), ui-monospace, monospace;
+  --font-serif: var(--font-bitter), ui-serif, Georgia, serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
 }
 
 @theme inline {
-  --color-gradient-1: var(--gradient-1);
-  --color-gradient-2: var(--gradient-2);
-  --color-gradient-3: var(--gradient-3);
-  --color-gradient-4: var(--gradient-4);
   --color-background: var(--background);
   --color-secondary-background: var(--secondary-background);
   --color-inverted-background: var(--inverted-background);
@@ -71,6 +57,7 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
+  --color-accent-33: var(--accent-33);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
@@ -80,9 +67,9 @@
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
   --radius-xl: calc(var(--radius) + 6px);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-departure-mono), ui-monospace, monospace;
-  --font-serif: var(--font-fanwood), ui-serif, Georgia, serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  --font-serif: var(--font-bitter), ui-serif, Georgia, serif;
 }
 
 @layer base {
@@ -169,515 +156,179 @@ body::-webkit-scrollbar-corner {
 }
 
 @layer utilities {
-  .page-frame {
-    @apply relative mx-auto w-full;
-    max-width: 93%;
-    container-type: inline-size;
+  a,
+  button,
+  [role='button'] {
+    touch-action: manipulation;
   }
 
-  @media (min-width: 768px) {
-    .page-frame {
-      max-width: 90vw;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .page-frame {
-      max-width: 87vw;
-    }
-  }
-
-  @media (max-width: 1023px) {
-    .page-frame {
-      --bento-cols: 2;
-    }
-  }
-
-  @media (max-width: 639px) {
-    .page-frame {
-      --bento-cols: 1;
-    }
-  }
-
-  /* Reusable dashed borders. Real 1px CSS dashed border using --border-dashed
-     (which points at --foreground), so they match the rest of the chrome. */
-  .dash,
-  .dash-t,
-  .dash-b,
-  .dash-l,
-  .dash-r,
-  .dash-x,
-  .dash-y {
-    border-style: dashed;
-    border-width: 0;
-    border-color: var(--border-dashed);
-  }
-
-  .dash {
-    border-width: var(--dash-width);
-  }
-
-  .dash-t {
-    border-top-width: var(--dash-width);
-  }
-
-  .dash-b {
-    border-bottom-width: var(--dash-width);
-  }
-
-  .dash-l {
-    border-left-width: var(--dash-width);
-  }
-
-  .dash-r {
-    border-right-width: var(--dash-width);
-  }
-
-  .dash-x {
-    border-left-width: var(--dash-width);
-    border-right-width: var(--dash-width);
-  }
-
-  .dash-y {
-    border-top-width: var(--dash-width);
-    border-bottom-width: var(--dash-width);
-  }
-
-  /* Reusable dotted borders. Native 1px CSS dotted border using --border-dotted
-     so they match the rest of the chrome. Dots inherit --dot-size for spacing. */
-  .dot,
-  .dot-t,
-  .dot-b,
-  .dot-l,
-  .dot-r,
-  .dot-x,
-  .dot-y {
-    border-style: dotted;
-    border-width: 0;
-    border-color: var(--border-dotted);
-  }
-
-  .dot {
-    border-width: calc(var(--dot-size) * 2);
-  }
-
-  .dot-t {
-    border-top-width: calc(var(--dot-size) * 2);
-  }
-
-  .dot-b {
-    border-bottom-width: calc(var(--dot-size) * 2);
-  }
-
-  .dot-l {
-    border-left-width: calc(var(--dot-size) * 2);
-  }
-
-  .dot-r {
-    border-right-width: calc(var(--dot-size) * 2);
-  }
-
-  .dot-x {
-    border-left-width: calc(var(--dot-size) * 2);
-    border-right-width: calc(var(--dot-size) * 2);
-  }
-
-  .dot-y {
-    border-top-width: calc(var(--dot-size) * 2);
-    border-bottom-width: calc(var(--dot-size) * 2);
-  }
-
-  /* Tunable dashed borders. Uses background-image gradients so segment
-     length and gap are controllable via --dash-length / --dash-gap.
-     Render an inline gradient line that sits exactly on each edge. */
-  .dash-line,
-  .dash-line-t,
-  .dash-line-b,
-  .dash-line-l,
-  .dash-line-r,
-  .dash-line-x,
-  .dash-line-y {
-    position: relative;
-  }
-
-  .dash-line::before,
-  .dash-line-t::before,
-  .dash-line-b::after,
-  .dash-line-l::before,
-  .dash-line-r::after,
-  .dash-line-x::before,
-  .dash-line-x::after,
-  .dash-line-y::before,
-  .dash-line-y::after {
-    content: '';
-    position: absolute;
-    pointer-events: none;
-    background-image: linear-gradient(
-      to right,
-      var(--border-dashed) 0 var(--dash-length),
-      transparent var(--dash-length) calc(var(--dash-length) + var(--dash-gap))
-    );
-    background-size: calc(var(--dash-length) + var(--dash-gap)) 100%;
-    background-repeat: repeat-x;
-  }
-
-  .dash-line-l::before,
-  .dash-line-r::after,
-  .dash-line-x::before,
-  .dash-line-x::after {
-    background-image: linear-gradient(
-      to bottom,
-      var(--border-dashed) 0 var(--dash-length),
-      transparent var(--dash-length) calc(var(--dash-length) + var(--dash-gap))
-    );
-    background-size: 100% calc(var(--dash-length) + var(--dash-gap));
-    background-repeat: repeat-y;
-  }
-
-  .dash-line::before,
-  .dash-line-t::before,
-  .dash-line-b::after,
-  .dash-line-y::before,
-  .dash-line-y::after {
-    left: 0;
-    right: 0;
-    height: var(--dash-width);
-  }
-
-  .dash-line::before,
-  .dash-line-t::before,
-  .dash-line-y::before {
-    top: 0;
-  }
-
-  .dash-line-b::after,
-  .dash-line-y::after {
-    bottom: 0;
-  }
-
-  .dash-line-l::before,
-  .dash-line-r::after,
-  .dash-line-x::before,
-  .dash-line-x::after {
-    top: 0;
-    bottom: 0;
-    width: var(--dash-width);
-  }
-
-  .dash-line-l::before,
-  .dash-line-x::before {
-    left: 0;
-  }
-
-  .dash-line-r::after,
-  .dash-line-x::after {
-    right: 0;
-  }
-
-  /* Tunable dotted borders. Renders round dots via radial-gradient so
-     dot diameter and spacing are controllable via --dot-size / --dot-gap.
-     Unlike the native .dot utility (which browser-spaces itself), this
-     variant produces evenly-spaced circles that align to the edge. */
-  .dot-line,
-  .dot-line-t,
-  .dot-line-b,
-  .dot-line-l,
-  .dot-line-r,
-  .dot-line-x,
-  .dot-line-y {
-    position: relative;
-  }
-
-  .dot-line::before,
-  .dot-line-t::before,
-  .dot-line-b::after,
-  .dot-line-l::before,
-  .dot-line-r::after,
-  .dot-line-x::before,
-  .dot-line-x::after,
-  .dot-line-y::before,
-  .dot-line-y::after {
-    content: '';
-    position: absolute;
-    pointer-events: none;
-    background-image: radial-gradient(
-      circle,
-      var(--border-dotted) var(--dot-size),
-      transparent calc(var(--dot-size) + 0.5px)
-    );
-    background-size: calc(var(--dot-size) + var(--dot-gap)) 100%;
-    background-repeat: repeat-x;
-  }
-
-  .dot-line-l::before,
-  .dot-line-r::after,
-  .dot-line-x::before,
-  .dot-line-x::after {
-    background-image: radial-gradient(
-      circle,
-      var(--border-dotted) var(--dot-size),
-      transparent calc(var(--dot-size) + 0.5px)
-    );
-    background-size: 100% calc(var(--dot-size) + var(--dot-gap));
-    background-repeat: repeat-y;
-  }
-
-  .dot-line::before,
-  .dot-line-t::before,
-  .dot-line-b::after,
-  .dot-line-y::before,
-  .dot-line-y::after {
-    left: 0;
-    right: 0;
-    height: calc(var(--dot-size) * 2);
-  }
-
-  .dot-line::before,
-  .dot-line-t::before,
-  .dot-line-y::before {
-    top: 0;
-  }
-
-  .dot-line-b::after,
-  .dot-line-y::after {
-    bottom: 0;
-  }
-
-  .dot-line-l::before,
-  .dot-line-r::after,
-  .dot-line-x::before,
-  .dot-line-x::after {
-    top: 0;
-    bottom: 0;
-    width: calc(var(--dot-size) * 2);
-  }
-
-  .dot-line-l::before,
-  .dot-line-x::before {
-    left: 0;
-  }
-
-  .dot-line-r::after,
-  .dot-line-x::after {
-    right: 0;
-  }
-
-  /* Procedural noise overlay. Drop `.noise` onto any container to layer a
-     tiled grain on top of its background. Direct children paint above the
-     noise because the overlay sits at z-index: -1 inside a new stacking
-     context (isolation: isolate). Tunable per-element via:
-       --noise-opacity (0-1, default 0.5)
-       --noise-size    (tile size, default 200px)
-       --noise-blend   (mix-blend-mode, default overlay) */
-  .noise {
-    --noise-opacity: 0.5;
-    --noise-size: 200px;
-    --noise-blend: overlay;
-    position: relative;
-    isolation: isolate;
-  }
-
-  .noise::before {
-    content: '';
-    position: absolute;
+  /* Boot splash - first visit / hard reload only (layout-mounted client overlay). */
+  .boot-splash {
+    position: fixed;
     inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-    background-size: var(--noise-size) var(--noise-size);
-    background-repeat: repeat;
-    opacity: var(--noise-opacity);
-    mix-blend-mode: var(--noise-blend);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background);
+    pointer-events: auto;
   }
-}
 
-a,
-button,
-[role='button'] {
-  touch-action: manipulation;
-}
+  /* Clip roll-up / intro to each text line’s box. */
+  .boot-splash-line {
+    overflow: hidden;
+  }
 
-/* Boot splash - first visit / hard reload only (layout-mounted client overlay). */
-.boot-splash {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--background);
-  pointer-events: auto;
-}
+  html.boot-splash-active {
+    overflow: hidden;
+  }
 
-/* Clip roll-up / intro to each text line’s box. */
-.boot-splash-line {
-  overflow: hidden;
-}
-
-html.boot-splash-active {
-  overflow: hidden;
-}
-
-/* Lenis uses overflow:clip when stopped, which can drop the gutter.
+  /* Lenis uses overflow:clip when stopped, which can drop the gutter.
    Match splash lock so scrollbar-gutter: stable keeps width stable. */
-html.lenis:not(.lenis-autoToggle).lenis-stopped {
-  overflow: hidden;
-}
+  html.lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: hidden;
+  }
 
-/* JS-driven intro is handled by Motion (initial/animate on the line elements)
+  /* JS-driven intro is handled by Motion (initial/animate on the line elements)
    so the entry mirrors the exit: text rises up through the clip wrapper. */
 
-/* No-JS: scroll up to reveal the site without hydration. */
-@keyframes boot-splash-noscript-reveal {
-  0%,
-  70% {
-    transform: translateY(0);
-    visibility: visible;
-  }
-  100% {
-    transform: translateY(-100%);
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
-
-@media (scripting: none) {
-  .boot-splash {
-    animation: boot-splash-noscript-reveal 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-}
-
-/* Atmospheric background - fades + sharpens in once on mount. */
-@keyframes boot-bg-fade-in {
-  from {
-    opacity: 0;
-    filter: blur(40px);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-  }
-}
-
-.boot-bg-fade-in {
-  animation: boot-bg-fade-in 2s ease-out both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+  /* No-JS: scroll up to reveal the site without hydration. */
+  @keyframes boot-splash-noscript-reveal {
+    0%,
+    70% {
+      transform: translateY(0);
+      visibility: visible;
+    }
+    100% {
+      transform: translateY(-100%);
+      visibility: hidden;
+      pointer-events: none;
+    }
   }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  @media (scripting: none) {
+    .boot-splash {
+      animation: boot-splash-noscript-reveal 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
   }
-}
 
-/* View Transitions - recipes for <ViewTransition> classes used by the frontend.
+  /* Atmospheric background - fades + sharpens in once on mount. */
+  @keyframes boot-bg-fade-in {
+    from {
+      opacity: 0;
+      filter: blur(40px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  .boot-bg-fade-in {
+    animation: boot-bg-fade-in 2s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* View Transitions - recipes for <ViewTransition> classes used by the frontend.
    See .agents/skills/vercel-react-view-transitions/AGENTS.md for the source. */
-:root {
-  --vt-duration-exit: 150ms;
-  --vt-duration-enter: 210ms;
-  --vt-duration-move: 400ms;
-}
+  :root {
+    --vt-duration-exit: 150ms;
+    --vt-duration-enter: 210ms;
+    --vt-duration-move: 400ms;
+  }
 
-/* Directional navigation slides - used alongside addTransitionType on router
+  /* Directional navigation slides - used alongside addTransitionType on router
    pushes. 'nav-forward' = page coming in from the right (push). 'nav-back' =
    page coming in from the left (browser history push). */
-::view-transition-new(.slide-from-right) {
-  --slide-offset: 60px;
-  animation:
-    var(--vt-duration-enter) ease-out var(--vt-duration-exit) both fade,
-    var(--vt-duration-move) ease-in-out both slide;
-}
-
-::view-transition-old(.slide-to-left) {
-  --slide-offset: -60px;
-  animation:
-    var(--vt-duration-exit) ease-in both fade reverse,
-    var(--vt-duration-move) ease-in-out both slide reverse;
-}
-
-::view-transition-new(.slide-from-left) {
-  --slide-offset: -60px;
-  animation:
-    var(--vt-duration-enter) ease-out var(--vt-duration-exit) both fade,
-    var(--vt-duration-move) ease-in-out both slide;
-}
-
-::view-transition-old(.slide-to-right) {
-  --slide-offset: 60px;
-  animation:
-    var(--vt-duration-exit) ease-in both fade reverse,
-    var(--vt-duration-move) ease-in-out both slide reverse;
-}
-
-@keyframes slide {
-  from {
-    transform: translateX(var(--slide-offset));
+  ::view-transition-new(.slide-from-right) {
+    --slide-offset: 60px;
+    animation:
+      var(--vt-duration-enter) ease-out var(--vt-duration-exit) both fade,
+      var(--vt-duration-move) ease-in-out both slide;
   }
-  to {
-    transform: translateX(0);
-  }
-}
 
-@keyframes fade {
-  from {
-    opacity: 0;
+  ::view-transition-old(.slide-to-left) {
+    --slide-offset: -60px;
+    animation:
+      var(--vt-duration-exit) ease-in both fade reverse,
+      var(--vt-duration-move) ease-in-out both slide reverse;
   }
-  to {
-    opacity: 1;
-  }
-}
 
-/* Reduced motion - collapse every view transition to a snap. Users with
+  ::view-transition-new(.slide-from-left) {
+    --slide-offset: -60px;
+    animation:
+      var(--vt-duration-enter) ease-out var(--vt-duration-exit) both fade,
+      var(--vt-duration-move) ease-in-out both slide;
+  }
+
+  ::view-transition-old(.slide-to-right) {
+    --slide-offset: 60px;
+    animation:
+      var(--vt-duration-exit) ease-in both fade reverse,
+      var(--vt-duration-move) ease-in-out both slide reverse;
+  }
+
+  @keyframes slide {
+    from {
+      transform: translateX(var(--slide-offset));
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Reduced motion - collapse every view transition to a snap. Users with
    prefers-reduced-motion must still see the new page, just instantly. */
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(*),
-  ::view-transition-new(*),
-  ::view-transition-group(*) {
-    animation-duration: 0s !important;
-    animation-delay: 0s !important;
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(*),
+    ::view-transition-new(*),
+    ::view-transition-group(*) {
+      animation-duration: 0s !important;
+      animation-delay: 0s !important;
+    }
   }
-}
 
-/* Persistent chrome (site header) - pull it out of the page content's
+  /* Persistent chrome (site header) - pull it out of the page content's
    snapshot so it stays anchored while the content slides. */
-::view-transition-group(site-header) {
-  animation: none;
-  z-index: 100;
-}
+  ::view-transition-group(site-header) {
+    animation: none;
+    z-index: 100;
+  }
 
-::view-transition-old(site-header) {
-  display: none;
-}
+  ::view-transition-old(site-header) {
+    display: none;
+  }
 
-::view-transition-new(site-header) {
-  animation: none;
-}
+  ::view-transition-new(site-header) {
+    animation: none;
+  }
 
-/* Let clicks pass through the view-transition overlay to the live page
+  /* Let clicks pass through the view-transition overlay to the live page
    during the transition. Hit-testing still skips named participants. */
-::view-transition {
-  pointer-events: none;
-}
-
-/* Stretch the barcode SVG to fill its parent so it spans the
-   full width of the section header's grid cell at every breakpoint.
-   The SVG attribute is set in the component via the ref callback on
-   the wrapper, since preserveAspectRatio is not a CSS property.
-   Bar fill comes from --primary so the barcode follows the theme. */
-[data-barcode-stretch='true'] > svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-[data-barcode-stretch='true'] > svg g {
-  fill: var(--primary);
+  ::view-transition {
+    pointer-events: none;
+  }
 }
