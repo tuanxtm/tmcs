@@ -9,7 +9,7 @@ alwaysApply: true
 
 2. Next.js: ALWAYS read docs before coding. Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated - the docs are the source of truth.
 
-3. IMPORTANT: English ONLY!
+3. IMPORTANT: ENGLISH ONLY!
 
 ## Codegraph (local CLI only)
 
