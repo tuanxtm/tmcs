@@ -42,7 +42,7 @@ describe('validateHomePage', () => {
         data: {
           template: 'home',
           _status: 'published',
-          layout: [{ blockType: 'layoutFeedSection' }],
+          layout: [{ blockType: 'pageFeedSection' }],
         },
         originalDoc: null,
         operation: 'create',
@@ -61,7 +61,7 @@ describe('validateHomePage', () => {
         data: {
           template: 'home',
           _status: 'published',
-          layout: [{ blockType: 'layoutHero', title: 'Home' }],
+          layout: [{ blockType: 'pageHero', title: 'Home' }],
         },
         originalDoc: null,
         operation: 'create',
@@ -78,7 +78,7 @@ describe('validateHomePage', () => {
     const data = {
       template: 'home',
       _status: 'published',
-      layout: [{ blockType: 'layoutHero', title: 'Home' }],
+      layout: [{ blockType: 'pageHero', title: 'Home' }],
     }
 
     const result = await validateHomePage({
@@ -124,7 +124,7 @@ describe('home page Local API query', () => {
     if (result.docs[0]) {
       expect(result.docs[0].template).toBe('home')
       const layout = result.docs[0].layout || []
-      const heroes = layout.filter((block) => block.blockType === 'layoutHero')
+      const heroes = layout.filter((block) => block.blockType === 'pageHero')
       expect(heroes.length).toBe(1)
     }
   })

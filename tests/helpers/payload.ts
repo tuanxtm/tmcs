@@ -157,7 +157,7 @@ export async function ensureTemplatePages(
 ): Promise<{ postTemplatePageId: number; projectTemplatePageId: number }> {
   const upsertPage = async (
     slug: string,
-    layout: { id: string; blockType: 'detailPost' | 'detailProject' }[],
+    layout: { id: string; blockType: 'templatePost' | 'templateProject' }[],
   ): Promise<number> => {
     const existing = await payload.find({
       collection: 'pages',
@@ -202,10 +202,10 @@ export async function ensureTemplatePages(
   }
 
   const postTemplatePageId = await upsertPage('post-detail-default', [
-    { id: 'seed-post-template-detail', blockType: 'detailPost' },
+    { id: 'seed-post-template-detail', blockType: 'templatePost' },
   ])
   const projectTemplatePageId = await upsertPage('project-detail-default', [
-    { id: 'seed-project-template-detail', blockType: 'detailProject' },
+    { id: 'seed-project-template-detail', blockType: 'templateProject' },
   ])
 
   return { postTemplatePageId, projectTemplatePageId }

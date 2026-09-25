@@ -1889,8 +1889,8 @@ async function seed() {
   const authorIds = Object.values(authors).map((a) => a.id)
 
   // Pre-create the two template Pages used by `templatePage`. Posts pick the
-  // post template; Projects pick the project template. A single `detailPost`
-  // / `detailProject` block sits inside each layout; the resolver binds the
+  // post template; Projects pick the project template. A single `templatePost`
+  // / `templateProject` block sits inside each layout; the resolver binds the
   // currently routed Post / Project at render time.
   const postTemplatePage = await upsertBySlug(payload, 'pages', 'post-detail-default', {
     title: 'Post Detail',
@@ -1899,7 +1899,7 @@ async function seed() {
     layout: [
       {
         id: 'seed-post-template-detail',
-        blockType: 'detailPost',
+        blockType: 'templatePost',
       },
     ],
     _status: 'published',
@@ -1917,7 +1917,7 @@ async function seed() {
     layout: [
       {
         id: 'seed-project-template-detail',
-        blockType: 'detailProject',
+        blockType: 'templateProject',
       },
     ],
     _status: 'published',
@@ -1938,7 +1938,7 @@ async function seed() {
       layout: [
         {
           id: 'seed-post-template-detail',
-          blockType: 'detailPost',
+          blockType: 'templatePost',
         },
       ],
       seo: {
@@ -1959,7 +1959,7 @@ async function seed() {
       layout: [
         {
           id: 'seed-project-template-detail',
-          blockType: 'detailProject',
+          blockType: 'templateProject',
         },
       ],
       seo: {
@@ -2164,7 +2164,7 @@ async function seed() {
     template: 'about',
     layout: [
       {
-        blockType: 'layoutRichTextWithoutBlock',
+        blockType: 'pageRichText',
         content: richText(
           'This site documents DIY projects, desk setups, and electronics experiments from a small home workshop.',
         ),
@@ -2184,7 +2184,7 @@ async function seed() {
       summary: 'Maker đứng sau các ghi chú xưởng.',
       layout: [
         {
-          blockType: 'layoutRichTextWithoutBlock',
+          blockType: 'pageRichText',
           content: richText(
             'Trang này ghi lại dự án DIY, setup bàn làm việc và thử nghiệm điện tử từ một xưởng nhỏ tại nhà.',
           ),
@@ -2202,7 +2202,7 @@ async function seed() {
     layout: [
       {
         id: 'seed-projects-index',
-        blockType: 'layoutFeedSection',
+        blockType: 'pageFeedSection',
         heading: 'projects',
         description: 'All published builds from the workshop.',
         feedType: 'projects',
@@ -2231,7 +2231,7 @@ async function seed() {
     layout: [
       {
         id: 'seed-posts-index',
-        blockType: 'layoutFeedSection',
+        blockType: 'pageFeedSection',
         heading: 'posts',
         description: 'All published notes from the bench.',
         feedType: 'posts',
@@ -2260,7 +2260,7 @@ async function seed() {
     layout: [
       {
         id: 'seed-things-index',
-        blockType: 'layoutFeedSection',
+        blockType: 'pageFeedSection',
         heading: 'things',
         description: 'All published tools and gear from the workshop.',
         feedType: 'things',
@@ -2373,7 +2373,7 @@ async function seed() {
   // (videos has no archive page so showViewAll is false there).
   const blankSpace = (id: string) => ({
     id,
-    blockType: 'layoutBlankSpace' as const,
+    blockType: 'pageBlankSpace' as const,
     height: '30vh',
   })
 
@@ -2384,13 +2384,8 @@ async function seed() {
     layout: [
       {
         id: 'seed-home-hero',
-        blockType: 'layoutHero',
-        labelTitle: 'Passenger',
-        title: 'tuantm',
-        labelTagline: 'Route',
-        tagline: 'DIY builds, tech workspace, and maker notes',
-        labelBio: 'Notes',
-        bio: richText('Documenting builds, failures, and the tools that survive them.'),
+        blockType: 'pageHero',
+        paragraph: richText('Documenting builds, failures, and the tools that survive them.'),
         cursorPopup: 'scroll down',
         labelSocialLinks: 'Socials',
         socialLinks: [linkIds.en.about],
@@ -2399,7 +2394,7 @@ async function seed() {
       },
       {
         id: 'seed-home-projects',
-        blockType: 'layoutFeedSection',
+        blockType: 'pageFeedSection',
         heading: 'projects',
         description: 'Selected builds from the workshop.',
         feedType: 'projects',
@@ -2417,7 +2412,7 @@ async function seed() {
       blankSpace('seed-home-gap-1'),
       {
         id: 'seed-home-things',
-        blockType: 'layoutFeedSection',
+        blockType: 'pageFeedSection',
         heading: 'things',
         description: 'Tools and gear from the bench.',
         feedType: 'things',
@@ -2435,7 +2430,7 @@ async function seed() {
       blankSpace('seed-home-gap-2'),
       {
         id: 'seed-home-posts',
-        blockType: 'layoutFeedSection',
+        blockType: 'pageFeedSection',
         heading: 'posts',
         description: 'Notes, process logs, and maker write-ups.',
         feedType: 'posts',
@@ -2453,7 +2448,7 @@ async function seed() {
       blankSpace('seed-home-gap-3'),
       {
         id: 'seed-home-videos',
-        blockType: 'layoutFeedSection',
+        blockType: 'pageFeedSection',
         heading: 'videos',
         description: 'Short clips from the workshop.',
         feedType: 'videos',
@@ -2523,7 +2518,7 @@ async function seed() {
       layout: [
         {
           id: 'seed-projects-index',
-          blockType: 'layoutFeedSection',
+          blockType: 'pageFeedSection',
           heading: 'dự án',
           description: 'Tất cả bản build đã xuất bản từ xưởng.',
           feedType: 'projects',
@@ -2555,7 +2550,7 @@ async function seed() {
       layout: [
         {
           id: 'seed-posts-index',
-          blockType: 'layoutFeedSection',
+          blockType: 'pageFeedSection',
           heading: 'bài viết',
           description: 'Tất cả ghi chú đã xuất bản từ bàn thợ.',
           feedType: 'posts',
@@ -2587,7 +2582,7 @@ async function seed() {
       layout: [
         {
           id: 'seed-things-index',
-          blockType: 'layoutFeedSection',
+          blockType: 'pageFeedSection',
           heading: 'món đồ',
           description: 'Tất cả dụng cụ và đồ nghề đã xuất bản từ xưởng.',
           feedType: 'things',
@@ -2618,13 +2613,8 @@ async function seed() {
       layout: [
         {
           id: 'seed-home-hero',
-          blockType: 'layoutHero',
-          labelTitle: 'Hành khách',
-          title: 'tuantm',
-          labelTagline: 'Hành trình',
-          tagline: 'Dự án DIY, không gian tech và ghi chú maker',
-          labelBio: 'Ghi chú',
-          bio: richText('Ghi lại bản build, thất bại và dụng cụ còn sót lại.'),
+          blockType: 'pageHero',
+          paragraph: richText('Ghi lại bản build, thất bại và dụng cụ còn sót lại.'),
           cursorPopup: 'kéo xuống',
           labelSocialLinks: 'Mạng xã hội',
           socialLinks: [linkIds.vi.about],
@@ -2633,7 +2623,7 @@ async function seed() {
         },
         {
           id: 'seed-home-projects',
-          blockType: 'layoutFeedSection',
+          blockType: 'pageFeedSection',
           heading: 'dự án',
           description: 'Những bản build chọn lọc từ xưởng.',
           feedType: 'projects',
@@ -2651,7 +2641,7 @@ async function seed() {
         blankSpace('seed-home-gap-1'),
         {
           id: 'seed-home-things',
-          blockType: 'layoutFeedSection',
+          blockType: 'pageFeedSection',
           heading: 'món đồ',
           description: 'Dụng cụ và đồ nghề từ bàn thợ.',
           feedType: 'things',
@@ -2669,7 +2659,7 @@ async function seed() {
         blankSpace('seed-home-gap-2'),
         {
           id: 'seed-home-posts',
-          blockType: 'layoutFeedSection',
+          blockType: 'pageFeedSection',
           heading: 'bài viết',
           description: 'Ghi chú, nhật ký quy trình và bài viết maker.',
           feedType: 'posts',
@@ -2687,7 +2677,7 @@ async function seed() {
         blankSpace('seed-home-gap-3'),
         {
           id: 'seed-home-videos',
-          blockType: 'layoutFeedSection',
+          blockType: 'pageFeedSection',
           heading: 'video',
           description: 'Clip ngắn từ xưởng.',
           feedType: 'videos',
