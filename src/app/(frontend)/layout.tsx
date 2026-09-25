@@ -24,11 +24,12 @@ import './styles.css'
 const geist = Geist({
   subsets: ['latin'],
   variable: '--font-geist',
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
 })
 
 const bitter = Bitter({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700'],
   style: ['normal', 'italic'],
   variable: '--font-bitter',
 })
@@ -69,10 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   // this render tree. `<html lang>` defaults to `en`; the inline script in
   // `<LocaleMeta />` updates it to the request-time locale before paint.
   return (
-    <html
-      lang="en"
-      className={`${geist.variable} ${bitter.variable} ${ibmPlexMono.variable}`}
-    >
+    <html lang="en" className={`${geist.variable} ${bitter.variable} ${ibmPlexMono.variable}`}>
       <head>
         {/* Suspense fallback intentionally empty - if `headers()` blocks,
             the static shell still ships with the default lang and the script

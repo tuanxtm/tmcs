@@ -1,6 +1,6 @@
 'use client'
 
-import { ElementType, useEffect, useMemo, useState } from 'react'
+import { ElementType, useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { motion, Variants } from 'motion/react'
 
 import { cn } from '@/lib/utils'
@@ -82,6 +82,11 @@ interface TypewriterProps {
    * Optional class name for cursor styling
    */
   cursorClassName?: string
+
+  /**
+   * Callback when typing completes (no loop, single text)
+   */
+  onComplete?: () => void
 }
 
 const Typewriter = ({
@@ -109,14 +114,20 @@ const Typewriter = ({
       },
     },
   },
+  onComplete,
   ...props
 }: TypewriterProps & React.HTMLAttributes<HTMLElement>) => {
   const [displayText, setDisplayText] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
+  const [hasCompleted, setHasCompleted] = useState(false)
 
   const texts = useMemo(() => (Array.isArray(text) ? text : [text]), [text])
+
+  // Stable wrapper that always calls the latest `onComplete`. Excluded from
+  // the effect's dependency array on purpose - see rule 8.4.
+  const notifyComplete = useEffectEvent(() => onComplete?.())
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
@@ -148,6 +159,9 @@ const Typewriter = ({
           timeout = setTimeout(() => {
             setIsDeleting(true)
           }, waitTime)
+        } else if (!hasCompleted) {
+          setHasCompleted(true)
+          notifyComplete()
         }
       }
     }
@@ -171,6 +185,7 @@ const Typewriter = ({
     texts,
     currentTextIndex,
     loop,
+    hasCompleted,
   ])
 
   return (
