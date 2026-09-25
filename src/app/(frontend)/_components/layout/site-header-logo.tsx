@@ -66,8 +66,8 @@ const SEQUENCES: Record<Letter, readonly Frame[]> = {
   ],
 }
 
-const STEP_MS = 300
-const LETTER_BREATH_MS = 500
+const STEP_MS = 600
+const LETTER_BREATH_MS = 600
 
 const SLOT_WIDTH_PX = 5
 const UNIT_PX = 5
@@ -77,12 +77,12 @@ function Highlight({ level }: { level: MotionValue<number> }) {
   return (
     <span
       aria-hidden="true"
-      className="bg-accent/15 block origin-bottom rotate-30"
+      className="bg-accent/15 block origin-bottom rotate-30 rounded-[0.5px]"
       style={{ width: SLOT_WIDTH_PX, height: UNIT_PX * 3 }}
     >
       <motion.span
         aria-hidden="true"
-        className="bg-accent block h-full w-full origin-bottom"
+        className="bg-accent block h-full w-full origin-bottom rounded-[0.5px]"
         style={{ scaleY }}
       />
     </span>
@@ -154,12 +154,8 @@ export function SiteHeaderLogo({ siteName }: SiteHeaderLogoProps) {
   }, [reduceMotion, level0, level1, level2])
 
   return (
-    <div
-      role="img"
-      className="flex items-center justify-center"
-      aria-label={siteName}
-    >
-      <div className="relative flex items-end gap-0.5">
+    <div role="img" className="flex items-center justify-center" aria-label={siteName}>
+      <div className="relative flex items-center gap-0.75">
         <Highlight level={level0} />
         <Highlight level={level1} />
         <Highlight level={level2} />
