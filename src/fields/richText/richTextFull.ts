@@ -7,7 +7,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { pageBlocks } from '@/blocks'
-import { inlineBlocks } from '@/blocks/inline-blocks'
+import { inlineBlocks } from '@/blocks'
 
 /**
  * Lexical editor with row-level blocks via `BlocksFeature({ blocks: pageBlocks })`.

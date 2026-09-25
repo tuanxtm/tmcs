@@ -1,3 +1,1 @@
-import { InlineImageBlock } from './inline-image'
-
-export const inlineBlocks = [InlineImageBlock]
+export { InlineImageBlock } from './inline-image'

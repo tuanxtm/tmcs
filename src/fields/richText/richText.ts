@@ -7,8 +7,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { inlineBlocks } from '@/blocks/inline-blocks'
-
+import { inlineBlocks } from '@/blocks'
 import { textStateConfig } from '../textStateConfig'
 
 /**
