@@ -33,23 +33,23 @@ import type {
   CmsPageView,
   ContentMediaBlockView,
   DetailAuthorView,
-  DetailPostBlockView,
-  DetailProjectBlockView,
   FeedSectionBlockView,
   FeedType,
   HomePageView,
-  LayoutBlankSpaceBlockView,
-  LayoutFooterBlockView,
-  LayoutHeroBlockView,
-  LayoutRichTextWithoutBlockView,
-  LayoutScrambleHoverBlockView,
-  LayoutTypewriterBlockView,
   NavChildView,
+  PageBlankSpaceBlockView,
+  PageFooterBlockView,
+  PageHeroBlockView,
+  PageRichTextBlockView,
+  PageScrambleHoverBlockView,
+  PageTypewriterBlockView,
   PostCardView,
   PostDetailView,
   ProjectCardView,
   ProjectDetailView,
   ResolvedBlockView,
+  TemplatePostBlockView,
+  TemplateProjectBlockView,
   ThingCardView,
   ThingDetailView,
   VideoCardView,
@@ -65,12 +65,12 @@ const getPayloadClient = cache(async () => getPayload({ config }))
 export type PageLayoutBlock = NonNullable<Page['layout']>[number]
 
 /**
- * Layout block shape regardless of which collection the layout belongs to.
+ * Page-level block shape regardless of which collection the layout belongs to.
  * Posts and Projects use the same `pageBlocks` so their layouts are structurally
  * identical to `Page['layout']` - they just belong to a different collection.
  * We accept this union so the resolver is collection-agnostic.
  */
-export type AnyLayoutBlock =
+export type AnyPageBlock =
   PageLayoutBlock | NonNullable<Post['layout']>[number] | NonNullable<Project['layout']>[number]
 
 const PAGE_SELECT = {
@@ -214,24 +214,19 @@ function toAuthor(author: unknown): DetailAuthorView | null {
   }
 }
 
-async function resolveLayoutHeroBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'layoutHero' }>,
+async function resolvePageHeroBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'pageHero' }>,
   locale: LocaleCode,
   index: number,
-): Promise<LayoutHeroBlockView> {
+): Promise<PageHeroBlockView> {
   const [socialLinks, otherLinks] = await Promise.all([
     resolveLinkIds(block.socialLinks, locale, `hero-${index}-social`),
     resolveLinkIds(block.otherLinks, locale, `hero-${index}-other`),
   ])
   return {
-    blockType: 'layoutHero',
+    blockType: 'pageHero',
     id: blockId(block, `hero-${index}`),
-    labelTitle: block.labelTitle ?? null,
-    title: block.title,
-    labelTagline: block.labelTagline ?? null,
-    tagline: block.tagline ?? null,
-    labelBio: block.labelBio ?? null,
-    bio: (block.bio as DefaultTypedEditorState | null | undefined) ?? null,
+    paragraph: (block.paragraph as DefaultTypedEditorState | null | undefined) ?? null,
     heroImage: toMediaView(block.heroImage),
     labelSocialLinks: block.labelSocialLinks ?? null,
     socialLinks,
@@ -242,7 +237,7 @@ async function resolveLayoutHeroBlock(
 }
 
 async function resolveFeedSectionBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'layoutFeedSection' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'pageFeedSection' }>,
   locale: LocaleCode,
   index: number,
 ): Promise<FeedSectionBlockView | null> {
@@ -315,7 +310,7 @@ async function resolveFeedSectionBlock(
   const docs: unknown[] = Array.isArray(docsResult) ? docsResult : docsResult.docs
 
   const base = {
-    blockType: 'layoutFeedSection' as const,
+    blockType: 'pageFeedSection' as const,
     id: blockId(block, `feed-${feedType}-${index}`),
     heading: block.heading || adapter.defaultHeading,
     description: block.description ?? null,
@@ -414,11 +409,11 @@ async function resolveFeedSectionBlock(
 }
 
 async function resolveRichTextBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'layoutRichTextWithoutBlock' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'pageRichText' }>,
   index: number,
-): Promise<LayoutRichTextWithoutBlockView> {
+): Promise<PageRichTextBlockView> {
   return {
-    blockType: 'layoutRichTextWithoutBlock',
+    blockType: 'pageRichText',
     id: blockId(block, `rich-text-${index}`),
     content: block.content as DefaultTypedEditorState,
   }
@@ -439,21 +434,21 @@ async function resolveContentMediaBlock(
 }
 
 async function resolveBlankSpaceBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'layoutBlankSpace' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'pageBlankSpace' }>,
   index: number,
-): Promise<LayoutBlankSpaceBlockView> {
+): Promise<PageBlankSpaceBlockView> {
   return {
-    blockType: 'layoutBlankSpace',
+    blockType: 'pageBlankSpace',
     id: blockId(block, `blank-space-${index}`),
     height: block.height || '60vh',
   }
 }
 
 async function resolveTypewriterBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'layoutTypewriter' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'pageTypewriter' }>,
   locale: LocaleCode,
   index: number,
-): Promise<LayoutTypewriterBlockView | null> {
+): Promise<PageTypewriterBlockView | null> {
   const ids = relationIds(block.stories)
   if (ids.length === 0) return null
 
@@ -462,17 +457,17 @@ async function resolveTypewriterBlock(
   if (filtered.length === 0) return null
 
   return {
-    blockType: 'layoutTypewriter',
+    blockType: 'pageTypewriter',
     id: blockId(block, `typewriter-${index}`),
     texts: filtered,
   }
 }
 
 async function resolveScrambleHoverBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'layoutScrambleHover' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'pageScrambleHover' }>,
   locale: LocaleCode,
   index: number,
-): Promise<LayoutScrambleHoverBlockView | null> {
+): Promise<PageScrambleHoverBlockView | null> {
   const ids = relationIds(block.stories)
   if (ids.length === 0) return null
 
@@ -481,17 +476,17 @@ async function resolveScrambleHoverBlock(
   if (filtered.length === 0) return null
 
   return {
-    blockType: 'layoutScrambleHover',
+    blockType: 'pageScrambleHover',
     id: blockId(block, `scramble-hover-${index}`),
     texts: filtered,
   }
 }
 
 async function resolveFooterBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'layoutFooter' }>,
+  block: Extract<PageLayoutBlock, { blockType: 'pageFooter' }>,
   locale: LocaleCode,
   index: number,
-): Promise<LayoutFooterBlockView> {
+): Promise<PageFooterBlockView> {
   // Start the link resolution, the shell, and (via shell) the active pack's
   // footerItem + decoration lookup all in parallel. Each step only depends
   // on the previous one, so Promise.all above gives us one round trip.
@@ -506,7 +501,7 @@ async function resolveFooterBlock(
   const footerDecoration = await getFooterDecoration(shell.activeDecorationPackId, footerItemId)
 
   return {
-    blockType: 'layoutFooter',
+    blockType: 'pageFooter',
     id: blockId(block, `footer-${index}`),
     footerText: (block.footerText as DefaultTypedEditorState | null | undefined) ?? null,
     labelSocialLinks: block.labelSocialLinks ?? null,
@@ -519,28 +514,28 @@ async function resolveFooterBlock(
   }
 }
 
-async function resolveDetailPostBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'detailPost' }>,
+async function resolveTemplatePostBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'templatePost' }>,
   context: { currentPostView: PostDetailView | null },
   index: number,
-): Promise<DetailPostBlockView | null> {
+): Promise<TemplatePostBlockView | null> {
   if (!context.currentPostView) return null
   return {
-    blockType: 'detailPost',
-    id: blockId(block, `detail-post-${index}`),
+    blockType: 'templatePost',
+    id: blockId(block, `template-post-${index}`),
     view: context.currentPostView,
   }
 }
 
-async function resolveDetailProjectBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'detailProject' }>,
+async function resolveTemplateProjectBlock(
+  block: Extract<PageLayoutBlock, { blockType: 'templateProject' }>,
   context: { currentProjectView: ProjectDetailView | null },
   index: number,
-): Promise<DetailProjectBlockView | null> {
+): Promise<TemplateProjectBlockView | null> {
   if (!context.currentProjectView) return null
   return {
-    blockType: 'detailProject',
-    id: blockId(block, `detail-project-${index}`),
+    blockType: 'templateProject',
+    id: blockId(block, `template-project-${index}`),
     view: context.currentProjectView,
   }
 }
@@ -553,8 +548,8 @@ export type ResolveLayoutBlocksContext = {
   currentProjectView?: ProjectDetailView | null
 }
 
-export async function resolveLayoutBlocks(
-  layout: AnyLayoutBlock[] | null | undefined,
+export async function resolvePageBlocks(
+  layout: AnyPageBlock[] | null | undefined,
   locale: LocaleCode,
   context: ResolveLayoutBlocksContext = {},
 ): Promise<ResolvedBlockView[]> {
@@ -571,31 +566,31 @@ export async function resolveLayoutBlocks(
       // identically across collections.
       const typed = block as PageLayoutBlock
       switch (typed.blockType) {
-        case 'layoutHero':
-          return resolveLayoutHeroBlock(typed, locale, index)
-        case 'layoutFeedSection':
+        case 'pageHero':
+          return resolvePageHeroBlock(typed, locale, index)
+        case 'pageFeedSection':
           return resolveFeedSectionBlock(typed, locale, index)
-        case 'layoutRichTextWithoutBlock':
+        case 'pageRichText':
           return resolveRichTextBlock(typed, index)
         case 'contentMedia':
           return resolveContentMediaBlock(typed, index)
         case 'contentGallery':
-        case 'layoutRelatedItems':
+        case 'pageRelatedItems':
           // Frontend render is deferred until posts/projects detail routes
           // are implemented. Skip so editors can author now.
           return null
-        case 'layoutTypewriter':
+        case 'pageTypewriter':
           return resolveTypewriterBlock(typed, locale, index)
-        case 'layoutScrambleHover':
+        case 'pageScrambleHover':
           return resolveScrambleHoverBlock(typed, locale, index)
-        case 'layoutBlankSpace':
+        case 'pageBlankSpace':
           return resolveBlankSpaceBlock(typed, index)
-        case 'layoutFooter':
+        case 'pageFooter':
           return resolveFooterBlock(typed, locale, index)
-        case 'detailPost':
-          return resolveDetailPostBlock(typed, { currentPostView }, index)
-        case 'detailProject':
-          return resolveDetailProjectBlock(typed, { currentProjectView }, index)
+        case 'templatePost':
+          return resolveTemplatePostBlock(typed, { currentPostView }, index)
+        case 'templateProject':
+          return resolveTemplateProjectBlock(typed, { currentProjectView }, index)
         default:
           return null
       }
@@ -690,7 +685,7 @@ function toCmsPageView(
   page: Page,
   blocks: ResolvedBlockView[],
   alternateSlug: string | null,
-  layout: AnyLayoutBlock[],
+  layout: AnyPageBlock[],
 ): CmsPageView {
   return {
     title: page.title,
@@ -740,14 +735,9 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
 
   const blocks: ResolvedBlockView[] = [
     {
-      blockType: 'layoutHero',
+      blockType: 'pageHero',
       id: 'fallback-hero',
-      labelTitle: null,
-      title: hero.siteName,
-      labelTagline: null,
-      tagline: hero.tagline,
-      labelBio: null,
-      bio: hero.bio,
+      paragraph: hero.bio,
       heroImage: hero.coverImage,
       labelSocialLinks: null,
       socialLinks: hero.links,
@@ -756,7 +746,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopup: 'scroll down',
     },
     {
-      blockType: 'layoutFeedSection',
+      blockType: 'pageFeedSection',
       id: 'fallback-projects',
       heading: FEED_SOURCE_REGISTRY.projects.defaultHeading,
       description: null,
@@ -775,7 +765,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       decorations,
     },
     {
-      blockType: 'layoutFeedSection',
+      blockType: 'pageFeedSection',
       id: 'fallback-posts',
       heading: FEED_SOURCE_REGISTRY.posts.defaultHeading,
       description: null,
@@ -794,7 +784,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       decorations,
     },
     {
-      blockType: 'layoutFeedSection',
+      blockType: 'pageFeedSection',
       id: 'fallback-things',
       heading: FEED_SOURCE_REGISTRY.things.defaultHeading,
       description: null,
@@ -813,7 +803,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       decorations,
     },
     {
-      blockType: 'layoutFeedSection',
+      blockType: 'pageFeedSection',
       id: 'fallback-videos',
       heading: FEED_SOURCE_REGISTRY.videos.defaultHeading,
       description: null,
@@ -876,7 +866,7 @@ async function loadHomePage(locale: LocaleCode): Promise<HomePageView> {
   }
 
   const [blocks, alternateSlug] = await Promise.all([
-    resolveLayoutBlocks(page.layout, locale),
+    resolvePageBlocks(page.layout, locale),
     loadAlternateSlug(page.id, locale),
   ])
 
@@ -920,7 +910,7 @@ async function loadPageBySlug(locale: LocaleCode, slug: string): Promise<CmsPage
   if (!page) return null
 
   const [blocks, alternateSlug] = await Promise.all([
-    resolveLayoutBlocks(page.layout, locale),
+    resolvePageBlocks(page.layout, locale),
     loadAlternateSlug(page.id, locale),
   ])
 
@@ -975,9 +965,9 @@ export const getPageBySlug = cache(
   },
 )
 
-export function firstHeroBlock(blocks: ResolvedBlockView[]): LayoutHeroBlockView | null {
+export function firstHeroBlock(blocks: ResolvedBlockView[]): PageHeroBlockView | null {
   return (
-    blocks.find((block): block is LayoutHeroBlockView => block.blockType === 'layoutHero') ?? null
+    blocks.find((block): block is PageHeroBlockView => block.blockType === 'pageHero') ?? null
   )
 }
 
@@ -1111,7 +1101,7 @@ export const getPostBySlug = cache(
     const post = await loadPostBySlug(locale, slug)
     if (!post) return null
 
-    const blocks = await resolveLayoutBlocks(post.layout ?? [], locale)
+    const blocks = await resolvePageBlocks(post.layout ?? [], locale)
 
     return toPostDetailView(post, blocks)
   },
@@ -1172,7 +1162,7 @@ export const getProjectBySlug = cache(
     const project = await loadProjectBySlug(locale, slug)
     if (!project) return null
 
-    const blocks = await resolveLayoutBlocks(project.layout ?? [], locale)
+    const blocks = await resolvePageBlocks(project.layout ?? [], locale)
 
     return toProjectDetailView(project, blocks)
   },

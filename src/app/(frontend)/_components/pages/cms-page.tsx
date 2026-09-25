@@ -8,7 +8,7 @@ import {
   firstHeroBlock,
   getPageBySlug,
   isReservedCmsPageSlug,
-  resolveLayoutBlocks,
+  resolvePageBlocks,
 } from '@/app/(frontend)/_lib/page-data'
 import { homeHref, pageHref } from '@/app/(frontend)/_lib/locale'
 import type { PostDetailView, ProjectDetailView } from '@/app/(frontend)/_lib/types'
@@ -43,7 +43,6 @@ export async function generateCmsPageMetadata(
   const description =
     page.seo.metaDescription ||
     page.summary ||
-    hero?.tagline ||
     shell.seo.metaDescription ||
     shell.description ||
     undefined
@@ -116,7 +115,7 @@ export async function CmsPage({ locale, slug, detailView }: CmsPageProps) {
   // routed here), so we must re-run once with the right context. React
   // dedupes the Local API calls via the per-collection loaders inside.
   const blocks = detailView
-    ? await resolveLayoutBlocks(page.layout, locale, {
+    ? await resolvePageBlocks(page.layout, locale, {
         currentPostView: detailView.kind === 'post' ? detailView.view : null,
         currentProjectView: detailView.kind === 'project' ? detailView.view : null,
       })

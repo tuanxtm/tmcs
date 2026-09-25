@@ -19,7 +19,6 @@ export async function generateHomeMetadata(locale: LocaleCode): Promise<Metadata
   const description =
     home.seo.metaDescription ||
     home.summary ||
-    hero?.tagline ||
     shell.seo.metaDescription ||
     shell.description ||
     undefined

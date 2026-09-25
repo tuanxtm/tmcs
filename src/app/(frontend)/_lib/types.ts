@@ -2,7 +2,7 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import type { LocaleCode } from '@/lib/locales'
 import type { StoryShape } from '@/lib/story-shapes'
-import type { AnyLayoutBlock } from '@/app/(frontend)/_lib/page-data'
+import type { AnyPageBlock } from '@/app/(frontend)/_lib/page-data'
 
 export type { StoryShape }
 
@@ -216,15 +216,10 @@ export type PageSeoView = {
   noFollow: boolean
 }
 
-export type LayoutHeroBlockView = {
-  blockType: 'layoutHero'
+export type PageHeroBlockView = {
+  blockType: 'pageHero'
   id: string
-  labelTitle: string | null
-  title: string
-  labelTagline: string | null
-  tagline: string | null
-  labelBio: string | null
-  bio: DefaultTypedEditorState | null
+  paragraph: DefaultTypedEditorState | null
   heroImage: MediaView | null
   labelSocialLinks: string | null
   socialLinks: NavChildView[]
@@ -237,7 +232,7 @@ export type FeedType = 'posts' | 'projects' | 'things' | 'videos'
 export type FeedPaginationMode = 'static' | 'infinite'
 
 type FeedSectionBase = {
-  blockType: 'layoutFeedSection'
+  blockType: 'pageFeedSection'
   id: string
   heading: string
   description: string | null
@@ -273,8 +268,8 @@ export type FeedSectionBlockView =
       docs: VideoCardView[]
     })
 
-export type LayoutRichTextWithoutBlockView = {
-  blockType: 'layoutRichTextWithoutBlock'
+export type PageRichTextBlockView = {
+  blockType: 'pageRichText'
   id: string
   content: DefaultTypedEditorState
 }
@@ -286,29 +281,29 @@ export type ContentMediaBlockView = {
   caption: string | null
 }
 
-export type LayoutTypewriterBlockView = {
-  blockType: 'layoutTypewriter'
+export type PageTypewriterBlockView = {
+  blockType: 'pageTypewriter'
   id: string
   /** Pre-resolved plain-text strings ready for the Typewriter component. */
   texts: string[]
 }
 
-export type LayoutBlankSpaceBlockView = {
-  blockType: 'layoutBlankSpace'
+export type PageBlankSpaceBlockView = {
+  blockType: 'pageBlankSpace'
   id: string
   /** CSS height for the blank section (e.g. "60vh", "400px"). */
   height: string
 }
 
-export type LayoutScrambleHoverBlockView = {
-  blockType: 'layoutScrambleHover'
+export type PageScrambleHoverBlockView = {
+  blockType: 'pageScrambleHover'
   id: string
   /** Pre-resolved plain-text strings ready for the ScrambleHover component. */
   texts: string[]
 }
 
-export type LayoutFooterBlockView = {
-  blockType: 'layoutFooter'
+export type PageFooterBlockView = {
+  blockType: 'pageFooter'
   id: string
   footerText: DefaultTypedEditorState | null
   labelSocialLinks: string | null
@@ -327,11 +322,11 @@ export type LayoutFooterBlockView = {
  * auto-binds to whichever Post is at `/[slug]`.
  *
  * `view` is required. The resolver returns `null` for this block when the
- * route is not a Post template render, and `resolveLayoutBlocks` filters
+ * route is not a Post template render, and `resolvePageBlocks` filters
  * such blocks out before they reach the renderer.
  */
-export type DetailPostBlockView = {
-  blockType: 'detailPost'
+export type TemplatePostBlockView = {
+  blockType: 'templatePost'
   id: string
   view: PostDetailView
 }
@@ -343,11 +338,11 @@ export type DetailPostBlockView = {
  * auto-binds to whichever Project is at `/[slug]`.
  *
  * `view` is required. The resolver returns `null` for this block when the
- * route is not a Project template render, and `resolveLayoutBlocks` filters
+ * route is not a Project template render, and `resolvePageBlocks` filters
  * such blocks out before they reach the renderer.
  */
-export type DetailProjectBlockView = {
-  blockType: 'detailProject'
+export type TemplateProjectBlockView = {
+  blockType: 'templateProject'
   id: string
   view: ProjectDetailView
 }
@@ -363,24 +358,24 @@ export type ContentGalleryBlockView = {
   id: string
 }
 
-export type LayoutRelatedItemsBlockView = {
-  blockType: 'layoutRelatedItems'
+export type PageRelatedItemsBlockView = {
+  blockType: 'pageRelatedItems'
   id: string
 }
 
 export type ResolvedBlockView =
-  | LayoutHeroBlockView
+  | PageHeroBlockView
   | FeedSectionBlockView
-  | LayoutRichTextWithoutBlockView
+  | PageRichTextBlockView
   | ContentMediaBlockView
   | ContentGalleryBlockView
-  | LayoutRelatedItemsBlockView
-  | LayoutTypewriterBlockView
-  | LayoutScrambleHoverBlockView
-  | LayoutBlankSpaceBlockView
-  | LayoutFooterBlockView
-  | DetailPostBlockView
-  | DetailProjectBlockView
+  | PageRelatedItemsBlockView
+  | PageTypewriterBlockView
+  | PageScrambleHoverBlockView
+  | PageBlankSpaceBlockView
+  | PageFooterBlockView
+  | TemplatePostBlockView
+  | TemplateProjectBlockView
 
 export type CmsPageView = {
   title: string
@@ -391,12 +386,12 @@ export type CmsPageView = {
   seo: PageSeoView
   /**
    * Raw layout (block descriptors as stored in the CMS). Carried alongside
-   * `blocks` so a template Page that hosts a `Detail - Post` /
-   * `Detail - Project` block can re-resolve the layout with the routed
+   * `blocks` so a template Page that hosts a `Template - Post` /
+   * `Template - Project` block can re-resolve the layout with the routed
    * Post/Project context. Without this, the block cannot bind to the
    * currently-routed document.
    */
-  layout: AnyLayoutBlock[]
+  layout: AnyPageBlock[]
   blocks: ResolvedBlockView[]
   /** Alternate-locale path when a localized sibling slug exists; otherwise null. */
   alternateSlug: string | null

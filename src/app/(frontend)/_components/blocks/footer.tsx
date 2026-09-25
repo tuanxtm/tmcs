@@ -4,8 +4,8 @@ import Image from 'next/image'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import type {
   FeedDecorationView,
-  LayoutFooterBlockView,
   NavChildView,
+  PageFooterBlockView,
 } from '@/app/(frontend)/_lib/types'
 import { trimUrlScheme } from '@/app/(frontend)/_lib/social-icons'
 import { homeHref } from '@/app/(frontend)/_lib/locale'
@@ -13,7 +13,7 @@ import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
 type FooterBlockProps = {
-  block: LayoutFooterBlockView
+  block: PageFooterBlockView
   siteName: string
   locale: LocaleCode
 }

@@ -1,9 +1,9 @@
-import type { LayoutBlankSpaceBlockView } from '@/app/(frontend)/_lib/types'
+import type { PageBlankSpaceBlockView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
 import { Scales } from '@/components/ui/scales'
 
 type BlankSpaceBlockProps = {
-  block: LayoutBlankSpaceBlockView
+  block: PageBlankSpaceBlockView
 }
 
 /**

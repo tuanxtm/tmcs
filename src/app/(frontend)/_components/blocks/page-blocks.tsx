@@ -24,7 +24,7 @@ type PageBlocksProps = {
   navigation?: NavItemView[]
   /**
    * Currently routed Post or Project when the surrounding layout is a
-   * template Page. Forwarded to the `Detail - Post` / `Detail - Project`
+   * template Page. Forwarded to the `Template - Post` / `Template - Project`
    * block renderers so they can bind to the field-less block's view.
    */
   currentView?: CmsPageDetailView
@@ -47,7 +47,7 @@ function DeferredBlockPlaceholder({
   blockType,
   blockId,
 }: {
-  blockType: 'contentGallery' | 'layoutRelatedItems'
+  blockType: 'contentGallery' | 'pageRelatedItems'
   blockId: string
 }) {
   return (
@@ -84,10 +84,10 @@ export function PageBlocks({
       />
       {blocks.map((block) => {
         switch (block.blockType) {
-          case 'layoutHero':
+          case 'pageHero':
             return <Hero key={block.id} hero={block} />
 
-          case 'layoutFeedSection': {
+          case 'pageFeedSection': {
             const ids = sectionDomIds(block.id)
             // Remount when the server snapshot changes so client infinite-scroll state resets.
             const feedKey = [
@@ -197,7 +197,7 @@ export function PageBlocks({
             )
           }
 
-          case 'layoutRichTextWithoutBlock':
+          case 'pageRichText':
             return (
               <section key={block.id} className="px-4 py-8">
                 <CmsRichText
@@ -219,33 +219,33 @@ export function PageBlocks({
               />
             )
 
-          case 'layoutRelatedItems':
+          case 'pageRelatedItems':
             return (
               <DeferredBlockPlaceholder
                 key={block.id}
-                blockType="layoutRelatedItems"
+                blockType="pageRelatedItems"
                 blockId={block.id}
               />
             )
 
-          case 'layoutTypewriter':
+          case 'pageTypewriter':
             return <TypewriterBlock key={block.id} block={block} />
 
-          case 'layoutScrambleHover':
+          case 'pageScrambleHover':
             return <ScrambleHoverBlock key={block.id} block={block} />
 
-          case 'layoutBlankSpace':
+          case 'pageBlankSpace':
             return <BlankSpaceBlock key={block.id} block={block} />
 
-          case 'layoutFooter':
+          case 'pageFooter':
             return <FooterBlock key={block.id} block={block} locale={locale} siteName={siteName} />
 
-          case 'detailPost':
+          case 'templatePost':
             return currentView?.kind === 'post' ? (
               <DetailPostBlock key={block.id} view={currentView.view} locale={locale} />
             ) : null
 
-          case 'detailProject':
+          case 'templateProject':
             return currentView?.kind === 'project' ? (
               <DetailProjectBlock key={block.id} view={currentView.view} locale={locale} />
             ) : null

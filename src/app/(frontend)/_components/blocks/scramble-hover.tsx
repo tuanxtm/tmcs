@@ -1,11 +1,11 @@
 'use client'
 
 import ScrambleHover from '@/components/ui/scramble-hover'
-import type { LayoutScrambleHoverBlockView } from '@/app/(frontend)/_lib/types'
+import type { PageScrambleHoverBlockView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
 
 type ScrambleHoverBlockProps = {
-  block: LayoutScrambleHoverBlockView
+  block: PageScrambleHoverBlockView
 }
 
 /**
