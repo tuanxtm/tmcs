@@ -44,7 +44,7 @@ export function CmsImage({
   const height = media.height || 900
 
   return (
-    <div className={cn('overflow-hidden', className)} style={style}>
+    <span className={cn('inline-block', className)} style={style}>
       <Image
         src={media.url}
         alt={media.alt}
@@ -54,6 +54,6 @@ export function CmsImage({
         priority={priority}
         className={cn('h-auto w-full', imgClassName)}
       />
-    </div>
+    </span>
   )
 }
