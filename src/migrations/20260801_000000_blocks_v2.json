@@ -1117,8 +1117,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_hero": {
-      "name": "posts_blocks_layout_hero",
+    "posts_blocks_page_hero": {
+      "name": "posts_blocks_page_hero",
       "columns": {
         "_order": {
           "name": "_order",
@@ -1164,29 +1164,29 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_hero_order_idx": {
-          "name": "posts_blocks_layout_hero_order_idx",
+        "posts_blocks_page_hero_order_idx": {
+          "name": "posts_blocks_page_hero_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_hero_parent_id_idx": {
-          "name": "posts_blocks_layout_hero_parent_id_idx",
+        "posts_blocks_page_hero_parent_id_idx": {
+          "name": "posts_blocks_page_hero_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_hero_path_idx": {
-          "name": "posts_blocks_layout_hero_path_idx",
+        "posts_blocks_page_hero_path_idx": {
+          "name": "posts_blocks_page_hero_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_hero_hero_image_idx": {
-          "name": "posts_blocks_layout_hero_hero_image_idx",
+        "posts_blocks_page_hero_hero_image_idx": {
+          "name": "posts_blocks_page_hero_hero_image_idx",
           "columns": [
             "hero_image_id"
           ],
@@ -1194,9 +1194,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_hero_hero_image_id_media_id_fk": {
-          "name": "posts_blocks_layout_hero_hero_image_id_media_id_fk",
-          "tableFrom": "posts_blocks_layout_hero",
+        "posts_blocks_page_hero_hero_image_id_media_id_fk": {
+          "name": "posts_blocks_page_hero_hero_image_id_media_id_fk",
+          "tableFrom": "posts_blocks_page_hero",
           "tableTo": "media",
           "columnsFrom": [
             "hero_image_id"
@@ -1207,9 +1207,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "posts_blocks_layout_hero_parent_id_fk": {
-          "name": "posts_blocks_layout_hero_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_hero",
+        "posts_blocks_page_hero_parent_id_fk": {
+          "name": "posts_blocks_page_hero_parent_id_fk",
+          "tableFrom": "posts_blocks_page_hero",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -1225,46 +1225,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_hero_locales": {
-      "name": "posts_blocks_layout_hero_locales",
+    "posts_blocks_page_hero_locales": {
+      "name": "posts_blocks_page_hero_locales",
       "columns": {
-        "label_title": {
-          "name": "label_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_tagline": {
-          "name": "label_tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tagline": {
-          "name": "tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_bio": {
-          "name": "label_bio",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "bio": {
-          "name": "bio",
+        "paragraph": {
+          "name": "paragraph",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1315,8 +1280,8 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_hero_locales_locale_parent_id_unique": {
-          "name": "posts_blocks_layout_hero_locales_locale_parent_id_unique",
+        "posts_blocks_page_hero_locales_locale_parent_id_unique": {
+          "name": "posts_blocks_page_hero_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -1325,10 +1290,10 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_hero_locales_parent_id_fk": {
-          "name": "posts_blocks_layout_hero_locales_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_hero_locales",
-          "tableTo": "posts_blocks_layout_hero",
+        "posts_blocks_page_hero_locales_parent_id_fk": {
+          "name": "posts_blocks_page_hero_locales_parent_id_fk",
+          "tableFrom": "posts_blocks_page_hero_locales",
+          "tableTo": "posts_blocks_page_hero",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -1343,8 +1308,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_feed_section": {
-      "name": "posts_blocks_layout_feed_section",
+    "posts_blocks_page_feed_section": {
+      "name": "posts_blocks_page_feed_section",
       "columns": {
         "_order": {
           "name": "_order",
@@ -1430,29 +1395,29 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_feed_section_order_idx": {
-          "name": "posts_blocks_layout_feed_section_order_idx",
+        "posts_blocks_page_feed_section_order_idx": {
+          "name": "posts_blocks_page_feed_section_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_feed_section_parent_id_idx": {
-          "name": "posts_blocks_layout_feed_section_parent_id_idx",
+        "posts_blocks_page_feed_section_parent_id_idx": {
+          "name": "posts_blocks_page_feed_section_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_feed_section_path_idx": {
-          "name": "posts_blocks_layout_feed_section_path_idx",
+        "posts_blocks_page_feed_section_path_idx": {
+          "name": "posts_blocks_page_feed_section_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_feed_section_view_all_page_idx": {
-          "name": "posts_blocks_layout_feed_section_view_all_page_idx",
+        "posts_blocks_page_feed_section_view_all_page_idx": {
+          "name": "posts_blocks_page_feed_section_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -1460,9 +1425,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_feed_section_view_all_page_id_pages_id_fk": {
-          "name": "posts_blocks_layout_feed_section_view_all_page_id_pages_id_fk",
-          "tableFrom": "posts_blocks_layout_feed_section",
+        "posts_blocks_page_feed_section_view_all_page_id_pages_id_fk": {
+          "name": "posts_blocks_page_feed_section_view_all_page_id_pages_id_fk",
+          "tableFrom": "posts_blocks_page_feed_section",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -1473,9 +1438,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "posts_blocks_layout_feed_section_parent_id_fk": {
-          "name": "posts_blocks_layout_feed_section_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_feed_section",
+        "posts_blocks_page_feed_section_parent_id_fk": {
+          "name": "posts_blocks_page_feed_section_parent_id_fk",
+          "tableFrom": "posts_blocks_page_feed_section",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -1491,8 +1456,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_feed_section_locales": {
-      "name": "posts_blocks_layout_feed_section_locales",
+    "posts_blocks_page_feed_section_locales": {
+      "name": "posts_blocks_page_feed_section_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -1566,8 +1531,8 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_feed_section_locales_locale_parent_id_un": {
-          "name": "posts_blocks_layout_feed_section_locales_locale_parent_id_un",
+        "posts_blocks_page_feed_section_locales_locale_parent_id_uniq": {
+          "name": "posts_blocks_page_feed_section_locales_locale_parent_id_uniq",
           "columns": [
             "_locale",
             "_parent_id"
@@ -1576,10 +1541,10 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_feed_section_locales_parent_id_fk": {
-          "name": "posts_blocks_layout_feed_section_locales_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_feed_section_locales",
-          "tableTo": "posts_blocks_layout_feed_section",
+        "posts_blocks_page_feed_section_locales_parent_id_fk": {
+          "name": "posts_blocks_page_feed_section_locales_parent_id_fk",
+          "tableFrom": "posts_blocks_page_feed_section_locales",
+          "tableTo": "posts_blocks_page_feed_section",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -1594,8 +1559,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_rich_text_without_block": {
-      "name": "posts_blocks_layout_rich_text_without_block",
+    "posts_blocks_page_rich_text": {
+      "name": "posts_blocks_page_rich_text",
       "columns": {
         "_order": {
           "name": "_order",
@@ -1634,22 +1599,22 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_rich_text_without_block_order_idx": {
-          "name": "posts_blocks_layout_rich_text_without_block_order_idx",
+        "posts_blocks_page_rich_text_order_idx": {
+          "name": "posts_blocks_page_rich_text_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_rich_text_without_block_parent_id_idx": {
-          "name": "posts_blocks_layout_rich_text_without_block_parent_id_idx",
+        "posts_blocks_page_rich_text_parent_id_idx": {
+          "name": "posts_blocks_page_rich_text_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_rich_text_without_block_path_idx": {
-          "name": "posts_blocks_layout_rich_text_without_block_path_idx",
+        "posts_blocks_page_rich_text_path_idx": {
+          "name": "posts_blocks_page_rich_text_path_idx",
           "columns": [
             "_path"
           ],
@@ -1657,9 +1622,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_rich_text_without_block_parent_id_fk": {
-          "name": "posts_blocks_layout_rich_text_without_block_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_rich_text_without_block",
+        "posts_blocks_page_rich_text_parent_id_fk": {
+          "name": "posts_blocks_page_rich_text_parent_id_fk",
+          "tableFrom": "posts_blocks_page_rich_text",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -1675,8 +1640,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_rich_text_without_block_locales": {
-      "name": "posts_blocks_layout_rich_text_without_block_locales",
+    "posts_blocks_page_rich_text_locales": {
+      "name": "posts_blocks_page_rich_text_locales",
       "columns": {
         "content": {
           "name": "content",
@@ -1708,8 +1673,8 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_rich_text_without_block_locales_locale_p": {
-          "name": "posts_blocks_layout_rich_text_without_block_locales_locale_p",
+        "posts_blocks_page_rich_text_locales_locale_parent_id_unique": {
+          "name": "posts_blocks_page_rich_text_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -1718,10 +1683,10 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_rich_text_without_block_locales_paren_fk": {
-          "name": "posts_blocks_layout_rich_text_without_block_locales_paren_fk",
-          "tableFrom": "posts_blocks_layout_rich_text_without_block_locales",
-          "tableTo": "posts_blocks_layout_rich_text_without_block",
+        "posts_blocks_page_rich_text_locales_parent_id_fk": {
+          "name": "posts_blocks_page_rich_text_locales_parent_id_fk",
+          "tableFrom": "posts_blocks_page_rich_text_locales",
+          "tableTo": "posts_blocks_page_rich_text",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -2134,8 +2099,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_related_items": {
-      "name": "posts_blocks_layout_related_items",
+    "posts_blocks_page_related_items": {
+      "name": "posts_blocks_page_related_items",
       "columns": {
         "_order": {
           "name": "_order",
@@ -2205,29 +2170,29 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_related_items_order_idx": {
-          "name": "posts_blocks_layout_related_items_order_idx",
+        "posts_blocks_page_related_items_order_idx": {
+          "name": "posts_blocks_page_related_items_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_related_items_parent_id_idx": {
-          "name": "posts_blocks_layout_related_items_parent_id_idx",
+        "posts_blocks_page_related_items_parent_id_idx": {
+          "name": "posts_blocks_page_related_items_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_related_items_path_idx": {
-          "name": "posts_blocks_layout_related_items_path_idx",
+        "posts_blocks_page_related_items_path_idx": {
+          "name": "posts_blocks_page_related_items_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_related_items_view_all_page_idx": {
-          "name": "posts_blocks_layout_related_items_view_all_page_idx",
+        "posts_blocks_page_related_items_view_all_page_idx": {
+          "name": "posts_blocks_page_related_items_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -2235,9 +2200,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_related_items_view_all_page_id_pages_id_fk": {
-          "name": "posts_blocks_layout_related_items_view_all_page_id_pages_id_fk",
-          "tableFrom": "posts_blocks_layout_related_items",
+        "posts_blocks_page_related_items_view_all_page_id_pages_id_fk": {
+          "name": "posts_blocks_page_related_items_view_all_page_id_pages_id_fk",
+          "tableFrom": "posts_blocks_page_related_items",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -2248,9 +2213,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "posts_blocks_layout_related_items_parent_id_fk": {
-          "name": "posts_blocks_layout_related_items_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_related_items",
+        "posts_blocks_page_related_items_parent_id_fk": {
+          "name": "posts_blocks_page_related_items_parent_id_fk",
+          "tableFrom": "posts_blocks_page_related_items",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -2266,8 +2231,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_related_items_locales": {
-      "name": "posts_blocks_layout_related_items_locales",
+    "posts_blocks_page_related_items_locales": {
+      "name": "posts_blocks_page_related_items_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -2327,8 +2292,8 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_related_items_locales_locale_parent_id_u": {
-          "name": "posts_blocks_layout_related_items_locales_locale_parent_id_u",
+        "posts_blocks_page_related_items_locales_locale_parent_id_uni": {
+          "name": "posts_blocks_page_related_items_locales_locale_parent_id_uni",
           "columns": [
             "_locale",
             "_parent_id"
@@ -2337,10 +2302,10 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_related_items_locales_parent_id_fk": {
-          "name": "posts_blocks_layout_related_items_locales_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_related_items_locales",
-          "tableTo": "posts_blocks_layout_related_items",
+        "posts_blocks_page_related_items_locales_parent_id_fk": {
+          "name": "posts_blocks_page_related_items_locales_parent_id_fk",
+          "tableFrom": "posts_blocks_page_related_items_locales",
+          "tableTo": "posts_blocks_page_related_items",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -2355,8 +2320,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_typewriter": {
-      "name": "posts_blocks_layout_typewriter",
+    "posts_blocks_page_typewriter": {
+      "name": "posts_blocks_page_typewriter",
       "columns": {
         "_order": {
           "name": "_order",
@@ -2395,22 +2360,22 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_typewriter_order_idx": {
-          "name": "posts_blocks_layout_typewriter_order_idx",
+        "posts_blocks_page_typewriter_order_idx": {
+          "name": "posts_blocks_page_typewriter_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_typewriter_parent_id_idx": {
-          "name": "posts_blocks_layout_typewriter_parent_id_idx",
+        "posts_blocks_page_typewriter_parent_id_idx": {
+          "name": "posts_blocks_page_typewriter_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_typewriter_path_idx": {
-          "name": "posts_blocks_layout_typewriter_path_idx",
+        "posts_blocks_page_typewriter_path_idx": {
+          "name": "posts_blocks_page_typewriter_path_idx",
           "columns": [
             "_path"
           ],
@@ -2418,9 +2383,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_typewriter_parent_id_fk": {
-          "name": "posts_blocks_layout_typewriter_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_typewriter",
+        "posts_blocks_page_typewriter_parent_id_fk": {
+          "name": "posts_blocks_page_typewriter_parent_id_fk",
+          "tableFrom": "posts_blocks_page_typewriter",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -2436,8 +2401,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_scramble_hover": {
-      "name": "posts_blocks_layout_scramble_hover",
+    "posts_blocks_page_scramble_hover": {
+      "name": "posts_blocks_page_scramble_hover",
       "columns": {
         "_order": {
           "name": "_order",
@@ -2476,22 +2441,22 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_scramble_hover_order_idx": {
-          "name": "posts_blocks_layout_scramble_hover_order_idx",
+        "posts_blocks_page_scramble_hover_order_idx": {
+          "name": "posts_blocks_page_scramble_hover_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_scramble_hover_parent_id_idx": {
-          "name": "posts_blocks_layout_scramble_hover_parent_id_idx",
+        "posts_blocks_page_scramble_hover_parent_id_idx": {
+          "name": "posts_blocks_page_scramble_hover_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_scramble_hover_path_idx": {
-          "name": "posts_blocks_layout_scramble_hover_path_idx",
+        "posts_blocks_page_scramble_hover_path_idx": {
+          "name": "posts_blocks_page_scramble_hover_path_idx",
           "columns": [
             "_path"
           ],
@@ -2499,9 +2464,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_scramble_hover_parent_id_fk": {
-          "name": "posts_blocks_layout_scramble_hover_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_scramble_hover",
+        "posts_blocks_page_scramble_hover_parent_id_fk": {
+          "name": "posts_blocks_page_scramble_hover_parent_id_fk",
+          "tableFrom": "posts_blocks_page_scramble_hover",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -2517,8 +2482,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_blank_space": {
-      "name": "posts_blocks_layout_blank_space",
+    "posts_blocks_page_blank_space": {
+      "name": "posts_blocks_page_blank_space",
       "columns": {
         "_order": {
           "name": "_order",
@@ -2565,22 +2530,22 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_blank_space_order_idx": {
-          "name": "posts_blocks_layout_blank_space_order_idx",
+        "posts_blocks_page_blank_space_order_idx": {
+          "name": "posts_blocks_page_blank_space_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_blank_space_parent_id_idx": {
-          "name": "posts_blocks_layout_blank_space_parent_id_idx",
+        "posts_blocks_page_blank_space_parent_id_idx": {
+          "name": "posts_blocks_page_blank_space_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_blank_space_path_idx": {
-          "name": "posts_blocks_layout_blank_space_path_idx",
+        "posts_blocks_page_blank_space_path_idx": {
+          "name": "posts_blocks_page_blank_space_path_idx",
           "columns": [
             "_path"
           ],
@@ -2588,9 +2553,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_blank_space_parent_id_fk": {
-          "name": "posts_blocks_layout_blank_space_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_blank_space",
+        "posts_blocks_page_blank_space_parent_id_fk": {
+          "name": "posts_blocks_page_blank_space_parent_id_fk",
+          "tableFrom": "posts_blocks_page_blank_space",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -2606,8 +2571,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_footer": {
-      "name": "posts_blocks_layout_footer",
+    "posts_blocks_page_footer": {
+      "name": "posts_blocks_page_footer",
       "columns": {
         "_order": {
           "name": "_order",
@@ -2646,22 +2611,22 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_footer_order_idx": {
-          "name": "posts_blocks_layout_footer_order_idx",
+        "posts_blocks_page_footer_order_idx": {
+          "name": "posts_blocks_page_footer_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_footer_parent_id_idx": {
-          "name": "posts_blocks_layout_footer_parent_id_idx",
+        "posts_blocks_page_footer_parent_id_idx": {
+          "name": "posts_blocks_page_footer_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_layout_footer_path_idx": {
-          "name": "posts_blocks_layout_footer_path_idx",
+        "posts_blocks_page_footer_path_idx": {
+          "name": "posts_blocks_page_footer_path_idx",
           "columns": [
             "_path"
           ],
@@ -2669,9 +2634,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_footer_parent_id_fk": {
-          "name": "posts_blocks_layout_footer_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_footer",
+        "posts_blocks_page_footer_parent_id_fk": {
+          "name": "posts_blocks_page_footer_parent_id_fk",
+          "tableFrom": "posts_blocks_page_footer",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -2687,8 +2652,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_layout_footer_locales": {
-      "name": "posts_blocks_layout_footer_locales",
+    "posts_blocks_page_footer_locales": {
+      "name": "posts_blocks_page_footer_locales",
       "columns": {
         "footer_text": {
           "name": "footer_text",
@@ -2749,8 +2714,8 @@
         }
       },
       "indexes": {
-        "posts_blocks_layout_footer_locales_locale_parent_id_unique": {
-          "name": "posts_blocks_layout_footer_locales_locale_parent_id_unique",
+        "posts_blocks_page_footer_locales_locale_parent_id_unique": {
+          "name": "posts_blocks_page_footer_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -2759,10 +2724,10 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_layout_footer_locales_parent_id_fk": {
-          "name": "posts_blocks_layout_footer_locales_parent_id_fk",
-          "tableFrom": "posts_blocks_layout_footer_locales",
-          "tableTo": "posts_blocks_layout_footer",
+        "posts_blocks_page_footer_locales_parent_id_fk": {
+          "name": "posts_blocks_page_footer_locales_parent_id_fk",
+          "tableFrom": "posts_blocks_page_footer_locales",
+          "tableTo": "posts_blocks_page_footer",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -2777,8 +2742,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_detail_post": {
-      "name": "posts_blocks_detail_post",
+    "posts_blocks_template_post": {
+      "name": "posts_blocks_template_post",
       "columns": {
         "_order": {
           "name": "_order",
@@ -2817,22 +2782,22 @@
         }
       },
       "indexes": {
-        "posts_blocks_detail_post_order_idx": {
-          "name": "posts_blocks_detail_post_order_idx",
+        "posts_blocks_template_post_order_idx": {
+          "name": "posts_blocks_template_post_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_detail_post_parent_id_idx": {
-          "name": "posts_blocks_detail_post_parent_id_idx",
+        "posts_blocks_template_post_parent_id_idx": {
+          "name": "posts_blocks_template_post_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_detail_post_path_idx": {
-          "name": "posts_blocks_detail_post_path_idx",
+        "posts_blocks_template_post_path_idx": {
+          "name": "posts_blocks_template_post_path_idx",
           "columns": [
             "_path"
           ],
@@ -2840,9 +2805,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_detail_post_parent_id_fk": {
-          "name": "posts_blocks_detail_post_parent_id_fk",
-          "tableFrom": "posts_blocks_detail_post",
+        "posts_blocks_template_post_parent_id_fk": {
+          "name": "posts_blocks_template_post_parent_id_fk",
+          "tableFrom": "posts_blocks_template_post",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -2858,8 +2823,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "posts_blocks_detail_project": {
-      "name": "posts_blocks_detail_project",
+    "posts_blocks_template_project": {
+      "name": "posts_blocks_template_project",
       "columns": {
         "_order": {
           "name": "_order",
@@ -2898,22 +2863,22 @@
         }
       },
       "indexes": {
-        "posts_blocks_detail_project_order_idx": {
-          "name": "posts_blocks_detail_project_order_idx",
+        "posts_blocks_template_project_order_idx": {
+          "name": "posts_blocks_template_project_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "posts_blocks_detail_project_parent_id_idx": {
-          "name": "posts_blocks_detail_project_parent_id_idx",
+        "posts_blocks_template_project_parent_id_idx": {
+          "name": "posts_blocks_template_project_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "posts_blocks_detail_project_path_idx": {
-          "name": "posts_blocks_detail_project_path_idx",
+        "posts_blocks_template_project_path_idx": {
+          "name": "posts_blocks_template_project_path_idx",
           "columns": [
             "_path"
           ],
@@ -2921,9 +2886,9 @@
         }
       },
       "foreignKeys": {
-        "posts_blocks_detail_project_parent_id_fk": {
-          "name": "posts_blocks_detail_project_parent_id_fk",
-          "tableFrom": "posts_blocks_detail_project",
+        "posts_blocks_template_project_parent_id_fk": {
+          "name": "posts_blocks_template_project_parent_id_fk",
+          "tableFrom": "posts_blocks_template_project",
           "tableTo": "posts",
           "columnsFrom": [
             "_parent_id"
@@ -3650,8 +3615,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_hero": {
-      "name": "_posts_v_blocks_layout_hero",
+    "_posts_v_blocks_page_hero": {
+      "name": "_posts_v_blocks_page_hero",
       "columns": {
         "_order": {
           "name": "_order",
@@ -3704,29 +3669,29 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_hero_order_idx": {
-          "name": "_posts_v_blocks_layout_hero_order_idx",
+        "_posts_v_blocks_page_hero_order_idx": {
+          "name": "_posts_v_blocks_page_hero_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_hero_parent_id_idx": {
-          "name": "_posts_v_blocks_layout_hero_parent_id_idx",
+        "_posts_v_blocks_page_hero_parent_id_idx": {
+          "name": "_posts_v_blocks_page_hero_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_hero_path_idx": {
-          "name": "_posts_v_blocks_layout_hero_path_idx",
+        "_posts_v_blocks_page_hero_path_idx": {
+          "name": "_posts_v_blocks_page_hero_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_hero_hero_image_idx": {
-          "name": "_posts_v_blocks_layout_hero_hero_image_idx",
+        "_posts_v_blocks_page_hero_hero_image_idx": {
+          "name": "_posts_v_blocks_page_hero_hero_image_idx",
           "columns": [
             "hero_image_id"
           ],
@@ -3734,9 +3699,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_hero_hero_image_id_media_id_fk": {
-          "name": "_posts_v_blocks_layout_hero_hero_image_id_media_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_hero",
+        "_posts_v_blocks_page_hero_hero_image_id_media_id_fk": {
+          "name": "_posts_v_blocks_page_hero_hero_image_id_media_id_fk",
+          "tableFrom": "_posts_v_blocks_page_hero",
           "tableTo": "media",
           "columnsFrom": [
             "hero_image_id"
@@ -3747,9 +3712,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "_posts_v_blocks_layout_hero_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_hero_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_hero",
+        "_posts_v_blocks_page_hero_parent_id_fk": {
+          "name": "_posts_v_blocks_page_hero_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_hero",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -3765,46 +3730,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_hero_locales": {
-      "name": "_posts_v_blocks_layout_hero_locales",
+    "_posts_v_blocks_page_hero_locales": {
+      "name": "_posts_v_blocks_page_hero_locales",
       "columns": {
-        "label_title": {
-          "name": "label_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_tagline": {
-          "name": "label_tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tagline": {
-          "name": "tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_bio": {
-          "name": "label_bio",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "bio": {
-          "name": "bio",
+        "paragraph": {
+          "name": "paragraph",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -3855,8 +3785,8 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_hero_locales_locale_parent_id_unique": {
-          "name": "_posts_v_blocks_layout_hero_locales_locale_parent_id_unique",
+        "_posts_v_blocks_page_hero_locales_locale_parent_id_unique": {
+          "name": "_posts_v_blocks_page_hero_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -3865,10 +3795,10 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_hero_locales_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_hero_locales_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_hero_locales",
-          "tableTo": "_posts_v_blocks_layout_hero",
+        "_posts_v_blocks_page_hero_locales_parent_id_fk": {
+          "name": "_posts_v_blocks_page_hero_locales_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_hero_locales",
+          "tableTo": "_posts_v_blocks_page_hero",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -3883,8 +3813,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_feed_section": {
-      "name": "_posts_v_blocks_layout_feed_section",
+    "_posts_v_blocks_page_feed_section": {
+      "name": "_posts_v_blocks_page_feed_section",
       "columns": {
         "_order": {
           "name": "_order",
@@ -3977,29 +3907,29 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_feed_section_order_idx": {
-          "name": "_posts_v_blocks_layout_feed_section_order_idx",
+        "_posts_v_blocks_page_feed_section_order_idx": {
+          "name": "_posts_v_blocks_page_feed_section_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_feed_section_parent_id_idx": {
-          "name": "_posts_v_blocks_layout_feed_section_parent_id_idx",
+        "_posts_v_blocks_page_feed_section_parent_id_idx": {
+          "name": "_posts_v_blocks_page_feed_section_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_feed_section_path_idx": {
-          "name": "_posts_v_blocks_layout_feed_section_path_idx",
+        "_posts_v_blocks_page_feed_section_path_idx": {
+          "name": "_posts_v_blocks_page_feed_section_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_feed_section_view_all_page_idx": {
-          "name": "_posts_v_blocks_layout_feed_section_view_all_page_idx",
+        "_posts_v_blocks_page_feed_section_view_all_page_idx": {
+          "name": "_posts_v_blocks_page_feed_section_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -4007,9 +3937,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_feed_section_view_all_page_id_pages_id_fk": {
-          "name": "_posts_v_blocks_layout_feed_section_view_all_page_id_pages_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_feed_section",
+        "_posts_v_blocks_page_feed_section_view_all_page_id_pages_id_fk": {
+          "name": "_posts_v_blocks_page_feed_section_view_all_page_id_pages_id_fk",
+          "tableFrom": "_posts_v_blocks_page_feed_section",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -4020,9 +3950,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "_posts_v_blocks_layout_feed_section_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_feed_section_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_feed_section",
+        "_posts_v_blocks_page_feed_section_parent_id_fk": {
+          "name": "_posts_v_blocks_page_feed_section_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_feed_section",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -4038,8 +3968,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_feed_section_locales": {
-      "name": "_posts_v_blocks_layout_feed_section_locales",
+    "_posts_v_blocks_page_feed_section_locales": {
+      "name": "_posts_v_blocks_page_feed_section_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -4113,8 +4043,8 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_feed_section_locales_locale_parent_id": {
-          "name": "_posts_v_blocks_layout_feed_section_locales_locale_parent_id",
+        "_posts_v_blocks_page_feed_section_locales_locale_parent_id_u": {
+          "name": "_posts_v_blocks_page_feed_section_locales_locale_parent_id_u",
           "columns": [
             "_locale",
             "_parent_id"
@@ -4123,10 +4053,10 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_feed_section_locales_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_feed_section_locales_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_feed_section_locales",
-          "tableTo": "_posts_v_blocks_layout_feed_section",
+        "_posts_v_blocks_page_feed_section_locales_parent_id_fk": {
+          "name": "_posts_v_blocks_page_feed_section_locales_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_feed_section_locales",
+          "tableTo": "_posts_v_blocks_page_feed_section",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -4141,8 +4071,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_rich_text_without_block": {
-      "name": "_posts_v_blocks_layout_rich_text_without_block",
+    "_posts_v_blocks_page_rich_text": {
+      "name": "_posts_v_blocks_page_rich_text",
       "columns": {
         "_order": {
           "name": "_order",
@@ -4188,22 +4118,22 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_rich_text_without_block_order_idx": {
-          "name": "_posts_v_blocks_layout_rich_text_without_block_order_idx",
+        "_posts_v_blocks_page_rich_text_order_idx": {
+          "name": "_posts_v_blocks_page_rich_text_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_rich_text_without_block_parent_id_idx": {
-          "name": "_posts_v_blocks_layout_rich_text_without_block_parent_id_idx",
+        "_posts_v_blocks_page_rich_text_parent_id_idx": {
+          "name": "_posts_v_blocks_page_rich_text_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_rich_text_without_block_path_idx": {
-          "name": "_posts_v_blocks_layout_rich_text_without_block_path_idx",
+        "_posts_v_blocks_page_rich_text_path_idx": {
+          "name": "_posts_v_blocks_page_rich_text_path_idx",
           "columns": [
             "_path"
           ],
@@ -4211,9 +4141,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_rich_text_without_block_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_rich_text_without_block_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_rich_text_without_block",
+        "_posts_v_blocks_page_rich_text_parent_id_fk": {
+          "name": "_posts_v_blocks_page_rich_text_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_rich_text",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -4229,8 +4159,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_rich_text_without_block_locales": {
-      "name": "_posts_v_blocks_layout_rich_text_without_block_locales",
+    "_posts_v_blocks_page_rich_text_locales": {
+      "name": "_posts_v_blocks_page_rich_text_locales",
       "columns": {
         "content": {
           "name": "content",
@@ -4262,8 +4192,8 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_rich_text_without_block_locales_local": {
-          "name": "_posts_v_blocks_layout_rich_text_without_block_locales_local",
+        "_posts_v_blocks_page_rich_text_locales_locale_parent_id_uniq": {
+          "name": "_posts_v_blocks_page_rich_text_locales_locale_parent_id_uniq",
           "columns": [
             "_locale",
             "_parent_id"
@@ -4272,10 +4202,10 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_rich_text_without_block_locales_pa_fk": {
-          "name": "_posts_v_blocks_layout_rich_text_without_block_locales_pa_fk",
-          "tableFrom": "_posts_v_blocks_layout_rich_text_without_block_locales",
-          "tableTo": "_posts_v_blocks_layout_rich_text_without_block",
+        "_posts_v_blocks_page_rich_text_locales_parent_id_fk": {
+          "name": "_posts_v_blocks_page_rich_text_locales_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_rich_text_locales",
+          "tableTo": "_posts_v_blocks_page_rich_text",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -4709,8 +4639,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_related_items": {
-      "name": "_posts_v_blocks_layout_related_items",
+    "_posts_v_blocks_page_related_items": {
+      "name": "_posts_v_blocks_page_related_items",
       "columns": {
         "_order": {
           "name": "_order",
@@ -4787,29 +4717,29 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_related_items_order_idx": {
-          "name": "_posts_v_blocks_layout_related_items_order_idx",
+        "_posts_v_blocks_page_related_items_order_idx": {
+          "name": "_posts_v_blocks_page_related_items_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_related_items_parent_id_idx": {
-          "name": "_posts_v_blocks_layout_related_items_parent_id_idx",
+        "_posts_v_blocks_page_related_items_parent_id_idx": {
+          "name": "_posts_v_blocks_page_related_items_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_related_items_path_idx": {
-          "name": "_posts_v_blocks_layout_related_items_path_idx",
+        "_posts_v_blocks_page_related_items_path_idx": {
+          "name": "_posts_v_blocks_page_related_items_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_related_items_view_all_page_idx": {
-          "name": "_posts_v_blocks_layout_related_items_view_all_page_idx",
+        "_posts_v_blocks_page_related_items_view_all_page_idx": {
+          "name": "_posts_v_blocks_page_related_items_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -4817,9 +4747,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_related_items_view_all_page_id_pages_id_fk": {
-          "name": "_posts_v_blocks_layout_related_items_view_all_page_id_pages_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_related_items",
+        "_posts_v_blocks_page_related_items_view_all_page_id_pages_id_fk": {
+          "name": "_posts_v_blocks_page_related_items_view_all_page_id_pages_id_fk",
+          "tableFrom": "_posts_v_blocks_page_related_items",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -4830,9 +4760,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "_posts_v_blocks_layout_related_items_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_related_items_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_related_items",
+        "_posts_v_blocks_page_related_items_parent_id_fk": {
+          "name": "_posts_v_blocks_page_related_items_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_related_items",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -4848,8 +4778,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_related_items_locales": {
-      "name": "_posts_v_blocks_layout_related_items_locales",
+    "_posts_v_blocks_page_related_items_locales": {
+      "name": "_posts_v_blocks_page_related_items_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -4909,8 +4839,8 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_related_items_locales_locale_parent_i": {
-          "name": "_posts_v_blocks_layout_related_items_locales_locale_parent_i",
+        "_posts_v_blocks_page_related_items_locales_locale_parent_id_": {
+          "name": "_posts_v_blocks_page_related_items_locales_locale_parent_id_",
           "columns": [
             "_locale",
             "_parent_id"
@@ -4919,10 +4849,10 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_related_items_locales_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_related_items_locales_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_related_items_locales",
-          "tableTo": "_posts_v_blocks_layout_related_items",
+        "_posts_v_blocks_page_related_items_locales_parent_id_fk": {
+          "name": "_posts_v_blocks_page_related_items_locales_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_related_items_locales",
+          "tableTo": "_posts_v_blocks_page_related_items",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -4937,8 +4867,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_typewriter": {
-      "name": "_posts_v_blocks_layout_typewriter",
+    "_posts_v_blocks_page_typewriter": {
+      "name": "_posts_v_blocks_page_typewriter",
       "columns": {
         "_order": {
           "name": "_order",
@@ -4984,22 +4914,22 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_typewriter_order_idx": {
-          "name": "_posts_v_blocks_layout_typewriter_order_idx",
+        "_posts_v_blocks_page_typewriter_order_idx": {
+          "name": "_posts_v_blocks_page_typewriter_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_typewriter_parent_id_idx": {
-          "name": "_posts_v_blocks_layout_typewriter_parent_id_idx",
+        "_posts_v_blocks_page_typewriter_parent_id_idx": {
+          "name": "_posts_v_blocks_page_typewriter_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_typewriter_path_idx": {
-          "name": "_posts_v_blocks_layout_typewriter_path_idx",
+        "_posts_v_blocks_page_typewriter_path_idx": {
+          "name": "_posts_v_blocks_page_typewriter_path_idx",
           "columns": [
             "_path"
           ],
@@ -5007,9 +4937,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_typewriter_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_typewriter_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_typewriter",
+        "_posts_v_blocks_page_typewriter_parent_id_fk": {
+          "name": "_posts_v_blocks_page_typewriter_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_typewriter",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -5025,8 +4955,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_scramble_hover": {
-      "name": "_posts_v_blocks_layout_scramble_hover",
+    "_posts_v_blocks_page_scramble_hover": {
+      "name": "_posts_v_blocks_page_scramble_hover",
       "columns": {
         "_order": {
           "name": "_order",
@@ -5072,22 +5002,22 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_scramble_hover_order_idx": {
-          "name": "_posts_v_blocks_layout_scramble_hover_order_idx",
+        "_posts_v_blocks_page_scramble_hover_order_idx": {
+          "name": "_posts_v_blocks_page_scramble_hover_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_scramble_hover_parent_id_idx": {
-          "name": "_posts_v_blocks_layout_scramble_hover_parent_id_idx",
+        "_posts_v_blocks_page_scramble_hover_parent_id_idx": {
+          "name": "_posts_v_blocks_page_scramble_hover_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_scramble_hover_path_idx": {
-          "name": "_posts_v_blocks_layout_scramble_hover_path_idx",
+        "_posts_v_blocks_page_scramble_hover_path_idx": {
+          "name": "_posts_v_blocks_page_scramble_hover_path_idx",
           "columns": [
             "_path"
           ],
@@ -5095,9 +5025,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_scramble_hover_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_scramble_hover_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_scramble_hover",
+        "_posts_v_blocks_page_scramble_hover_parent_id_fk": {
+          "name": "_posts_v_blocks_page_scramble_hover_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_scramble_hover",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -5113,8 +5043,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_blank_space": {
-      "name": "_posts_v_blocks_layout_blank_space",
+    "_posts_v_blocks_page_blank_space": {
+      "name": "_posts_v_blocks_page_blank_space",
       "columns": {
         "_order": {
           "name": "_order",
@@ -5168,22 +5098,22 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_blank_space_order_idx": {
-          "name": "_posts_v_blocks_layout_blank_space_order_idx",
+        "_posts_v_blocks_page_blank_space_order_idx": {
+          "name": "_posts_v_blocks_page_blank_space_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_blank_space_parent_id_idx": {
-          "name": "_posts_v_blocks_layout_blank_space_parent_id_idx",
+        "_posts_v_blocks_page_blank_space_parent_id_idx": {
+          "name": "_posts_v_blocks_page_blank_space_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_blank_space_path_idx": {
-          "name": "_posts_v_blocks_layout_blank_space_path_idx",
+        "_posts_v_blocks_page_blank_space_path_idx": {
+          "name": "_posts_v_blocks_page_blank_space_path_idx",
           "columns": [
             "_path"
           ],
@@ -5191,9 +5121,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_blank_space_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_blank_space_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_blank_space",
+        "_posts_v_blocks_page_blank_space_parent_id_fk": {
+          "name": "_posts_v_blocks_page_blank_space_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_blank_space",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -5209,8 +5139,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_footer": {
-      "name": "_posts_v_blocks_layout_footer",
+    "_posts_v_blocks_page_footer": {
+      "name": "_posts_v_blocks_page_footer",
       "columns": {
         "_order": {
           "name": "_order",
@@ -5256,22 +5186,22 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_footer_order_idx": {
-          "name": "_posts_v_blocks_layout_footer_order_idx",
+        "_posts_v_blocks_page_footer_order_idx": {
+          "name": "_posts_v_blocks_page_footer_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_footer_parent_id_idx": {
-          "name": "_posts_v_blocks_layout_footer_parent_id_idx",
+        "_posts_v_blocks_page_footer_parent_id_idx": {
+          "name": "_posts_v_blocks_page_footer_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_layout_footer_path_idx": {
-          "name": "_posts_v_blocks_layout_footer_path_idx",
+        "_posts_v_blocks_page_footer_path_idx": {
+          "name": "_posts_v_blocks_page_footer_path_idx",
           "columns": [
             "_path"
           ],
@@ -5279,9 +5209,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_footer_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_footer_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_footer",
+        "_posts_v_blocks_page_footer_parent_id_fk": {
+          "name": "_posts_v_blocks_page_footer_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_footer",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -5297,8 +5227,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_layout_footer_locales": {
-      "name": "_posts_v_blocks_layout_footer_locales",
+    "_posts_v_blocks_page_footer_locales": {
+      "name": "_posts_v_blocks_page_footer_locales",
       "columns": {
         "footer_text": {
           "name": "footer_text",
@@ -5359,8 +5289,8 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_layout_footer_locales_locale_parent_id_uniqu": {
-          "name": "_posts_v_blocks_layout_footer_locales_locale_parent_id_uniqu",
+        "_posts_v_blocks_page_footer_locales_locale_parent_id_unique": {
+          "name": "_posts_v_blocks_page_footer_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -5369,10 +5299,10 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_layout_footer_locales_parent_id_fk": {
-          "name": "_posts_v_blocks_layout_footer_locales_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_layout_footer_locales",
-          "tableTo": "_posts_v_blocks_layout_footer",
+        "_posts_v_blocks_page_footer_locales_parent_id_fk": {
+          "name": "_posts_v_blocks_page_footer_locales_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_page_footer_locales",
+          "tableTo": "_posts_v_blocks_page_footer",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -5387,8 +5317,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_detail_post": {
-      "name": "_posts_v_blocks_detail_post",
+    "_posts_v_blocks_template_post": {
+      "name": "_posts_v_blocks_template_post",
       "columns": {
         "_order": {
           "name": "_order",
@@ -5434,22 +5364,22 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_detail_post_order_idx": {
-          "name": "_posts_v_blocks_detail_post_order_idx",
+        "_posts_v_blocks_template_post_order_idx": {
+          "name": "_posts_v_blocks_template_post_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_detail_post_parent_id_idx": {
-          "name": "_posts_v_blocks_detail_post_parent_id_idx",
+        "_posts_v_blocks_template_post_parent_id_idx": {
+          "name": "_posts_v_blocks_template_post_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_detail_post_path_idx": {
-          "name": "_posts_v_blocks_detail_post_path_idx",
+        "_posts_v_blocks_template_post_path_idx": {
+          "name": "_posts_v_blocks_template_post_path_idx",
           "columns": [
             "_path"
           ],
@@ -5457,9 +5387,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_detail_post_parent_id_fk": {
-          "name": "_posts_v_blocks_detail_post_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_detail_post",
+        "_posts_v_blocks_template_post_parent_id_fk": {
+          "name": "_posts_v_blocks_template_post_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_template_post",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -5475,8 +5405,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_posts_v_blocks_detail_project": {
-      "name": "_posts_v_blocks_detail_project",
+    "_posts_v_blocks_template_project": {
+      "name": "_posts_v_blocks_template_project",
       "columns": {
         "_order": {
           "name": "_order",
@@ -5522,22 +5452,22 @@
         }
       },
       "indexes": {
-        "_posts_v_blocks_detail_project_order_idx": {
-          "name": "_posts_v_blocks_detail_project_order_idx",
+        "_posts_v_blocks_template_project_order_idx": {
+          "name": "_posts_v_blocks_template_project_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_detail_project_parent_id_idx": {
-          "name": "_posts_v_blocks_detail_project_parent_id_idx",
+        "_posts_v_blocks_template_project_parent_id_idx": {
+          "name": "_posts_v_blocks_template_project_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_posts_v_blocks_detail_project_path_idx": {
-          "name": "_posts_v_blocks_detail_project_path_idx",
+        "_posts_v_blocks_template_project_path_idx": {
+          "name": "_posts_v_blocks_template_project_path_idx",
           "columns": [
             "_path"
           ],
@@ -5545,9 +5475,9 @@
         }
       },
       "foreignKeys": {
-        "_posts_v_blocks_detail_project_parent_id_fk": {
-          "name": "_posts_v_blocks_detail_project_parent_id_fk",
-          "tableFrom": "_posts_v_blocks_detail_project",
+        "_posts_v_blocks_template_project_parent_id_fk": {
+          "name": "_posts_v_blocks_template_project_parent_id_fk",
+          "tableFrom": "_posts_v_blocks_template_project",
           "tableTo": "_posts_v",
           "columnsFrom": [
             "_parent_id"
@@ -7355,8 +7285,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_hero": {
-      "name": "projects_blocks_layout_hero",
+    "projects_blocks_page_hero": {
+      "name": "projects_blocks_page_hero",
       "columns": {
         "_order": {
           "name": "_order",
@@ -7402,29 +7332,29 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_hero_order_idx": {
-          "name": "projects_blocks_layout_hero_order_idx",
+        "projects_blocks_page_hero_order_idx": {
+          "name": "projects_blocks_page_hero_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_hero_parent_id_idx": {
-          "name": "projects_blocks_layout_hero_parent_id_idx",
+        "projects_blocks_page_hero_parent_id_idx": {
+          "name": "projects_blocks_page_hero_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_hero_path_idx": {
-          "name": "projects_blocks_layout_hero_path_idx",
+        "projects_blocks_page_hero_path_idx": {
+          "name": "projects_blocks_page_hero_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_hero_hero_image_idx": {
-          "name": "projects_blocks_layout_hero_hero_image_idx",
+        "projects_blocks_page_hero_hero_image_idx": {
+          "name": "projects_blocks_page_hero_hero_image_idx",
           "columns": [
             "hero_image_id"
           ],
@@ -7432,9 +7362,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_hero_hero_image_id_media_id_fk": {
-          "name": "projects_blocks_layout_hero_hero_image_id_media_id_fk",
-          "tableFrom": "projects_blocks_layout_hero",
+        "projects_blocks_page_hero_hero_image_id_media_id_fk": {
+          "name": "projects_blocks_page_hero_hero_image_id_media_id_fk",
+          "tableFrom": "projects_blocks_page_hero",
           "tableTo": "media",
           "columnsFrom": [
             "hero_image_id"
@@ -7445,9 +7375,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "projects_blocks_layout_hero_parent_id_fk": {
-          "name": "projects_blocks_layout_hero_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_hero",
+        "projects_blocks_page_hero_parent_id_fk": {
+          "name": "projects_blocks_page_hero_parent_id_fk",
+          "tableFrom": "projects_blocks_page_hero",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -7463,46 +7393,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_hero_locales": {
-      "name": "projects_blocks_layout_hero_locales",
+    "projects_blocks_page_hero_locales": {
+      "name": "projects_blocks_page_hero_locales",
       "columns": {
-        "label_title": {
-          "name": "label_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_tagline": {
-          "name": "label_tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tagline": {
-          "name": "tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_bio": {
-          "name": "label_bio",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "bio": {
-          "name": "bio",
+        "paragraph": {
+          "name": "paragraph",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -7553,8 +7448,8 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_hero_locales_locale_parent_id_unique": {
-          "name": "projects_blocks_layout_hero_locales_locale_parent_id_unique",
+        "projects_blocks_page_hero_locales_locale_parent_id_unique": {
+          "name": "projects_blocks_page_hero_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -7563,10 +7458,10 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_hero_locales_parent_id_fk": {
-          "name": "projects_blocks_layout_hero_locales_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_hero_locales",
-          "tableTo": "projects_blocks_layout_hero",
+        "projects_blocks_page_hero_locales_parent_id_fk": {
+          "name": "projects_blocks_page_hero_locales_parent_id_fk",
+          "tableFrom": "projects_blocks_page_hero_locales",
+          "tableTo": "projects_blocks_page_hero",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -7581,8 +7476,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_feed_section": {
-      "name": "projects_blocks_layout_feed_section",
+    "projects_blocks_page_feed_section": {
+      "name": "projects_blocks_page_feed_section",
       "columns": {
         "_order": {
           "name": "_order",
@@ -7668,29 +7563,29 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_feed_section_order_idx": {
-          "name": "projects_blocks_layout_feed_section_order_idx",
+        "projects_blocks_page_feed_section_order_idx": {
+          "name": "projects_blocks_page_feed_section_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_feed_section_parent_id_idx": {
-          "name": "projects_blocks_layout_feed_section_parent_id_idx",
+        "projects_blocks_page_feed_section_parent_id_idx": {
+          "name": "projects_blocks_page_feed_section_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_feed_section_path_idx": {
-          "name": "projects_blocks_layout_feed_section_path_idx",
+        "projects_blocks_page_feed_section_path_idx": {
+          "name": "projects_blocks_page_feed_section_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_feed_section_view_all_page_idx": {
-          "name": "projects_blocks_layout_feed_section_view_all_page_idx",
+        "projects_blocks_page_feed_section_view_all_page_idx": {
+          "name": "projects_blocks_page_feed_section_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -7698,9 +7593,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_feed_section_view_all_page_id_pages_id_fk": {
-          "name": "projects_blocks_layout_feed_section_view_all_page_id_pages_id_fk",
-          "tableFrom": "projects_blocks_layout_feed_section",
+        "projects_blocks_page_feed_section_view_all_page_id_pages_id_fk": {
+          "name": "projects_blocks_page_feed_section_view_all_page_id_pages_id_fk",
+          "tableFrom": "projects_blocks_page_feed_section",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -7711,9 +7606,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "projects_blocks_layout_feed_section_parent_id_fk": {
-          "name": "projects_blocks_layout_feed_section_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_feed_section",
+        "projects_blocks_page_feed_section_parent_id_fk": {
+          "name": "projects_blocks_page_feed_section_parent_id_fk",
+          "tableFrom": "projects_blocks_page_feed_section",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -7729,8 +7624,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_feed_section_locales": {
-      "name": "projects_blocks_layout_feed_section_locales",
+    "projects_blocks_page_feed_section_locales": {
+      "name": "projects_blocks_page_feed_section_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -7804,8 +7699,8 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_feed_section_locales_locale_parent_id": {
-          "name": "projects_blocks_layout_feed_section_locales_locale_parent_id",
+        "projects_blocks_page_feed_section_locales_locale_parent_id_u": {
+          "name": "projects_blocks_page_feed_section_locales_locale_parent_id_u",
           "columns": [
             "_locale",
             "_parent_id"
@@ -7814,10 +7709,10 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_feed_section_locales_parent_id_fk": {
-          "name": "projects_blocks_layout_feed_section_locales_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_feed_section_locales",
-          "tableTo": "projects_blocks_layout_feed_section",
+        "projects_blocks_page_feed_section_locales_parent_id_fk": {
+          "name": "projects_blocks_page_feed_section_locales_parent_id_fk",
+          "tableFrom": "projects_blocks_page_feed_section_locales",
+          "tableTo": "projects_blocks_page_feed_section",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -7832,8 +7727,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_rich_text_without_block": {
-      "name": "projects_blocks_layout_rich_text_without_block",
+    "projects_blocks_page_rich_text": {
+      "name": "projects_blocks_page_rich_text",
       "columns": {
         "_order": {
           "name": "_order",
@@ -7872,22 +7767,22 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_rich_text_without_block_order_idx": {
-          "name": "projects_blocks_layout_rich_text_without_block_order_idx",
+        "projects_blocks_page_rich_text_order_idx": {
+          "name": "projects_blocks_page_rich_text_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_rich_text_without_block_parent_id_idx": {
-          "name": "projects_blocks_layout_rich_text_without_block_parent_id_idx",
+        "projects_blocks_page_rich_text_parent_id_idx": {
+          "name": "projects_blocks_page_rich_text_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_rich_text_without_block_path_idx": {
-          "name": "projects_blocks_layout_rich_text_without_block_path_idx",
+        "projects_blocks_page_rich_text_path_idx": {
+          "name": "projects_blocks_page_rich_text_path_idx",
           "columns": [
             "_path"
           ],
@@ -7895,9 +7790,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_rich_text_without_block_parent_id_fk": {
-          "name": "projects_blocks_layout_rich_text_without_block_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_rich_text_without_block",
+        "projects_blocks_page_rich_text_parent_id_fk": {
+          "name": "projects_blocks_page_rich_text_parent_id_fk",
+          "tableFrom": "projects_blocks_page_rich_text",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -7913,8 +7808,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_rich_text_without_block_locales": {
-      "name": "projects_blocks_layout_rich_text_without_block_locales",
+    "projects_blocks_page_rich_text_locales": {
+      "name": "projects_blocks_page_rich_text_locales",
       "columns": {
         "content": {
           "name": "content",
@@ -7946,8 +7841,8 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_rich_text_without_block_locales_local": {
-          "name": "projects_blocks_layout_rich_text_without_block_locales_local",
+        "projects_blocks_page_rich_text_locales_locale_parent_id_uniq": {
+          "name": "projects_blocks_page_rich_text_locales_locale_parent_id_uniq",
           "columns": [
             "_locale",
             "_parent_id"
@@ -7956,10 +7851,10 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_rich_text_without_block_locales_pa_fk": {
-          "name": "projects_blocks_layout_rich_text_without_block_locales_pa_fk",
-          "tableFrom": "projects_blocks_layout_rich_text_without_block_locales",
-          "tableTo": "projects_blocks_layout_rich_text_without_block",
+        "projects_blocks_page_rich_text_locales_parent_id_fk": {
+          "name": "projects_blocks_page_rich_text_locales_parent_id_fk",
+          "tableFrom": "projects_blocks_page_rich_text_locales",
+          "tableTo": "projects_blocks_page_rich_text",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -8372,8 +8267,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_related_items": {
-      "name": "projects_blocks_layout_related_items",
+    "projects_blocks_page_related_items": {
+      "name": "projects_blocks_page_related_items",
       "columns": {
         "_order": {
           "name": "_order",
@@ -8443,29 +8338,29 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_related_items_order_idx": {
-          "name": "projects_blocks_layout_related_items_order_idx",
+        "projects_blocks_page_related_items_order_idx": {
+          "name": "projects_blocks_page_related_items_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_related_items_parent_id_idx": {
-          "name": "projects_blocks_layout_related_items_parent_id_idx",
+        "projects_blocks_page_related_items_parent_id_idx": {
+          "name": "projects_blocks_page_related_items_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_related_items_path_idx": {
-          "name": "projects_blocks_layout_related_items_path_idx",
+        "projects_blocks_page_related_items_path_idx": {
+          "name": "projects_blocks_page_related_items_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_related_items_view_all_page_idx": {
-          "name": "projects_blocks_layout_related_items_view_all_page_idx",
+        "projects_blocks_page_related_items_view_all_page_idx": {
+          "name": "projects_blocks_page_related_items_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -8473,9 +8368,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_related_items_view_all_page_id_pages_id_fk": {
-          "name": "projects_blocks_layout_related_items_view_all_page_id_pages_id_fk",
-          "tableFrom": "projects_blocks_layout_related_items",
+        "projects_blocks_page_related_items_view_all_page_id_pages_id_fk": {
+          "name": "projects_blocks_page_related_items_view_all_page_id_pages_id_fk",
+          "tableFrom": "projects_blocks_page_related_items",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -8486,9 +8381,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "projects_blocks_layout_related_items_parent_id_fk": {
-          "name": "projects_blocks_layout_related_items_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_related_items",
+        "projects_blocks_page_related_items_parent_id_fk": {
+          "name": "projects_blocks_page_related_items_parent_id_fk",
+          "tableFrom": "projects_blocks_page_related_items",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -8504,8 +8399,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_related_items_locales": {
-      "name": "projects_blocks_layout_related_items_locales",
+    "projects_blocks_page_related_items_locales": {
+      "name": "projects_blocks_page_related_items_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -8565,8 +8460,8 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_related_items_locales_locale_parent_i": {
-          "name": "projects_blocks_layout_related_items_locales_locale_parent_i",
+        "projects_blocks_page_related_items_locales_locale_parent_id_": {
+          "name": "projects_blocks_page_related_items_locales_locale_parent_id_",
           "columns": [
             "_locale",
             "_parent_id"
@@ -8575,10 +8470,10 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_related_items_locales_parent_id_fk": {
-          "name": "projects_blocks_layout_related_items_locales_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_related_items_locales",
-          "tableTo": "projects_blocks_layout_related_items",
+        "projects_blocks_page_related_items_locales_parent_id_fk": {
+          "name": "projects_blocks_page_related_items_locales_parent_id_fk",
+          "tableFrom": "projects_blocks_page_related_items_locales",
+          "tableTo": "projects_blocks_page_related_items",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -8593,8 +8488,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_typewriter": {
-      "name": "projects_blocks_layout_typewriter",
+    "projects_blocks_page_typewriter": {
+      "name": "projects_blocks_page_typewriter",
       "columns": {
         "_order": {
           "name": "_order",
@@ -8633,22 +8528,22 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_typewriter_order_idx": {
-          "name": "projects_blocks_layout_typewriter_order_idx",
+        "projects_blocks_page_typewriter_order_idx": {
+          "name": "projects_blocks_page_typewriter_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_typewriter_parent_id_idx": {
-          "name": "projects_blocks_layout_typewriter_parent_id_idx",
+        "projects_blocks_page_typewriter_parent_id_idx": {
+          "name": "projects_blocks_page_typewriter_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_typewriter_path_idx": {
-          "name": "projects_blocks_layout_typewriter_path_idx",
+        "projects_blocks_page_typewriter_path_idx": {
+          "name": "projects_blocks_page_typewriter_path_idx",
           "columns": [
             "_path"
           ],
@@ -8656,9 +8551,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_typewriter_parent_id_fk": {
-          "name": "projects_blocks_layout_typewriter_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_typewriter",
+        "projects_blocks_page_typewriter_parent_id_fk": {
+          "name": "projects_blocks_page_typewriter_parent_id_fk",
+          "tableFrom": "projects_blocks_page_typewriter",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -8674,8 +8569,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_scramble_hover": {
-      "name": "projects_blocks_layout_scramble_hover",
+    "projects_blocks_page_scramble_hover": {
+      "name": "projects_blocks_page_scramble_hover",
       "columns": {
         "_order": {
           "name": "_order",
@@ -8714,22 +8609,22 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_scramble_hover_order_idx": {
-          "name": "projects_blocks_layout_scramble_hover_order_idx",
+        "projects_blocks_page_scramble_hover_order_idx": {
+          "name": "projects_blocks_page_scramble_hover_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_scramble_hover_parent_id_idx": {
-          "name": "projects_blocks_layout_scramble_hover_parent_id_idx",
+        "projects_blocks_page_scramble_hover_parent_id_idx": {
+          "name": "projects_blocks_page_scramble_hover_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_scramble_hover_path_idx": {
-          "name": "projects_blocks_layout_scramble_hover_path_idx",
+        "projects_blocks_page_scramble_hover_path_idx": {
+          "name": "projects_blocks_page_scramble_hover_path_idx",
           "columns": [
             "_path"
           ],
@@ -8737,9 +8632,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_scramble_hover_parent_id_fk": {
-          "name": "projects_blocks_layout_scramble_hover_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_scramble_hover",
+        "projects_blocks_page_scramble_hover_parent_id_fk": {
+          "name": "projects_blocks_page_scramble_hover_parent_id_fk",
+          "tableFrom": "projects_blocks_page_scramble_hover",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -8755,8 +8650,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_blank_space": {
-      "name": "projects_blocks_layout_blank_space",
+    "projects_blocks_page_blank_space": {
+      "name": "projects_blocks_page_blank_space",
       "columns": {
         "_order": {
           "name": "_order",
@@ -8803,22 +8698,22 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_blank_space_order_idx": {
-          "name": "projects_blocks_layout_blank_space_order_idx",
+        "projects_blocks_page_blank_space_order_idx": {
+          "name": "projects_blocks_page_blank_space_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_blank_space_parent_id_idx": {
-          "name": "projects_blocks_layout_blank_space_parent_id_idx",
+        "projects_blocks_page_blank_space_parent_id_idx": {
+          "name": "projects_blocks_page_blank_space_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_blank_space_path_idx": {
-          "name": "projects_blocks_layout_blank_space_path_idx",
+        "projects_blocks_page_blank_space_path_idx": {
+          "name": "projects_blocks_page_blank_space_path_idx",
           "columns": [
             "_path"
           ],
@@ -8826,9 +8721,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_blank_space_parent_id_fk": {
-          "name": "projects_blocks_layout_blank_space_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_blank_space",
+        "projects_blocks_page_blank_space_parent_id_fk": {
+          "name": "projects_blocks_page_blank_space_parent_id_fk",
+          "tableFrom": "projects_blocks_page_blank_space",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -8844,8 +8739,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_footer": {
-      "name": "projects_blocks_layout_footer",
+    "projects_blocks_page_footer": {
+      "name": "projects_blocks_page_footer",
       "columns": {
         "_order": {
           "name": "_order",
@@ -8884,22 +8779,22 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_footer_order_idx": {
-          "name": "projects_blocks_layout_footer_order_idx",
+        "projects_blocks_page_footer_order_idx": {
+          "name": "projects_blocks_page_footer_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_footer_parent_id_idx": {
-          "name": "projects_blocks_layout_footer_parent_id_idx",
+        "projects_blocks_page_footer_parent_id_idx": {
+          "name": "projects_blocks_page_footer_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_layout_footer_path_idx": {
-          "name": "projects_blocks_layout_footer_path_idx",
+        "projects_blocks_page_footer_path_idx": {
+          "name": "projects_blocks_page_footer_path_idx",
           "columns": [
             "_path"
           ],
@@ -8907,9 +8802,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_footer_parent_id_fk": {
-          "name": "projects_blocks_layout_footer_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_footer",
+        "projects_blocks_page_footer_parent_id_fk": {
+          "name": "projects_blocks_page_footer_parent_id_fk",
+          "tableFrom": "projects_blocks_page_footer",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -8925,8 +8820,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_layout_footer_locales": {
-      "name": "projects_blocks_layout_footer_locales",
+    "projects_blocks_page_footer_locales": {
+      "name": "projects_blocks_page_footer_locales",
       "columns": {
         "footer_text": {
           "name": "footer_text",
@@ -8987,8 +8882,8 @@
         }
       },
       "indexes": {
-        "projects_blocks_layout_footer_locales_locale_parent_id_uniqu": {
-          "name": "projects_blocks_layout_footer_locales_locale_parent_id_uniqu",
+        "projects_blocks_page_footer_locales_locale_parent_id_unique": {
+          "name": "projects_blocks_page_footer_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -8997,10 +8892,10 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_layout_footer_locales_parent_id_fk": {
-          "name": "projects_blocks_layout_footer_locales_parent_id_fk",
-          "tableFrom": "projects_blocks_layout_footer_locales",
-          "tableTo": "projects_blocks_layout_footer",
+        "projects_blocks_page_footer_locales_parent_id_fk": {
+          "name": "projects_blocks_page_footer_locales_parent_id_fk",
+          "tableFrom": "projects_blocks_page_footer_locales",
+          "tableTo": "projects_blocks_page_footer",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -9015,8 +8910,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_detail_post": {
-      "name": "projects_blocks_detail_post",
+    "projects_blocks_template_post": {
+      "name": "projects_blocks_template_post",
       "columns": {
         "_order": {
           "name": "_order",
@@ -9055,22 +8950,22 @@
         }
       },
       "indexes": {
-        "projects_blocks_detail_post_order_idx": {
-          "name": "projects_blocks_detail_post_order_idx",
+        "projects_blocks_template_post_order_idx": {
+          "name": "projects_blocks_template_post_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_detail_post_parent_id_idx": {
-          "name": "projects_blocks_detail_post_parent_id_idx",
+        "projects_blocks_template_post_parent_id_idx": {
+          "name": "projects_blocks_template_post_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_detail_post_path_idx": {
-          "name": "projects_blocks_detail_post_path_idx",
+        "projects_blocks_template_post_path_idx": {
+          "name": "projects_blocks_template_post_path_idx",
           "columns": [
             "_path"
           ],
@@ -9078,9 +8973,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_detail_post_parent_id_fk": {
-          "name": "projects_blocks_detail_post_parent_id_fk",
-          "tableFrom": "projects_blocks_detail_post",
+        "projects_blocks_template_post_parent_id_fk": {
+          "name": "projects_blocks_template_post_parent_id_fk",
+          "tableFrom": "projects_blocks_template_post",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -9096,8 +8991,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "projects_blocks_detail_project": {
-      "name": "projects_blocks_detail_project",
+    "projects_blocks_template_project": {
+      "name": "projects_blocks_template_project",
       "columns": {
         "_order": {
           "name": "_order",
@@ -9136,22 +9031,22 @@
         }
       },
       "indexes": {
-        "projects_blocks_detail_project_order_idx": {
-          "name": "projects_blocks_detail_project_order_idx",
+        "projects_blocks_template_project_order_idx": {
+          "name": "projects_blocks_template_project_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "projects_blocks_detail_project_parent_id_idx": {
-          "name": "projects_blocks_detail_project_parent_id_idx",
+        "projects_blocks_template_project_parent_id_idx": {
+          "name": "projects_blocks_template_project_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "projects_blocks_detail_project_path_idx": {
-          "name": "projects_blocks_detail_project_path_idx",
+        "projects_blocks_template_project_path_idx": {
+          "name": "projects_blocks_template_project_path_idx",
           "columns": [
             "_path"
           ],
@@ -9159,9 +9054,9 @@
         }
       },
       "foreignKeys": {
-        "projects_blocks_detail_project_parent_id_fk": {
-          "name": "projects_blocks_detail_project_parent_id_fk",
-          "tableFrom": "projects_blocks_detail_project",
+        "projects_blocks_template_project_parent_id_fk": {
+          "name": "projects_blocks_template_project_parent_id_fk",
+          "tableFrom": "projects_blocks_template_project",
           "tableTo": "projects",
           "columnsFrom": [
             "_parent_id"
@@ -9853,8 +9748,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_hero": {
-      "name": "_projects_v_blocks_layout_hero",
+    "_projects_v_blocks_page_hero": {
+      "name": "_projects_v_blocks_page_hero",
       "columns": {
         "_order": {
           "name": "_order",
@@ -9907,29 +9802,29 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_hero_order_idx": {
-          "name": "_projects_v_blocks_layout_hero_order_idx",
+        "_projects_v_blocks_page_hero_order_idx": {
+          "name": "_projects_v_blocks_page_hero_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_hero_parent_id_idx": {
-          "name": "_projects_v_blocks_layout_hero_parent_id_idx",
+        "_projects_v_blocks_page_hero_parent_id_idx": {
+          "name": "_projects_v_blocks_page_hero_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_hero_path_idx": {
-          "name": "_projects_v_blocks_layout_hero_path_idx",
+        "_projects_v_blocks_page_hero_path_idx": {
+          "name": "_projects_v_blocks_page_hero_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_hero_hero_image_idx": {
-          "name": "_projects_v_blocks_layout_hero_hero_image_idx",
+        "_projects_v_blocks_page_hero_hero_image_idx": {
+          "name": "_projects_v_blocks_page_hero_hero_image_idx",
           "columns": [
             "hero_image_id"
           ],
@@ -9937,9 +9832,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_hero_hero_image_id_media_id_fk": {
-          "name": "_projects_v_blocks_layout_hero_hero_image_id_media_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_hero",
+        "_projects_v_blocks_page_hero_hero_image_id_media_id_fk": {
+          "name": "_projects_v_blocks_page_hero_hero_image_id_media_id_fk",
+          "tableFrom": "_projects_v_blocks_page_hero",
           "tableTo": "media",
           "columnsFrom": [
             "hero_image_id"
@@ -9950,9 +9845,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "_projects_v_blocks_layout_hero_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_hero_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_hero",
+        "_projects_v_blocks_page_hero_parent_id_fk": {
+          "name": "_projects_v_blocks_page_hero_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_hero",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -9968,46 +9863,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_hero_locales": {
-      "name": "_projects_v_blocks_layout_hero_locales",
+    "_projects_v_blocks_page_hero_locales": {
+      "name": "_projects_v_blocks_page_hero_locales",
       "columns": {
-        "label_title": {
-          "name": "label_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_tagline": {
-          "name": "label_tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tagline": {
-          "name": "tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_bio": {
-          "name": "label_bio",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "bio": {
-          "name": "bio",
+        "paragraph": {
+          "name": "paragraph",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -10058,8 +9918,8 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_hero_locales_locale_parent_id_uniq": {
-          "name": "_projects_v_blocks_layout_hero_locales_locale_parent_id_uniq",
+        "_projects_v_blocks_page_hero_locales_locale_parent_id_unique": {
+          "name": "_projects_v_blocks_page_hero_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -10068,10 +9928,10 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_hero_locales_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_hero_locales_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_hero_locales",
-          "tableTo": "_projects_v_blocks_layout_hero",
+        "_projects_v_blocks_page_hero_locales_parent_id_fk": {
+          "name": "_projects_v_blocks_page_hero_locales_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_hero_locales",
+          "tableTo": "_projects_v_blocks_page_hero",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -10086,8 +9946,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_feed_section": {
-      "name": "_projects_v_blocks_layout_feed_section",
+    "_projects_v_blocks_page_feed_section": {
+      "name": "_projects_v_blocks_page_feed_section",
       "columns": {
         "_order": {
           "name": "_order",
@@ -10180,29 +10040,29 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_feed_section_order_idx": {
-          "name": "_projects_v_blocks_layout_feed_section_order_idx",
+        "_projects_v_blocks_page_feed_section_order_idx": {
+          "name": "_projects_v_blocks_page_feed_section_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_feed_section_parent_id_idx": {
-          "name": "_projects_v_blocks_layout_feed_section_parent_id_idx",
+        "_projects_v_blocks_page_feed_section_parent_id_idx": {
+          "name": "_projects_v_blocks_page_feed_section_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_feed_section_path_idx": {
-          "name": "_projects_v_blocks_layout_feed_section_path_idx",
+        "_projects_v_blocks_page_feed_section_path_idx": {
+          "name": "_projects_v_blocks_page_feed_section_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_feed_section_view_all_page_idx": {
-          "name": "_projects_v_blocks_layout_feed_section_view_all_page_idx",
+        "_projects_v_blocks_page_feed_section_view_all_page_idx": {
+          "name": "_projects_v_blocks_page_feed_section_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -10210,9 +10070,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_feed_section_view_all_page_id_pages_id_fk": {
-          "name": "_projects_v_blocks_layout_feed_section_view_all_page_id_pages_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_feed_section",
+        "_projects_v_blocks_page_feed_section_view_all_page_id_pages_id_fk": {
+          "name": "_projects_v_blocks_page_feed_section_view_all_page_id_pages_id_fk",
+          "tableFrom": "_projects_v_blocks_page_feed_section",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -10223,9 +10083,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "_projects_v_blocks_layout_feed_section_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_feed_section_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_feed_section",
+        "_projects_v_blocks_page_feed_section_parent_id_fk": {
+          "name": "_projects_v_blocks_page_feed_section_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_feed_section",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -10241,8 +10101,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_feed_section_locales": {
-      "name": "_projects_v_blocks_layout_feed_section_locales",
+    "_projects_v_blocks_page_feed_section_locales": {
+      "name": "_projects_v_blocks_page_feed_section_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -10316,8 +10176,8 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_feed_section_locales_locale_parent": {
-          "name": "_projects_v_blocks_layout_feed_section_locales_locale_parent",
+        "_projects_v_blocks_page_feed_section_locales_locale_parent_i": {
+          "name": "_projects_v_blocks_page_feed_section_locales_locale_parent_i",
           "columns": [
             "_locale",
             "_parent_id"
@@ -10326,10 +10186,10 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_feed_section_locales_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_feed_section_locales_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_feed_section_locales",
-          "tableTo": "_projects_v_blocks_layout_feed_section",
+        "_projects_v_blocks_page_feed_section_locales_parent_id_fk": {
+          "name": "_projects_v_blocks_page_feed_section_locales_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_feed_section_locales",
+          "tableTo": "_projects_v_blocks_page_feed_section",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -10344,8 +10204,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_rich_text_without_block": {
-      "name": "_projects_v_blocks_layout_rich_text_without_block",
+    "_projects_v_blocks_page_rich_text": {
+      "name": "_projects_v_blocks_page_rich_text",
       "columns": {
         "_order": {
           "name": "_order",
@@ -10391,22 +10251,22 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_rich_text_without_block_order_idx": {
-          "name": "_projects_v_blocks_layout_rich_text_without_block_order_idx",
+        "_projects_v_blocks_page_rich_text_order_idx": {
+          "name": "_projects_v_blocks_page_rich_text_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_rich_text_without_block_parent_id_idx": {
-          "name": "_projects_v_blocks_layout_rich_text_without_block_parent_id_idx",
+        "_projects_v_blocks_page_rich_text_parent_id_idx": {
+          "name": "_projects_v_blocks_page_rich_text_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_rich_text_without_block_path_idx": {
-          "name": "_projects_v_blocks_layout_rich_text_without_block_path_idx",
+        "_projects_v_blocks_page_rich_text_path_idx": {
+          "name": "_projects_v_blocks_page_rich_text_path_idx",
           "columns": [
             "_path"
           ],
@@ -10414,9 +10274,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_rich_text_without_block_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_rich_text_without_block_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_rich_text_without_block",
+        "_projects_v_blocks_page_rich_text_parent_id_fk": {
+          "name": "_projects_v_blocks_page_rich_text_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_rich_text",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -10432,8 +10292,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_rich_text_without_block_locales": {
-      "name": "_projects_v_blocks_layout_rich_text_without_block_locales",
+    "_projects_v_blocks_page_rich_text_locales": {
+      "name": "_projects_v_blocks_page_rich_text_locales",
       "columns": {
         "content": {
           "name": "content",
@@ -10465,8 +10325,8 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_rich_text_without_block_locales_lo": {
-          "name": "_projects_v_blocks_layout_rich_text_without_block_locales_lo",
+        "_projects_v_blocks_page_rich_text_locales_locale_parent_id_u": {
+          "name": "_projects_v_blocks_page_rich_text_locales_locale_parent_id_u",
           "columns": [
             "_locale",
             "_parent_id"
@@ -10475,10 +10335,10 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_rich_text_without_block_locales_fk": {
-          "name": "_projects_v_blocks_layout_rich_text_without_block_locales_fk",
-          "tableFrom": "_projects_v_blocks_layout_rich_text_without_block_locales",
-          "tableTo": "_projects_v_blocks_layout_rich_text_without_block",
+        "_projects_v_blocks_page_rich_text_locales_parent_id_fk": {
+          "name": "_projects_v_blocks_page_rich_text_locales_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_rich_text_locales",
+          "tableTo": "_projects_v_blocks_page_rich_text",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -10912,8 +10772,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_related_items": {
-      "name": "_projects_v_blocks_layout_related_items",
+    "_projects_v_blocks_page_related_items": {
+      "name": "_projects_v_blocks_page_related_items",
       "columns": {
         "_order": {
           "name": "_order",
@@ -10990,29 +10850,29 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_related_items_order_idx": {
-          "name": "_projects_v_blocks_layout_related_items_order_idx",
+        "_projects_v_blocks_page_related_items_order_idx": {
+          "name": "_projects_v_blocks_page_related_items_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_related_items_parent_id_idx": {
-          "name": "_projects_v_blocks_layout_related_items_parent_id_idx",
+        "_projects_v_blocks_page_related_items_parent_id_idx": {
+          "name": "_projects_v_blocks_page_related_items_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_related_items_path_idx": {
-          "name": "_projects_v_blocks_layout_related_items_path_idx",
+        "_projects_v_blocks_page_related_items_path_idx": {
+          "name": "_projects_v_blocks_page_related_items_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_related_items_view_all_page_idx": {
-          "name": "_projects_v_blocks_layout_related_items_view_all_page_idx",
+        "_projects_v_blocks_page_related_items_view_all_page_idx": {
+          "name": "_projects_v_blocks_page_related_items_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -11020,9 +10880,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_related_items_view_all_page_id_pages_id_fk": {
-          "name": "_projects_v_blocks_layout_related_items_view_all_page_id_pages_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_related_items",
+        "_projects_v_blocks_page_related_items_view_all_page_id_pages_id_fk": {
+          "name": "_projects_v_blocks_page_related_items_view_all_page_id_pages_id_fk",
+          "tableFrom": "_projects_v_blocks_page_related_items",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -11033,9 +10893,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "_projects_v_blocks_layout_related_items_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_related_items_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_related_items",
+        "_projects_v_blocks_page_related_items_parent_id_fk": {
+          "name": "_projects_v_blocks_page_related_items_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_related_items",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -11051,8 +10911,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_related_items_locales": {
-      "name": "_projects_v_blocks_layout_related_items_locales",
+    "_projects_v_blocks_page_related_items_locales": {
+      "name": "_projects_v_blocks_page_related_items_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -11112,8 +10972,8 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_related_items_locales_locale_paren": {
-          "name": "_projects_v_blocks_layout_related_items_locales_locale_paren",
+        "_projects_v_blocks_page_related_items_locales_locale_parent_": {
+          "name": "_projects_v_blocks_page_related_items_locales_locale_parent_",
           "columns": [
             "_locale",
             "_parent_id"
@@ -11122,10 +10982,10 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_related_items_locales_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_related_items_locales_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_related_items_locales",
-          "tableTo": "_projects_v_blocks_layout_related_items",
+        "_projects_v_blocks_page_related_items_locales_parent_id_fk": {
+          "name": "_projects_v_blocks_page_related_items_locales_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_related_items_locales",
+          "tableTo": "_projects_v_blocks_page_related_items",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -11140,8 +11000,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_typewriter": {
-      "name": "_projects_v_blocks_layout_typewriter",
+    "_projects_v_blocks_page_typewriter": {
+      "name": "_projects_v_blocks_page_typewriter",
       "columns": {
         "_order": {
           "name": "_order",
@@ -11187,22 +11047,22 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_typewriter_order_idx": {
-          "name": "_projects_v_blocks_layout_typewriter_order_idx",
+        "_projects_v_blocks_page_typewriter_order_idx": {
+          "name": "_projects_v_blocks_page_typewriter_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_typewriter_parent_id_idx": {
-          "name": "_projects_v_blocks_layout_typewriter_parent_id_idx",
+        "_projects_v_blocks_page_typewriter_parent_id_idx": {
+          "name": "_projects_v_blocks_page_typewriter_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_typewriter_path_idx": {
-          "name": "_projects_v_blocks_layout_typewriter_path_idx",
+        "_projects_v_blocks_page_typewriter_path_idx": {
+          "name": "_projects_v_blocks_page_typewriter_path_idx",
           "columns": [
             "_path"
           ],
@@ -11210,9 +11070,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_typewriter_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_typewriter_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_typewriter",
+        "_projects_v_blocks_page_typewriter_parent_id_fk": {
+          "name": "_projects_v_blocks_page_typewriter_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_typewriter",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -11228,8 +11088,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_scramble_hover": {
-      "name": "_projects_v_blocks_layout_scramble_hover",
+    "_projects_v_blocks_page_scramble_hover": {
+      "name": "_projects_v_blocks_page_scramble_hover",
       "columns": {
         "_order": {
           "name": "_order",
@@ -11275,22 +11135,22 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_scramble_hover_order_idx": {
-          "name": "_projects_v_blocks_layout_scramble_hover_order_idx",
+        "_projects_v_blocks_page_scramble_hover_order_idx": {
+          "name": "_projects_v_blocks_page_scramble_hover_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_scramble_hover_parent_id_idx": {
-          "name": "_projects_v_blocks_layout_scramble_hover_parent_id_idx",
+        "_projects_v_blocks_page_scramble_hover_parent_id_idx": {
+          "name": "_projects_v_blocks_page_scramble_hover_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_scramble_hover_path_idx": {
-          "name": "_projects_v_blocks_layout_scramble_hover_path_idx",
+        "_projects_v_blocks_page_scramble_hover_path_idx": {
+          "name": "_projects_v_blocks_page_scramble_hover_path_idx",
           "columns": [
             "_path"
           ],
@@ -11298,9 +11158,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_scramble_hover_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_scramble_hover_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_scramble_hover",
+        "_projects_v_blocks_page_scramble_hover_parent_id_fk": {
+          "name": "_projects_v_blocks_page_scramble_hover_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_scramble_hover",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -11316,8 +11176,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_blank_space": {
-      "name": "_projects_v_blocks_layout_blank_space",
+    "_projects_v_blocks_page_blank_space": {
+      "name": "_projects_v_blocks_page_blank_space",
       "columns": {
         "_order": {
           "name": "_order",
@@ -11371,22 +11231,22 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_blank_space_order_idx": {
-          "name": "_projects_v_blocks_layout_blank_space_order_idx",
+        "_projects_v_blocks_page_blank_space_order_idx": {
+          "name": "_projects_v_blocks_page_blank_space_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_blank_space_parent_id_idx": {
-          "name": "_projects_v_blocks_layout_blank_space_parent_id_idx",
+        "_projects_v_blocks_page_blank_space_parent_id_idx": {
+          "name": "_projects_v_blocks_page_blank_space_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_blank_space_path_idx": {
-          "name": "_projects_v_blocks_layout_blank_space_path_idx",
+        "_projects_v_blocks_page_blank_space_path_idx": {
+          "name": "_projects_v_blocks_page_blank_space_path_idx",
           "columns": [
             "_path"
           ],
@@ -11394,9 +11254,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_blank_space_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_blank_space_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_blank_space",
+        "_projects_v_blocks_page_blank_space_parent_id_fk": {
+          "name": "_projects_v_blocks_page_blank_space_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_blank_space",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -11412,8 +11272,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_footer": {
-      "name": "_projects_v_blocks_layout_footer",
+    "_projects_v_blocks_page_footer": {
+      "name": "_projects_v_blocks_page_footer",
       "columns": {
         "_order": {
           "name": "_order",
@@ -11459,22 +11319,22 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_footer_order_idx": {
-          "name": "_projects_v_blocks_layout_footer_order_idx",
+        "_projects_v_blocks_page_footer_order_idx": {
+          "name": "_projects_v_blocks_page_footer_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_footer_parent_id_idx": {
-          "name": "_projects_v_blocks_layout_footer_parent_id_idx",
+        "_projects_v_blocks_page_footer_parent_id_idx": {
+          "name": "_projects_v_blocks_page_footer_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_layout_footer_path_idx": {
-          "name": "_projects_v_blocks_layout_footer_path_idx",
+        "_projects_v_blocks_page_footer_path_idx": {
+          "name": "_projects_v_blocks_page_footer_path_idx",
           "columns": [
             "_path"
           ],
@@ -11482,9 +11342,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_footer_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_footer_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_footer",
+        "_projects_v_blocks_page_footer_parent_id_fk": {
+          "name": "_projects_v_blocks_page_footer_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_footer",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -11500,8 +11360,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_layout_footer_locales": {
-      "name": "_projects_v_blocks_layout_footer_locales",
+    "_projects_v_blocks_page_footer_locales": {
+      "name": "_projects_v_blocks_page_footer_locales",
       "columns": {
         "footer_text": {
           "name": "footer_text",
@@ -11562,8 +11422,8 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_layout_footer_locales_locale_parent_id_un": {
-          "name": "_projects_v_blocks_layout_footer_locales_locale_parent_id_un",
+        "_projects_v_blocks_page_footer_locales_locale_parent_id_uniq": {
+          "name": "_projects_v_blocks_page_footer_locales_locale_parent_id_uniq",
           "columns": [
             "_locale",
             "_parent_id"
@@ -11572,10 +11432,10 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_layout_footer_locales_parent_id_fk": {
-          "name": "_projects_v_blocks_layout_footer_locales_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_layout_footer_locales",
-          "tableTo": "_projects_v_blocks_layout_footer",
+        "_projects_v_blocks_page_footer_locales_parent_id_fk": {
+          "name": "_projects_v_blocks_page_footer_locales_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_page_footer_locales",
+          "tableTo": "_projects_v_blocks_page_footer",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -11590,8 +11450,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_detail_post": {
-      "name": "_projects_v_blocks_detail_post",
+    "_projects_v_blocks_template_post": {
+      "name": "_projects_v_blocks_template_post",
       "columns": {
         "_order": {
           "name": "_order",
@@ -11637,22 +11497,22 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_detail_post_order_idx": {
-          "name": "_projects_v_blocks_detail_post_order_idx",
+        "_projects_v_blocks_template_post_order_idx": {
+          "name": "_projects_v_blocks_template_post_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_detail_post_parent_id_idx": {
-          "name": "_projects_v_blocks_detail_post_parent_id_idx",
+        "_projects_v_blocks_template_post_parent_id_idx": {
+          "name": "_projects_v_blocks_template_post_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_detail_post_path_idx": {
-          "name": "_projects_v_blocks_detail_post_path_idx",
+        "_projects_v_blocks_template_post_path_idx": {
+          "name": "_projects_v_blocks_template_post_path_idx",
           "columns": [
             "_path"
           ],
@@ -11660,9 +11520,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_detail_post_parent_id_fk": {
-          "name": "_projects_v_blocks_detail_post_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_detail_post",
+        "_projects_v_blocks_template_post_parent_id_fk": {
+          "name": "_projects_v_blocks_template_post_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_template_post",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -11678,8 +11538,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_projects_v_blocks_detail_project": {
-      "name": "_projects_v_blocks_detail_project",
+    "_projects_v_blocks_template_project": {
+      "name": "_projects_v_blocks_template_project",
       "columns": {
         "_order": {
           "name": "_order",
@@ -11725,22 +11585,22 @@
         }
       },
       "indexes": {
-        "_projects_v_blocks_detail_project_order_idx": {
-          "name": "_projects_v_blocks_detail_project_order_idx",
+        "_projects_v_blocks_template_project_order_idx": {
+          "name": "_projects_v_blocks_template_project_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_detail_project_parent_id_idx": {
-          "name": "_projects_v_blocks_detail_project_parent_id_idx",
+        "_projects_v_blocks_template_project_parent_id_idx": {
+          "name": "_projects_v_blocks_template_project_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_projects_v_blocks_detail_project_path_idx": {
-          "name": "_projects_v_blocks_detail_project_path_idx",
+        "_projects_v_blocks_template_project_path_idx": {
+          "name": "_projects_v_blocks_template_project_path_idx",
           "columns": [
             "_path"
           ],
@@ -11748,9 +11608,9 @@
         }
       },
       "foreignKeys": {
-        "_projects_v_blocks_detail_project_parent_id_fk": {
-          "name": "_projects_v_blocks_detail_project_parent_id_fk",
-          "tableFrom": "_projects_v_blocks_detail_project",
+        "_projects_v_blocks_template_project_parent_id_fk": {
+          "name": "_projects_v_blocks_template_project_parent_id_fk",
+          "tableFrom": "_projects_v_blocks_template_project",
           "tableTo": "_projects_v",
           "columnsFrom": [
             "_parent_id"
@@ -13882,8 +13742,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_hero": {
-      "name": "pages_blocks_layout_hero",
+    "pages_blocks_page_hero": {
+      "name": "pages_blocks_page_hero",
       "columns": {
         "_order": {
           "name": "_order",
@@ -13929,29 +13789,29 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_hero_order_idx": {
-          "name": "pages_blocks_layout_hero_order_idx",
+        "pages_blocks_page_hero_order_idx": {
+          "name": "pages_blocks_page_hero_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_hero_parent_id_idx": {
-          "name": "pages_blocks_layout_hero_parent_id_idx",
+        "pages_blocks_page_hero_parent_id_idx": {
+          "name": "pages_blocks_page_hero_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_hero_path_idx": {
-          "name": "pages_blocks_layout_hero_path_idx",
+        "pages_blocks_page_hero_path_idx": {
+          "name": "pages_blocks_page_hero_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_hero_hero_image_idx": {
-          "name": "pages_blocks_layout_hero_hero_image_idx",
+        "pages_blocks_page_hero_hero_image_idx": {
+          "name": "pages_blocks_page_hero_hero_image_idx",
           "columns": [
             "hero_image_id"
           ],
@@ -13959,9 +13819,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_hero_hero_image_id_media_id_fk": {
-          "name": "pages_blocks_layout_hero_hero_image_id_media_id_fk",
-          "tableFrom": "pages_blocks_layout_hero",
+        "pages_blocks_page_hero_hero_image_id_media_id_fk": {
+          "name": "pages_blocks_page_hero_hero_image_id_media_id_fk",
+          "tableFrom": "pages_blocks_page_hero",
           "tableTo": "media",
           "columnsFrom": [
             "hero_image_id"
@@ -13972,9 +13832,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "pages_blocks_layout_hero_parent_id_fk": {
-          "name": "pages_blocks_layout_hero_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_hero",
+        "pages_blocks_page_hero_parent_id_fk": {
+          "name": "pages_blocks_page_hero_parent_id_fk",
+          "tableFrom": "pages_blocks_page_hero",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -13990,46 +13850,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_hero_locales": {
-      "name": "pages_blocks_layout_hero_locales",
+    "pages_blocks_page_hero_locales": {
+      "name": "pages_blocks_page_hero_locales",
       "columns": {
-        "label_title": {
-          "name": "label_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_tagline": {
-          "name": "label_tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tagline": {
-          "name": "tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_bio": {
-          "name": "label_bio",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "bio": {
-          "name": "bio",
+        "paragraph": {
+          "name": "paragraph",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -14080,8 +13905,8 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_hero_locales_locale_parent_id_unique": {
-          "name": "pages_blocks_layout_hero_locales_locale_parent_id_unique",
+        "pages_blocks_page_hero_locales_locale_parent_id_unique": {
+          "name": "pages_blocks_page_hero_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -14090,10 +13915,10 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_hero_locales_parent_id_fk": {
-          "name": "pages_blocks_layout_hero_locales_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_hero_locales",
-          "tableTo": "pages_blocks_layout_hero",
+        "pages_blocks_page_hero_locales_parent_id_fk": {
+          "name": "pages_blocks_page_hero_locales_parent_id_fk",
+          "tableFrom": "pages_blocks_page_hero_locales",
+          "tableTo": "pages_blocks_page_hero",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -14108,8 +13933,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_feed_section": {
-      "name": "pages_blocks_layout_feed_section",
+    "pages_blocks_page_feed_section": {
+      "name": "pages_blocks_page_feed_section",
       "columns": {
         "_order": {
           "name": "_order",
@@ -14195,29 +14020,29 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_feed_section_order_idx": {
-          "name": "pages_blocks_layout_feed_section_order_idx",
+        "pages_blocks_page_feed_section_order_idx": {
+          "name": "pages_blocks_page_feed_section_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_feed_section_parent_id_idx": {
-          "name": "pages_blocks_layout_feed_section_parent_id_idx",
+        "pages_blocks_page_feed_section_parent_id_idx": {
+          "name": "pages_blocks_page_feed_section_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_feed_section_path_idx": {
-          "name": "pages_blocks_layout_feed_section_path_idx",
+        "pages_blocks_page_feed_section_path_idx": {
+          "name": "pages_blocks_page_feed_section_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_feed_section_view_all_page_idx": {
-          "name": "pages_blocks_layout_feed_section_view_all_page_idx",
+        "pages_blocks_page_feed_section_view_all_page_idx": {
+          "name": "pages_blocks_page_feed_section_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -14225,9 +14050,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_feed_section_view_all_page_id_pages_id_fk": {
-          "name": "pages_blocks_layout_feed_section_view_all_page_id_pages_id_fk",
-          "tableFrom": "pages_blocks_layout_feed_section",
+        "pages_blocks_page_feed_section_view_all_page_id_pages_id_fk": {
+          "name": "pages_blocks_page_feed_section_view_all_page_id_pages_id_fk",
+          "tableFrom": "pages_blocks_page_feed_section",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -14238,9 +14063,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "pages_blocks_layout_feed_section_parent_id_fk": {
-          "name": "pages_blocks_layout_feed_section_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_feed_section",
+        "pages_blocks_page_feed_section_parent_id_fk": {
+          "name": "pages_blocks_page_feed_section_parent_id_fk",
+          "tableFrom": "pages_blocks_page_feed_section",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -14256,8 +14081,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_feed_section_locales": {
-      "name": "pages_blocks_layout_feed_section_locales",
+    "pages_blocks_page_feed_section_locales": {
+      "name": "pages_blocks_page_feed_section_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -14331,8 +14156,8 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_feed_section_locales_locale_parent_id_un": {
-          "name": "pages_blocks_layout_feed_section_locales_locale_parent_id_un",
+        "pages_blocks_page_feed_section_locales_locale_parent_id_uniq": {
+          "name": "pages_blocks_page_feed_section_locales_locale_parent_id_uniq",
           "columns": [
             "_locale",
             "_parent_id"
@@ -14341,10 +14166,10 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_feed_section_locales_parent_id_fk": {
-          "name": "pages_blocks_layout_feed_section_locales_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_feed_section_locales",
-          "tableTo": "pages_blocks_layout_feed_section",
+        "pages_blocks_page_feed_section_locales_parent_id_fk": {
+          "name": "pages_blocks_page_feed_section_locales_parent_id_fk",
+          "tableFrom": "pages_blocks_page_feed_section_locales",
+          "tableTo": "pages_blocks_page_feed_section",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -14359,8 +14184,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_rich_text_without_block": {
-      "name": "pages_blocks_layout_rich_text_without_block",
+    "pages_blocks_page_rich_text": {
+      "name": "pages_blocks_page_rich_text",
       "columns": {
         "_order": {
           "name": "_order",
@@ -14399,22 +14224,22 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_rich_text_without_block_order_idx": {
-          "name": "pages_blocks_layout_rich_text_without_block_order_idx",
+        "pages_blocks_page_rich_text_order_idx": {
+          "name": "pages_blocks_page_rich_text_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_rich_text_without_block_parent_id_idx": {
-          "name": "pages_blocks_layout_rich_text_without_block_parent_id_idx",
+        "pages_blocks_page_rich_text_parent_id_idx": {
+          "name": "pages_blocks_page_rich_text_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_rich_text_without_block_path_idx": {
-          "name": "pages_blocks_layout_rich_text_without_block_path_idx",
+        "pages_blocks_page_rich_text_path_idx": {
+          "name": "pages_blocks_page_rich_text_path_idx",
           "columns": [
             "_path"
           ],
@@ -14422,9 +14247,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_rich_text_without_block_parent_id_fk": {
-          "name": "pages_blocks_layout_rich_text_without_block_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_rich_text_without_block",
+        "pages_blocks_page_rich_text_parent_id_fk": {
+          "name": "pages_blocks_page_rich_text_parent_id_fk",
+          "tableFrom": "pages_blocks_page_rich_text",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -14440,8 +14265,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_rich_text_without_block_locales": {
-      "name": "pages_blocks_layout_rich_text_without_block_locales",
+    "pages_blocks_page_rich_text_locales": {
+      "name": "pages_blocks_page_rich_text_locales",
       "columns": {
         "content": {
           "name": "content",
@@ -14473,8 +14298,8 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_rich_text_without_block_locales_locale_p": {
-          "name": "pages_blocks_layout_rich_text_without_block_locales_locale_p",
+        "pages_blocks_page_rich_text_locales_locale_parent_id_unique": {
+          "name": "pages_blocks_page_rich_text_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -14483,10 +14308,10 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_rich_text_without_block_locales_paren_fk": {
-          "name": "pages_blocks_layout_rich_text_without_block_locales_paren_fk",
-          "tableFrom": "pages_blocks_layout_rich_text_without_block_locales",
-          "tableTo": "pages_blocks_layout_rich_text_without_block",
+        "pages_blocks_page_rich_text_locales_parent_id_fk": {
+          "name": "pages_blocks_page_rich_text_locales_parent_id_fk",
+          "tableFrom": "pages_blocks_page_rich_text_locales",
+          "tableTo": "pages_blocks_page_rich_text",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -14899,8 +14724,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_related_items": {
-      "name": "pages_blocks_layout_related_items",
+    "pages_blocks_page_related_items": {
+      "name": "pages_blocks_page_related_items",
       "columns": {
         "_order": {
           "name": "_order",
@@ -14970,29 +14795,29 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_related_items_order_idx": {
-          "name": "pages_blocks_layout_related_items_order_idx",
+        "pages_blocks_page_related_items_order_idx": {
+          "name": "pages_blocks_page_related_items_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_related_items_parent_id_idx": {
-          "name": "pages_blocks_layout_related_items_parent_id_idx",
+        "pages_blocks_page_related_items_parent_id_idx": {
+          "name": "pages_blocks_page_related_items_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_related_items_path_idx": {
-          "name": "pages_blocks_layout_related_items_path_idx",
+        "pages_blocks_page_related_items_path_idx": {
+          "name": "pages_blocks_page_related_items_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_related_items_view_all_page_idx": {
-          "name": "pages_blocks_layout_related_items_view_all_page_idx",
+        "pages_blocks_page_related_items_view_all_page_idx": {
+          "name": "pages_blocks_page_related_items_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -15000,9 +14825,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_related_items_view_all_page_id_pages_id_fk": {
-          "name": "pages_blocks_layout_related_items_view_all_page_id_pages_id_fk",
-          "tableFrom": "pages_blocks_layout_related_items",
+        "pages_blocks_page_related_items_view_all_page_id_pages_id_fk": {
+          "name": "pages_blocks_page_related_items_view_all_page_id_pages_id_fk",
+          "tableFrom": "pages_blocks_page_related_items",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -15013,9 +14838,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "pages_blocks_layout_related_items_parent_id_fk": {
-          "name": "pages_blocks_layout_related_items_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_related_items",
+        "pages_blocks_page_related_items_parent_id_fk": {
+          "name": "pages_blocks_page_related_items_parent_id_fk",
+          "tableFrom": "pages_blocks_page_related_items",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -15031,8 +14856,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_related_items_locales": {
-      "name": "pages_blocks_layout_related_items_locales",
+    "pages_blocks_page_related_items_locales": {
+      "name": "pages_blocks_page_related_items_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -15092,8 +14917,8 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_related_items_locales_locale_parent_id_u": {
-          "name": "pages_blocks_layout_related_items_locales_locale_parent_id_u",
+        "pages_blocks_page_related_items_locales_locale_parent_id_uni": {
+          "name": "pages_blocks_page_related_items_locales_locale_parent_id_uni",
           "columns": [
             "_locale",
             "_parent_id"
@@ -15102,10 +14927,10 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_related_items_locales_parent_id_fk": {
-          "name": "pages_blocks_layout_related_items_locales_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_related_items_locales",
-          "tableTo": "pages_blocks_layout_related_items",
+        "pages_blocks_page_related_items_locales_parent_id_fk": {
+          "name": "pages_blocks_page_related_items_locales_parent_id_fk",
+          "tableFrom": "pages_blocks_page_related_items_locales",
+          "tableTo": "pages_blocks_page_related_items",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -15120,8 +14945,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_typewriter": {
-      "name": "pages_blocks_layout_typewriter",
+    "pages_blocks_page_typewriter": {
+      "name": "pages_blocks_page_typewriter",
       "columns": {
         "_order": {
           "name": "_order",
@@ -15160,22 +14985,22 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_typewriter_order_idx": {
-          "name": "pages_blocks_layout_typewriter_order_idx",
+        "pages_blocks_page_typewriter_order_idx": {
+          "name": "pages_blocks_page_typewriter_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_typewriter_parent_id_idx": {
-          "name": "pages_blocks_layout_typewriter_parent_id_idx",
+        "pages_blocks_page_typewriter_parent_id_idx": {
+          "name": "pages_blocks_page_typewriter_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_typewriter_path_idx": {
-          "name": "pages_blocks_layout_typewriter_path_idx",
+        "pages_blocks_page_typewriter_path_idx": {
+          "name": "pages_blocks_page_typewriter_path_idx",
           "columns": [
             "_path"
           ],
@@ -15183,9 +15008,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_typewriter_parent_id_fk": {
-          "name": "pages_blocks_layout_typewriter_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_typewriter",
+        "pages_blocks_page_typewriter_parent_id_fk": {
+          "name": "pages_blocks_page_typewriter_parent_id_fk",
+          "tableFrom": "pages_blocks_page_typewriter",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -15201,8 +15026,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_scramble_hover": {
-      "name": "pages_blocks_layout_scramble_hover",
+    "pages_blocks_page_scramble_hover": {
+      "name": "pages_blocks_page_scramble_hover",
       "columns": {
         "_order": {
           "name": "_order",
@@ -15241,22 +15066,22 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_scramble_hover_order_idx": {
-          "name": "pages_blocks_layout_scramble_hover_order_idx",
+        "pages_blocks_page_scramble_hover_order_idx": {
+          "name": "pages_blocks_page_scramble_hover_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_scramble_hover_parent_id_idx": {
-          "name": "pages_blocks_layout_scramble_hover_parent_id_idx",
+        "pages_blocks_page_scramble_hover_parent_id_idx": {
+          "name": "pages_blocks_page_scramble_hover_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_scramble_hover_path_idx": {
-          "name": "pages_blocks_layout_scramble_hover_path_idx",
+        "pages_blocks_page_scramble_hover_path_idx": {
+          "name": "pages_blocks_page_scramble_hover_path_idx",
           "columns": [
             "_path"
           ],
@@ -15264,9 +15089,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_scramble_hover_parent_id_fk": {
-          "name": "pages_blocks_layout_scramble_hover_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_scramble_hover",
+        "pages_blocks_page_scramble_hover_parent_id_fk": {
+          "name": "pages_blocks_page_scramble_hover_parent_id_fk",
+          "tableFrom": "pages_blocks_page_scramble_hover",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -15282,8 +15107,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_blank_space": {
-      "name": "pages_blocks_layout_blank_space",
+    "pages_blocks_page_blank_space": {
+      "name": "pages_blocks_page_blank_space",
       "columns": {
         "_order": {
           "name": "_order",
@@ -15330,22 +15155,22 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_blank_space_order_idx": {
-          "name": "pages_blocks_layout_blank_space_order_idx",
+        "pages_blocks_page_blank_space_order_idx": {
+          "name": "pages_blocks_page_blank_space_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_blank_space_parent_id_idx": {
-          "name": "pages_blocks_layout_blank_space_parent_id_idx",
+        "pages_blocks_page_blank_space_parent_id_idx": {
+          "name": "pages_blocks_page_blank_space_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_blank_space_path_idx": {
-          "name": "pages_blocks_layout_blank_space_path_idx",
+        "pages_blocks_page_blank_space_path_idx": {
+          "name": "pages_blocks_page_blank_space_path_idx",
           "columns": [
             "_path"
           ],
@@ -15353,9 +15178,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_blank_space_parent_id_fk": {
-          "name": "pages_blocks_layout_blank_space_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_blank_space",
+        "pages_blocks_page_blank_space_parent_id_fk": {
+          "name": "pages_blocks_page_blank_space_parent_id_fk",
+          "tableFrom": "pages_blocks_page_blank_space",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -15371,8 +15196,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_footer": {
-      "name": "pages_blocks_layout_footer",
+    "pages_blocks_page_footer": {
+      "name": "pages_blocks_page_footer",
       "columns": {
         "_order": {
           "name": "_order",
@@ -15411,22 +15236,22 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_footer_order_idx": {
-          "name": "pages_blocks_layout_footer_order_idx",
+        "pages_blocks_page_footer_order_idx": {
+          "name": "pages_blocks_page_footer_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_footer_parent_id_idx": {
-          "name": "pages_blocks_layout_footer_parent_id_idx",
+        "pages_blocks_page_footer_parent_id_idx": {
+          "name": "pages_blocks_page_footer_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_layout_footer_path_idx": {
-          "name": "pages_blocks_layout_footer_path_idx",
+        "pages_blocks_page_footer_path_idx": {
+          "name": "pages_blocks_page_footer_path_idx",
           "columns": [
             "_path"
           ],
@@ -15434,9 +15259,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_footer_parent_id_fk": {
-          "name": "pages_blocks_layout_footer_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_footer",
+        "pages_blocks_page_footer_parent_id_fk": {
+          "name": "pages_blocks_page_footer_parent_id_fk",
+          "tableFrom": "pages_blocks_page_footer",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -15452,8 +15277,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_layout_footer_locales": {
-      "name": "pages_blocks_layout_footer_locales",
+    "pages_blocks_page_footer_locales": {
+      "name": "pages_blocks_page_footer_locales",
       "columns": {
         "footer_text": {
           "name": "footer_text",
@@ -15514,8 +15339,8 @@
         }
       },
       "indexes": {
-        "pages_blocks_layout_footer_locales_locale_parent_id_unique": {
-          "name": "pages_blocks_layout_footer_locales_locale_parent_id_unique",
+        "pages_blocks_page_footer_locales_locale_parent_id_unique": {
+          "name": "pages_blocks_page_footer_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -15524,10 +15349,10 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_layout_footer_locales_parent_id_fk": {
-          "name": "pages_blocks_layout_footer_locales_parent_id_fk",
-          "tableFrom": "pages_blocks_layout_footer_locales",
-          "tableTo": "pages_blocks_layout_footer",
+        "pages_blocks_page_footer_locales_parent_id_fk": {
+          "name": "pages_blocks_page_footer_locales_parent_id_fk",
+          "tableFrom": "pages_blocks_page_footer_locales",
+          "tableTo": "pages_blocks_page_footer",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -15542,8 +15367,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_detail_post": {
-      "name": "pages_blocks_detail_post",
+    "pages_blocks_template_post": {
+      "name": "pages_blocks_template_post",
       "columns": {
         "_order": {
           "name": "_order",
@@ -15582,22 +15407,22 @@
         }
       },
       "indexes": {
-        "pages_blocks_detail_post_order_idx": {
-          "name": "pages_blocks_detail_post_order_idx",
+        "pages_blocks_template_post_order_idx": {
+          "name": "pages_blocks_template_post_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_detail_post_parent_id_idx": {
-          "name": "pages_blocks_detail_post_parent_id_idx",
+        "pages_blocks_template_post_parent_id_idx": {
+          "name": "pages_blocks_template_post_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_detail_post_path_idx": {
-          "name": "pages_blocks_detail_post_path_idx",
+        "pages_blocks_template_post_path_idx": {
+          "name": "pages_blocks_template_post_path_idx",
           "columns": [
             "_path"
           ],
@@ -15605,9 +15430,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_detail_post_parent_id_fk": {
-          "name": "pages_blocks_detail_post_parent_id_fk",
-          "tableFrom": "pages_blocks_detail_post",
+        "pages_blocks_template_post_parent_id_fk": {
+          "name": "pages_blocks_template_post_parent_id_fk",
+          "tableFrom": "pages_blocks_template_post",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -15623,8 +15448,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "pages_blocks_detail_project": {
-      "name": "pages_blocks_detail_project",
+    "pages_blocks_template_project": {
+      "name": "pages_blocks_template_project",
       "columns": {
         "_order": {
           "name": "_order",
@@ -15663,22 +15488,22 @@
         }
       },
       "indexes": {
-        "pages_blocks_detail_project_order_idx": {
-          "name": "pages_blocks_detail_project_order_idx",
+        "pages_blocks_template_project_order_idx": {
+          "name": "pages_blocks_template_project_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "pages_blocks_detail_project_parent_id_idx": {
-          "name": "pages_blocks_detail_project_parent_id_idx",
+        "pages_blocks_template_project_parent_id_idx": {
+          "name": "pages_blocks_template_project_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "pages_blocks_detail_project_path_idx": {
-          "name": "pages_blocks_detail_project_path_idx",
+        "pages_blocks_template_project_path_idx": {
+          "name": "pages_blocks_template_project_path_idx",
           "columns": [
             "_path"
           ],
@@ -15686,9 +15511,9 @@
         }
       },
       "foreignKeys": {
-        "pages_blocks_detail_project_parent_id_fk": {
-          "name": "pages_blocks_detail_project_parent_id_fk",
-          "tableFrom": "pages_blocks_detail_project",
+        "pages_blocks_template_project_parent_id_fk": {
+          "name": "pages_blocks_template_project_parent_id_fk",
+          "tableFrom": "pages_blocks_template_project",
           "tableTo": "pages",
           "columnsFrom": [
             "_parent_id"
@@ -16238,8 +16063,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_hero": {
-      "name": "_pages_v_blocks_layout_hero",
+    "_pages_v_blocks_page_hero": {
+      "name": "_pages_v_blocks_page_hero",
       "columns": {
         "_order": {
           "name": "_order",
@@ -16292,29 +16117,29 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_hero_order_idx": {
-          "name": "_pages_v_blocks_layout_hero_order_idx",
+        "_pages_v_blocks_page_hero_order_idx": {
+          "name": "_pages_v_blocks_page_hero_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_hero_parent_id_idx": {
-          "name": "_pages_v_blocks_layout_hero_parent_id_idx",
+        "_pages_v_blocks_page_hero_parent_id_idx": {
+          "name": "_pages_v_blocks_page_hero_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_hero_path_idx": {
-          "name": "_pages_v_blocks_layout_hero_path_idx",
+        "_pages_v_blocks_page_hero_path_idx": {
+          "name": "_pages_v_blocks_page_hero_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_hero_hero_image_idx": {
-          "name": "_pages_v_blocks_layout_hero_hero_image_idx",
+        "_pages_v_blocks_page_hero_hero_image_idx": {
+          "name": "_pages_v_blocks_page_hero_hero_image_idx",
           "columns": [
             "hero_image_id"
           ],
@@ -16322,9 +16147,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_hero_hero_image_id_media_id_fk": {
-          "name": "_pages_v_blocks_layout_hero_hero_image_id_media_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_hero",
+        "_pages_v_blocks_page_hero_hero_image_id_media_id_fk": {
+          "name": "_pages_v_blocks_page_hero_hero_image_id_media_id_fk",
+          "tableFrom": "_pages_v_blocks_page_hero",
           "tableTo": "media",
           "columnsFrom": [
             "hero_image_id"
@@ -16335,9 +16160,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "_pages_v_blocks_layout_hero_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_hero_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_hero",
+        "_pages_v_blocks_page_hero_parent_id_fk": {
+          "name": "_pages_v_blocks_page_hero_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_hero",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -16353,46 +16178,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_hero_locales": {
-      "name": "_pages_v_blocks_layout_hero_locales",
+    "_pages_v_blocks_page_hero_locales": {
+      "name": "_pages_v_blocks_page_hero_locales",
       "columns": {
-        "label_title": {
-          "name": "label_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_tagline": {
-          "name": "label_tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tagline": {
-          "name": "tagline",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "label_bio": {
-          "name": "label_bio",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "bio": {
-          "name": "bio",
+        "paragraph": {
+          "name": "paragraph",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -16443,8 +16233,8 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_hero_locales_locale_parent_id_unique": {
-          "name": "_pages_v_blocks_layout_hero_locales_locale_parent_id_unique",
+        "_pages_v_blocks_page_hero_locales_locale_parent_id_unique": {
+          "name": "_pages_v_blocks_page_hero_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -16453,10 +16243,10 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_hero_locales_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_hero_locales_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_hero_locales",
-          "tableTo": "_pages_v_blocks_layout_hero",
+        "_pages_v_blocks_page_hero_locales_parent_id_fk": {
+          "name": "_pages_v_blocks_page_hero_locales_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_hero_locales",
+          "tableTo": "_pages_v_blocks_page_hero",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -16471,8 +16261,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_feed_section": {
-      "name": "_pages_v_blocks_layout_feed_section",
+    "_pages_v_blocks_page_feed_section": {
+      "name": "_pages_v_blocks_page_feed_section",
       "columns": {
         "_order": {
           "name": "_order",
@@ -16565,29 +16355,29 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_feed_section_order_idx": {
-          "name": "_pages_v_blocks_layout_feed_section_order_idx",
+        "_pages_v_blocks_page_feed_section_order_idx": {
+          "name": "_pages_v_blocks_page_feed_section_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_feed_section_parent_id_idx": {
-          "name": "_pages_v_blocks_layout_feed_section_parent_id_idx",
+        "_pages_v_blocks_page_feed_section_parent_id_idx": {
+          "name": "_pages_v_blocks_page_feed_section_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_feed_section_path_idx": {
-          "name": "_pages_v_blocks_layout_feed_section_path_idx",
+        "_pages_v_blocks_page_feed_section_path_idx": {
+          "name": "_pages_v_blocks_page_feed_section_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_feed_section_view_all_page_idx": {
-          "name": "_pages_v_blocks_layout_feed_section_view_all_page_idx",
+        "_pages_v_blocks_page_feed_section_view_all_page_idx": {
+          "name": "_pages_v_blocks_page_feed_section_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -16595,9 +16385,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_feed_section_view_all_page_id_pages_id_fk": {
-          "name": "_pages_v_blocks_layout_feed_section_view_all_page_id_pages_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_feed_section",
+        "_pages_v_blocks_page_feed_section_view_all_page_id_pages_id_fk": {
+          "name": "_pages_v_blocks_page_feed_section_view_all_page_id_pages_id_fk",
+          "tableFrom": "_pages_v_blocks_page_feed_section",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -16608,9 +16398,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "_pages_v_blocks_layout_feed_section_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_feed_section_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_feed_section",
+        "_pages_v_blocks_page_feed_section_parent_id_fk": {
+          "name": "_pages_v_blocks_page_feed_section_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_feed_section",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -16626,8 +16416,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_feed_section_locales": {
-      "name": "_pages_v_blocks_layout_feed_section_locales",
+    "_pages_v_blocks_page_feed_section_locales": {
+      "name": "_pages_v_blocks_page_feed_section_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -16701,8 +16491,8 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_feed_section_locales_locale_parent_id": {
-          "name": "_pages_v_blocks_layout_feed_section_locales_locale_parent_id",
+        "_pages_v_blocks_page_feed_section_locales_locale_parent_id_u": {
+          "name": "_pages_v_blocks_page_feed_section_locales_locale_parent_id_u",
           "columns": [
             "_locale",
             "_parent_id"
@@ -16711,10 +16501,10 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_feed_section_locales_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_feed_section_locales_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_feed_section_locales",
-          "tableTo": "_pages_v_blocks_layout_feed_section",
+        "_pages_v_blocks_page_feed_section_locales_parent_id_fk": {
+          "name": "_pages_v_blocks_page_feed_section_locales_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_feed_section_locales",
+          "tableTo": "_pages_v_blocks_page_feed_section",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -16729,8 +16519,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_rich_text_without_block": {
-      "name": "_pages_v_blocks_layout_rich_text_without_block",
+    "_pages_v_blocks_page_rich_text": {
+      "name": "_pages_v_blocks_page_rich_text",
       "columns": {
         "_order": {
           "name": "_order",
@@ -16776,22 +16566,22 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_rich_text_without_block_order_idx": {
-          "name": "_pages_v_blocks_layout_rich_text_without_block_order_idx",
+        "_pages_v_blocks_page_rich_text_order_idx": {
+          "name": "_pages_v_blocks_page_rich_text_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_rich_text_without_block_parent_id_idx": {
-          "name": "_pages_v_blocks_layout_rich_text_without_block_parent_id_idx",
+        "_pages_v_blocks_page_rich_text_parent_id_idx": {
+          "name": "_pages_v_blocks_page_rich_text_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_rich_text_without_block_path_idx": {
-          "name": "_pages_v_blocks_layout_rich_text_without_block_path_idx",
+        "_pages_v_blocks_page_rich_text_path_idx": {
+          "name": "_pages_v_blocks_page_rich_text_path_idx",
           "columns": [
             "_path"
           ],
@@ -16799,9 +16589,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_rich_text_without_block_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_rich_text_without_block_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_rich_text_without_block",
+        "_pages_v_blocks_page_rich_text_parent_id_fk": {
+          "name": "_pages_v_blocks_page_rich_text_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_rich_text",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -16817,8 +16607,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_rich_text_without_block_locales": {
-      "name": "_pages_v_blocks_layout_rich_text_without_block_locales",
+    "_pages_v_blocks_page_rich_text_locales": {
+      "name": "_pages_v_blocks_page_rich_text_locales",
       "columns": {
         "content": {
           "name": "content",
@@ -16850,8 +16640,8 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_rich_text_without_block_locales_local": {
-          "name": "_pages_v_blocks_layout_rich_text_without_block_locales_local",
+        "_pages_v_blocks_page_rich_text_locales_locale_parent_id_uniq": {
+          "name": "_pages_v_blocks_page_rich_text_locales_locale_parent_id_uniq",
           "columns": [
             "_locale",
             "_parent_id"
@@ -16860,10 +16650,10 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_rich_text_without_block_locales_pa_fk": {
-          "name": "_pages_v_blocks_layout_rich_text_without_block_locales_pa_fk",
-          "tableFrom": "_pages_v_blocks_layout_rich_text_without_block_locales",
-          "tableTo": "_pages_v_blocks_layout_rich_text_without_block",
+        "_pages_v_blocks_page_rich_text_locales_parent_id_fk": {
+          "name": "_pages_v_blocks_page_rich_text_locales_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_rich_text_locales",
+          "tableTo": "_pages_v_blocks_page_rich_text",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -17297,8 +17087,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_related_items": {
-      "name": "_pages_v_blocks_layout_related_items",
+    "_pages_v_blocks_page_related_items": {
+      "name": "_pages_v_blocks_page_related_items",
       "columns": {
         "_order": {
           "name": "_order",
@@ -17375,29 +17165,29 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_related_items_order_idx": {
-          "name": "_pages_v_blocks_layout_related_items_order_idx",
+        "_pages_v_blocks_page_related_items_order_idx": {
+          "name": "_pages_v_blocks_page_related_items_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_related_items_parent_id_idx": {
-          "name": "_pages_v_blocks_layout_related_items_parent_id_idx",
+        "_pages_v_blocks_page_related_items_parent_id_idx": {
+          "name": "_pages_v_blocks_page_related_items_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_related_items_path_idx": {
-          "name": "_pages_v_blocks_layout_related_items_path_idx",
+        "_pages_v_blocks_page_related_items_path_idx": {
+          "name": "_pages_v_blocks_page_related_items_path_idx",
           "columns": [
             "_path"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_related_items_view_all_page_idx": {
-          "name": "_pages_v_blocks_layout_related_items_view_all_page_idx",
+        "_pages_v_blocks_page_related_items_view_all_page_idx": {
+          "name": "_pages_v_blocks_page_related_items_view_all_page_idx",
           "columns": [
             "view_all_page_id"
           ],
@@ -17405,9 +17195,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_related_items_view_all_page_id_pages_id_fk": {
-          "name": "_pages_v_blocks_layout_related_items_view_all_page_id_pages_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_related_items",
+        "_pages_v_blocks_page_related_items_view_all_page_id_pages_id_fk": {
+          "name": "_pages_v_blocks_page_related_items_view_all_page_id_pages_id_fk",
+          "tableFrom": "_pages_v_blocks_page_related_items",
           "tableTo": "pages",
           "columnsFrom": [
             "view_all_page_id"
@@ -17418,9 +17208,9 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "_pages_v_blocks_layout_related_items_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_related_items_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_related_items",
+        "_pages_v_blocks_page_related_items_parent_id_fk": {
+          "name": "_pages_v_blocks_page_related_items_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_related_items",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -17436,8 +17226,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_related_items_locales": {
-      "name": "_pages_v_blocks_layout_related_items_locales",
+    "_pages_v_blocks_page_related_items_locales": {
+      "name": "_pages_v_blocks_page_related_items_locales",
       "columns": {
         "heading": {
           "name": "heading",
@@ -17497,8 +17287,8 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_related_items_locales_locale_parent_i": {
-          "name": "_pages_v_blocks_layout_related_items_locales_locale_parent_i",
+        "_pages_v_blocks_page_related_items_locales_locale_parent_id_": {
+          "name": "_pages_v_blocks_page_related_items_locales_locale_parent_id_",
           "columns": [
             "_locale",
             "_parent_id"
@@ -17507,10 +17297,10 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_related_items_locales_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_related_items_locales_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_related_items_locales",
-          "tableTo": "_pages_v_blocks_layout_related_items",
+        "_pages_v_blocks_page_related_items_locales_parent_id_fk": {
+          "name": "_pages_v_blocks_page_related_items_locales_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_related_items_locales",
+          "tableTo": "_pages_v_blocks_page_related_items",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -17525,8 +17315,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_typewriter": {
-      "name": "_pages_v_blocks_layout_typewriter",
+    "_pages_v_blocks_page_typewriter": {
+      "name": "_pages_v_blocks_page_typewriter",
       "columns": {
         "_order": {
           "name": "_order",
@@ -17572,22 +17362,22 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_typewriter_order_idx": {
-          "name": "_pages_v_blocks_layout_typewriter_order_idx",
+        "_pages_v_blocks_page_typewriter_order_idx": {
+          "name": "_pages_v_blocks_page_typewriter_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_typewriter_parent_id_idx": {
-          "name": "_pages_v_blocks_layout_typewriter_parent_id_idx",
+        "_pages_v_blocks_page_typewriter_parent_id_idx": {
+          "name": "_pages_v_blocks_page_typewriter_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_typewriter_path_idx": {
-          "name": "_pages_v_blocks_layout_typewriter_path_idx",
+        "_pages_v_blocks_page_typewriter_path_idx": {
+          "name": "_pages_v_blocks_page_typewriter_path_idx",
           "columns": [
             "_path"
           ],
@@ -17595,9 +17385,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_typewriter_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_typewriter_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_typewriter",
+        "_pages_v_blocks_page_typewriter_parent_id_fk": {
+          "name": "_pages_v_blocks_page_typewriter_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_typewriter",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -17613,8 +17403,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_scramble_hover": {
-      "name": "_pages_v_blocks_layout_scramble_hover",
+    "_pages_v_blocks_page_scramble_hover": {
+      "name": "_pages_v_blocks_page_scramble_hover",
       "columns": {
         "_order": {
           "name": "_order",
@@ -17660,22 +17450,22 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_scramble_hover_order_idx": {
-          "name": "_pages_v_blocks_layout_scramble_hover_order_idx",
+        "_pages_v_blocks_page_scramble_hover_order_idx": {
+          "name": "_pages_v_blocks_page_scramble_hover_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_scramble_hover_parent_id_idx": {
-          "name": "_pages_v_blocks_layout_scramble_hover_parent_id_idx",
+        "_pages_v_blocks_page_scramble_hover_parent_id_idx": {
+          "name": "_pages_v_blocks_page_scramble_hover_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_scramble_hover_path_idx": {
-          "name": "_pages_v_blocks_layout_scramble_hover_path_idx",
+        "_pages_v_blocks_page_scramble_hover_path_idx": {
+          "name": "_pages_v_blocks_page_scramble_hover_path_idx",
           "columns": [
             "_path"
           ],
@@ -17683,9 +17473,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_scramble_hover_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_scramble_hover_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_scramble_hover",
+        "_pages_v_blocks_page_scramble_hover_parent_id_fk": {
+          "name": "_pages_v_blocks_page_scramble_hover_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_scramble_hover",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -17701,8 +17491,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_blank_space": {
-      "name": "_pages_v_blocks_layout_blank_space",
+    "_pages_v_blocks_page_blank_space": {
+      "name": "_pages_v_blocks_page_blank_space",
       "columns": {
         "_order": {
           "name": "_order",
@@ -17756,22 +17546,22 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_blank_space_order_idx": {
-          "name": "_pages_v_blocks_layout_blank_space_order_idx",
+        "_pages_v_blocks_page_blank_space_order_idx": {
+          "name": "_pages_v_blocks_page_blank_space_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_blank_space_parent_id_idx": {
-          "name": "_pages_v_blocks_layout_blank_space_parent_id_idx",
+        "_pages_v_blocks_page_blank_space_parent_id_idx": {
+          "name": "_pages_v_blocks_page_blank_space_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_blank_space_path_idx": {
-          "name": "_pages_v_blocks_layout_blank_space_path_idx",
+        "_pages_v_blocks_page_blank_space_path_idx": {
+          "name": "_pages_v_blocks_page_blank_space_path_idx",
           "columns": [
             "_path"
           ],
@@ -17779,9 +17569,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_blank_space_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_blank_space_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_blank_space",
+        "_pages_v_blocks_page_blank_space_parent_id_fk": {
+          "name": "_pages_v_blocks_page_blank_space_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_blank_space",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -17797,8 +17587,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_footer": {
-      "name": "_pages_v_blocks_layout_footer",
+    "_pages_v_blocks_page_footer": {
+      "name": "_pages_v_blocks_page_footer",
       "columns": {
         "_order": {
           "name": "_order",
@@ -17844,22 +17634,22 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_footer_order_idx": {
-          "name": "_pages_v_blocks_layout_footer_order_idx",
+        "_pages_v_blocks_page_footer_order_idx": {
+          "name": "_pages_v_blocks_page_footer_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_footer_parent_id_idx": {
-          "name": "_pages_v_blocks_layout_footer_parent_id_idx",
+        "_pages_v_blocks_page_footer_parent_id_idx": {
+          "name": "_pages_v_blocks_page_footer_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_layout_footer_path_idx": {
-          "name": "_pages_v_blocks_layout_footer_path_idx",
+        "_pages_v_blocks_page_footer_path_idx": {
+          "name": "_pages_v_blocks_page_footer_path_idx",
           "columns": [
             "_path"
           ],
@@ -17867,9 +17657,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_footer_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_footer_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_footer",
+        "_pages_v_blocks_page_footer_parent_id_fk": {
+          "name": "_pages_v_blocks_page_footer_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_footer",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -17885,8 +17675,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_layout_footer_locales": {
-      "name": "_pages_v_blocks_layout_footer_locales",
+    "_pages_v_blocks_page_footer_locales": {
+      "name": "_pages_v_blocks_page_footer_locales",
       "columns": {
         "footer_text": {
           "name": "footer_text",
@@ -17947,8 +17737,8 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_layout_footer_locales_locale_parent_id_uniqu": {
-          "name": "_pages_v_blocks_layout_footer_locales_locale_parent_id_uniqu",
+        "_pages_v_blocks_page_footer_locales_locale_parent_id_unique": {
+          "name": "_pages_v_blocks_page_footer_locales_locale_parent_id_unique",
           "columns": [
             "_locale",
             "_parent_id"
@@ -17957,10 +17747,10 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_layout_footer_locales_parent_id_fk": {
-          "name": "_pages_v_blocks_layout_footer_locales_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_layout_footer_locales",
-          "tableTo": "_pages_v_blocks_layout_footer",
+        "_pages_v_blocks_page_footer_locales_parent_id_fk": {
+          "name": "_pages_v_blocks_page_footer_locales_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_page_footer_locales",
+          "tableTo": "_pages_v_blocks_page_footer",
           "columnsFrom": [
             "_parent_id"
           ],
@@ -17975,8 +17765,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_detail_post": {
-      "name": "_pages_v_blocks_detail_post",
+    "_pages_v_blocks_template_post": {
+      "name": "_pages_v_blocks_template_post",
       "columns": {
         "_order": {
           "name": "_order",
@@ -18022,22 +17812,22 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_detail_post_order_idx": {
-          "name": "_pages_v_blocks_detail_post_order_idx",
+        "_pages_v_blocks_template_post_order_idx": {
+          "name": "_pages_v_blocks_template_post_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_detail_post_parent_id_idx": {
-          "name": "_pages_v_blocks_detail_post_parent_id_idx",
+        "_pages_v_blocks_template_post_parent_id_idx": {
+          "name": "_pages_v_blocks_template_post_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_detail_post_path_idx": {
-          "name": "_pages_v_blocks_detail_post_path_idx",
+        "_pages_v_blocks_template_post_path_idx": {
+          "name": "_pages_v_blocks_template_post_path_idx",
           "columns": [
             "_path"
           ],
@@ -18045,9 +17835,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_detail_post_parent_id_fk": {
-          "name": "_pages_v_blocks_detail_post_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_detail_post",
+        "_pages_v_blocks_template_post_parent_id_fk": {
+          "name": "_pages_v_blocks_template_post_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_template_post",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -18063,8 +17853,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "_pages_v_blocks_detail_project": {
-      "name": "_pages_v_blocks_detail_project",
+    "_pages_v_blocks_template_project": {
+      "name": "_pages_v_blocks_template_project",
       "columns": {
         "_order": {
           "name": "_order",
@@ -18110,22 +17900,22 @@
         }
       },
       "indexes": {
-        "_pages_v_blocks_detail_project_order_idx": {
-          "name": "_pages_v_blocks_detail_project_order_idx",
+        "_pages_v_blocks_template_project_order_idx": {
+          "name": "_pages_v_blocks_template_project_order_idx",
           "columns": [
             "_order"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_detail_project_parent_id_idx": {
-          "name": "_pages_v_blocks_detail_project_parent_id_idx",
+        "_pages_v_blocks_template_project_parent_id_idx": {
+          "name": "_pages_v_blocks_template_project_parent_id_idx",
           "columns": [
             "_parent_id"
           ],
           "isUnique": false
         },
-        "_pages_v_blocks_detail_project_path_idx": {
-          "name": "_pages_v_blocks_detail_project_path_idx",
+        "_pages_v_blocks_template_project_path_idx": {
+          "name": "_pages_v_blocks_template_project_path_idx",
           "columns": [
             "_path"
           ],
@@ -18133,9 +17923,9 @@
         }
       },
       "foreignKeys": {
-        "_pages_v_blocks_detail_project_parent_id_fk": {
-          "name": "_pages_v_blocks_detail_project_parent_id_fk",
-          "tableFrom": "_pages_v_blocks_detail_project",
+        "_pages_v_blocks_template_project_parent_id_fk": {
+          "name": "_pages_v_blocks_template_project_parent_id_fk",
+          "tableFrom": "_pages_v_blocks_template_project",
           "tableTo": "_pages_v",
           "columnsFrom": [
             "_parent_id"
@@ -21524,6 +21314,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "fd7c0fc6-e9f4-4ad9-b733-69494fc5d7fa",
+  "id": "f631bbab-0f6c-4c92-ab7d-449fd2c7d591",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }
