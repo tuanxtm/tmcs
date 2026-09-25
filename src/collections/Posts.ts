@@ -8,6 +8,7 @@ import {
   publishedOrOwned,
 } from '@/access'
 import { pageBlocks } from '@/blocks'
+import { richTextFull } from '@/fields/richText/richTextFull'
 import { ownerField, publishedAtField, translationReadyField } from '@/fields/common'
 import { seoFields } from '@/fields/seoFields'
 import { slugField } from '@/fields/slug'
@@ -102,6 +103,7 @@ export const Posts: CollectionConfig = {
               type: 'richText',
               localized: true,
               required: true,
+              editor: richTextFull,
             },
             {
               name: 'layout',
