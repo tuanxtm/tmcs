@@ -2,7 +2,7 @@ import type { GlobalConfig } from 'payload'
 
 import { adminOrManager, anyone, fieldAdminOrManager } from '@/access'
 import { seoFields } from '@/fields/seoFields'
-import { slimRichTextEditor } from '@/fields/slimRichText'
+import { richText } from '@/fields/richText'
 import { revalidateSiteShellGlobal } from '@/hooks/revalidateFrontend'
 import { validateAbsoluteHttpUrl } from '@/lib/url'
 
@@ -67,7 +67,7 @@ export const SiteSettings: GlobalConfig = {
               name: 'bio',
               type: 'richText',
               localized: true,
-              editor: slimRichTextEditor,
+              editor: richText,
               label: 'Bio',
             },
             {

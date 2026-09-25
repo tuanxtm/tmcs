@@ -1,54 +1,29 @@
 import type { Block } from 'payload'
 
 import { linkPickerField } from '@/fields/common'
-import { slimRichTextEditor } from '@/fields/slimRichText'
+import { richTextWithoutBlock } from '@/fields/richTextWithoutBlock'
 
-export const LayoutHeroBlock: Block = {
-  slug: 'layoutHero',
+/**
+ * Page block rendered at the bottom of a page.
+ *
+ * Uses `richTextWithoutBlock` to opt out of `BlocksFeature`. Without this
+ * opt-out, `PageFooterBlock.footerText` would inherit the global editor,
+ * which includes `BlocksFeature`, and create the same recursive schema that
+ * `PageRichTextBlock.content` already guards against.
+ */
+export const PageFooterBlock: Block = {
+  slug: 'pageFooter',
   labels: {
-    singular: 'Layout - Hero',
-    plural: 'Layout - Heroes',
+    singular: 'Page - Footer',
+    plural: 'Page - Footers',
   },
   fields: [
     {
-      name: 'labelTitle',
-      label: 'Label title',
-      type: 'text',
-      localized: true,
-    },
-    {
-      name: 'title',
-      type: 'text',
-      localized: true,
-      required: true,
-    },
-    {
-      name: 'labelTagline',
-      label: 'Label tagline',
-      type: 'text',
-      localized: true,
-    },
-    {
-      name: 'tagline',
-      type: 'text',
-      localized: true,
-    },
-    {
-      name: 'labelBio',
-      type: 'text',
-      localized: true,
-    },
-    {
-      name: 'bio',
+      name: 'footerText',
       type: 'richText',
       localized: true,
-      editor: slimRichTextEditor,
-    },
-    {
-      name: 'heroImage',
-      type: 'upload',
-      relationTo: 'media',
-      label: 'Hero image',
+      editor: richTextWithoutBlock,
+      label: 'Text',
     },
     {
       name: 'labelSocialLinks',
@@ -78,9 +53,17 @@ export const LayoutHeroBlock: Block = {
       name: 'cursorPopup',
       type: 'text',
       localized: true,
-      defaultValue: 'scroll down',
+      defaultValue: 'footer',
       admin: {
         description: 'Cursor popup text while hovering this section.',
+      },
+    },
+    {
+      name: 'copyright',
+      type: 'text',
+      localized: true,
+      admin: {
+        description: 'Use {{year}} as a placeholder for the current year in the frontend.',
       },
     },
   ],

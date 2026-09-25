@@ -7,13 +7,13 @@ import type { Block } from 'payload'
  * Project is at `/[slug]` (via the resolver context that the route sets up
  * before calling the template Page's layout). The `templatePage` sidebar
  * field on a Project (required) chooses which template Page renders for it;
- * the `Detail - Project` block lives somewhere inside that template's layout.
+ * the `Template - Project` block lives somewhere inside that template's layout.
  */
-export const DetailProjectBlock: Block = {
-  slug: 'detailProject',
+export const TemplateProjectBlock: Block = {
+  slug: 'templateProject',
   labels: {
-    singular: 'Detail - Project',
-    plural: 'Detail - Projects',
+    singular: 'Template - Project',
+    plural: 'Template - Projects',
   },
   fields: [],
 }

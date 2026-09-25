@@ -1,10 +1,10 @@
 import type { Block } from 'payload'
 
-export const LayoutRelatedItemsBlock: Block = {
-  slug: 'layoutRelatedItems',
+export const PageRelatedItemsBlock: Block = {
+  slug: 'pageRelatedItems',
   labels: {
-    singular: 'Layout - Related items',
-    plural: 'Layout - Related items',
+    singular: 'Page - Related items',
+    plural: 'Page - Related items',
   },
   fields: [
     {

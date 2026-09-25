@@ -1,10 +1,10 @@
 import type { Block } from 'payload'
 
-export const LayoutFeedSectionBlock: Block = {
-  slug: 'layoutFeedSection',
+export const PageFeedSectionBlock: Block = {
+  slug: 'pageFeedSection',
   labels: {
-    singular: 'Layout - Feed section',
-    plural: 'Layout - Feed sections',
+    singular: 'Page - Feed section',
+    plural: 'Page - Feed sections',
   },
   fields: [
     {

@@ -339,12 +339,7 @@ export interface Post {
   layout?:
     | (
         | {
-            labelTitle?: string | null;
-            title: string;
-            labelTagline?: string | null;
-            tagline?: string | null;
-            labelBio?: string | null;
-            bio?: {
+            paragraph?: {
               root: {
                 type: string;
                 children: {
@@ -376,7 +371,7 @@ export interface Post {
             cursorPopup?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutHero';
+            blockType: 'pageHero';
           }
         | {
             heading: string;
@@ -431,7 +426,7 @@ export interface Post {
             cursorPopupViewAll?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutFeedSection';
+            blockType: 'pageFeedSection';
           }
         | {
             content: {
@@ -451,7 +446,7 @@ export interface Post {
             };
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutRichTextWithoutBlock';
+            blockType: 'pageRichText';
           }
         | {
             media: number | Media;
@@ -505,7 +500,7 @@ export interface Post {
             cursorPopupViewAll?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutRelatedItems';
+            blockType: 'pageRelatedItems';
           }
         | {
             /**
@@ -514,7 +509,7 @@ export interface Post {
             stories: (number | ShortStory)[];
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutTypewriter';
+            blockType: 'pageTypewriter';
           }
         | {
             /**
@@ -523,7 +518,7 @@ export interface Post {
             stories: (number | ShortStory)[];
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutScrambleHover';
+            blockType: 'pageScrambleHover';
           }
         | {
             /**
@@ -532,7 +527,7 @@ export interface Post {
             height?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutBlankSpace';
+            blockType: 'pageBlankSpace';
           }
         | {
             footerText?: {
@@ -570,17 +565,17 @@ export interface Post {
             copyright?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutFooter';
+            blockType: 'pageFooter';
           }
         | {
             id?: string | null;
             blockName?: string | null;
-            blockType: 'detailPost';
+            blockType: 'templatePost';
           }
         | {
             id?: string | null;
             blockName?: string | null;
-            blockType: 'detailProject';
+            blockType: 'templateProject';
           }
       )[]
     | null;
@@ -706,12 +701,7 @@ export interface Page {
   layout?:
     | (
         | {
-            labelTitle?: string | null;
-            title: string;
-            labelTagline?: string | null;
-            tagline?: string | null;
-            labelBio?: string | null;
-            bio?: {
+            paragraph?: {
               root: {
                 type: string;
                 children: {
@@ -743,7 +733,7 @@ export interface Page {
             cursorPopup?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutHero';
+            blockType: 'pageHero';
           }
         | {
             heading: string;
@@ -798,7 +788,7 @@ export interface Page {
             cursorPopupViewAll?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutFeedSection';
+            blockType: 'pageFeedSection';
           }
         | {
             content: {
@@ -818,7 +808,7 @@ export interface Page {
             };
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutRichTextWithoutBlock';
+            blockType: 'pageRichText';
           }
         | {
             media: number | Media;
@@ -872,7 +862,7 @@ export interface Page {
             cursorPopupViewAll?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutRelatedItems';
+            blockType: 'pageRelatedItems';
           }
         | {
             /**
@@ -881,7 +871,7 @@ export interface Page {
             stories: (number | ShortStory)[];
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutTypewriter';
+            blockType: 'pageTypewriter';
           }
         | {
             /**
@@ -890,7 +880,7 @@ export interface Page {
             stories: (number | ShortStory)[];
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutScrambleHover';
+            blockType: 'pageScrambleHover';
           }
         | {
             /**
@@ -899,7 +889,7 @@ export interface Page {
             height?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutBlankSpace';
+            blockType: 'pageBlankSpace';
           }
         | {
             footerText?: {
@@ -937,17 +927,17 @@ export interface Page {
             copyright?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutFooter';
+            blockType: 'pageFooter';
           }
         | {
             id?: string | null;
             blockName?: string | null;
-            blockType: 'detailPost';
+            blockType: 'templatePost';
           }
         | {
             id?: string | null;
             blockName?: string | null;
-            blockType: 'detailProject';
+            blockType: 'templateProject';
           }
       )[]
     | null;
@@ -1036,12 +1026,7 @@ export interface Project {
   layout?:
     | (
         | {
-            labelTitle?: string | null;
-            title: string;
-            labelTagline?: string | null;
-            tagline?: string | null;
-            labelBio?: string | null;
-            bio?: {
+            paragraph?: {
               root: {
                 type: string;
                 children: {
@@ -1073,7 +1058,7 @@ export interface Project {
             cursorPopup?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutHero';
+            blockType: 'pageHero';
           }
         | {
             heading: string;
@@ -1128,7 +1113,7 @@ export interface Project {
             cursorPopupViewAll?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutFeedSection';
+            blockType: 'pageFeedSection';
           }
         | {
             content: {
@@ -1148,7 +1133,7 @@ export interface Project {
             };
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutRichTextWithoutBlock';
+            blockType: 'pageRichText';
           }
         | {
             media: number | Media;
@@ -1202,7 +1187,7 @@ export interface Project {
             cursorPopupViewAll?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutRelatedItems';
+            blockType: 'pageRelatedItems';
           }
         | {
             /**
@@ -1211,7 +1196,7 @@ export interface Project {
             stories: (number | ShortStory)[];
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutTypewriter';
+            blockType: 'pageTypewriter';
           }
         | {
             /**
@@ -1220,7 +1205,7 @@ export interface Project {
             stories: (number | ShortStory)[];
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutScrambleHover';
+            blockType: 'pageScrambleHover';
           }
         | {
             /**
@@ -1229,7 +1214,7 @@ export interface Project {
             height?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutBlankSpace';
+            blockType: 'pageBlankSpace';
           }
         | {
             footerText?: {
@@ -1267,17 +1252,17 @@ export interface Project {
             copyright?: string | null;
             id?: string | null;
             blockName?: string | null;
-            blockType: 'layoutFooter';
+            blockType: 'pageFooter';
           }
         | {
             id?: string | null;
             blockName?: string | null;
-            blockType: 'detailPost';
+            blockType: 'templatePost';
           }
         | {
             id?: string | null;
             blockName?: string | null;
-            blockType: 'detailProject';
+            blockType: 'templateProject';
           }
       )[]
     | null;
@@ -1928,15 +1913,10 @@ export interface PostsSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        layoutHero?:
+        pageHero?:
           | T
           | {
-              labelTitle?: T;
-              title?: T;
-              labelTagline?: T;
-              tagline?: T;
-              labelBio?: T;
-              bio?: T;
+              paragraph?: T;
               heroImage?: T;
               labelSocialLinks?: T;
               socialLinks?: T;
@@ -1946,7 +1926,7 @@ export interface PostsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutFeedSection?:
+        pageFeedSection?:
           | T
           | {
               heading?: T;
@@ -1969,7 +1949,7 @@ export interface PostsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutRichTextWithoutBlock?:
+        pageRichText?:
           | T
           | {
               content?: T;
@@ -1997,7 +1977,7 @@ export interface PostsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutRelatedItems?:
+        pageRelatedItems?:
           | T
           | {
               heading?: T;
@@ -2013,28 +1993,28 @@ export interface PostsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutTypewriter?:
+        pageTypewriter?:
           | T
           | {
               stories?: T;
               id?: T;
               blockName?: T;
             };
-        layoutScrambleHover?:
+        pageScrambleHover?:
           | T
           | {
               stories?: T;
               id?: T;
               blockName?: T;
             };
-        layoutBlankSpace?:
+        pageBlankSpace?:
           | T
           | {
               height?: T;
               id?: T;
               blockName?: T;
             };
-        layoutFooter?:
+        pageFooter?:
           | T
           | {
               footerText?: T;
@@ -2047,13 +2027,13 @@ export interface PostsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        detailPost?:
+        templatePost?:
           | T
           | {
               id?: T;
               blockName?: T;
             };
-        detailProject?:
+        templateProject?:
           | T
           | {
               id?: T;
@@ -2179,15 +2159,10 @@ export interface ProjectsSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        layoutHero?:
+        pageHero?:
           | T
           | {
-              labelTitle?: T;
-              title?: T;
-              labelTagline?: T;
-              tagline?: T;
-              labelBio?: T;
-              bio?: T;
+              paragraph?: T;
               heroImage?: T;
               labelSocialLinks?: T;
               socialLinks?: T;
@@ -2197,7 +2172,7 @@ export interface ProjectsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutFeedSection?:
+        pageFeedSection?:
           | T
           | {
               heading?: T;
@@ -2220,7 +2195,7 @@ export interface ProjectsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutRichTextWithoutBlock?:
+        pageRichText?:
           | T
           | {
               content?: T;
@@ -2248,7 +2223,7 @@ export interface ProjectsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutRelatedItems?:
+        pageRelatedItems?:
           | T
           | {
               heading?: T;
@@ -2264,28 +2239,28 @@ export interface ProjectsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutTypewriter?:
+        pageTypewriter?:
           | T
           | {
               stories?: T;
               id?: T;
               blockName?: T;
             };
-        layoutScrambleHover?:
+        pageScrambleHover?:
           | T
           | {
               stories?: T;
               id?: T;
               blockName?: T;
             };
-        layoutBlankSpace?:
+        pageBlankSpace?:
           | T
           | {
               height?: T;
               id?: T;
               blockName?: T;
             };
-        layoutFooter?:
+        pageFooter?:
           | T
           | {
               footerText?: T;
@@ -2298,13 +2273,13 @@ export interface ProjectsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        detailPost?:
+        templatePost?:
           | T
           | {
               id?: T;
               blockName?: T;
             };
-        detailProject?:
+        templateProject?:
           | T
           | {
               id?: T;
@@ -2405,15 +2380,10 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        layoutHero?:
+        pageHero?:
           | T
           | {
-              labelTitle?: T;
-              title?: T;
-              labelTagline?: T;
-              tagline?: T;
-              labelBio?: T;
-              bio?: T;
+              paragraph?: T;
               heroImage?: T;
               labelSocialLinks?: T;
               socialLinks?: T;
@@ -2423,7 +2393,7 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutFeedSection?:
+        pageFeedSection?:
           | T
           | {
               heading?: T;
@@ -2446,7 +2416,7 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutRichTextWithoutBlock?:
+        pageRichText?:
           | T
           | {
               content?: T;
@@ -2474,7 +2444,7 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutRelatedItems?:
+        pageRelatedItems?:
           | T
           | {
               heading?: T;
@@ -2490,28 +2460,28 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        layoutTypewriter?:
+        pageTypewriter?:
           | T
           | {
               stories?: T;
               id?: T;
               blockName?: T;
             };
-        layoutScrambleHover?:
+        pageScrambleHover?:
           | T
           | {
               stories?: T;
               id?: T;
               blockName?: T;
             };
-        layoutBlankSpace?:
+        pageBlankSpace?:
           | T
           | {
               height?: T;
               id?: T;
               blockName?: T;
             };
-        layoutFooter?:
+        pageFooter?:
           | T
           | {
               footerText?: T;
@@ -2524,13 +2494,13 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        detailPost?:
+        templatePost?:
           | T
           | {
               id?: T;
               blockName?: T;
             };
-        detailProject?:
+        templateProject?:
           | T
           | {
               id?: T;
@@ -2887,6 +2857,17 @@ export interface TaskSchedulePublish {
     user?: (number | null) | User;
   };
   output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "InlineImageBlock".
+ */
+export interface InlineImageBlock {
+  image: number | Media;
+  caption?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'inlineImage';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

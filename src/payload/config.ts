@@ -1,16 +1,15 @@
 import fs from 'fs'
 import path from 'path'
 import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite'
-import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
 import { GetPlatformProxyOptions } from 'wrangler'
 import { r2Storage } from '@payloadcms/storage-r2'
 
-import { pageBlocks } from '../blocks'
 import { collections } from '../collections'
 import { globals } from '../globals'
+import { richText } from '../fields/richText'
 import { constantTimeEqual } from '../lib/crypto'
 import { getPayloadSecret, getServerURL, getTrustedOrigins } from '../lib/env'
 import { DEFAULT_LOCALE, LOCALES } from '../lib/locales'
@@ -76,18 +75,7 @@ export default buildConfig({
   },
   collections,
   globals,
-  editor: lexicalEditor({
-    features: ({ defaultFeatures }) => [
-      ...defaultFeatures,
-      // Inline embeddable blocks inside any rich text field that uses the
-      // global editor (Posts.content, Projects.content, LayoutRichTextWithoutBlock.content,
-      // etc.). Code-mirror clients pick the block up via the `+` button in
-      // the Lexical toolbar and persist it as a `block` node carrying the
-      // canonical block payload. The frontend renders these via the `block`
-      // converter in `_components/cms/rich-text.tsx`.
-      BlocksFeature({ blocks: pageBlocks }),
-    ],
-  }),
+  editor: richText,
   secret: getPayloadSecret(),
   // Empty serverURL in development so Admin uses relative URLs and works when
   // opened via localhost OR a LAN IP. A fixed serverURL (e.g. localhost) makes

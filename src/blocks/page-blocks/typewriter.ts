@@ -1,10 +1,10 @@
 import type { Block } from 'payload'
 
-export const LayoutTypewriterBlock: Block = {
-  slug: 'layoutTypewriter',
+export const PageTypewriterBlock: Block = {
+  slug: 'pageTypewriter',
   labels: {
-    singular: 'Layout - Typewriter',
-    plural: 'Layout - Typewriter',
+    singular: 'Page - Typewriter',
+    plural: 'Page - Typewriter',
   },
   fields: [
     {

@@ -1,42 +1,44 @@
-import { LayoutBlankSpaceBlock } from './blank-space'
-import { ContentGalleryBlock } from './content-gallery'
-import { ContentMediaBlock } from './content-media'
-import { DetailPostBlock } from './detail-post'
-import { DetailProjectBlock } from './detail-project'
-import { LayoutFeedSectionBlock } from './feed-section'
-import { LayoutFooterBlock } from './footer'
-import { LayoutHeroBlock } from './hero'
-import { LayoutRelatedItemsBlock } from './layout-related-items'
-import { LayoutRichTextWithoutBlock } from './rich-text'
-import { LayoutScrambleHoverBlock } from './scramble-hover'
-import { LayoutTypewriterBlock } from './typewriter'
+import { ContentGalleryBlock } from './content-blocks/gallery'
+import { ContentMediaBlock } from './content-blocks/media'
+import {
+  PageBlankSpaceBlock,
+  PageFeedSectionBlock,
+  PageFooterBlock,
+  PageHeroBlock,
+  PageRelatedItemsBlock,
+  PageRichTextBlock,
+  PageScrambleHoverBlock,
+  PageTypewriterBlock,
+} from './page-blocks'
+import { TemplatePostBlock } from './template-blocks/post'
+import { TemplateProjectBlock } from './template-blocks/project'
 
 export {
   ContentGalleryBlock,
   ContentMediaBlock,
-  DetailPostBlock,
-  DetailProjectBlock,
-  LayoutBlankSpaceBlock,
-  LayoutFeedSectionBlock,
-  LayoutFooterBlock,
-  LayoutHeroBlock,
-  LayoutRelatedItemsBlock,
-  LayoutRichTextWithoutBlock,
-  LayoutScrambleHoverBlock,
-  LayoutTypewriterBlock,
+  PageBlankSpaceBlock,
+  PageFeedSectionBlock,
+  PageFooterBlock,
+  PageHeroBlock,
+  PageRelatedItemsBlock,
+  PageRichTextBlock,
+  PageScrambleHoverBlock,
+  PageTypewriterBlock,
+  TemplatePostBlock,
+  TemplateProjectBlock,
 }
 
 export const pageBlocks = [
-  LayoutHeroBlock,
-  LayoutFeedSectionBlock,
-  LayoutRichTextWithoutBlock,
+  PageHeroBlock,
+  PageFeedSectionBlock,
+  PageRichTextBlock,
   ContentMediaBlock,
   ContentGalleryBlock,
-  LayoutRelatedItemsBlock,
-  LayoutTypewriterBlock,
-  LayoutScrambleHoverBlock,
-  LayoutBlankSpaceBlock,
-  LayoutFooterBlock,
-  DetailPostBlock,
-  DetailProjectBlock,
+  PageRelatedItemsBlock,
+  PageTypewriterBlock,
+  PageScrambleHoverBlock,
+  PageBlankSpaceBlock,
+  PageFooterBlock,
+  TemplatePostBlock,
+  TemplateProjectBlock,
 ]
