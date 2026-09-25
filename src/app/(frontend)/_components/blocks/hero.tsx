@@ -1,13 +1,12 @@
 import Link from 'next/link'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
-import { FieldRow } from '@/app/(frontend)/_components/layout/field-row'
 import { trimUrlScheme } from '@/app/(frontend)/_lib/social-icons'
-import type { LayoutHeroBlockView, NavChildView } from '@/app/(frontend)/_lib/types'
+import type { PageHeroBlockView, NavChildView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
 
 type HeroProps = {
-  hero: LayoutHeroBlockView
+  hero: PageHeroBlockView
   className?: string
 }
 
@@ -31,10 +30,12 @@ function LinkList({ links, variant }: { links: NavChildView[]; variant: LinkList
               )}
               data-cursor-popup={''}
             >
-              <span className={cn(
-                'text-primary hover:text-foreground font-mono',
-                'text-xs md:text-base',
-              )}>
+              <span
+                className={cn(
+                  'text-primary hover:text-foreground font-mono',
+                  'text-xs md:text-base',
+                )}
+              >
                 &gt;
               </span>
               <span
@@ -58,73 +59,37 @@ export function Hero({ hero, className }: HeroProps) {
     <section
       id="hero"
       className={cn(
-        'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.7)]',
+        'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.9)]',
         className,
       )}
-      aria-labelledby="hero-heading"
+      aria-label="Hero"
       data-cursor-popup={hero.cursorPopup || 'scroll down'}
     >
       <div className="flex h-full w-full flex-col-reverse items-stretch justify-between md:flex-row">
         <div className="relative isolate min-h-0 flex-1 overflow-hidden">
-          <div className={cn('relative z-10 h-full overflow-y-auto', 'px-2 py-4 md:p-3 lg:p-4')}>
-            <div className="grid grid-cols-2 gap-x-16 gap-y-4 md:gap-y-8 lg:gap-x-8 lg:gap-y-16">
-              <FieldRow label={hero.labelTitle}>
-                <h1
-                  id="hero-heading"
-                  className={cn(
-                    'text-foreground font-medium',
-                    'text-sm md:text-base lg:text-lg',
-                  )}
-                >
-                  {hero.title}
-                </h1>
-              </FieldRow>
+          <div className={cn('relative z-10 h-full overflow-y-auto', 'px-2 py-4 md:p-4 lg:p-5')}>
+            {hero.paragraph ? (
+              <CmsRichText
+                data={hero.paragraph}
+                className={cn('text-foreground font-serif', 'text-xl md:text-2xl lg:text-5xl')}
+                paragraphClassName="md:leading-[1.15] lg:leading-[1.2]"
+              />
+            ) : null}
 
-              {hero.tagline ? (
-                <FieldRow label={hero.labelTagline}>
-                  <p className={cn(
-                      'text-foreground font-medium',
-                      'text-sm md:text-base lg:text-lg',
-                    )}>
-                    {hero.tagline}
-                  </p>
-                </FieldRow>
-              ) : (
-                <div aria-hidden="true" />
-              )}
+            {hero.socialLinks.length > 0 ? (
+              <LinkList links={hero.socialLinks} variant="social" />
+            ) : null}
 
-              {hero.bio ? (
-                <FieldRow label={hero.labelBio} className="col-span-2">
-                  <CmsRichText
-                    data={hero.bio}
-                    className={cn(
-                      'text-foreground mb-3 font-medium',
-                      'text-sm md:text-base lg:text-lg',
-                    )}
-                  />
-                </FieldRow>
-              ) : null}
-
-              <FieldRow label={hero.labelSocialLinks}>
-                <LinkList links={hero.socialLinks} variant="social" />
-              </FieldRow>
-
-              {hero.otherLinks.length > 0 ? (
-                <FieldRow label={hero.labelOtherLinks}>
-                  <LinkList links={hero.otherLinks} variant="destination" />
-                </FieldRow>
-              ) : (
-                <div aria-hidden="true" />
-              )}
-            </div>
+            {hero.otherLinks.length > 0 ? (
+              <LinkList links={hero.otherLinks} variant="destination" />
+            ) : null}
           </div>
         </div>
 
         <div
           className={cn(
             'relative overflow-hidden md:h-full',
-            // Minus 20px and 40px to match width with the 4th item in the grid
-            'h-40 w-full md:w-[calc((100%-20px)/3)] lg:w-[calc((100%-40px)/4)]',
+            'h-40 w-full md:w-2/5',
             'max-sm:pl-2',
             className,
           )}
@@ -133,7 +98,7 @@ export function Hero({ hero, className }: HeroProps) {
             <CmsImage
               media={hero.heroImage}
               fill
-              sizes="(min-width: 768px) 25vw, 100vw"
+              sizes="(min-width: 768px) 40vw, 100vw"
               className="h-full w-full"
               imgClassName="object-cover"
               priority
