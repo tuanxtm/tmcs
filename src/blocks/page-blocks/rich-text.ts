@@ -1,6 +1,6 @@
 import type { Block } from 'payload'
 
-import { richTextWithoutBlock } from '@/fields/richTextWithoutBlock'
+import { richTextWithoutBlock } from '@/fields/richText/richText'
 
 /**
  * Overrides the global editor so this block's `content` rich text field does
@@ -11,7 +11,7 @@ import { richTextWithoutBlock } from '@/fields/richTextWithoutBlock'
  *       global editor includes BlocksFeature(pageBlocks) ->
  *         pageBlocks again includes PageRichTextBlock -> ...
  *
- * The override lives in `src/fields/richTextWithoutBlock.ts` so the import
+ * The override lives in `src/fields/richText.ts` so the import
  * chain `richText.ts <- { blocks/index.ts <- this file }` is not cyclic.
  */
 export const PageRichTextBlock: Block = {

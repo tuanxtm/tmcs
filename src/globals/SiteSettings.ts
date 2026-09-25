@@ -2,7 +2,7 @@ import type { GlobalConfig } from 'payload'
 
 import { adminOrManager, anyone, fieldAdminOrManager } from '@/access'
 import { seoFields } from '@/fields/seoFields'
-import { richText } from '@/fields/richText'
+import { richText } from '@/fields/richText/richText'
 import { revalidateSiteShellGlobal } from '@/hooks/revalidateFrontend'
 import { validateAbsoluteHttpUrl } from '@/lib/url'
 

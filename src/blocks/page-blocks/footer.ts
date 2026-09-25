@@ -1,7 +1,7 @@
 import type { Block } from 'payload'
 
 import { linkPickerField } from '@/fields/common'
-import { richTextWithoutBlock } from '@/fields/richTextWithoutBlock'
+import { richTextWithoutBlock } from '@/fields/richText/richText'
 
 /**
  * Page block rendered at the bottom of a page.

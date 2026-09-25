@@ -1,7 +1,7 @@
 import type { Block } from 'payload'
 
 import { linkPickerField } from '@/fields/common'
-import { richText } from '@/fields/richText'
+import { richText } from '@/fields/richText/richText'
 
 /**
  * Page block rendered near the top of a page.

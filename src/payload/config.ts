@@ -9,7 +9,7 @@ import { r2Storage } from '@payloadcms/storage-r2'
 
 import { collections } from '../collections'
 import { globals } from '../globals'
-import { richText } from '../fields/richText'
+import { richText } from '../fields/richText/richText'
 import { constantTimeEqual } from '../lib/crypto'
 import { getPayloadSecret, getServerURL, getTrustedOrigins } from '../lib/env'
 import { DEFAULT_LOCALE, LOCALES } from '../lib/locales'
