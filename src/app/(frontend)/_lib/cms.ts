@@ -7,6 +7,7 @@ import { getServerURL } from '@/lib/env'
 import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
 import { lexicalToPlainText } from '@/lib/readingTime'
+import { PROJECTS_BATCH_SIZE } from './projects-feed'
 import type {
   DecorationPack,
   FeedDecoration,
@@ -44,7 +45,7 @@ import type {
 import { parseYouTubeVideoId } from '@/lib/youtube'
 
 export const POSTS_PAGE_SIZE = 11
-export const PROJECTS_PAGE_SIZE = 11
+export const PROJECTS_PAGE_SIZE = PROJECTS_BATCH_SIZE
 export const VIDEOS_PAGE_SIZE = 11
 export const SHORT_STORIES_POOL_LIMIT = 48
 export const FEED_DECORATIONS_POOL_LIMIT = 48

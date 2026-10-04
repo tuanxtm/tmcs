@@ -380,18 +380,21 @@ export interface Post {
              */
             description?: string | null;
             /**
-             * Posts/Projects/Videos use the feed grid. Things uses a custom showcase layout with the same source logic.
+             * Projects uses a draggable canvas. Posts and Videos use a feed grid. Things uses a custom showcase with the same source logic.
              */
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects always renders a static preview on the canvas; the canonical Projects archive loads every published project in batches of 10.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
-             * Initial item count. For static previews this is the full grid size; for infinite scroll it is the first page size.
+             * Number of items in the preview (1-48, default 12). Projects respects this count on blocks; its archive uses infinite scrolling.
              */
             limit: number;
+            /**
+             * Projects always links Show all to the canonical localized Projects archive.
+             */
             showViewAll?: boolean | null;
             /**
              * Label for the trailing tile (e.g. “View all posts”).
@@ -742,18 +745,21 @@ export interface Page {
              */
             description?: string | null;
             /**
-             * Posts/Projects/Videos use the feed grid. Things uses a custom showcase layout with the same source logic.
+             * Projects uses a draggable canvas. Posts and Videos use a feed grid. Things uses a custom showcase with the same source logic.
              */
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects always renders a static preview on the canvas; the canonical Projects archive loads every published project in batches of 10.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
-             * Initial item count. For static previews this is the full grid size; for infinite scroll it is the first page size.
+             * Number of items in the preview (1-48, default 12). Projects respects this count on blocks; its archive uses infinite scrolling.
              */
             limit: number;
+            /**
+             * Projects always links Show all to the canonical localized Projects archive.
+             */
             showViewAll?: boolean | null;
             /**
              * Label for the trailing tile (e.g. “View all posts”).
@@ -1067,18 +1073,21 @@ export interface Project {
              */
             description?: string | null;
             /**
-             * Posts/Projects/Videos use the feed grid. Things uses a custom showcase layout with the same source logic.
+             * Projects uses a draggable canvas. Posts and Videos use a feed grid. Things uses a custom showcase with the same source logic.
              */
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects always renders a static preview on the canvas; the canonical Projects archive loads every published project in batches of 10.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
-             * Initial item count. For static previews this is the full grid size; for infinite scroll it is the first page size.
+             * Number of items in the preview (1-48, default 12). Projects respects this count on blocks; its archive uses infinite scrolling.
              */
             limit: number;
+            /**
+             * Projects always links Show all to the canonical localized Projects archive.
+             */
             showViewAll?: boolean | null;
             /**
              * Label for the trailing tile (e.g. “View all posts”).

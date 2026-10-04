@@ -21,7 +21,7 @@ test.describe('Frontend homepage', () => {
     expect(response?.ok()).toBeTruthy()
     await expect(page.locator('html')).toHaveAttribute('lang', 'vi')
     await expect(page.locator('#hero-heading')).toBeVisible()
-    await expect(page.locator('[data-feed-type="projects"] .section-header h2')).toBeVisible()
+    await expect(page.locator('[data-feed-type="projects"] h2')).toBeVisible()
   })
 
   test('header is sticky and shows site name', async ({ page }) => {
@@ -39,7 +39,8 @@ test.describe('Frontend homepage', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
 
-    const sectionHeader = page.locator('[data-feed-type="projects"] .section-header')
+    // Posts keeps the compact sticky section header; Projects uses the canvas.
+    const sectionHeader = page.locator('[data-feed-type="posts"] .section-header')
     await expect(sectionHeader).toHaveCSS('position', 'sticky')
     await expect(sectionHeader).toHaveAttribute('data-stuck', 'false')
 
@@ -51,7 +52,7 @@ test.describe('Frontend homepage', () => {
 
     await page.evaluate(() => {
       const siteHeader = document.querySelector('header')
-      const sectionHeaderEl = document.querySelector('[data-feed-type="projects"] .section-header')
+      const sectionHeaderEl = document.querySelector('[data-feed-type="posts"] .section-header')
       if (!siteHeader || !sectionHeaderEl) return
       const siteHeight = siteHeader.getBoundingClientRect().height
       const absoluteTop = sectionHeaderEl.getBoundingClientRect().top + window.scrollY
@@ -68,7 +69,7 @@ test.describe('Frontend homepage', () => {
 
     const metrics = await page.evaluate(() => {
       const siteHeader = document.querySelector('header')
-      const sectionHeaderEl = document.querySelector('[data-feed-type="projects"] .section-header')
+      const sectionHeaderEl = document.querySelector('[data-feed-type="posts"] .section-header')
       if (!siteHeader || !sectionHeaderEl) return null
       return {
         top: sectionHeaderEl.getBoundingClientRect().top,
@@ -89,7 +90,7 @@ test.describe('Frontend homepage', () => {
     const fold = await page.evaluate(() => {
       const header = document.querySelector('header')
       const hero = document.querySelector('#hero')
-      const sectionHeader = document.querySelector('[data-feed-type] .section-header')
+      const sectionHeader = document.querySelector('[data-feed-type="posts"] .section-header')
       if (!header || !hero || !sectionHeader) return null
 
       const headerRect = header.getBoundingClientRect()
@@ -112,8 +113,8 @@ test.describe('Frontend homepage', () => {
   test('desktop feed grids use four columns', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
-    const grid = page.locator('[data-feed-type="projects"] [data-grid="feed"]')
-    if ((await page.locator('[data-feed-type="projects"] [data-feed-grid-item]').count()) === 0) {
+    const grid = page.locator('[data-feed-type="posts"] [data-grid="feed"]')
+    if ((await page.locator('[data-feed-type="posts"] [data-feed-grid-item]').count()) === 0) {
       test.skip()
       return
     }
@@ -125,7 +126,7 @@ test.describe('Frontend homepage', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
 
-    const images = page.locator('[data-feed-type="projects"] [data-feed-grid-item] img')
+    const images = page.locator('[data-feed-type="posts"] [data-feed-grid-item] img')
     if ((await images.count()) === 0) {
       test.skip()
       return
@@ -153,8 +154,8 @@ test.describe('Frontend homepage', () => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('http://localhost:3000/')
 
-    const grid = page.locator('[data-feed-type="projects"] [data-grid="feed"]')
-    if ((await page.locator('[data-feed-type="projects"] [data-feed-grid-item]').count()) === 0) {
+    const grid = page.locator('[data-feed-type="posts"] [data-grid="feed"]')
+    if ((await page.locator('[data-feed-type="posts"] [data-feed-grid-item]').count()) === 0) {
       test.skip()
       return
     }
@@ -163,9 +164,65 @@ test.describe('Frontend homepage', () => {
     await expect(grid).toHaveCSS('grid-template-columns', /^[^\s]+$/)
   })
 
+  test('projects render on the draggable canvas with grid lines and contained images', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('http://localhost:3000/')
+
+    const canvas = page.locator('[data-feed-type="projects"] [data-project-canvas]')
+    if ((await page.locator('[data-feed-type="projects"] [data-project-item]').count()) === 0) {
+      test.skip()
+      return
+    }
+
+    await expect(canvas).toBeVisible()
+    expect(await canvas.evaluate((el) => getComputedStyle(el).backgroundImage)).toContain(
+      'linear-gradient',
+    )
+    // Preview count follows the CMS block limit.
+    expect(await page.locator('[data-feed-type="projects"] [data-project-item]').count()).toBeLessThanOrEqual(
+      12,
+    )
+    // Movement handles exist for every project.
+    expect(await page.locator('[data-feed-type="projects"] [data-project-drag-handle]').count()).toBe(
+      await page.locator('[data-feed-type="projects"] [data-project-item]').count(),
+    )
+  })
+
+  test('project images use object-fit contain and are not cropped', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('http://localhost:3000/')
+
+    const images = page.locator('[data-feed-type="projects"] [data-project-item] img')
+    if ((await images.count()) === 0) {
+      test.skip()
+      return
+    }
+
+    await expect(images.first()).toHaveCSS('object-fit', 'contain')
+  })
+
+  test('project names appear to the right of their image', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('http://localhost:3000/')
+
+    const item = page.locator('[data-feed-type="projects"] [data-project-item]').first()
+    if ((await item.count()) === 0) {
+      test.skip()
+      return
+    }
+
+    const imageBox = await item.locator('[data-project-image]').first().boundingBox()
+    const titleBox = await item.locator('[title]').last().boundingBox()
+    expect(imageBox).not.toBeNull()
+    expect(titleBox).not.toBeNull()
+    expect(titleBox!.x).toBeGreaterThanOrEqual(imageBox!.x + imageBox!.width - 1)
+  })
+
   test('feed tile titles remain accessible to assistive tech', async ({ page }) => {
     await page.goto('http://localhost:3000/')
-    const tile = page.locator('[data-feed-type="projects"] [data-feed-grid-item]').first()
+    const tile = page.locator('[data-feed-type="posts"] [data-feed-grid-item]').first()
     if ((await tile.count()) === 0) {
       test.skip()
       return
@@ -220,9 +277,9 @@ test.describe('Frontend homepage', () => {
     expect(count).toBeLessThanOrEqual(12)
   })
 
-  test('projects section shows view all tile after feed items', async ({ page }) => {
+  test('projects section shows the canonical view all link', async ({ page }) => {
     await page.goto('http://localhost:3000/')
-    const items = page.locator('[data-feed-type="projects"] [data-feed-grid-item]')
+    const items = page.locator('[data-feed-type="projects"] [data-project-item]')
     const count = await items.count()
     if (count === 0) {
       test.skip()
@@ -242,10 +299,22 @@ test.describe('Frontend homepage', () => {
     await expect(page.locator('main')).toBeVisible()
   })
 
-  test('projects archive page uses infinite feed section', async ({ page }) => {
+  test('projects archive page uses the canvas with infinite pagination', async ({ page }) => {
     const response = await page.goto('http://localhost:3000/projects')
     expect(response?.ok()).toBeTruthy()
     await expect(page.locator('[data-feed-type="projects"]')).toBeVisible()
+    await expect(page.locator('[data-feed-type="projects"] [data-project-canvas]')).toBeVisible()
+    // Archive hides the Show all link.
+    await expect(
+      page.locator('[data-feed-type="projects"]').getByRole('link', { name: /view all projects/i }),
+    ).toHaveCount(0)
+  })
+
+  test('vietnamese projects archive renders the canvas', async ({ page }) => {
+    const response = await page.goto('http://localhost:3000/vi/projects')
+    expect(response?.ok()).toBeTruthy()
+    await expect(page.locator('html')).toHaveAttribute('lang', 'vi')
+    await expect(page.locator('[data-feed-type="projects"] [data-project-canvas]')).toBeVisible()
   })
 
   test('vietnamese about page sets lang', async ({ page }) => {
@@ -295,11 +364,13 @@ test.describe('Frontend homepage', () => {
     await expect(bubble).toBeVisible({ timeout: 2000 })
     await expect(bubble).toHaveText(/scroll down|kéo xuống/i)
 
-    const projectsHeader = page.locator('[data-feed-type="projects"] .section-header h2')
-    await projectsHeader.scrollIntoViewIfNeeded()
-    await projectsHeader.hover()
-    await expect(bubble).toBeVisible({ timeout: 2000 })
-    await expect(bubble).toHaveText(/cool projects|dự án/i)
+    const projectsItem = page.locator('[data-feed-type="projects"] [data-project-item]').first()
+    if ((await projectsItem.count()) > 0) {
+      await projectsItem.scrollIntoViewIfNeeded()
+      await projectsItem.hover()
+      await expect(bubble).toBeVisible({ timeout: 2000 })
+      await expect(bubble).toHaveText(/view details|xem chi tiết/i)
+    }
 
     const postsHeader = page.locator('[data-feed-type="posts"] .section-header h2')
     await postsHeader.scrollIntoViewIfNeeded()

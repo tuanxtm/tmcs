@@ -10,7 +10,6 @@ export default function Icon() {
         paddingTop: 4,
       }}
     >
-      {}
       <img
         src="/logo.svg"
         alt="tuantm"

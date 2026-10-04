@@ -29,6 +29,7 @@ import {
   toMediaView,
 } from '@/app/(frontend)/_lib/cms'
 import { resolveCmsLink, resolvePageHref } from '@/app/(frontend)/_lib/links'
+import { PROJECTS_PREVIEW_LIMIT } from '@/app/(frontend)/_lib/projects-feed'
 import type {
   CmsPageView,
   ContentMediaBlockView,
@@ -245,7 +246,11 @@ async function resolveFeedSectionBlock(
   const feedType: FeedType = block.feedType
   const source: FeedSourceMode = isFeedSourceMode(block.source) ? block.source : 'latest'
   const adapter = FEED_SOURCE_REGISTRY[feedType]
-  const limit = clampLimit(block.limit)
+  // Project previews honor the CMS count and paginate only on the archive.
+  const isProjectsPreview = feedType === 'projects'
+  const limit = clampLimit(
+    isProjectsPreview ? (block.limit ?? PROJECTS_PREVIEW_LIMIT) : block.limit,
+  )
 
   const manualIds =
     feedType === 'posts'
@@ -263,8 +268,9 @@ async function resolveFeedSectionBlock(
   )
     ? (block as { pagination: FeedPaginationMode }).pagination
     : 'static'
-  const pagination: FeedPaginationMode =
-    feedType !== 'things' && source === 'latest' && requestedPagination === 'infinite'
+  const pagination: FeedPaginationMode = isProjectsPreview
+    ? 'static'
+    : feedType !== 'things' && source === 'latest' && requestedPagination === 'infinite'
       ? 'infinite'
       : 'static'
 
@@ -273,8 +279,11 @@ async function resolveFeedSectionBlock(
       ? false
       : (block as { showViewAll?: boolean | null }).showViewAll !== false
 
-  const viewAllHref =
-    showViewAll && 'viewAllPage' in block && block.viewAllPage != null
+  const viewAllHref = isProjectsPreview
+    ? showViewAll
+      ? `/${locale === 'vi' ? 'vi/' : ''}projects`
+      : null
+    : showViewAll && 'viewAllPage' in block && block.viewAllPage != null
       ? resolvePageHref((block as { viewAllPage?: unknown }).viewAllPage, locale)
       : showViewAll
         ? `/${locale === 'vi' ? 'vi/' : ''}${feedType}`

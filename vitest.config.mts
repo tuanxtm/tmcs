@@ -9,7 +9,7 @@ export default defineConfig({
     // (TextEncoder/Uint8Array instanceof invariant).
     environment: 'node',
     setupFiles: ['./vitest.setup.ts'],
-    include: ['tests/int/**/*.int.spec.ts'],
+    include: ['tests/int/**/*.int.spec.ts', 'tests/int/**/*.int.spec.tsx'],
     testTimeout: 60000,
     hookTimeout: 120000,
     fileParallelism: false,

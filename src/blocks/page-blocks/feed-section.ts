@@ -34,7 +34,7 @@ export const PageFeedSectionBlock: Block = {
       ],
       admin: {
         description:
-          'Posts/Projects/Videos use the feed grid. Things uses a custom showcase layout with the same source logic.',
+          'Projects uses a draggable canvas. Posts and Videos use a feed grid. Things uses a custom showcase with the same source logic.',
       },
     },
     {
@@ -59,20 +59,21 @@ export const PageFeedSectionBlock: Block = {
       ],
       admin: {
         description:
-          'Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published.',
-        condition: (_, siblingData) => siblingData?.source === 'latest',
+          'Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects always renders a static preview on the canvas; the canonical Projects archive loads every published project in batches of 10.',
+        condition: (_, siblingData) =>
+          siblingData?.feedType !== 'projects' && siblingData?.source === 'latest',
       },
     },
     {
       name: 'limit',
       type: 'number',
       required: true,
-      defaultValue: 11,
+      defaultValue: 12,
       min: 1,
       max: 48,
       admin: {
         description:
-          'Initial item count. For static previews this is the full grid size; for infinite scroll it is the first page size.',
+          'Number of items in the preview (1-48, default 12). Projects respects this count on blocks; its archive uses infinite scrolling.',
       },
     },
     {
@@ -80,8 +81,11 @@ export const PageFeedSectionBlock: Block = {
       type: 'checkbox',
       defaultValue: true,
       admin: {
+        description: 'Projects always links Show all to the canonical localized Projects archive.',
         condition: (_, siblingData) =>
-          siblingData?.pagination !== 'infinite' || siblingData?.source !== 'latest',
+          siblingData?.feedType === 'projects' ||
+          siblingData?.pagination !== 'infinite' ||
+          siblingData?.source !== 'latest',
       },
     },
     {
@@ -91,7 +95,9 @@ export const PageFeedSectionBlock: Block = {
       admin: {
         condition: (_, siblingData) =>
           Boolean(siblingData?.showViewAll) &&
-          (siblingData?.pagination !== 'infinite' || siblingData?.source !== 'latest'),
+          (siblingData?.feedType === 'projects' ||
+            siblingData?.pagination !== 'infinite' ||
+            siblingData?.source !== 'latest'),
         description: 'Label for the trailing tile (e.g. “View all posts”).',
       },
     },
@@ -102,6 +108,7 @@ export const PageFeedSectionBlock: Block = {
       admin: {
         condition: (_, siblingData) =>
           Boolean(siblingData?.showViewAll) &&
+          siblingData?.feedType !== 'projects' &&
           (siblingData?.pagination !== 'infinite' || siblingData?.source !== 'latest'),
         description: 'CMS page the View all tile links to (e.g. Posts or Projects index page).',
       },
@@ -189,7 +196,9 @@ export const PageFeedSectionBlock: Block = {
           admin: {
             condition: (_, siblingData) =>
               Boolean(siblingData?.showViewAll) &&
-              (siblingData?.pagination !== 'infinite' || siblingData?.source !== 'latest'),
+              (siblingData?.feedType === 'projects' ||
+                siblingData?.pagination !== 'infinite' ||
+                siblingData?.source !== 'latest'),
             description: 'While hovering the “View all” tile.',
           },
         },

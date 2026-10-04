@@ -3,6 +3,7 @@ import { ContentMediaBlock } from '@/app/(frontend)/_components/blocks/content-m
 import { DetailPostBlock } from '@/app/(frontend)/_components/blocks/detail-post'
 import { DetailProjectBlock } from '@/app/(frontend)/_components/blocks/detail-project'
 import { FeedSection } from '@/app/(frontend)/_components/feed/feed-section'
+import { ProjectsSection } from '@/app/(frontend)/_components/projects/projects-section'
 import { FooterBlock } from '@/app/(frontend)/_components/blocks/footer'
 import { Hero } from '@/app/(frontend)/_components/blocks/hero'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
@@ -99,6 +100,41 @@ export function PageBlocks({
               block.docs.length,
             ].join(':')
 
+            // Projects own their renderer: client pagination appends must not
+            // change the key, so only the server snapshot participates.
+            if (block.feedType === 'projects') {
+              const projectsKey = JSON.stringify([
+                locale,
+                ids.sectionId,
+                block.docs,
+                block.nextCursor,
+                block.hasNextPage,
+                block.pagination,
+              ])
+              return (
+                <ProjectsSection
+                  key={projectsKey}
+                  locale={locale}
+                  sectionId={ids.sectionId}
+                  headingId={ids.headingId}
+                  heading={block.heading}
+                  description={block.description}
+                  docs={block.docs}
+                  pagination={block.pagination}
+                  nextCursor={block.nextCursor}
+                  hasNextPage={block.hasNextPage}
+                  showViewAll={block.showViewAll}
+                  viewAllLabel={block.viewAllLabel}
+                  viewAllHref={block.viewAllHref}
+                  cursorPopup={block.cursorPopup}
+                  cursorPopupEmpty={block.cursorPopupEmpty}
+                  cursorPopupItem={block.cursorPopupItem}
+                  cursorPopupViewAll={block.cursorPopupViewAll}
+                  decorations={block.decorations}
+                />
+              )
+            }
+
             if (block.feedType === 'things') {
               return (
                 <ThingsSection
@@ -172,29 +208,7 @@ export function PageBlocks({
               )
             }
 
-            return (
-              <FeedSection
-                key={feedKey}
-                locale={locale}
-                sectionId={ids.sectionId}
-                headingId={ids.headingId}
-                heading={block.heading}
-                description={block.description}
-                cursorPopup={block.cursorPopup}
-                cursorPopupEmpty={block.cursorPopupEmpty}
-                cursorPopupItem={block.cursorPopupItem}
-                cursorPopupViewAll={block.cursorPopupViewAll}
-                feedType="projects"
-                docs={block.docs}
-                pagination={block.pagination}
-                nextCursor={block.nextCursor}
-                hasNextPage={block.hasNextPage}
-                showViewAll={block.showViewAll}
-                viewAllLabel={block.viewAllLabel}
-                viewAllHref={block.viewAllHref}
-                decorations={block.decorations}
-              />
-            )
+            return null
           }
 
           case 'pageRichText':

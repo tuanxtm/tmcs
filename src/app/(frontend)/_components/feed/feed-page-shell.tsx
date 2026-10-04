@@ -5,7 +5,7 @@ import { PageTransition } from '@/app/(frontend)/_components/layout/page-transit
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
 import { getPageBySlug } from '@/app/(frontend)/_lib/page-data'
 import { FEED_SOURCE_REGISTRY } from '@/app/(frontend)/_lib/feed-registry'
-import type { FeedDecorationView, FeedType } from '@/app/(frontend)/_lib/types'
+import type { FeedDecorationView, FeedType, ResolvedBlockView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 
 type FeedPageShellOptions = {
@@ -25,6 +25,16 @@ type FeedPageShellOptions = {
     adapter: (typeof FEED_SOURCE_REGISTRY)[FeedType]
     decorations?: FeedDecorationView[]
   }) => React.ReactNode
+  /**
+   * Optional server-only rewrite of the CMS page blocks. Only the Projects
+   * page uses it to turn its first project block into the full archive feed.
+   */
+  transformPageBlocks?: (args: {
+    blocks: ResolvedBlockView[]
+    locale: LocaleCode
+    feed: unknown
+    decorations?: FeedDecorationView[]
+  }) => ResolvedBlockView[]
 }
 
 type SiteShell = Awaited<ReturnType<typeof getSiteShell>>
@@ -42,6 +52,7 @@ export function createFeedPageShell({
   feedType,
   loadFeed,
   renderFeed,
+  transformPageBlocks,
 }: FeedPageShellOptions) {
   const adapter = FEED_SOURCE_REGISTRY[feedType]
 
@@ -92,10 +103,14 @@ export function createFeedPageShell({
       : undefined
 
     if (page) {
+      const blocks = transformPageBlocks
+        ? transformPageBlocks({ blocks: page.blocks, locale, feed, decorations })
+        : page.blocks
+
       return (
         <PageTransition>
           <PageBlocks
-            blocks={page.blocks}
+            blocks={blocks}
             locale={locale}
             siteName={shell.siteName}
             navigation={shell.navigation}
