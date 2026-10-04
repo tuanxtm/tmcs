@@ -1,4 +1,4 @@
-import { Bitter, Geist, IBM_Plex_Mono } from 'next/font/google'
+import { Bitter, Geist, JetBrains_Mono } from 'next/font/google'
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 
@@ -34,10 +34,10 @@ const bitter = Bitter({
   variable: '--font-bitter',
 })
 
-const ibmPlexMono = IBM_Plex_Mono({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-ibm-plex-mono',
+  variable: '--font-jetbrains-mono',
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -70,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   // this render tree. `<html lang>` defaults to `en`; the inline script in
   // `<LocaleMeta />` updates it to the request-time locale before paint.
   return (
-    <html lang="en" className={`${geist.variable} ${bitter.variable} ${ibmPlexMono.variable}`}>
+    <html lang="en" className={`${geist.variable} ${bitter.variable} ${jetbrainsMono.variable}`}>
       <head>
         {/* Suspense fallback intentionally empty - if `headers()` blocks,
             the static shell still ships with the default lang and the script
