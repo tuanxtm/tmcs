@@ -2,15 +2,11 @@ import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import LenisProvider from 'lenis/react'
 
-import { ProjectsCanvas } from '@/app/(frontend)/_components/projects/projects-canvas'
-import type { FeedDecorationView, ProjectCardView } from '@/app/(frontend)/_lib/types'
+import { ThingsCanvas } from '@/app/(frontend)/_components/things/things-canvas'
+import type { FeedDecorationView, ThingCardView } from '@/app/(frontend)/_lib/types'
 import styles from '@/app/(frontend)/_components/canvas/canvas.module.css'
 
-/**
- * Canvas-focused browser fixture. It renders ProjectsCanvas directly instead of
- * ProjectsSection so the Payload-backed pagination action never enters the
- * browser bundle. Pagination state is covered by the mocked component tests.
- */
+/** Browser fixture for Things canvas movement and drawer interactions. */
 type FixtureOptions = {
   count?: number
   /** Edge scrolling runs through Lenis when true, native scroll otherwise. */
@@ -33,7 +29,7 @@ const LONG_TITLES = [
   'Ink-and-paper notebook tooling',
 ]
 
-function makeProject(index: number): ProjectCardView {
+function makeThing(index: number): ThingCardView & { detailImage: unknown } {
   const id = index + 1
   // Mixed ratios, missing images, transparent images, and long titles.
   const missing = index % 7 === 3
@@ -44,16 +40,26 @@ function makeProject(index: number): ProjectCardView {
 
   return {
     id,
-    slug: `fixture-project-${id}`,
-    title: LONG_TITLES[index % LONG_TITLES.length],
-    href: `/projects/fixture-project-${id}`,
+    slug: `fixture-thing-${id}`,
+    name: LONG_TITLES[index % LONG_TITLES.length],
+    description: 'Useful tools for the workshop.',
+    links: [],
+    primaryUrl: index === 2 ? null : `/buy/fixture-thing-${id}`,
+    detailImage: {
+      id: 100 + id,
+      url: '/secondary-never-render.png',
+      alt: 'Secondary',
+      width: 800,
+      height: 400,
+      dominantColor: null,
+    },
     publishedAt: '2026-01-01T00:00:00.000Z',
-    image: missing
+    primaryImage: missing
       ? null
       : {
           id,
           url: transparent ? TRANSPARENT_PNG : OPAQUE_PNG,
-          alt: `Fixture project ${id}`,
+          alt: `Fixture thing ${id}`,
           width,
           height,
           dominantColor: null,
@@ -61,8 +67,8 @@ function makeProject(index: number): ProjectCardView {
   }
 }
 
-function makeProjects(count: number): ProjectCardView[] {
-  return Array.from({ length: count }, (_, index) => makeProject(index))
+function makeThings(count: number): ThingCardView[] {
+  return Array.from({ length: count }, (_, index) => makeThing(index))
 }
 
 const DECORATIONS: FeedDecorationView[] = [
@@ -75,28 +81,29 @@ const root = createRoot(host)
 
 declare global {
   interface Window {
-    renderProjectsFixture: (options?: FixtureOptions) => void
+    renderThingsFixture: (options?: FixtureOptions) => void
   }
 }
 
-window.renderProjectsFixture = (options = {}) => {
+window.renderThingsFixture = (options = {}) => {
   const count = options.count ?? 25
-  const projects = makeProjects(count)
+  const things = makeThings(count)
   const decorations = options.decorations === false ? undefined : DECORATIONS
 
   const section = (
-    <section id="fixture-projects" aria-labelledby="fixture-projects-heading">
+    <section id="fixture-things" aria-labelledby="fixture-things-heading">
       <div className={styles.frame}>
-        <h2 id="fixture-projects-heading" className={styles.heading}>
-          projects
+        <h2 id="fixture-things-heading" className={styles.heading}>
+          things
         </h2>
-        <ProjectsCanvas
-          projects={projects}
-          description="Drag any project to rearrange the workshop wall."
+        <ThingsCanvas
+          things={things}
+          locale="en"
+          description="Drag any thing to rearrange the workshop wall."
           cursorPopupItem="view details"
           decorations={decorations}
           onMovementChange={(moving) => {
-            document.documentElement.dataset.projectMoving = String(moving)
+            document.documentElement.dataset.thingMoving = String(moving)
           }}
         />
       </div>
@@ -120,4 +127,4 @@ window.renderProjectsFixture = (options = {}) => {
   }
 }
 
-window.renderProjectsFixture()
+window.renderThingsFixture()

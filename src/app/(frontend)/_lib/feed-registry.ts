@@ -1,12 +1,7 @@
 import { getPayload, type Where } from 'payload'
 import { cache } from 'react'
 
-import {
-  toPostCard,
-  toProjectCard,
-  toThingCard,
-  toVideoCard,
-} from '@/app/(frontend)/_lib/cms'
+import { toPostCard, toProjectCard, toThingCard, toVideoCard } from '@/app/(frontend)/_lib/cms'
 import type {
   FeedType,
   PostCardView,
@@ -191,7 +186,6 @@ async function loadThings(args: {
     name: true,
     description: true,
     primaryImage: true,
-    detailImage: true,
     primaryUrl: true,
     links: true,
     publishedAt: true,

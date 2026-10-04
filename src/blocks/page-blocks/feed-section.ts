@@ -34,7 +34,7 @@ export const PageFeedSectionBlock: Block = {
       ],
       admin: {
         description:
-          'Projects uses a draggable canvas. Posts and Videos use a feed grid. Things uses a custom showcase with the same source logic.',
+          'Projects and Things use draggable canvases. Posts and Videos use a feed grid.',
       },
     },
     {
@@ -59,9 +59,10 @@ export const PageFeedSectionBlock: Block = {
       ],
       admin: {
         description:
-          'Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects always renders a static preview on the canvas; the canonical Projects archive loads every published project in batches of 10.',
+          'Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.',
         condition: (_, siblingData) =>
-          siblingData?.feedType !== 'projects' && siblingData?.source === 'latest',
+          !['projects', 'things'].includes(siblingData?.feedType) &&
+          siblingData?.source === 'latest',
       },
     },
     {
@@ -73,7 +74,7 @@ export const PageFeedSectionBlock: Block = {
       max: 48,
       admin: {
         description:
-          'Number of items in the preview (1-48, default 12). Projects respects this count on blocks; its archive uses infinite scrolling.',
+          'Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling.',
       },
     },
     {
@@ -81,9 +82,10 @@ export const PageFeedSectionBlock: Block = {
       type: 'checkbox',
       defaultValue: true,
       admin: {
-        description: 'Projects always links Show all to the canonical localized Projects archive.',
+        description:
+          'Projects and Things always link View all to their canonical localized archives.',
         condition: (_, siblingData) =>
-          siblingData?.feedType === 'projects' ||
+          ['projects', 'things'].includes(siblingData?.feedType) ||
           siblingData?.pagination !== 'infinite' ||
           siblingData?.source !== 'latest',
       },
@@ -95,7 +97,7 @@ export const PageFeedSectionBlock: Block = {
       admin: {
         condition: (_, siblingData) =>
           Boolean(siblingData?.showViewAll) &&
-          (siblingData?.feedType === 'projects' ||
+          (['projects', 'things'].includes(siblingData?.feedType) ||
             siblingData?.pagination !== 'infinite' ||
             siblingData?.source !== 'latest'),
         description: 'Label for the trailing tile (e.g. “View all posts”).',
@@ -108,7 +110,7 @@ export const PageFeedSectionBlock: Block = {
       admin: {
         condition: (_, siblingData) =>
           Boolean(siblingData?.showViewAll) &&
-          siblingData?.feedType !== 'projects' &&
+          !['projects', 'things'].includes(siblingData?.feedType) &&
           (siblingData?.pagination !== 'infinite' || siblingData?.source !== 'latest'),
         description: 'CMS page the View all tile links to (e.g. Posts or Projects index page).',
       },
@@ -130,7 +132,8 @@ export const PageFeedSectionBlock: Block = {
       hasMany: true,
       admin: {
         condition: (_, siblingData) =>
-          siblingData?.source === 'manual' && siblingData?.feedType === 'projects',
+          siblingData?.source === 'manual' &&
+          ['projects', 'things'].includes(siblingData?.feedType),
       },
     },
     {
@@ -141,7 +144,7 @@ export const PageFeedSectionBlock: Block = {
       admin: {
         condition: (_, siblingData) =>
           siblingData?.source === 'manual' && siblingData?.feedType === 'things',
-        description: 'Homepage Things showcase uses up to 5 tiles plus an optional View all tile.',
+        description: 'Things previews respect the preview count and the order of this selection.',
       },
     },
     {
@@ -196,7 +199,7 @@ export const PageFeedSectionBlock: Block = {
           admin: {
             condition: (_, siblingData) =>
               Boolean(siblingData?.showViewAll) &&
-              (siblingData?.feedType === 'projects' ||
+              (['projects', 'things'].includes(siblingData?.feedType) ||
                 siblingData?.pagination !== 'infinite' ||
                 siblingData?.source !== 'latest'),
             description: 'While hovering the “View all” tile.',

@@ -26,8 +26,7 @@ type FeedPageShellOptions = {
     decorations?: FeedDecorationView[]
   }) => React.ReactNode
   /**
-   * Optional server-only rewrite of the CMS page blocks. Only the Projects
-   * page uses it to turn its first project block into the full archive feed.
+   * Server-only rewrite used by canvas archives to promote their first feed block.
    */
   transformPageBlocks?: (args: {
     blocks: ResolvedBlockView[]

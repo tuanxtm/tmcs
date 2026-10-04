@@ -8,6 +8,7 @@ import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
 import { lexicalToPlainText } from '@/lib/readingTime'
 import { PROJECTS_BATCH_SIZE } from './projects-feed'
+import { THINGS_BATCH_SIZE, THINGS_PREVIEW_LIMIT } from './things-feed'
 import type {
   DecorationPack,
   FeedDecoration,
@@ -37,6 +38,7 @@ import type {
   ShortStoryCardView,
   SiteShellView,
   ThingCardView,
+  ThingsPageView,
   ThingPlatformLink,
   VideoCardView,
   VideoProvider,
@@ -50,8 +52,8 @@ export const VIDEOS_PAGE_SIZE = 11
 export const SHORT_STORIES_POOL_LIMIT = 48
 export const FEED_DECORATIONS_POOL_LIMIT = 48
 export const FEED_POOL_LIMIT = 48
-/** Homepage Things showcase: default preview tile count (plus optional View all). */
-export const THINGS_HOMEPAGE_LIMIT = 5
+/** Default Things preview count. */
+export const THINGS_HOMEPAGE_LIMIT = THINGS_PREVIEW_LIMIT
 
 /** Fields selected for public decoration-pack reads (not the full collection doc). */
 type SlimDecorationPack = {
@@ -179,7 +181,6 @@ function toProjectCard(project: Project, locale: LocaleCode): ProjectCardView {
 
 function toThingCard(thing: Thing): ThingCardView {
   const primaryImage = toMediaView(thing.primaryImage)
-  const detailImage = toMediaView(thing.detailImage) || primaryImage
 
   const links: ThingPlatformLink[] = (thing.links ?? []).flatMap((l) =>
     l?.label && l?.url ? [{ label: l.label, url: l.url }] : [],
@@ -191,7 +192,6 @@ function toThingCard(thing: Thing): ThingCardView {
     name: thing.name,
     description: thing.description ?? null,
     primaryImage,
-    detailImage,
     primaryUrl: thing.primaryUrl ?? null,
     links,
     publishedAt: thing.publishedAt ?? null,
@@ -295,10 +295,7 @@ async function loadProjectBySlug(locale: LocaleCode, slug: string): Promise<Proj
   return (docs[0] as Project | undefined) ?? null
 }
 
-async function cachedLoadProjectBySlug(
-  locale: LocaleCode,
-  slug: string,
-): Promise<Project | null> {
+async function cachedLoadProjectBySlug(locale: LocaleCode, slug: string): Promise<Project | null> {
   'use cache'
   cacheLife('days')
   cacheTag(CACHE_TAGS.projects, CACHE_TAGS.media)
@@ -416,12 +413,7 @@ async function loadSiteSettings(locale: LocaleCode) {
 async function cachedLoadSiteSettings(locale: LocaleCode) {
   'use cache'
   cacheLife('days')
-  cacheTag(
-    CACHE_TAGS.siteShell,
-    CACHE_TAGS.media,
-    CACHE_TAGS.decorationPacks,
-    CACHE_TAGS.links,
-  )
+  cacheTag(CACHE_TAGS.siteShell, CACHE_TAGS.media, CACHE_TAGS.decorationPacks, CACHE_TAGS.links)
   return loadSiteSettings(locale)
 }
 
@@ -549,6 +541,73 @@ async function cachedLoadProjectsPage(
   cacheLife('days')
   cacheTag(CACHE_TAGS.projects, CACHE_TAGS.media)
   return loadProjectsPage(locale, cursorRaw)
+}
+
+async function loadThingsPage(
+  locale: LocaleCode,
+  cursorRaw: string | null,
+): Promise<ThingsPageView> {
+  const payload = await getPayloadClient()
+  const cursor = decodePostsCursor(cursorRaw)
+
+  const where = cursor
+    ? {
+        and: [
+          publishedStatusWhere,
+          {
+            or: [
+              { publishedAt: { less_than: cursor.publishedAt } },
+              {
+                and: [
+                  { publishedAt: { equals: cursor.publishedAt } },
+                  { id: { less_than: cursor.id } },
+                ],
+              },
+            ],
+          },
+        ],
+      }
+    : publishedStatusWhere
+
+  const result = await payload.find({
+    collection: 'things',
+    locale,
+    where,
+    sort: '-publishedAt,-id',
+    limit: THINGS_BATCH_SIZE + 1,
+    depth: 1,
+    overrideAccess: false,
+    select: {
+      name: true,
+      description: true,
+      primaryImage: true,
+      primaryUrl: true,
+      links: true,
+      publishedAt: true,
+    },
+  })
+
+  const hasNextPage = result.docs.length > THINGS_BATCH_SIZE
+  const pageDocs = hasNextPage ? result.docs.slice(0, THINGS_BATCH_SIZE) : result.docs
+  const cards = pageDocs.map((thing) => toThingCard(thing as Thing))
+  const last = cards[cards.length - 1]
+  const nextCursor = hasNextPage && last ? cursorFromPost(last) : null
+
+  return {
+    docs: cards,
+    nextCursor,
+    hasNextPage,
+  }
+}
+
+async function cachedLoadThingsPage(
+  locale: LocaleCode,
+  cursorRaw: string | null,
+): Promise<ThingsPageView> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(CACHE_TAGS.things, CACHE_TAGS.media)
+  return loadThingsPage(locale, cursorRaw)
 }
 
 async function loadVideosPage(
@@ -730,14 +789,12 @@ export const getFooterDecoration = cache(
  * `'use cache'` boundary + tag invalidation applies as for the rest of
  * the decoration pipeline.
  */
-export const getActiveFooterItemId = cache(
-  async (packId: number): Promise<string | null> => {
-    if (!packId) return null
-    const pack = await cachedLoadDecorationPack(packId)
-    const raw = pack?.footerItem
-    return typeof raw === 'string' && raw.length > 0 ? raw : null
-  },
-)
+export const getActiveFooterItemId = cache(async (packId: number): Promise<string | null> => {
+  if (!packId) return null
+  const pack = await cachedLoadDecorationPack(packId)
+  const raw = pack?.footerItem
+  return typeof raw === 'string' && raw.length > 0 ? raw : null
+})
 
 export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellView> => {
   const siteSettings = await cachedLoadSiteSettings(locale)
@@ -799,6 +856,12 @@ export const getProjectsPage = cache(
   },
 )
 
+export const getThingsPage = cache(
+  async (locale: LocaleCode, cursor: string | null = null): Promise<ThingsPageView> => {
+    return cachedLoadThingsPage(locale, cursor)
+  },
+)
+
 export const getVideosPage = cache(
   async (locale: LocaleCode, cursor: string | null = null): Promise<VideosPageView> => {
     return cachedLoadVideosPage(locale, cursor)
@@ -809,10 +872,7 @@ export const getShortStories = cache(async (locale: LocaleCode): Promise<ShortSt
   return cachedLoadShortStories(locale)
 })
 
-async function cachedLoadShortStoryTexts(
-  locale: LocaleCode,
-  ids: number[],
-): Promise<string[]> {
+async function cachedLoadShortStoryTexts(locale: LocaleCode, ids: number[]): Promise<string[]> {
   'use cache'
   cacheLife('days')
   cacheTag(CACHE_TAGS.shortStories)

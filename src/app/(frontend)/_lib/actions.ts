@@ -1,29 +1,34 @@
 'use server'
 
-import { getPostsPage, getProjectsPage, getVideosPage } from '@/app/(frontend)/_lib/cms'
+import {
+  getPostsPage,
+  getProjectsPage,
+  getThingsPage,
+  getVideosPage,
+} from '@/app/(frontend)/_lib/cms'
 import { isFeedType } from '@/app/(frontend)/_lib/feed-registry'
 import { decodePostsCursor } from '@/app/(frontend)/_lib/posts-cursor'
 import type {
   FeedType,
   PostsPageView,
   ProjectsPageView,
+  ThingsPageView,
   VideosPageView,
 } from '@/app/(frontend)/_lib/types'
 import { isLocaleCode, type LocaleCode } from '@/lib/locales'
 
-export type FeedPageView = PostsPageView | ProjectsPageView | VideosPageView
+export type FeedPageView = PostsPageView | ProjectsPageView | ThingsPageView | VideosPageView
 
 /**
  * Paginated published feed via Payload Local API (keyset cursor).
  * Prefer this over a custom REST route - public CRUD remains under `(payload)/api`.
- * Things homepage sections are static-only and are not loaded through this action.
  */
 export async function loadFeedPage(
   feedTypeInput: string,
   localeInput: string,
   cursorInput: string | null = null,
 ): Promise<FeedPageView> {
-  if (!isFeedType(feedTypeInput) || feedTypeInput === 'things') {
+  if (!isFeedType(feedTypeInput)) {
     throw new Error('Invalid feed type')
   }
 
@@ -50,6 +55,8 @@ export async function loadFeedPage(
   if (feedType === 'projects') {
     return getProjectsPage(locale, cursorInput)
   }
+
+  if (feedType === 'things') return getThingsPage(locale, cursorInput)
 
   return getVideosPage(locale, cursorInput)
 }

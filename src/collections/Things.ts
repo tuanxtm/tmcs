@@ -47,11 +47,7 @@ export const Things: CollectionConfig = {
       revalidateThings,
       async ({ doc, operation, req }) => {
         if (operation === 'create' || operation === 'update') {
-          await upsertSlugReservations(
-            req.payload,
-            'things',
-            doc as { id: number; slug?: unknown },
-          )
+          await upsertSlugReservations(req.payload, 'things', doc as { id: number; slug?: unknown })
         }
       },
     ],
@@ -80,7 +76,7 @@ export const Things: CollectionConfig = {
       type: 'textarea',
       localized: true,
       admin: {
-        description: 'Short blurb shown in the Things showcase panel.',
+        description: 'Short blurb shown in the Things detail drawer.',
       },
     },
     {
@@ -89,7 +85,7 @@ export const Things: CollectionConfig = {
       relationTo: 'media',
       required: true,
       admin: {
-        description: 'Large showcase image (left / top).',
+        description: 'The only image shown in the Things canvas and detail drawer.',
       },
     },
     {
@@ -97,7 +93,8 @@ export const Things: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
       admin: {
-        description: 'Optional smaller panel image. Falls back to the primary image when empty.',
+        description:
+          'Retained for compatibility with stored content. Not displayed in the canvas or detail drawer.',
       },
     },
     {
@@ -106,7 +103,7 @@ export const Things: CollectionConfig = {
       localized: false,
       labels: { singular: 'Platform Link', plural: 'Platform Links' },
       admin: {
-        description: 'Links shown in the Buy now dialog.',
+        description: 'Links shown in the detail drawer.',
       },
       fields: [
         {
@@ -130,7 +127,7 @@ export const Things: CollectionConfig = {
       validate: validateAbsoluteHttpUrl,
       admin: {
         position: 'sidebar',
-        description: 'Select a link from the array above to show on the tile.',
+        description: 'Select a link for image clicks and the Buy action.',
         components: {
           Field: '@/fields/arrayFieldSelect#ArrayFieldSelect',
         },

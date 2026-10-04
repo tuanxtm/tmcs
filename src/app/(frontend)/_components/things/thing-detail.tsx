@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, type ComponentType } from 'react'
+import { useEffect, useRef, type ComponentType, type RefObject } from 'react'
 import { useLenis } from 'lenis/react'
 import {
   IconBrandAmazon,
@@ -58,15 +58,16 @@ export function ThingDetail({
   onOpenChangeAction,
   locale,
   thing,
+  returnFocus,
 }: {
   open: boolean
   onOpenChangeAction: (open: boolean) => void
   locale: LocaleCode
   thing: ThingCardView
+  returnFocus?: RefObject<HTMLButtonElement | null>
 }) {
   const copy = COPY[locale]
-  const image = thing.primaryImage || thing.detailImage
-  const hasDetailImage = Boolean(thing.detailImage && (!image || thing.detailImage.id !== image.id))
+  const image = thing.primaryImage
   const lenis = useLenis()
   // Track whether we've paused Lenis so we only resume on the open→closed
   // transition, not on lenis-init or identity changes.
@@ -99,11 +100,14 @@ export function ThingDetail({
 
   return (
     <Drawer swipeDirection="down" open={open} onOpenChange={onOpenChangeAction}>
-      <DrawerContent className={cn(
-        'bg-background text-foreground mx-auto flex w-full flex-col overflow-hidden',
-        'rounded-none border-none p-0',
-        '[--drawer-height:80dvh] md:[--drawer-height:60dvh]',
-      )}>
+      <DrawerContent
+        finalFocus={returnFocus}
+        className={cn(
+          'bg-background text-foreground mx-auto flex w-full flex-col overflow-hidden',
+          'rounded-none border-none p-0',
+          '[--drawer-height:80dvh] md:[--drawer-height:60dvh]',
+        )}
+      >
         <DrawerTitle className="sr-only">{copy.thing}</DrawerTitle>
         <DrawerDescription className="sr-only">{thing.name}</DrawerDescription>
 
@@ -128,24 +132,15 @@ export function ThingDetail({
         />
 
         <div className="grid min-h-0 flex-1 grid-rows-[1fr_auto] overflow-y-auto md:grid-cols-2 md:grid-rows-1">
-          {/* Image cell: full width/height of its grid track. Hover swaps the
-              primary image for the detail image. */}
           {image ? (
-            <div className="group/image relative min-h-0 w-full overflow-hidden md:aspect-auto">
+            <div className="relative min-h-0 w-full overflow-hidden md:aspect-auto">
               <CmsImage
                 media={image}
+                fill
                 sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover"
-                imgClassName="h-full w-full transition-opacity duration-300 group-hover/image:opacity-0"
+                className="bg-transparent!"
+                imgClassName="object-contain"
               />
-              {hasDetailImage && thing.detailImage ? (
-                <CmsImage
-                  media={thing.detailImage}
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                  className="absolute inset-0 object-cover opacity-0 transition-opacity duration-300 group-hover/image:opacity-100"
-                  imgClassName="h-full w-full"
-                />
-              ) : null}
             </div>
           ) : null}
 

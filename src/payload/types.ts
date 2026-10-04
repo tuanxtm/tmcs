@@ -380,20 +380,20 @@ export interface Post {
              */
             description?: string | null;
             /**
-             * Projects uses a draggable canvas. Posts and Videos use a feed grid. Things uses a custom showcase with the same source logic.
+             * Projects and Things use draggable canvases. Posts and Videos use a feed grid.
              */
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects always renders a static preview on the canvas; the canonical Projects archive loads every published project in batches of 10.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
-             * Number of items in the preview (1-48, default 12). Projects respects this count on blocks; its archive uses infinite scrolling.
+             * Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling.
              */
             limit: number;
             /**
-             * Projects always links Show all to the canonical localized Projects archive.
+             * Projects and Things always link View all to their canonical localized archives.
              */
             showViewAll?: boolean | null;
             /**
@@ -407,7 +407,7 @@ export interface Post {
             postItems?: (number | Post)[] | null;
             projectItems?: (number | Project)[] | null;
             /**
-             * Homepage Things showcase uses up to 5 tiles plus an optional View all tile.
+             * Things previews respect the preview count and the order of this selection.
              */
             thingItems?: (number | Thing)[] | null;
             videoItems?: (number | Video)[] | null;
@@ -745,20 +745,20 @@ export interface Page {
              */
             description?: string | null;
             /**
-             * Projects uses a draggable canvas. Posts and Videos use a feed grid. Things uses a custom showcase with the same source logic.
+             * Projects and Things use draggable canvases. Posts and Videos use a feed grid.
              */
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects always renders a static preview on the canvas; the canonical Projects archive loads every published project in batches of 10.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
-             * Number of items in the preview (1-48, default 12). Projects respects this count on blocks; its archive uses infinite scrolling.
+             * Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling.
              */
             limit: number;
             /**
-             * Projects always links Show all to the canonical localized Projects archive.
+             * Projects and Things always link View all to their canonical localized archives.
              */
             showViewAll?: boolean | null;
             /**
@@ -772,7 +772,7 @@ export interface Page {
             postItems?: (number | Post)[] | null;
             projectItems?: (number | Project)[] | null;
             /**
-             * Homepage Things showcase uses up to 5 tiles plus an optional View all tile.
+             * Things previews respect the preview count and the order of this selection.
              */
             thingItems?: (number | Thing)[] | null;
             videoItems?: (number | Video)[] | null;
@@ -1073,20 +1073,20 @@ export interface Project {
              */
             description?: string | null;
             /**
-             * Projects uses a draggable canvas. Posts and Videos use a feed grid. Things uses a custom showcase with the same source logic.
+             * Projects and Things use draggable canvases. Posts and Videos use a feed grid.
              */
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects always renders a static preview on the canvas; the canonical Projects archive loads every published project in batches of 10.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
-             * Number of items in the preview (1-48, default 12). Projects respects this count on blocks; its archive uses infinite scrolling.
+             * Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling.
              */
             limit: number;
             /**
-             * Projects always links Show all to the canonical localized Projects archive.
+             * Projects and Things always link View all to their canonical localized archives.
              */
             showViewAll?: boolean | null;
             /**
@@ -1100,7 +1100,7 @@ export interface Project {
             postItems?: (number | Post)[] | null;
             projectItems?: (number | Project)[] | null;
             /**
-             * Homepage Things showcase uses up to 5 tiles plus an optional View all tile.
+             * Things previews respect the preview count and the order of this selection.
              */
             thingItems?: (number | Thing)[] | null;
             videoItems?: (number | Video)[] | null;
@@ -1348,19 +1348,19 @@ export interface Thing {
   slug: string;
   slugLock?: boolean | null;
   /**
-   * Short blurb shown in the Things showcase panel.
+   * Short blurb shown in the Things detail drawer.
    */
   description?: string | null;
   /**
-   * Large showcase image (left / top).
+   * The only image shown in the Things canvas and detail drawer.
    */
   primaryImage: number | Media;
   /**
-   * Optional smaller panel image. Falls back to the primary image when empty.
+   * Retained for compatibility with stored content. Not displayed in the canvas or detail drawer.
    */
   detailImage?: (number | null) | Media;
   /**
-   * Links shown in the Buy now dialog.
+   * Links shown in the detail drawer.
    */
   links?:
     | {
@@ -1373,7 +1373,7 @@ export interface Thing {
       }[]
     | null;
   /**
-   * Select a link from the array above to show on the tile.
+   * Select a link for image clicks and the Buy action.
    */
   primaryUrl?: string | null;
   featured?: boolean | null;

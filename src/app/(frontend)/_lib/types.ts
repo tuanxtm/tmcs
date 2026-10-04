@@ -91,7 +91,6 @@ export type ThingCardView = {
   name: string
   description: string | null
   primaryImage: MediaView | null
-  detailImage: MediaView | null
   /** Localized primary URL - shown on the tile, opened directly if user clicks the tile card. */
   primaryUrl: string | null
   /** Non-localized platform links - drive the dialog buttons. */
@@ -197,6 +196,12 @@ export type ProjectDetailView = {
 export type ProjectsPageView = {
   docs: ProjectCardView[]
   /** Opaque keyset cursor for the next page; null when exhausted. */
+  nextCursor: string | null
+  hasNextPage: boolean
+}
+
+export type ThingsPageView = {
+  docs: ThingCardView[]
   nextCursor: string | null
   hasNextPage: boolean
 }

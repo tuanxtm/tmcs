@@ -1,100 +1,72 @@
 import { test, expect } from '@playwright/test'
 import { createCanvasFixture } from '../helpers/canvas-fixture'
 
-const openFixture = createCanvasFixture('projects')
+const openFixture = createCanvasFixture('things')
 
-test('heading, grid lines, and image-left name-right composition', async ({ page }) => {
-  await openFixture(page)
-
-  const heading = page.locator('#fixture-projects-heading')
-  await expect(heading).toBeVisible()
-  await expect(heading).toHaveCSS('text-align', 'center')
-  expect(
-    (await heading.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))) * 1,
-  ).toBeGreaterThan(36)
-
-  const canvas = page.locator('[data-project-canvas]')
-  const backgroundImage = await canvas.evaluate((el) => getComputedStyle(el).backgroundImage)
-  expect(backgroundImage).toContain('linear-gradient')
-
-  // Names sit to the right of their image on desktop, tablet, and mobile.
-  for (const width of [1440, 768, 390]) {
+test('heading, transparent complete grid, and metadata below original-color images', async ({
+  page,
+}) => {
+  await openFixture(page, { count: 6 })
+  await expect(page.locator('#fixture-things-heading')).toHaveCSS('text-align', 'center')
+  const canvas = page.locator('[data-thing-canvas]')
+  await expect(canvas).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
+  await expect(canvas).toHaveCSS('background-repeat', /^round(, round)*$/)
+  expect(await canvas.evaluate((el) => getComputedStyle(el).boxShadow)).toContain('inset')
+  for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 })
-    const item = page.locator('[data-project-item]').first()
-    const image = item.locator('[data-project-image]').first()
-    const title = item.locator('a[title], span[title]').last()
-    const imageBox = await image.boundingBox()
-    const titleBox = await title.boundingBox()
-    expect(imageBox).not.toBeNull()
-    expect(titleBox).not.toBeNull()
-    expect(titleBox!.x).toBeGreaterThanOrEqual(imageBox!.x + imageBox!.width - 1)
+    const item = page.locator('[data-thing-item]').first()
+    const image = (await item.locator('[data-thing-image]').boundingBox())!
+    const label = (await item.locator('[data-thing-label]').boundingBox())!
+    const title = item.locator('span[title]')
+    expect(label.y).toBeGreaterThanOrEqual(image.y + image.height - 1)
+    expect(label.x).toBeCloseTo(image.x, 0)
+    expect(label.height).toBe(100)
+    await expect(title).toHaveCSS('-webkit-line-clamp', '3')
+    const handle = item.locator('[data-thing-drag-handle]')
+    if (width < 1024) {
+      await expect(handle).toHaveCSS('width', '28px')
+      await expect(handle.locator('svg')).toHaveCSS('width', '14px')
+    }
+    const first = (await item.boundingBox())!
+    const second = (await page.locator('[data-thing-item]').nth(1).boundingBox())!
+    const third = (await page.locator('[data-thing-item]').nth(2).boundingBox())!
+    expect(second.x).toBeGreaterThan(first.x + first.width)
+    if (width < 1024) expect(third.y).toBeGreaterThan(first.y + first.height)
+    const expectedHeight = width < 640 ? 200 : width < 1024 ? 260 : 280
+    expect(first.height).toBe(expectedHeight)
+    const action = (await item.getByRole('button', { name: /^Detail:/ }).boundingBox())!
+    expect(action.y + action.height).toBeLessThanOrEqual(first.y + first.height + 1)
+    const img = item.locator('img')
+    await expect(img).toHaveCSS('object-fit', 'contain')
+    await expect(img).toHaveCSS('filter', 'none')
   }
 })
 
-test('project images render with object-fit contain and no cropping', async ({ page }) => {
+test('thing images render with object-fit contain and no cropping', async ({ page }) => {
   await openFixture(page)
 
-  const img = page.locator('[data-project-item] img').first()
+  const img = page.locator('[data-thing-item] img').first()
   await expect(img).toBeVisible()
   await expect(img).toHaveCSS('object-fit', 'contain')
 })
 
 test('plain image clicks navigate without starting movement mode', async ({ page }) => {
   await openFixture(page)
-  await page.locator('[data-project-drag-surface]').first().click()
-  await page.waitForURL(/fixture-project-1/)
+  await page.locator('[data-thing-drag-surface]').first().click()
+  await page.waitForURL(/fixture-thing-1/)
 })
 
-test('compact controls, bottom-aligned labels, and complete transparent grid', async ({ page }) => {
-  await openFixture(page, { count: 6 })
-  const canvas = page.locator('[data-project-canvas]')
-  await expect(canvas).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
-  expect(await canvas.evaluate((el) => getComputedStyle(el).boxShadow)).toContain('inset')
-  await expect(
-    page.getByText('drag to move projects, use the handle for touch and keyboard'),
-  ).toHaveCount(0)
-
-  const item = page.locator('[data-project-item]').first()
-  const handle = item.locator('[data-project-drag-handle]')
-  await expect(handle).toHaveCSS('clip-path', 'inset(50%)')
-  const image = (await item.locator('[data-project-image]').boundingBox())!
-  const title = (await item.locator('a[title]').boundingBox())!
-  expect(title.y + title.height).toBeCloseTo(image.y + image.height, 0)
-
-  const description = page.getByText('Drag any project to rearrange the workshop wall.')
-  const reset = page.getByRole('button', { name: 'Reset project layout' })
-  expect((await reset.boundingBox())!.y).toBeLessThan((await canvas.boundingBox())!.y)
-  expect(
-    Math.abs((await reset.boundingBox())!.y - (await description.boundingBox())!.y),
-  ).toBeLessThan(12)
-
-  await page.setViewportSize({ width: 390, height: 844 })
-  await expect(handle).toHaveCSS('width', '28px')
-  const first = (await item.boundingBox())!
-  const second = (await page.locator('[data-project-item]').nth(1).boundingBox())!
-  const third = (await page.locator('[data-project-item]').nth(2).boundingBox())!
-  expect(second.x).toBeGreaterThan(first.x + first.width)
-  expect(Math.abs(first.y - second.y)).toBeLessThan(80)
-  expect(third.y).toBeGreaterThan(first.y + first.height)
-  const handleBox = (await handle.boundingBox())!
-  const number = (await item
-    .locator('span')
-    .filter({ hasText: /^01\.$/ })
-    .boundingBox())!
-  expect(handleBox.y + handleBox.height).toBeLessThanOrEqual(number.y)
-})
-
-test('appending projects preserves visitor placement', async ({ page }) => {
+test('appending things preserves visitor placement', async ({ page }) => {
   await openFixture(page, { count: 3 })
-  const item = page.locator('[data-project-item]').first()
-  const image = (await item.locator('[data-project-drag-surface]').boundingBox())!
+  const item = page.locator('[data-thing-item]').first()
+  const image = (await item.locator('[data-thing-drag-surface]').boundingBox())!
   await page.mouse.move(image.x + 10, image.y + 10)
   await page.mouse.down()
   await page.mouse.move(image.x + 130, image.y + 70, { steps: 8 })
   await page.mouse.up()
   const before = (await item.boundingBox())!
-  await page.evaluate(() => window.renderProjectsFixture({ count: 25 }))
-  await expect(page.locator('[data-project-item]')).toHaveCount(25)
+  await page.evaluate(() => window.renderThingsFixture({ count: 25 }))
+  await expect(page.locator('[data-thing-item]')).toHaveCount(25)
   const after = (await item.boundingBox())!
   expect(after.x).toBeCloseTo(before.x, 0)
   expect(after.y).toBeCloseTo(before.y, 0)
@@ -102,13 +74,13 @@ test('appending projects preserves visitor placement', async ({ page }) => {
 
 test('resize cancels an active drag and releases the movement guard', async ({ page }) => {
   await openFixture(page, { count: 6 })
-  const image = (await page.locator('[data-project-drag-surface]').first().boundingBox())!
+  const image = (await page.locator('[data-thing-drag-surface]').first().boundingBox())!
   await page.mouse.move(image.x + 10, image.y + 10)
   await page.mouse.down()
   await page.mouse.move(image.x + 70, image.y + 50, { steps: 5 })
-  await expect(page.locator('html')).toHaveAttribute('data-project-moving', 'true')
+  await expect(page.locator('html')).toHaveAttribute('data-thing-moving', 'true')
   await page.setViewportSize({ width: 768, height: 900 })
-  await expect(page.locator('html')).toHaveAttribute('data-project-moving', 'false')
+  await expect(page.locator('html')).toHaveAttribute('data-thing-moving', 'false')
   await page.mouse.up()
 })
 
@@ -118,16 +90,16 @@ for (const lenis of [true, false]) {
   }) => {
     await openFixture(page, { count: 25 })
     await page.evaluate(
-      (enabled) => window.renderProjectsFixture({ count: 25, lenis: enabled }),
+      (enabled) => window.renderThingsFixture({ count: 25, lenis: enabled }),
       lenis,
     )
-    const image = (await page.locator('[data-project-drag-surface]').first().boundingBox())!
+    const image = (await page.locator('[data-thing-drag-surface]').first().boundingBox())!
     await page.mouse.move(image.x + 10, image.y + 10)
     await page.mouse.down()
     await page.mouse.move(image.x + 10, 896, { steps: 8 })
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(80)
     await page.mouse.up()
-    await expect(page.locator('html')).toHaveAttribute('data-project-moving', 'false')
+    await expect(page.locator('html')).toHaveAttribute('data-thing-moving', 'false')
   })
 }
 
@@ -141,8 +113,8 @@ test('touch handle drag, tap movement controls, and page scrolling', async ({ br
   try {
     await openFixture(page, { width: 390, height: 844, count: 25 })
     const session = await context.newCDPSession(page)
-    const handle = page.locator('[data-project-drag-handle]').first()
-    const item = page.locator('[data-project-item]').first()
+    const handle = page.locator('[data-thing-drag-handle]').first()
+    const item = page.locator('[data-thing-item]').first()
     const box = (await handle.boundingBox())!
     const before = (await item.boundingBox())!
     const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 }
@@ -153,9 +125,9 @@ test('touch handle drag, tap movement controls, and page scrolling', async ({ br
     })
     await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
     await expect.poll(async () => (await item.boundingBox())!.x).toBeGreaterThan(before.x + 20)
-    await expect(page.locator('[data-project-movement]')).toHaveCount(0)
+    await expect(page.locator('[data-thing-movement]')).toHaveCount(0)
     await handle.tap()
-    await expect(page.locator('[data-project-movement]')).toBeVisible()
+    await expect(page.locator('[data-thing-movement]')).toBeVisible()
     await page.getByRole('button', { name: 'Finish moving' }).tap()
     await session.send('Input.dispatchTouchEvent', {
       type: 'touchStart',
@@ -174,12 +146,12 @@ test('touch handle drag, tap movement controls, and page scrolling', async ({ br
   }
 })
 
-test('mouse drag moves a project and a normal click still navigates', async ({ page }) => {
+test('mouse drag moves a thing and Buy still opens the primary URL', async ({ page }) => {
   await openFixture(page)
 
-  const item = page.locator('[data-project-item]').first()
+  const item = page.locator('[data-thing-item]').first()
   const before = await item.boundingBox()
-  const image = item.locator('[data-project-image]').first()
+  const image = item.locator('[data-thing-image]').first()
   const box = (await image.boundingBox())!
 
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
@@ -197,18 +169,18 @@ test('mouse drag moves a project and a normal click still navigates', async ({ p
   expect(Math.abs(after!.y - before!.y)).toBeGreaterThan(20)
 
   // A plain click on the title still navigates.
-  const title = item.locator('a[title]').first()
-  await title.click()
-  await page.waitForURL(/fixture-project-/)
+  const purchase = item.getByRole('link', { name: /^Buy:/ })
+  await purchase.click()
+  await page.waitForURL(/buy\/fixture-thing-/)
 })
 
 test('drag is clamped inside the canvas bounds', async ({ page }) => {
   await openFixture(page, { count: 4 })
 
-  const canvas = page.locator('[data-project-canvas]')
+  const canvas = page.locator('[data-thing-canvas]')
   const canvasBox = (await canvas.boundingBox())!
-  const item = page.locator('[data-project-item]').first()
-  const handle = item.locator('[data-project-drag-surface]')
+  const item = page.locator('[data-thing-item]').first()
+  const handle = item.locator('[data-thing-drag-surface]')
   const handleBox = (await handle.boundingBox())!
 
   await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2)
@@ -217,8 +189,9 @@ test('drag is clamped inside the canvas bounds', async ({ page }) => {
   await page.mouse.up()
 
   const moved = (await item.boundingBox())!
-  expect(moved.x).toBeGreaterThanOrEqual(canvasBox.x - 1)
-  expect(moved.y).toBeGreaterThanOrEqual(canvasBox.y - 1)
+  const currentCanvas = (await canvas.boundingBox())!
+  expect(moved.x).toBeGreaterThanOrEqual(currentCanvas.x - 1)
+  expect(moved.y).toBeGreaterThanOrEqual(currentCanvas.y - 1)
 
   const nextBox = (await handle.boundingBox())!
   await page.mouse.move(nextBox.x + 4, nextBox.y + 4)
@@ -229,20 +202,21 @@ test('drag is clamped inside the canvas bounds', async ({ page }) => {
   await page.mouse.up()
 
   const far = (await item.boundingBox())!
-  expect(far.x + far.width).toBeLessThanOrEqual(canvasBox.x + canvasBox.width + 1)
-  expect(far.y + far.height).toBeLessThanOrEqual(canvasBox.y + canvasBox.height + 1)
+  const finalCanvas = (await canvas.boundingBox())!
+  expect(far.x + far.width).toBeLessThanOrEqual(finalCanvas.x + finalCanvas.width + 1)
+  expect(far.y + far.height).toBeLessThanOrEqual(finalCanvas.y + finalCanvas.height + 1)
 })
 
 test('keyboard movement, cancellation, and directional buttons', async ({ page }) => {
   await openFixture(page, { count: 3 })
 
-  const item = page.locator('[data-project-item]').first()
-  const handle = item.locator('[data-project-drag-handle]')
+  const item = page.locator('[data-thing-item]').first()
+  const handle = item.locator('[data-thing-drag-handle]')
   const start = (await item.boundingBox())!
 
   await handle.focus()
   await page.keyboard.press('Enter')
-  await expect(page.locator('[data-project-movement]')).toBeVisible()
+  await expect(page.locator('[data-thing-movement]')).toBeVisible()
 
   await page.keyboard.press('ArrowRight')
   await page.keyboard.press('ArrowRight')
@@ -251,7 +225,7 @@ test('keyboard movement, cancellation, and directional buttons', async ({ page }
 
   // Escape restores the position captured when movement mode opened.
   await page.keyboard.press('Escape')
-  await expect(page.locator('[data-project-movement]')).toHaveCount(0)
+  await expect(page.locator('[data-thing-movement]')).toHaveCount(0)
   const restored = (await item.boundingBox())!
   expect(Math.abs(restored.x - start.x)).toBeLessThan(2)
 
@@ -266,27 +240,27 @@ test('keyboard movement, cancellation, and directional buttons', async ({ page }
   // Directional buttons give touch users an alternative.
   await handle.focus()
   await page.keyboard.press('Enter')
-  const overlay = page.locator('[data-project-movement]')
+  const overlay = page.locator('[data-thing-movement]')
   const beforeButton = (await item.boundingBox())!
-  await overlay.locator('[data-project-move="right"]').click()
+  await overlay.locator('[data-thing-move="right"]').click()
   const afterButton = (await item.boundingBox())!
   expect(afterButton.x).toBeGreaterThan(beforeButton.x)
-  await overlay.locator('[data-project-move="done"]').click()
+  await overlay.locator('[data-thing-move="done"]').click()
   await expect(overlay).toHaveCount(0)
 })
 
-test('reset layout restores all loaded projects', async ({ page }) => {
+test('reset layout restores all loaded things', async ({ page }) => {
   await openFixture(page, { count: 6 })
 
-  const canvas = page.locator('[data-project-canvas]')
+  const canvas = page.locator('[data-thing-canvas]')
   const canvasBox = (await canvas.boundingBox())!
   const positions: Array<{ x: number; y: number }> = []
 
-  const items = page.locator('[data-project-item]')
+  const items = page.locator('[data-thing-item]')
   const total = await items.count()
   for (let index = 0; index < 3; index += 1) {
     const item = items.nth(index)
-    const handle = item.locator('[data-project-drag-surface]')
+    const handle = item.locator('[data-thing-drag-surface]')
     const handleBox = (await handle.boundingBox())!
     await page.mouse.move(handleBox.x + 10, handleBox.y + 10)
     await page.mouse.down()
@@ -300,7 +274,7 @@ test('reset layout restores all loaded projects', async ({ page }) => {
   }
   expect(canvasBox.width).toBeGreaterThan(0)
 
-  const reset = page.locator('[data-project-reset]')
+  const reset = page.locator('[data-thing-reset]')
   await expect(reset).toBeEnabled()
   await reset.click()
 
@@ -309,7 +283,7 @@ test('reset layout restores all loaded projects', async ({ page }) => {
     // Default positions come back, so at least one item must have moved.
     if (positions[index].x !== box.x || positions[index].y !== box.y) return
   }
-  throw new Error('reset layout did not restore any project position')
+  throw new Error('reset layout did not restore any thing position')
 })
 
 test('no horizontal document overflow at tested widths', async ({ page }) => {
@@ -325,8 +299,8 @@ test('no horizontal document overflow at tested widths', async ({ page }) => {
 test('resize keeps items inside bounds', async ({ page }) => {
   await openFixture(page, { width: 1440, count: 8 })
 
-  const canvas = page.locator('[data-project-canvas]')
-  const handle = page.locator('[data-project-item]').first().locator('[data-project-drag-surface]')
+  const canvas = page.locator('[data-thing-canvas]')
+  const handle = page.locator('[data-thing-item]').first().locator('[data-thing-drag-surface]')
   const handleBox = (await handle.boundingBox())!
   await page.mouse.move(handleBox.x + 10, handleBox.y + 10)
   await page.mouse.down()
@@ -337,7 +311,7 @@ test('resize keeps items inside bounds', async ({ page }) => {
   await page.waitForTimeout(200)
 
   const canvasBox = (await canvas.boundingBox())!
-  const items = page.locator('[data-project-item]')
+  const items = page.locator('[data-thing-item]')
   const total = await items.count()
   for (let index = 0; index < total; index += 1) {
     const box = (await items.nth(index).boundingBox())!
@@ -349,24 +323,24 @@ test('resize keeps items inside bounds', async ({ page }) => {
 test('reduced motion keeps position changes immediate', async ({ page }) => {
   await openFixture(page, { count: 3, reducedMotion: true })
 
-  const item = page.locator('[data-project-item]').first()
-  const handle = item.locator('[data-project-drag-handle]')
+  const item = page.locator('[data-thing-item]').first()
+  const handle = item.locator('[data-thing-drag-handle]')
   await handle.focus()
   await page.keyboard.press('Enter')
   await page.keyboard.press('ArrowRight')
   await expect(item).toBeVisible()
-  await expect(page.locator('[data-project-movement]')).toBeVisible()
+  await expect(page.locator('[data-thing-movement]')).toBeVisible()
   await page.keyboard.press('Enter')
 })
 
-test('focus brings an obscured project forward', async ({ page }) => {
+test('focus brings an obscured thing forward', async ({ page }) => {
   await openFixture(page, { count: 3 })
 
-  // Stack the second project on top of the first via its movement mode.
-  const first = page.locator('[data-project-item]').nth(0)
+  // Stack the second thing on top of the first via its movement mode.
+  const first = page.locator('[data-thing-item]').nth(0)
   const firstBox = (await first.boundingBox())!
-  const second = page.locator('[data-project-item]').nth(1)
-  const secondHandle = second.locator('[data-project-drag-surface]')
+  const second = page.locator('[data-thing-item]').nth(1)
+  const secondHandle = second.locator('[data-thing-drag-surface]')
   const secondHandleBox = (await secondHandle.boundingBox())!
   await page.mouse.move(secondHandleBox.x + 10, secondHandleBox.y + 10)
   await page.mouse.down()
@@ -375,7 +349,7 @@ test('focus brings an obscured project forward', async ({ page }) => {
   })
   await page.mouse.up()
 
-  // Focusing the first project's handle must raise it above the overlap. Blur
+  // Focusing the first thing's handle must raise it above the overlap. Blur
   // the active element first so the focus event is a genuine change.
   const zBefore = await first.evaluate((el) => Number(getComputedStyle(el).zIndex))
   const otherZBefore = await second.evaluate((el) => Number(getComputedStyle(el).zIndex))
@@ -384,7 +358,7 @@ test('focus brings an obscured project forward', async ({ page }) => {
   await page.evaluate(
     'document.activeElement instanceof HTMLElement && document.activeElement.blur()',
   )
-  await first.locator('[data-project-drag-handle]').focus()
+  await first.locator('[data-thing-drag-handle]').focus()
 
   await expect
     .poll(async () => first.evaluate((el) => Number(getComputedStyle(el).zIndex)))
@@ -393,4 +367,44 @@ test('focus brings an obscured project forward', async ({ page }) => {
   const zIndex = await first.evaluate((el) => Number(getComputedStyle(el).zIndex))
   const otherZ = await second.evaluate((el) => Number(getComputedStyle(el).zIndex))
   expect(zIndex).toBeGreaterThan(otherZ)
+})
+
+test('Detail locks scrolling, restores focus, and uses only Primary Image on hover', async ({
+  page,
+}) => {
+  await openFixture(page, { count: 25 })
+  const item = page.locator('[data-thing-item]').first()
+  const detail = item.getByRole('button', { name: /^Detail:/ })
+  await detail.click()
+  const drawer = page.getByRole('dialog')
+  await expect(drawer).toBeVisible()
+  await expect(drawer.locator('img')).toHaveCount(1)
+  const primary = await item.locator('img').getAttribute('src')
+  await expect(drawer.locator('img')).toHaveAttribute('src', primary!)
+  await expect(drawer.locator('img')).toHaveCSS('object-fit', 'contain')
+  await drawer.locator('img').hover()
+  await expect(page.locator('img[src*="secondary"]')).toHaveCount(0)
+  const scrollY = await page.evaluate(() => window.scrollY)
+  await page.mouse.wheel(0, 400)
+  await page.waitForTimeout(150)
+  expect(await page.evaluate(() => window.scrollY)).toBe(scrollY)
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
+  await expect(drawer).not.toBeVisible()
+  await expect(detail).toBeFocused()
+  await page.mouse.wheel(0, 400)
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(scrollY)
+})
+
+test('missing URL omits Buy and missing Primary Image never renders the secondary image', async ({
+  page,
+}) => {
+  await openFixture(page, { count: 6 })
+  const noUrl = page.locator('[data-thing-item="3"]')
+  await expect(noUrl.getByRole('link')).toHaveCount(0)
+  await expect(noUrl.locator('[data-thing-drag-surface]')).toHaveJSProperty('tagName', 'SPAN')
+  const noImage = page.locator('[data-thing-item="4"]')
+  await expect(noImage.locator('img')).toHaveCount(0)
+  await noImage.getByRole('button', { name: /^Detail:/ }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page.getByRole('dialog').locator('img')).toHaveCount(0)
 })

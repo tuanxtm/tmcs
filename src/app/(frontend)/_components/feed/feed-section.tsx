@@ -101,7 +101,11 @@ export function FeedSection(props: FeedSectionProps) {
     startTransition(async () => {
       try {
         setError(null)
-        const page = await loadFeedPage(feedType, locale, nextCursor)
+        const page = (await loadFeedPage(feedType, locale, nextCursor)) as {
+          docs: FeedCardDoc[]
+          nextCursor: string | null
+          hasNextPage: boolean
+        }
         setDocs((current) => {
           const seen = new Set(current.map((doc) => doc.id))
           const appended = page.docs.filter((doc) => !seen.has(doc.id))

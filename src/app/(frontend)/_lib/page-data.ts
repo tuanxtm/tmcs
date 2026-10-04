@@ -246,11 +246,9 @@ async function resolveFeedSectionBlock(
   const feedType: FeedType = block.feedType
   const source: FeedSourceMode = isFeedSourceMode(block.source) ? block.source : 'latest'
   const adapter = FEED_SOURCE_REGISTRY[feedType]
-  // Project previews honor the CMS count and paginate only on the archive.
-  const isProjectsPreview = feedType === 'projects'
-  const limit = clampLimit(
-    isProjectsPreview ? (block.limit ?? PROJECTS_PREVIEW_LIMIT) : block.limit,
-  )
+  // Canvas previews honor the CMS count and paginate only on their archives.
+  const isCanvasPreview = feedType === 'projects' || feedType === 'things'
+  const limit = clampLimit(isCanvasPreview ? (block.limit ?? PROJECTS_PREVIEW_LIMIT) : block.limit)
 
   const manualIds =
     feedType === 'posts'
@@ -262,15 +260,15 @@ async function resolveFeedSectionBlock(
           : relationIds((block as { videoItems?: unknown }).videoItems)
 
   // Infinite scroll is only meaningful for latest published feeds.
-  // Things homepage showcase is always static (custom layout).
+  // Canvas blocks always remain static previews.
   const requestedPagination: FeedPaginationMode = isFeedPaginationMode(
     (block as { pagination?: unknown }).pagination,
   )
     ? (block as { pagination: FeedPaginationMode }).pagination
     : 'static'
-  const pagination: FeedPaginationMode = isProjectsPreview
+  const pagination: FeedPaginationMode = isCanvasPreview
     ? 'static'
-    : feedType !== 'things' && source === 'latest' && requestedPagination === 'infinite'
+    : source === 'latest' && requestedPagination === 'infinite'
       ? 'infinite'
       : 'static'
 
@@ -279,9 +277,9 @@ async function resolveFeedSectionBlock(
       ? false
       : (block as { showViewAll?: boolean | null }).showViewAll !== false
 
-  const viewAllHref = isProjectsPreview
+  const viewAllHref = isCanvasPreview
     ? showViewAll
-      ? `/${locale === 'vi' ? 'vi/' : ''}projects`
+      ? `/${locale === 'vi' ? 'vi/' : ''}${feedType}`
       : null
     : showViewAll && 'viewAllPage' in block && block.viewAllPage != null
       ? resolvePageHref((block as { viewAllPage?: unknown }).viewAllPage, locale)
@@ -724,7 +722,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
     FEED_SOURCE_REGISTRY.things.loadCards({
       locale,
       source: 'latest',
-      limit: 5,
+      limit: PROJECTS_PREVIEW_LIMIT,
       manualIds: [],
     }),
     FEED_SOURCE_REGISTRY.videos.loadCards({
@@ -975,9 +973,7 @@ export const getPageBySlug = cache(
 )
 
 export function firstHeroBlock(blocks: ResolvedBlockView[]): PageHeroBlockView | null {
-  return (
-    blocks.find((block): block is PageHeroBlockView => block.blockType === 'pageHero') ?? null
-  )
+  return blocks.find((block): block is PageHeroBlockView => block.blockType === 'pageHero') ?? null
 }
 
 // ─── Slug Dispatcher ───────────────────────────────────────────────────────────

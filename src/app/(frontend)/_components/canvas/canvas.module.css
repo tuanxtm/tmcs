@@ -73,7 +73,7 @@
   text-decoration: none;
 }
 
-/* Canvas geometry mirrors getProjectCanvasLayout so server-rendered items are
+/* Canvas geometry mirrors getCanvasLayout so server-rendered items are
    positioned before hydration. Manual drags add --manual-x / --manual-y. */
 .canvas {
   position: relative;
@@ -406,4 +406,76 @@
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+.thingsCanvas {
+  --row-height: 280px;
+  --item-height: 200px;
+}
+
+@container (min-width: 640px) and (max-width: 1023.98px) {
+  .thingsCanvas {
+    --row-height: 340px;
+    --item-height: 260px;
+  }
+}
+
+@container (min-width: 1024px) {
+  .thingsCanvas {
+    --row-height: 360px;
+    --item-height: 280px;
+  }
+}
+
+.thingItem {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: calc(var(--item-height) - 100px) 100px;
+  align-items: end;
+  --image-width: calc(var(--item-width) * var(--image-scale, 1));
+  --image-height: calc((var(--item-height) - 100px) * var(--image-scale, 1));
+}
+
+.thingLabel {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  grid-template-rows: 28px 42px 28px;
+  align-content: start;
+  align-items: center;
+  height: 100px;
+  gap: 1px 4px;
+  text-align: left;
+}
+
+.thingTitle {
+  grid-column: 1 / -1;
+  line-height: 14px;
+}
+.thingTitle:hover {
+  text-decoration: none;
+}
+
+.thingActions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.thingAction {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.thingAction:hover,
+.thingAction:focus-visible {
+  text-decoration: underline;
 }

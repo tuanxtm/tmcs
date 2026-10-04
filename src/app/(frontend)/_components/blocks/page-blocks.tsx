@@ -78,11 +78,7 @@ export function PageBlocks({
 
   return (
     <div className={cn('flex flex-col gap-y-(--section-gap-y)', className)}>
-      <SiteHeader
-        siteName={siteName}
-        locale={locale}
-        navigation={navigation ?? []}
-      />
+      <SiteHeader siteName={siteName} locale={locale} navigation={navigation ?? []} />
       {blocks.map((block) => {
         switch (block.blockType) {
           case 'pageHero':
@@ -138,7 +134,14 @@ export function PageBlocks({
             if (block.feedType === 'things') {
               return (
                 <ThingsSection
-                  key={feedKey}
+                  key={JSON.stringify([
+                    locale,
+                    ids.sectionId,
+                    block.docs,
+                    block.nextCursor,
+                    block.hasNextPage,
+                    block.pagination,
+                  ])}
                   locale={locale}
                   sectionId={ids.sectionId}
                   headingId={ids.headingId}
@@ -148,6 +151,10 @@ export function PageBlocks({
                   cursorPopupEmpty={block.cursorPopupEmpty}
                   cursorPopupItem={block.cursorPopupItem}
                   cursorPopupViewAll={block.cursorPopupViewAll}
+                  pagination={block.pagination}
+                  nextCursor={block.nextCursor}
+                  hasNextPage={block.hasNextPage}
+                  decorations={block.decorations}
                   docs={block.docs}
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}

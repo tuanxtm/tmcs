@@ -1,59 +1,60 @@
-import { cache } from 'react'
-import { cacheLife, cacheTag } from 'next/cache'
-
 import { ThingsSection } from '@/app/(frontend)/_components/things/things-section'
 import { createFeedPageShell } from '@/app/(frontend)/_components/feed/feed-page-shell'
+import { getThingsPage } from '@/app/(frontend)/_lib/cms'
 import { FEED_SOURCE_REGISTRY } from '@/app/(frontend)/_lib/feed-registry'
-import type { ThingCardView } from '@/app/(frontend)/_lib/types'
-import { CACHE_TAGS } from '@/lib/cache-tags'
-import type { LocaleCode } from '@/lib/locales'
+import {
+  createThingsArchiveBlock,
+  prepareThingsArchiveBlocks,
+} from '@/app/(frontend)/_lib/things-feed'
+import type { FeedDecorationView, ThingsPageView } from '@/app/(frontend)/_lib/types'
 
-import { cn } from '@/lib/utils'
-
-const THINGS_FEED_CLASSNAME = cn('pt-2 md:pt-3 lg:pt-4')
-
-const THINGS_FEED_LIMIT = 48
-
-async function loadThingsFeedCached(locale: LocaleCode): Promise<ThingCardView[]> {
-  'use cache'
-  cacheLife('days')
-  cacheTag(CACHE_TAGS.things, CACHE_TAGS.media)
-  return FEED_SOURCE_REGISTRY.things.loadCards({
-    locale,
-    source: 'latest',
-    limit: THINGS_FEED_LIMIT,
-    manualIds: [],
+/** Fallback archive block used when the CMS Things page has no Things block. */
+function buildArchiveFallback(page: ThingsPageView, decorations?: FeedDecorationView[]) {
+  return createThingsArchiveBlock({
+    page,
+    defaults: {
+      heading: FEED_SOURCE_REGISTRY.things.defaultHeading,
+      cursorPopup: FEED_SOURCE_REGISTRY.things.defaultCursorPopup,
+      cursorPopupEmpty: FEED_SOURCE_REGISTRY.things.defaultCursorPopupEmpty,
+      cursorPopupItem: FEED_SOURCE_REGISTRY.things.defaultCursorPopupItem,
+    },
+    decorations,
   })
 }
-
-const loadThingsFeed = cache(async (locale: LocaleCode): Promise<ThingCardView[]> => {
-  return loadThingsFeedCached(locale)
-})
 
 const { Page: ThingsFeedPage, generateMetadata: generateThingsFeedMetadata } = createFeedPageShell({
   slug: 'things',
   label: 'Things',
   feedType: 'things',
-  loadFeed: (locale) => loadThingsFeed(locale),
-  renderFeed: ({ locale, feed, adapter }) => {
-    const docs = feed as ThingCardView[]
+  loadFeed: (locale) => getThingsPage(locale, null),
+  transformPageBlocks: ({ blocks, feed, decorations }) => {
+    const page = feed as ThingsPageView
+    return prepareThingsArchiveBlocks(blocks, page, buildArchiveFallback(page, decorations))
+  },
+  renderFeed: ({ locale, feed, adapter, decorations }) => {
+    const { docs, nextCursor, hasNextPage } = feed as ThingsPageView
     return (
       <ThingsSection
+        key={JSON.stringify([locale, docs, nextCursor, hasNextPage])}
         locale={locale}
         sectionId="things-feed"
         headingId="things-feed-heading"
         heading={adapter.defaultHeading}
         description={null}
-        docs={docs}
         cursorPopup={adapter.defaultCursorPopup}
         cursorPopupEmpty={adapter.defaultCursorPopupEmpty}
         cursorPopupItem={adapter.defaultCursorPopupItem}
+        pagination="infinite"
+        nextCursor={nextCursor}
+        hasNextPage={hasNextPage}
         showViewAll={false}
-        className={THINGS_FEED_CLASSNAME}
+        docs={docs}
+        decorations={decorations}
       />
     )
   },
 })
 
 export { ThingsFeedPage, generateThingsFeedMetadata }
+
 export default ThingsFeedPage
