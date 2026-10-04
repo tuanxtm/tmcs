@@ -62,7 +62,7 @@ export default buildConfig({
     meta: {
       titleSuffix: " · tuantm's creative space",
       icons: {
-        icon: '@/app/favicon.ico',
+        icon: '/logo.svg',
       },
     },
     components: {
