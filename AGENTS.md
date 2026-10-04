@@ -31,6 +31,7 @@ A dedicated rule lives at `.cursor/rules/codegraph.mdc` (`alwaysApply: true`). I
 - **Scalability**: Use the simplest solution that is easy to scale.
 - **Performance**: Use the simplest solution that is maximizing performance.
 - **Output**: Do not use em dash (—), use regular dash (-).
+- **Comment**: Comment in code should be super concise, maximum 3 rows.
 
 ## Project backend map
 
