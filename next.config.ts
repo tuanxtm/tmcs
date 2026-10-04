@@ -20,15 +20,10 @@ function getAllowedDevOrigins(): string[] {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Cache Components replaces the legacy `dynamic`/`revalidate`/`fetchCache`
-  // route segment configs. Every page is dynamic by default; static shells are
-  // produced only when data reads are wrapped in `"use cache"` and request-time
-  // reads (`headers()`, `cookies()`, `await params`, `await searchParams`) are
-  // pushed into a `<Suspense>` boundary. See:
-  // https://nextjs.org/docs/app/guides/migrating-to-cache-components
+  // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
   cacheComponents: true,
-  // React Compiler is built into Next.js 16 - runs in the SWC pipeline before
-  // OpenNext bundles the output for Cloudflare Workers, so no runtime support
-  // is required in workerd.
+  // React Compiler is built into Next.js 16 - runs in the SWC pipeline before OpenNext bundles the output for Cloudflare Workers, so no runtime support is required in workerd.
+  // See: https://opennext.js.org/cloudflare/howtos/workerd
   reactCompiler: {
     compilationMode: 'annotation' as const,
   },
