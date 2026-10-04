@@ -1,0 +1,40 @@
+.uniform {
+  display: block;
+  isolation: isolate;
+  line-height: 1.15;
+}
+
+.uniform [data-inline-image-uniform] > img {
+  z-index: -1;
+}
+
+.uniform p {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  line-height: inherit;
+}
+
+/* The paragraph strut controls leading even when inline fonts differ. */
+.uniform p :where(span, a, strong, em, b, i, s, u, code, sub, sup) {
+  line-height: 0;
+}
+
+.probe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max-content;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+  line-height: 0;
+}
+
+.baselineMarker {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  vertical-align: baseline;
+}

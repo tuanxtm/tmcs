@@ -8,6 +8,7 @@ type CmsImageProps = {
   media: MediaView
   className?: string
   imgClassName?: string
+  imgStyle?: React.CSSProperties
   sizes: string
   priority?: boolean
   fill?: boolean
@@ -17,6 +18,7 @@ export function CmsImage({
   media,
   className,
   imgClassName,
+  imgStyle,
   sizes,
   priority = false,
   fill = false,
@@ -52,7 +54,8 @@ export function CmsImage({
         height={height}
         sizes={sizes}
         priority={priority}
-        className={cn('h-auto w-full', imgClassName)}
+        style={imgStyle}
+        className={cn('h-auto', imgClassName)}
       />
     </span>
   )

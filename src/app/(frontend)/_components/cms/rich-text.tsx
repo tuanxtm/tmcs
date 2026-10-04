@@ -1,3 +1,6 @@
+'use client'
+
+import { useLayoutEffect, useRef } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import type {
   DefaultTypedEditorState,
@@ -11,8 +14,11 @@ import {
 } from '@payloadcms/richtext-lexical/react'
 
 import { textStateConfig } from '@/fields/textStateConfig'
+import { cn } from '@/lib/utils'
 
 import { InlineBlock, type InlineBlockFields } from './inline-blocks'
+import { syncUniformInlineImages } from './inline-image-layout'
+import styles from './rich-text.module.css'
 
 const NODE_STATE_KEY = '$'
 
@@ -35,23 +41,23 @@ const blockConverter: JSXConverter<BlockNode> = ({ node }) => (
   <InlineBlock fields={node.fields as InlineBlockFields} />
 )
 
-const inlineBlockConverter: JSXConverter<InlineBlockNode> = ({ node }) => (
-  <InlineBlock fields={node.fields} />
-)
-
 type CmsRichTextProps = {
   data: DefaultTypedEditorState
   className?: string
   paragraphClassName?: string
+  /** Custom outer layout for natural spacing. Uniform spacing uses block flow. */
+  wrapperLayoutClassName?: string
+  lineSpacing?: 'natural' | 'uniform'
 }
 
 function buildParagraphConverter(
   paragraphClassName?: string,
+  uniform = false,
 ): JSXConverter<SerializedParagraphNode> {
   const converter: JSXConverter<SerializedParagraphNode> = ({ node, nodesToJSX }) => {
     const children = nodesToJSX({ nodes: node.children })
     return (
-      <p className={paragraphClassName}>
+      <p className={cn('m-0', !uniform && 'overflow-hidden', paragraphClassName)}>
         {children && children.length > 0 ? children : <br />}
       </p>
     )
@@ -85,8 +91,47 @@ function applyTextStateStyles(
   return text
 }
 
-export function CmsRichText({ data, className, paragraphClassName }: CmsRichTextProps) {
+export function CmsRichText({
+  data,
+  className,
+  paragraphClassName,
+  wrapperLayoutClassName,
+  lineSpacing = 'natural',
+}: CmsRichTextProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const uniform = lineSpacing === 'uniform'
+
+  // Sync responsive image alignment after content or fonts change.
+  useLayoutEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+
+    let disposed = false
+    const sync = () => {
+      if (disposed) return
+      const px = window.getComputedStyle(el).fontSize
+      el.style.setProperty('--rich-text-font-size', px)
+      if (uniform) {
+        syncUniformInlineImages(el)
+      }
+    }
+    sync()
+    window.addEventListener('resize', sync)
+    if (uniform) {
+      void document.fonts.ready.then(sync)
+      document.fonts.addEventListener('loadingdone', sync)
+    }
+    return () => {
+      disposed = true
+      window.removeEventListener('resize', sync)
+      if (uniform) document.fonts.removeEventListener('loadingdone', sync)
+    }
+  }, [className, data, paragraphClassName, uniform])
+
   const converters: JSXConvertersFunction = ({ defaultConverters }) => {
+    const inlineBlockConverter: JSXConverter<InlineBlockNode> = ({ node }) => (
+      <InlineBlock fields={node.fields} uniform={uniform} />
+    )
     const defaultTextFn =
       typeof defaultConverters.text === 'function' ? defaultConverters.text : null
 
@@ -102,7 +147,7 @@ export function CmsRichText({ data, className, paragraphClassName }: CmsRichText
 
     return {
       ...defaultConverters,
-      paragraph: buildParagraphConverter(paragraphClassName),
+      paragraph: buildParagraphConverter(paragraphClassName, uniform),
       text: wrappedText,
       blocks: {
         pageBlankSpace: blockConverter,
@@ -113,7 +158,17 @@ export function CmsRichText({ data, className, paragraphClassName }: CmsRichText
     }
   }
 
-  return <ConvertRichText data={data} converters={converters} className={className} />
+  return (
+    <div
+      ref={wrapperRef}
+      className={cn(
+        uniform ? styles.uniform : (wrapperLayoutClassName ?? 'flex flex-col gap-4'),
+        className,
+      )}
+    >
+      <ConvertRichText data={data} converters={converters} disableContainer={uniform} />
+    </div>
+  )
 }
 
 // Re-export the SerializedBlockNode type so other modules can type inline

@@ -71,8 +71,8 @@ export function Hero({ hero, className }: HeroProps) {
             {hero.paragraph ? (
               <CmsRichText
                 data={hero.paragraph}
-                className={cn('text-foreground font-serif', 'text-xl md:text-2xl lg:text-5xl')}
-                paragraphClassName="md:leading-[1.15] lg:leading-[1.2]"
+                className={cn('text-foreground/90 font-serif', 'text-xl md:text-2xl lg:text-5xl')}
+                lineSpacing="uniform"
               />
             ) : null}
 

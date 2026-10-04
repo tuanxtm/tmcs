@@ -1,19 +1,7 @@
-/**
- * Inline block payloads as Lexical node `fields`.
- *
- * Mirrors the schemas declared under `src/fields/richText.ts` (via
- * `BlocksFeature({ inlineBlocks: [...] })`). The block node is persisted by
- * `BlocksFeature` on the Lexical editor and deserialized into the editor state
- * by the server.
- *
- * Block types:
- *   - `pageBlankSpace` - layout-only blank gap (Page-level block exposed
- *     inside rich text via the BlocksFeature wiring).
- *   - `inlineImage` - Payload-native inline-block carrying a Media upload
- *     reference + an optional caption. Renders inside a paragraph at the
- *     position of the cursor (sits next to text runs).
- */
-import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
+// Payload inline blocks reserve image width in text flow.
+// Uniform mode paints images beyond a fixed text line height.
+import type { CSSProperties } from 'react'
+import { getInlineImageScale } from './inline-image-layout'
 
 export type MediaLite = {
   id?: number | string
@@ -25,12 +13,14 @@ export type MediaLite = {
   filename?: string
 }
 
-type InlineImageFields = {
+export type InlineImageFields = {
   blockType: 'inlineImage'
   blockName?: string | null
   id?: string
   image?: number | string | MediaLite | null
   caption?: string | null
+  scale?: number | null
+  align?: ('baseline' | 'top' | 'bottom' | 'middle' | 'text-top' | 'text-bottom') | null
 }
 
 type PageBlankSpaceFields = {
@@ -44,16 +34,23 @@ export type InlineBlockFields = InlineImageFields | PageBlankSpaceFields
 
 type InlineBlockProps = {
   fields: InlineBlockFields
+  uniform?: boolean
 }
 
 function asMedia(value: InlineImageFields['image']): MediaLite | null {
   if (value === null || value === undefined) return null
   if (typeof value === 'object') return value as MediaLite
-  // Numeric/string id only — caller needs to populate; render nothing in that case.
+  // Unpopulated media IDs cannot render an image.
   return null
 }
 
-function InlineImageInlineBlock({ fields }: { fields: InlineImageFields }) {
+function InlineImageInlineBlock({
+  fields,
+  uniform,
+}: {
+  fields: InlineImageFields
+  uniform?: boolean
+}) {
   const media = asMedia(fields.image)
   if (!media?.url) {
     if (process.env.NODE_ENV !== 'production') {
@@ -62,39 +59,61 @@ function InlineImageInlineBlock({ fields }: { fields: InlineImageFields }) {
     return null
   }
 
-  // Default render: 1.5em tall, aspect-ratio derived width. Match the
-  // historical legacy-inline-image look to avoid visual regressions in
-  // documents authored before the migration.
-  const aspectRatio =
-    media.width && media.height && media.height > 0 ? media.width / media.height : null
+  const scale = getInlineImageScale(fields.scale)
+  const em = '1em'
+  const wrapperHeight = `calc(${em} * ${scale})`
+  // Native aspect ratio (W/H).
+  const aspectRatio = media.width && media.height ? media.width / media.height : 1
 
-  // Phrasing content wrapper so it stays inside <p> without hydration errors.
+  // Map the CMS `align` value to a CSS `vertical-align` value.
+  const align = fields.align ?? 'text-bottom'
+  const initialTop =
+    align === 'top' || align === 'text-top'
+      ? '-0.9em'
+      : align === 'middle'
+        ? `calc(-0.5ex - ${wrapperHeight} / 2)`
+        : `calc(${align === 'baseline' ? '0em' : '0.2em'} - ${wrapperHeight})`
+
+  // Raw media preserves the original WebP and skips image optimization.
+  const dominantStyle: CSSProperties | undefined = media.dominantColor
+    ? { backgroundColor: media.dominantColor }
+    : undefined
+
   return (
-    <span className="my-6 inline-block align-middle">
-      <CmsImage
-        media={{
-          id: typeof media.id === 'number' ? media.id : 0,
-          url: media.url,
-          alt: media.alt ?? '',
-          width: media.width ?? null,
-          height: media.height ?? null,
-          dominantColor: media.dominantColor ?? null,
+    <span
+      data-inline-image-align={align}
+      data-inline-image-uniform={uniform || undefined}
+      style={{
+        display: 'inline-block',
+        position: uniform ? 'relative' : undefined,
+        height: uniform ? 0 : wrapperHeight,
+        // Reserve the visible width so text wraps around the image.
+        width: `calc(${wrapperHeight} * ${aspectRatio})`,
+        // verticalAlign is camelCase in React's style object.
+        verticalAlign: uniform ? 'baseline' : align,
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={media.url}
+        alt={media.alt ?? ''}
+        decoding="async"
+        style={{
+          ...(dominantStyle ?? {}),
+          // Uniform images reserve width and paint beyond the text line's height.
+          position: uniform ? 'absolute' : undefined,
+          top: uniform ? `var(--inline-image-top, ${initialTop})` : undefined,
+          left: uniform ? 0 : undefined,
+          height: uniform ? wrapperHeight : '100%',
+          width: '100%',
+          display: 'block',
         }}
-        sizes="1.5em"
-        imgClassName={
-          aspectRatio
-            ? `!h-[1.5em] !w-auto aspect-[${aspectRatio}]`
-            : '!h-[1.5em] !w-auto'
-        }
       />
-      {fields.caption ? (
-        <span className="text-foreground/70 mt-2 block text-xs">{fields.caption}</span>
-      ) : null}
     </span>
   )
 }
 
-export function InlineBlock({ fields }: InlineBlockProps) {
+export function InlineBlock({ fields, uniform }: InlineBlockProps) {
   switch (fields.blockType) {
     case 'pageBlankSpace': {
       const height = fields.height || '60vh'
@@ -102,7 +121,7 @@ export function InlineBlock({ fields }: InlineBlockProps) {
     }
 
     case 'inlineImage': {
-      return <InlineImageInlineBlock fields={fields} />
+      return <InlineImageInlineBlock fields={fields} uniform={uniform} />
     }
 
     default: {
