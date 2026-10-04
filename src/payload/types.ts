@@ -2865,6 +2865,14 @@ export interface TaskSchedulePublish {
 export interface InlineImageBlock {
   image: number | Media;
   caption?: string | null;
+  /**
+   * Visual size multiplier. Cap-height: 1. Step: 0.05. Min: 0.5. Max: 3.
+   */
+  scale?: number | null;
+  /**
+   * Vertical alignment on the text line. Default: text-bottom (rooted at descender line).
+   */
+  align?: ('text-bottom' | 'baseline' | 'middle' | 'text-top' | 'top' | 'bottom') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'inlineImage';
