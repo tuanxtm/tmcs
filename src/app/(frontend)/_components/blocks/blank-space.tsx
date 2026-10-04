@@ -1,14 +1,13 @@
 import type { PageBlankSpaceBlockView } from '@/app/(frontend)/_lib/types'
 import { cn } from '@/lib/utils'
-import { Scales } from '@/components/ui/scales'
 
 type BlankSpaceBlockProps = {
   block: PageBlankSpaceBlockView
 }
 
 /**
- * Renders an empty section with the configured height to add vertical
- * spacing between page blocks. Default height matches the Typewriter block.
+ * Renders an empty section with the configured height
+ * to add vertical spacing between page blocks.
  */
 export function BlankSpaceBlock({ block }: BlankSpaceBlockProps) {
   return (
@@ -17,8 +16,6 @@ export function BlankSpaceBlock({ block }: BlankSpaceBlockProps) {
       aria-hidden="true"
       style={{ height: block.height }}
       className={cn('relative')}
-    >
-      <Scales />
-    </section>
+    ></section>
   )
 }
