@@ -24,7 +24,7 @@ const CONFIG = {
   // Popup reveal delay after entering a marked region.
   SHOW_DELAY_MS: 1000,
   // Stacking order.
-  CROSS_Z: 'z-[-1]',
+  CROSS_Z: 'z-[2147483647]',
   POPUP_Z: 'z-[2147483647]',
 }
 
