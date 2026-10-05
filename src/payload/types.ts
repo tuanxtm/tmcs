@@ -380,16 +380,16 @@ export interface Post {
              */
             description?: string | null;
             /**
-             * Projects and Things use draggable canvases. Posts and Videos use a feed grid.
+             * Posts and Videos use a feed grid. Projects and Things use draggable canvases.
              */
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published Posts blocks and the canonical Videos archive grid. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
-             * Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling.
+             * Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling. Videos blocks apply this count per provider (YouTube, Instagram, TikTok, Other); the canonical Videos archive grid uses the total count.
              */
             limit: number;
             /**
@@ -745,16 +745,16 @@ export interface Page {
              */
             description?: string | null;
             /**
-             * Projects and Things use draggable canvases. Posts and Videos use a feed grid.
+             * Posts and Videos use a feed grid. Projects and Things use draggable canvases.
              */
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published Posts blocks and the canonical Videos archive grid. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
-             * Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling.
+             * Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling. Videos blocks apply this count per provider (YouTube, Instagram, TikTok, Other); the canonical Videos archive grid uses the total count.
              */
             limit: number;
             /**
@@ -1073,16 +1073,16 @@ export interface Project {
              */
             description?: string | null;
             /**
-             * Projects and Things use draggable canvases. Posts and Videos use a feed grid.
+             * Posts and Videos use a feed grid. Projects and Things use draggable canvases.
              */
             feedType: 'posts' | 'projects' | 'things' | 'videos';
             source: 'latest' | 'featured' | 'manual';
             /**
-             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.
+             * Static shows a capped preview (optionally with View all). Infinite loads more as the visitor scrolls - only available for latest published Posts blocks and the canonical Videos archive grid. Projects and Things blocks always render static previews; their canonical archives load all published items in batches of 10.
              */
             pagination?: ('static' | 'infinite') | null;
             /**
-             * Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling.
+             * Number of items in the preview (1-48, default 12). Projects and Things respect this count on blocks; their archives use infinite scrolling. Videos blocks apply this count per provider (YouTube, Instagram, TikTok, Other); the canonical Videos archive grid uses the total count.
              */
             limit: number;
             /**
