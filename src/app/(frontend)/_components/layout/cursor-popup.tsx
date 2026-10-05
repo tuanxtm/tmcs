@@ -222,7 +222,7 @@ export function CursorPopup() {
                   key={label}
                   className={cn(
                     'text-accent overflow-hidden whitespace-nowrap',
-                    'bg-background',
+                    'bg-background/50 backdrop-blur-sm',
                     isVi ? 'px-0.75 pt-1 pb-0.75' : 'p-0.75',
                     'font-mono text-[0.625rem] leading-none font-medium tracking-[-0.015em] uppercase',
                     'border-accent border',
