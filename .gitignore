@@ -61,3 +61,5 @@ backup_*
 core.*
 
 /example*
+
+.reasonix/
