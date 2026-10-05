@@ -47,31 +47,12 @@ export function ThingCanvasItem(
   return (
     <article
       ref={registerItemRef}
-      style={canvasItemStyle(index, manual, zIndex)}
+      style={canvasItemStyle(index, manual, zIndex, thing.primaryImage)}
       className={`${styles.item} ${styles.thingItem}`}
       data-thing-item={thing.id}
       data-cursor-popup={cursorPopup || undefined}
       onFocusCapture={onItemFocusCapture}
     >
-      {thing.primaryUrl ? (
-        <a
-          href={thing.primaryUrl}
-          aria-label={thing.name}
-          className={styles.imageArea}
-          data-thing-drag-surface=""
-          onPointerDown={onImagePointerDown}
-        >
-          {image}
-        </a>
-      ) : (
-        <span
-          className={styles.imageArea}
-          data-thing-drag-surface=""
-          onPointerDown={onImagePointerDown}
-        >
-          {image}
-        </span>
-      )}
       <div className={styles.thingLabel} data-thing-label="">
         <CanvasHandle
           item={thing}
@@ -109,6 +90,25 @@ export function ThingCanvasItem(
           </button>
         </div>
       </div>
+      {thing.primaryUrl ? (
+        <a
+          href={thing.primaryUrl}
+          aria-label={thing.name}
+          className={styles.imageArea}
+          data-thing-drag-surface=""
+          onPointerDown={onImagePointerDown}
+        >
+          {image}
+        </a>
+      ) : (
+        <span
+          className={styles.imageArea}
+          data-thing-drag-surface=""
+          onPointerDown={onImagePointerDown}
+        >
+          {image}
+        </span>
+      )}
       <ThingDetail
         open={open}
         onOpenChangeAction={changeOpen}

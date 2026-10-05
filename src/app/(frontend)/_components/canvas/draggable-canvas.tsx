@@ -61,6 +61,7 @@ type CanvasGeometry = {
   canvas: Size
   padding: number
   itemSize: Size
+  itemSizes: Record<number, Size>
 }
 
 export type CanvasDoc = { id: number; title: string }
@@ -101,7 +102,8 @@ function readItemPosition(element: HTMLElement | undefined): Point {
 
 function readItemSize(element: HTMLElement | undefined, fallback: Size): Size {
   if (!element) return fallback
-  return { width: element.offsetWidth, height: element.offsetHeight }
+  const rect = element.getBoundingClientRect()
+  return { width: rect.width, height: rect.height }
 }
 
 /** Id-keyed element registry shared by render-time handler factories. */
@@ -279,8 +281,11 @@ export function DraggableCanvas<T extends CanvasDoc>({
       canvas: { width: layout.width, height: layout.height },
       padding: layout.padding,
       itemSize: { width: first.width, height: first.height },
+      itemSizes: Object.fromEntries(
+        items.map((item) => [item.id, readItemSize(itemElements.get(item.id), first)]),
+      ),
     }
-  }, [items.length, kind])
+  }, [items, itemElements, kind])
 
   const applyGeometry = useCallback(
     (geometry: CanvasGeometry) => {
@@ -302,16 +307,16 @@ export function DraggableCanvas<T extends CanvasDoc>({
       const remapped: ManualPositions = {}
       let changed = false
       for (const [id, position] of Object.entries(positionsRef.current)) {
+        const itemId = Number(id)
         const next = remapCanvasPosition({
           position,
           oldCanvas: previous.canvas,
           newCanvas: geometry.canvas,
-          item: geometry.itemSize,
-          oldItem: previous.itemSize,
+          item: geometry.itemSizes[itemId] ?? geometry.itemSize,
+          oldItem: previous.itemSizes[itemId] ?? previous.itemSize,
           oldPadding: previous.padding,
           newPadding: geometry.padding,
         })
-        const itemId = Number(id)
         remapped[itemId] = next
         if (next.x !== position.x || next.y !== position.y) changed = true
       }
@@ -406,6 +411,8 @@ export function DraggableCanvas<T extends CanvasDoc>({
     // Commit React state on release; pointer frames update only this item.
     drag.itemElement.style.setProperty('--manual-x', `${next.x}px`)
     drag.itemElement.style.setProperty('--manual-y', `${next.y}px`)
+    drag.itemElement.style.setProperty('--manual-bottom', 'auto')
+    drag.itemElement.style.setProperty('--manual-right', 'auto')
     positionsRef.current = { ...positionsRef.current, [drag.itemId]: next }
   }, [])
 

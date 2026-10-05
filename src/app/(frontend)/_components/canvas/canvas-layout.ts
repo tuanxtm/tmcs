@@ -35,9 +35,8 @@ export function getCanvasLayout(
           : 220
   const laneWidth = Math.max(1, width - padding * 2) / columns
   const itemWidth =
-    width < 640 ? Math.min(laneWidth * 0.92, laneWidth - 16) : Math.min(400, laneWidth * 0.84)
-  const itemHeight =
-    kind === 'thing' ? (width >= 1024 ? 280 : width >= 640 ? 260 : 200) : rowHeight - 80
+    width < 640 ? Math.min(laneWidth * 0.92, laneWidth - 16) : Math.min(480, laneWidth * 0.9)
+  const itemHeight = rowHeight - (width >= 1024 ? 40 : width >= 640 ? 50 : 60)
 
   const placements: CanvasPlacement[] = Array.from({ length: count }, (_, index) => {
     const column = index % columns
@@ -51,7 +50,7 @@ export function getCanvasLayout(
       y: padding + row * rowHeight + verticalSlack * OFFSET_Y[index % OFFSET_Y.length],
       width: itemWidth,
       height: itemHeight,
-      imageWidth: itemWidth * (kind === 'thing' ? 1 : width < 640 ? 0.55 : 0.6) * scale,
+      imageWidth: itemWidth * (width < 640 ? 0.55 : 0.6) * scale,
       imageHeight: (kind === 'thing' ? itemHeight - 100 : itemHeight) * scale,
     }
   })

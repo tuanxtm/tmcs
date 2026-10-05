@@ -47,7 +47,7 @@ export function ProjectCanvasItem({
   registerItemRef,
   registerHandleRef,
 }: ProjectCanvasItemProps) {
-  const style = canvasItemStyle(index, manual, zIndex)
+  const style = canvasItemStyle(index, manual, zIndex, project.image)
 
   return (
     <article

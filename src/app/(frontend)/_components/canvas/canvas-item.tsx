@@ -17,6 +17,7 @@ export function canvasItemStyle(
   index: number,
   manual?: { x: number; y: number } | null,
   zIndex?: number | null,
+  image?: MediaView | null,
 ): CSSProperties {
   return {
     '--column-mobile': index % 2,
@@ -28,7 +29,20 @@ export function canvasItemStyle(
     '--offset-x': OFFSET_X[index % OFFSET_X.length],
     '--offset-y': OFFSET_Y[index % OFFSET_Y.length],
     '--image-scale': IMAGE_SCALE[index % IMAGE_SCALE.length],
-    ...(manual ? { '--manual-x': `${manual.x}px`, '--manual-y': `${manual.y}px` } : {}),
+    ...(manual
+      ? {
+          '--manual-x': `${manual.x}px`,
+          '--manual-y': `${manual.y}px`,
+          '--manual-bottom': 'auto',
+          '--manual-right': 'auto',
+        }
+      : {}),
+    ...(image?.width && image.height && image.width > 0 && image.height > 0
+      ? {
+          '--media-width': `calc(var(--image-max-height) * ${image.width / image.height})`,
+          '--media-height': `calc(var(--image-max-width) / ${image.width / image.height})`,
+        }
+      : {}),
     ...(zIndex != null ? { '--item-z': zIndex } : {}),
   } as CSSProperties
 }
@@ -54,7 +68,7 @@ export function CanvasImage({
           fill
           sizes={
             kind === 'project'
-              ? '(min-width: 1024px) 240px, (min-width: 640px) 220px, 180px'
+              ? '(min-width: 640px) 288px, 180px'
               : '(min-width: 1024px) 400px, (min-width: 640px) 280px, 180px'
           }
           className="bg-transparent!"
