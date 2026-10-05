@@ -1,7 +1,13 @@
 import { test, expect } from '@playwright/test'
 import { createCanvasFixture } from '../helpers/canvas-fixture'
+import { expectTightCanvasBounds } from '../helpers/canvas-bounds'
 
 const openFixture = createCanvasFixture('projects')
+
+test('content fits its drag bounds and can reach every canvas edge', async ({ page }) => {
+  await openFixture(page, { count: 6 })
+  await expectTightCanvasBounds(page, 'project')
+})
 
 test('heading, grid lines, and image-left name-right composition', async ({ page }) => {
   await openFixture(page)

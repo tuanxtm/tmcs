@@ -1,9 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { createCanvasFixture } from '../helpers/canvas-fixture'
+import { expectTightCanvasBounds } from '../helpers/canvas-bounds'
 
 const openFixture = createCanvasFixture('things')
 
-test('heading, transparent complete grid, and metadata below original-color images', async ({
+test('content fits its drag bounds and can reach every canvas edge', async ({ page }) => {
+  await openFixture(page, { count: 6 })
+  await expectTightCanvasBounds(page, 'thing')
+})
+
+test('heading, transparent complete grid, and metadata left of original-color images', async ({
   page,
 }) => {
   await openFixture(page, { count: 6 })
@@ -18,9 +24,9 @@ test('heading, transparent complete grid, and metadata below original-color imag
     const image = (await item.locator('[data-thing-image]').boundingBox())!
     const label = (await item.locator('[data-thing-label]').boundingBox())!
     const title = item.locator('span[title]')
-    expect(label.y).toBeGreaterThanOrEqual(image.y + image.height - 1)
-    expect(label.x).toBeCloseTo(image.x, 0)
-    expect(label.height).toBe(100)
+    expect(label.x + label.width).toBeLessThanOrEqual(image.x)
+    expect(label.y + label.height).toBeCloseTo(image.y + image.height, 0)
+    await expect(item.locator('[data-thing-label]')).toHaveCSS('text-align', 'right')
     await expect(title).toHaveCSS('-webkit-line-clamp', '3')
     const handle = item.locator('[data-thing-drag-handle]')
     if (width < 1024) {
@@ -33,8 +39,10 @@ test('heading, transparent complete grid, and metadata below original-color imag
     expect(second.x).toBeGreaterThan(first.x + first.width)
     if (width < 1024) expect(third.y).toBeGreaterThan(first.y + first.height)
     const expectedHeight = width < 640 ? 200 : width < 1024 ? 260 : 280
-    expect(first.height).toBe(expectedHeight)
+    expect(first.height).toBeLessThan(expectedHeight)
     const action = (await item.getByRole('button', { name: /^Detail:/ }).boundingBox())!
+    expect(label.y).toBeGreaterThanOrEqual(first.y)
+    expect(action.x + action.width).toBeLessThanOrEqual(image.x)
     expect(action.y + action.height).toBeLessThanOrEqual(first.y + first.height + 1)
     const img = item.locator('img')
     await expect(img).toHaveCSS('object-fit', 'contain')
