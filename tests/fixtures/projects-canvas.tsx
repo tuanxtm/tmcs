@@ -95,7 +95,7 @@ window.renderProjectsFixture = (options = {}) => {
           description="Drag any project to rearrange the workshop wall."
           cursorPopupItem="view details"
           decorations={decorations}
-          onMovementChange={(moving) => {
+          onMovementChangeAction={(moving) => {
             document.documentElement.dataset.projectMoving = String(moving)
           }}
         />

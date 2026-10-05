@@ -13,8 +13,16 @@ export function ProjectsCanvas(props: {
   description?: string | null
   cursorPopupItem?: string | null
   decorations?: FeedDecorationView[]
-  onMovementChange?: (moving: boolean) => void
+  onMovementChangeAction?: (moving: boolean) => void
 }) {
-  const { projects, ...rest } = props
-  return <DraggableCanvas items={projects} kind="project" renderItem={renderProject} {...rest} />
+  const { projects, onMovementChangeAction, ...rest } = props
+  return (
+    <DraggableCanvas
+      items={projects}
+      kind="project"
+      renderItem={renderProject}
+      onMovementChange={onMovementChangeAction}
+      {...rest}
+    />
+  )
 }

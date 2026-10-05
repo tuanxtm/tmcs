@@ -23,7 +23,7 @@ function ProjectsContent({
       description={description}
       cursorPopupItem={cursorPopupItem}
       decorations={decorations}
-      onMovementChange={onMovementChange}
+      onMovementChangeAction={onMovementChange}
     />
   )
 }
