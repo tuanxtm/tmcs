@@ -29,7 +29,7 @@ describe('homepage feed helpers', () => {
     expect(isFeedType('things')).toBe(true)
     expect(isFeedType('notes')).toBe(false)
     expect(FEED_SOURCE_REGISTRY.posts.defaultHeading).toBe('posts')
-    expect(FEED_SOURCE_REGISTRY.projects.defaultViewAllLabel).toBe('View all projects')
+    expect(FEED_SOURCE_REGISTRY.projects.defaultViewAllLabel.en).toBe('View all projects')
     expect(FEED_SOURCE_REGISTRY.things.defaultHeading).toBe('things')
     expect(FEED_SOURCE_REGISTRY.videos.defaultCursorPopupItem).toBe('play')
   })
