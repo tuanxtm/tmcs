@@ -271,6 +271,12 @@ export type FeedSectionBlockView =
   | (FeedSectionBase & {
       feedType: 'videos'
       docs: VideoCardView[]
+      /**
+       * Layout chosen by the resolver. `provider-rows` renders the redesigned
+       provider rows section (server output). `grid` keeps the original feed
+       grid (used by the canonical /videos archive).
+       */
+      videosLayout?: 'provider-rows' | 'grid'
     })
 
 export type PageRichTextBlockView = {

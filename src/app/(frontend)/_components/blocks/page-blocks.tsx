@@ -11,6 +11,7 @@ import { ScrambleHoverBlock } from '@/app/(frontend)/_components/blocks/scramble
 import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
 import { ThingsSection } from '@/app/(frontend)/_components/things/things-section'
 import { TypewriterBlock } from '@/app/(frontend)/_components/blocks/typewriter'
+import { VideosSection } from '@/app/(frontend)/_components/videos/videos-section'
 import type { CmsPageDetailView } from '@/app/(frontend)/_components/pages/cms-page'
 import type { NavItemView, ResolvedBlockView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
@@ -190,27 +191,46 @@ export function PageBlocks({
             }
 
             if (block.feedType === 'videos') {
+              if (block.videosLayout === 'grid') {
+                return (
+                  <FeedSection
+                    key={feedKey}
+                    locale={locale}
+                    sectionId={ids.sectionId}
+                    headingId={ids.headingId}
+                    heading={block.heading}
+                    description={block.description}
+                    cursorPopup={block.cursorPopup}
+                    cursorPopupEmpty={block.cursorPopupEmpty}
+                    cursorPopupItem={block.cursorPopupItem}
+                    cursorPopupViewAll={block.cursorPopupViewAll}
+                    feedType="videos"
+                    docs={block.docs}
+                    pagination={block.pagination}
+                    nextCursor={block.nextCursor}
+                    hasNextPage={block.hasNextPage}
+                    showViewAll={block.showViewAll}
+                    viewAllLabel={block.viewAllLabel}
+                    viewAllHref={block.viewAllHref}
+                    decorations={block.decorations}
+                  />
+                )
+              }
               return (
-                <FeedSection
+                <VideosSection
                   key={feedKey}
-                  locale={locale}
                   sectionId={ids.sectionId}
                   headingId={ids.headingId}
                   heading={block.heading}
                   description={block.description}
+                  docs={block.docs}
+                  locale={locale}
                   cursorPopup={block.cursorPopup}
                   cursorPopupEmpty={block.cursorPopupEmpty}
-                  cursorPopupItem={block.cursorPopupItem}
                   cursorPopupViewAll={block.cursorPopupViewAll}
-                  feedType="videos"
-                  docs={block.docs}
-                  pagination={block.pagination}
-                  nextCursor={block.nextCursor}
-                  hasNextPage={block.hasNextPage}
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}
                   viewAllHref={block.viewAllHref}
-                  decorations={block.decorations}
                 />
               )
             }

@@ -9,6 +9,7 @@ import {
   isFeedPaginationMode,
   isFeedSourceMode,
   isFeedType,
+  loadVideoPreviewCards,
   relationIds,
   type FeedPaginationMode,
   type FeedSourceMode,
@@ -241,6 +242,7 @@ async function resolveFeedSectionBlock(
   block: Extract<PageLayoutBlock, { blockType: 'pageFeedSection' }>,
   locale: LocaleCode,
   index: number,
+  context: { videosLayout?: 'provider-rows' | 'grid' } = {},
 ): Promise<FeedSectionBlockView | null> {
   if (!isFeedType(block.feedType)) return null
   const feedType: FeedType = block.feedType
@@ -259,21 +261,31 @@ async function resolveFeedSectionBlock(
           ? relationIds((block as { thingItems?: unknown }).thingItems)
           : relationIds((block as { videoItems?: unknown }).videoItems)
 
+  // Videos default to provider rows; the canonical /videos archive opts into
+  // the legacy grid layout via the resolver context.
+  const videosLayout: 'provider-rows' | 'grid' =
+    feedType === 'videos' && context.videosLayout ? context.videosLayout : 'provider-rows'
+
   // Infinite scroll is only meaningful for latest published feeds.
   // Canvas blocks always remain static previews.
+  // Provider-rows videos are always static previews.
   const requestedPagination: FeedPaginationMode = isFeedPaginationMode(
     (block as { pagination?: unknown }).pagination,
   )
     ? (block as { pagination: FeedPaginationMode }).pagination
     : 'static'
-  const pagination: FeedPaginationMode = isCanvasPreview
-    ? 'static'
-    : source === 'latest' && requestedPagination === 'infinite'
-      ? 'infinite'
-      : 'static'
+
+  // Compute the effective pagination per branch so the type narrows cleanly.
+  const isProviderRows = feedType === 'videos' && videosLayout === 'provider-rows'
+  const effectivePagination: FeedPaginationMode =
+    isCanvasPreview || isProviderRows
+      ? 'static'
+      : source === 'latest' && requestedPagination === 'infinite'
+        ? 'infinite'
+        : 'static'
 
   const showViewAll =
-    pagination === 'infinite'
+    effectivePagination === 'infinite'
       ? false
       : (block as { showViewAll?: boolean | null }).showViewAll !== false
 
@@ -287,6 +299,10 @@ async function resolveFeedSectionBlock(
         ? `/${locale === 'vi' ? 'vi/' : ''}${feedType}`
         : null
 
+  // Provider-rows videos: load cards per provider. All other videos paths
+  // (canonical archive grid) keep the original `loadCards` adapter call.
+  const useProviderRows = feedType === 'videos' && videosLayout === 'provider-rows'
+
   // Fetch shell (needed for decorations + metadata) in parallel with the docs
   // load and the decorations lookup. Decorations depend on the resolved
   // shell, so we chain the lookup off `shellPromise`; everything else kicks
@@ -296,7 +312,7 @@ async function resolveFeedSectionBlock(
     s.activeDecorationPackId ? getFeedDecorations(s.activeDecorationPackId) : undefined,
   )
   const docsPromise =
-    pagination === 'infinite'
+    effectivePagination === 'infinite'
       ? feedType === 'posts'
         ? getPostsPage(locale, null)
         : feedType === 'projects'
@@ -304,9 +320,16 @@ async function resolveFeedSectionBlock(
           : feedType === 'videos'
             ? getVideosPage(locale, null)
             : adapter.loadCards({ locale, source, limit, manualIds })
-      : adapter.loadCards({ locale, source, limit, manualIds })
+      : useProviderRows
+        ? loadVideoPreviewCards({
+            locale,
+            source,
+            limitPerProvider: limit,
+            manualIds,
+          })
+        : adapter.loadCards({ locale, source, limit, manualIds })
 
-  const [shell, docsResult, decorations] = await Promise.all([
+  const [_shell, docsResult, decorations] = await Promise.all([
     shellPromise,
     docsPromise,
     decorationsPromise,
@@ -321,7 +344,7 @@ async function resolveFeedSectionBlock(
     id: blockId(block, `feed-${feedType}-${index}`),
     heading: block.heading || adapter.defaultHeading,
     description: block.description ?? null,
-    pagination,
+    pagination: effectivePagination,
     showViewAll: showViewAll && Boolean(viewAllHref),
     viewAllLabel: showViewAll ? (block.viewAllLabel ?? adapter.defaultViewAllLabel) : null,
     viewAllHref: showViewAll ? viewAllHref : null,
@@ -334,7 +357,7 @@ async function resolveFeedSectionBlock(
     decorations,
   }
 
-  if (pagination === 'infinite') {
+  if (effectivePagination === 'infinite') {
     const page = docsResult as { docs: unknown[]; nextCursor: string | null; hasNextPage: boolean }
     if (feedType === 'posts') {
       return {
@@ -373,6 +396,7 @@ async function resolveFeedSectionBlock(
         viewAllLabel: null,
         viewAllHref: null,
         cursorPopupViewAll: null,
+        videosLayout: 'grid',
       }
     }
   }
@@ -412,6 +436,7 @@ async function resolveFeedSectionBlock(
     docs: docs as VideoCardView[],
     nextCursor: null,
     hasNextPage: false,
+    videosLayout,
   }
 }
 
@@ -553,6 +578,10 @@ export type ResolveLayoutBlocksContext = {
   currentPostView?: PostDetailView | null
   /** Set when resolving a template Page for a routed Project. */
   currentProjectView?: ProjectDetailView | null
+  /** Optional override for the Videos block layout. Defaults to
+   *  `provider-rows`; the canonical /videos archive uses `grid` to preserve
+   *  the original feed grid + infinite pagination. */
+  videosLayout?: 'provider-rows' | 'grid'
 }
 
 export async function resolvePageBlocks(
@@ -564,6 +593,7 @@ export async function resolvePageBlocks(
 
   const currentPostView = context.currentPostView ?? null
   const currentProjectView = context.currentProjectView ?? null
+  const videosLayout = context.videosLayout
 
   const resolved = await Promise.all(
     layout.map(async (block, index): Promise<ResolvedBlockView | null> => {
@@ -576,7 +606,7 @@ export async function resolvePageBlocks(
         case 'pageHero':
           return resolvePageHeroBlock(typed, locale, index)
         case 'pageFeedSection':
-          return resolveFeedSectionBlock(typed, locale, index)
+          return resolveFeedSectionBlock(typed, locale, index, { videosLayout })
         case 'pageRichText':
           return resolveRichTextBlock(typed, index)
         case 'contentMedia':
@@ -715,7 +745,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
   const decorationsPromise = shellPromise.then((s) =>
     s.activeDecorationPackId ? getFeedDecorations(s.activeDecorationPackId) : undefined,
   )
-  const [hero, projects, posts, things, videos, shell, decorations] = await Promise.all([
+  const [hero, projects, posts, things, videos, _shell, decorations] = await Promise.all([
     getHero(locale),
     getProjectsPage(locale, null),
     getPostsPage(locale, null),
@@ -725,10 +755,12 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       limit: PROJECTS_PREVIEW_LIMIT,
       manualIds: [],
     }),
-    FEED_SOURCE_REGISTRY.videos.loadCards({
+    // Provider-aware preview for the redesigned homepage Videos section:
+    // ten items per provider so the four provider rows stay balanced.
+    loadVideoPreviewCards({
       locale,
       source: 'latest',
-      limit: 11,
+      limitPerProvider: 10,
       manualIds: [],
     }),
     shellPromise,
@@ -826,6 +858,7 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.videos.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.videos.defaultCursorPopupItem,
       cursorPopupViewAll: null,
+      videosLayout: 'provider-rows',
       decorations,
     },
   ]
@@ -916,8 +949,13 @@ async function loadPageBySlug(locale: LocaleCode, slug: string): Promise<CmsPage
   const page = (docs[0] as Page | undefined) ?? null
   if (!page) return null
 
+  // The canonical /videos archive keeps the original grid + infinite
+  // pagination. Every other CMS page uses the redesigned provider rows.
+  const videosLayout: 'grid' | 'provider-rows' =
+    trimmed === 'videos' ? 'grid' : 'provider-rows'
+
   const [blocks, alternateSlug] = await Promise.all([
-    resolvePageBlocks(page.layout, locale),
+    resolvePageBlocks(page.layout, locale, { videosLayout }),
     loadAlternateSlug(page.id, locale),
   ])
 
