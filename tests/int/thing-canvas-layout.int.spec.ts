@@ -20,7 +20,7 @@ import type {
 const getThingsCanvasLayout = (width: number, count: number) =>
   getCanvasLayout(width, count, 'thing')
 
-const WIDTHS = [320, 390, 768, 1024, 1440]
+const WIDTHS = [320, 390, 768, 1024, 1440, 1536, 1920, 2560]
 const COUNTS = [1, 9, 10, 11, 20, 25]
 
 function thing(id: number): ThingCardView {
@@ -58,12 +58,14 @@ describe('project canvas layout', () => {
     }
   })
 
-  it('switches column count at the 640px and 1024px container breakpoints', () => {
+  it('switches to three and four columns at the container breakpoints', () => {
     expect(getThingsCanvasLayout(320, 10).columns).toBe(2)
     expect(getThingsCanvasLayout(639, 10).columns).toBe(2)
     expect(getThingsCanvasLayout(640, 10).columns).toBe(2)
     expect(getThingsCanvasLayout(1023, 10).columns).toBe(2)
     expect(getThingsCanvasLayout(1024, 10).columns).toBe(3)
+    expect(getThingsCanvasLayout(1535, 10).columns).toBe(3)
+    expect(getThingsCanvasLayout(1536, 10).columns).toBe(4)
   })
 
   it('uses the documented padding, row height, and grid cell sizes', () => {

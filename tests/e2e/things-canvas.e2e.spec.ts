@@ -4,6 +4,28 @@ import { expectTightCanvasBounds } from '../helpers/canvas-bounds'
 
 const openFixture = createCanvasFixture('things')
 
+test('full-width canvas uses four lanes on wide screens', async ({ page }) => {
+  await openFixture(page, { width: 1920, count: 9 })
+  const canvas = page.locator('[data-thing-canvas]')
+  expect((await canvas.boundingBox())!.width).toBe(1920)
+  const items = page.locator('[data-thing-item]')
+  for (let index = 0; index < 4; index++) {
+    expect(
+      await items.nth(index).evaluate((el) => getComputedStyle(el).getPropertyValue('--row')),
+    ).toBe('0')
+    expect(
+      await items.nth(index).evaluate((el) => getComputedStyle(el).getPropertyValue('--column')),
+    ).toBe(String(index))
+  }
+  expect(await items.nth(4).evaluate((el) => getComputedStyle(el).getPropertyValue('--row'))).toBe(
+    '1',
+  )
+  await page.setViewportSize({ width: 1440, height: 900 })
+  expect(await items.nth(3).evaluate((el) => getComputedStyle(el).getPropertyValue('--row'))).toBe(
+    '1',
+  )
+})
+
 test('content fits its drag bounds and can reach every canvas edge', async ({ page }) => {
   await openFixture(page, { count: 6 })
   await expectTightCanvasBounds(page, 'thing')
@@ -17,7 +39,9 @@ test('heading, transparent complete grid, and metadata left of original-color im
   const canvas = page.locator('[data-thing-canvas]')
   await expect(canvas).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
   await expect(canvas).toHaveCSS('background-repeat', /^round(, round)*$/)
-  expect(await canvas.evaluate((el) => getComputedStyle(el).boxShadow)).toContain('inset')
+  expect(await canvas.evaluate((el) => getComputedStyle(el).boxShadow)).toContain('1.5px')
+  await expect(canvas).toHaveCSS('border-left-width', '0px')
+  await expect(canvas).toHaveCSS('border-right-width', '0px')
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 })
     const item = page.locator('[data-thing-item]').first()
@@ -62,6 +86,23 @@ test('plain image clicks navigate without starting movement mode', async ({ page
   await openFixture(page)
   await page.locator('[data-thing-drag-surface]').first().click()
   await page.waitForURL(/fixture-thing-1/)
+})
+
+test('the whole thing card link supports label clicks and keyboard activation', async ({
+  page,
+}) => {
+  await openFixture(page)
+  const item = page.locator('[data-thing-item="1"]')
+  const cardLink = item.locator('[data-thing-drag-surface]')
+  await expect(cardLink).toHaveAttribute('href', '/buy/fixture-thing-1')
+  const title = (await item.locator('[data-thing-label] [title]').boundingBox())!
+  await page.mouse.click(title.x + title.width / 2, title.y + title.height / 2)
+  await page.waitForURL(/buy\/fixture-thing-1/)
+
+  await openFixture(page)
+  await page.locator('[data-thing-item="1"] [data-thing-drag-surface]').focus()
+  await page.keyboard.press('Enter')
+  await page.waitForURL(/buy\/fixture-thing-1/)
 })
 
 test('appending things preserves visitor placement', async ({ page }) => {
@@ -154,7 +195,7 @@ test('touch handle drag, tap movement controls, and page scrolling', async ({ br
   }
 })
 
-test('mouse drag moves a thing and Buy still opens the primary URL', async ({ page }) => {
+test('mouse drag moves a thing and BUY NOW still opens the primary URL', async ({ page }) => {
   await openFixture(page)
 
   const item = page.locator('[data-thing-item]').first()
@@ -175,9 +216,11 @@ test('mouse drag moves a thing and Buy still opens the primary URL', async ({ pa
   const after = await item.boundingBox()
   expect(Math.abs(after!.x - before!.x)).toBeGreaterThan(40)
   expect(Math.abs(after!.y - before!.y)).toBeGreaterThan(20)
+  await expect(page).toHaveURL('http://things-canvas.test/')
 
   // A plain click on the title still navigates.
-  const purchase = item.getByRole('link', { name: /^Buy:/ })
+  const purchase = item.getByRole('link', { name: /^Buy now:/i })
+  await expect(purchase).toHaveAttribute('href', '/buy/fixture-thing-1')
   await purchase.click()
   await page.waitForURL(/buy\/fixture-thing-/)
 })
@@ -295,7 +338,7 @@ test('reset layout restores all loaded things', async ({ page }) => {
 })
 
 test('no horizontal document overflow at tested widths', async ({ page }) => {
-  for (const width of [320, 390, 768, 1024, 1440]) {
+  for (const width of [320, 390, 768, 1024, 1440, 1920, 2560]) {
     await openFixture(page, { width })
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -384,6 +427,7 @@ test('Detail locks scrolling, restores focus, and uses only Primary Image on hov
   const item = page.locator('[data-thing-item]').first()
   const detail = item.getByRole('button', { name: /^Detail:/ })
   await detail.click()
+  await expect(page).toHaveURL('http://things-canvas.test/')
   const drawer = page.getByRole('dialog')
   await expect(drawer).toBeVisible()
   await expect(drawer.locator('img')).toHaveCount(1)
@@ -403,9 +447,35 @@ test('Detail locks scrolling, restores focus, and uses only Primary Image on hov
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(scrollY)
 })
 
-test('missing URL omits Buy and missing Primary Image never renders the secondary image', async ({
-  page,
-}) => {
+test('purchase action aligns with the image and missing URL omits it', async ({ page }) => {
+  await openFixture(page, { count: 6 })
+  const item = page.locator('[data-thing-item="1"]')
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 900 })
+    const image = (await item.locator('[data-thing-image]').boundingBox())!
+    const label = (await item.locator('[data-thing-label]').boundingBox())!
+    const number = (await item.locator('[class*="number"]').boundingBox())!
+    const title = (await item.locator('[data-thing-label] [title]').boundingBox())!
+    const actions = (await item.locator('[class*="thingActions"]').boundingBox())!
+    expect(label.y + label.height).toBeCloseTo(image.y + image.height, 0)
+    expect(actions.y + actions.height).toBeCloseTo(image.y + image.height, 0)
+    for (const part of [number, title, actions]) {
+      expect(part.x + part.width).toBeCloseTo(label.x + label.width, 0)
+    }
+    if (width === 320 || width === 1440) {
+      await page.screenshot({ path: `/tmp/tmcs-things-row-${width}.png` })
+    }
+  }
+  await expect(item.getByRole('link', { name: /^Buy now:/i })).toHaveAttribute(
+    'href',
+    '/buy/fixture-thing-1',
+  )
+  const noUrl = page.locator('[data-thing-item="3"]')
+  await expect(noUrl.getByRole('link')).toHaveCount(0)
+  await expect(noUrl.getByRole('button', { name: /^Detail:/ })).toBeVisible()
+})
+
+test('missing Primary Image never renders the secondary image', async ({ page }) => {
   await openFixture(page, { count: 6 })
   const noUrl = page.locator('[data-thing-item="3"]')
   await expect(noUrl.getByRole('link')).toHaveCount(0)

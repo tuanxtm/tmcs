@@ -4,6 +4,28 @@ import { expectTightCanvasBounds } from '../helpers/canvas-bounds'
 
 const openFixture = createCanvasFixture('projects')
 
+test('full-width canvas uses four lanes on wide screens', async ({ page }) => {
+  await openFixture(page, { width: 1920, count: 9 })
+  const canvas = page.locator('[data-project-canvas]')
+  expect((await canvas.boundingBox())!.width).toBe(1920)
+  const items = page.locator('[data-project-item]')
+  for (let index = 0; index < 4; index++) {
+    expect(
+      await items.nth(index).evaluate((el) => getComputedStyle(el).getPropertyValue('--row')),
+    ).toBe('0')
+    expect(
+      await items.nth(index).evaluate((el) => getComputedStyle(el).getPropertyValue('--column')),
+    ).toBe(String(index))
+  }
+  expect(await items.nth(4).evaluate((el) => getComputedStyle(el).getPropertyValue('--row'))).toBe(
+    '1',
+  )
+  await page.setViewportSize({ width: 1440, height: 900 })
+  expect(await items.nth(3).evaluate((el) => getComputedStyle(el).getPropertyValue('--row'))).toBe(
+    '1',
+  )
+})
+
 test('content fits its drag bounds and can reach every canvas edge', async ({ page }) => {
   await openFixture(page, { count: 6 })
   await expectTightCanvasBounds(page, 'project')
@@ -55,7 +77,9 @@ test('compact controls, bottom-aligned labels, and complete transparent grid', a
   await openFixture(page, { count: 6 })
   const canvas = page.locator('[data-project-canvas]')
   await expect(canvas).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
-  expect(await canvas.evaluate((el) => getComputedStyle(el).boxShadow)).toContain('inset')
+  expect(await canvas.evaluate((el) => getComputedStyle(el).boxShadow)).toContain('1.5px')
+  await expect(canvas).toHaveCSS('border-left-width', '0px')
+  await expect(canvas).toHaveCSS('border-right-width', '0px')
   await expect(
     page.getByText('drag to move projects, use the handle for touch and keyboard'),
   ).toHaveCount(0)
@@ -319,7 +343,7 @@ test('reset layout restores all loaded projects', async ({ page }) => {
 })
 
 test('no horizontal document overflow at tested widths', async ({ page }) => {
-  for (const width of [320, 390, 768, 1024, 1440]) {
+  for (const width of [320, 390, 768, 1024, 1440, 1920, 2560]) {
     await openFixture(page, { width })
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

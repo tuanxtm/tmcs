@@ -4,10 +4,10 @@ export async function expectTightCanvasBounds(page: Page, kind: 'project' | 'thi
   const canvas = page.locator(`[data-${kind}-canvas]`)
   const items = page.locator(`[data-${kind}-item]`)
 
-  for (const width of [320, 390, 768, 1440]) {
+  for (const width of [320, 390, 768, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 })
     const frame = (await canvas.boundingBox())!
-    const columns = width >= 1024 ? 3 : 2
+    const columns = width >= 1536 ? 4 : width >= 1024 ? 3 : 2
     const padding = width >= 640 ? 24 : 16
     const laneWidth = (frame.width - padding * 2) / columns
     for (const [index, item] of (await items.all()).entries()) {

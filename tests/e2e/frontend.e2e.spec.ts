@@ -9,7 +9,7 @@ test.describe('Frontend homepage', () => {
     const response = await page.goto('http://localhost:3000/')
     expect(response?.ok()).toBeTruthy()
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
-    await expect(page.locator('#hero-heading')).toBeVisible()
+    await expect(page.locator('[data-hero-rich-text]')).toBeVisible()
     await expect(page.locator('[data-feed-type="projects"]')).toBeVisible()
     await expect(page.locator('[data-feed-type="posts"]')).toBeVisible()
     await expect(page.locator('header')).toBeVisible()
@@ -20,94 +20,47 @@ test.describe('Frontend homepage', () => {
     const response = await page.goto('http://localhost:3000/vi')
     expect(response?.ok()).toBeTruthy()
     await expect(page.locator('html')).toHaveAttribute('lang', 'vi')
-    await expect(page.locator('#hero-heading')).toBeVisible()
+    await expect(page.locator('[data-hero-rich-text]')).toBeVisible()
     await expect(page.locator('[data-feed-type="projects"] h2')).toBeVisible()
   })
 
-  test('header is sticky and shows site name', async ({ page }) => {
+  test('header scrolls while the viewport frame remains fixed', async ({ page }) => {
     await page.goto('http://localhost:3000/')
-    const header = page.locator('header')
-    await expect(header).toHaveCSS('position', 'sticky')
+    await expect(page.locator('html')).toHaveClass(/boot-ready/)
+    await expect(page.locator('.boot-splash')).toHaveCount(0)
+    const header = page.locator('.page-blocks > header')
+    await expect(header).toHaveCSS('position', 'relative')
     await expect(header.locator('a').first()).toBeVisible()
-    await expect(header).toHaveAttribute('data-scrolled', 'false')
-
+    const frame = await page.locator('[data-site-frame]').boundingBox()
     await page.evaluate(() => window.scrollTo(0, 120))
-    await expect(header).toHaveAttribute('data-scrolled', 'true')
+    expect(await page.locator('[data-site-frame]').boundingBox()).toEqual(frame)
+    expect((await header.boundingBox())!.y).toBeLessThan(0)
   })
 
-  test('section headers stick below the site header', async ({ page }) => {
+  test('feed section headers retain their independent dimensions', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
-
-    // Posts keeps the compact sticky section header; Projects uses the canvas.
-    const sectionHeader = page.locator('[data-feed-type="posts"] .section-header')
-    await expect(sectionHeader).toHaveCSS('position', 'sticky')
-    await expect(sectionHeader).toHaveAttribute('data-stuck', 'false')
-
-    const expectedStickyHeight = await page.evaluate(() => {
-      const root = getComputedStyle(document.documentElement)
-      const headerHeight = parseFloat(root.getPropertyValue('--header-height'))
-      return headerHeight / 2
-    })
-
-    await page.evaluate(() => {
-      const siteHeader = document.querySelector('header')
-      const sectionHeaderEl = document.querySelector('[data-feed-type="posts"] .section-header')
-      if (!siteHeader || !sectionHeaderEl) return
-      const siteHeight = siteHeader.getBoundingClientRect().height
-      const absoluteTop = sectionHeaderEl.getBoundingClientRect().top + window.scrollY
-      window.scrollTo({ top: absoluteTop - siteHeight + 4, behavior: 'instant' })
-    })
-
-    await expect(sectionHeader).toHaveAttribute('data-stuck', 'true')
-    await expect
-      .poll(async () => {
-        const box = await sectionHeader.boundingBox()
-        return box?.height ?? 0
-      })
-      .toBeLessThan(expectedStickyHeight + 2)
-
-    const metrics = await page.evaluate(() => {
-      const siteHeader = document.querySelector('header')
-      const sectionHeaderEl = document.querySelector('[data-feed-type="posts"] .section-header')
-      if (!siteHeader || !sectionHeaderEl) return null
-      return {
-        top: sectionHeaderEl.getBoundingClientRect().top,
-        siteBottom: siteHeader.getBoundingClientRect().bottom,
-        height: sectionHeaderEl.getBoundingClientRect().height,
-      }
-    })
-
-    expect(metrics).not.toBeNull()
-    expect(Math.abs(metrics!.top - metrics!.siteBottom)).toBeLessThan(3)
-    expect(Math.abs(metrics!.height - expectedStickyHeight)).toBeLessThan(2)
+    const heading = page.locator('[data-feed-type="posts"] h2')
+    await expect(heading).toBeVisible()
+    const sectionHeight = await heading.evaluate(
+      (element) => element.parentElement!.getBoundingClientRect().height,
+    )
+    expect(sectionHeight).toBe(48)
+    await expect(page.locator('.page-blocks > header')).toHaveCSS('height', '72px')
   })
 
-  test('first fold is header + hero + first section header at 100dvh', async ({ page }) => {
+  test('header and short hero fill the first viewport inside the frame', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
-
-    const fold = await page.evaluate(() => {
-      const header = document.querySelector('header')
-      const hero = document.querySelector('#hero')
-      const sectionHeader = document.querySelector('[data-feed-type="posts"] .section-header')
-      if (!header || !hero || !sectionHeader) return null
-
-      const headerRect = header.getBoundingClientRect()
-      const heroRect = hero.getBoundingClientRect()
-      const sectionRect = sectionHeader.getBoundingClientRect()
-      const total = headerRect.height + heroRect.height + sectionRect.height
-      return {
-        total,
-        viewport: window.innerHeight,
-        headerHeight: headerRect.height,
-        sectionHeaderHeight: sectionRect.height,
-      }
+    await expect(page.locator('html')).toHaveClass(/boot-ready/)
+    await expect(page.locator('[data-site-frame]')).toBeVisible()
+    await page.evaluate(() => document.fonts.ready)
+    await page.locator('[data-hero-rich-text]').evaluate((element) => {
+      element.textContent = 'Short hero content'
     })
-
-    expect(fold).not.toBeNull()
-    expect(Math.abs(fold!.total - fold!.viewport) / fold!.viewport).toBeLessThan(0.03)
-    expect(Math.abs(fold!.headerHeight - fold!.sectionHeaderHeight)).toBeLessThan(2)
+    const frame = await page.locator('[data-site-frame]').boundingBox()
+    const hero = await page.locator('#hero').boundingBox()
+    expect(Math.abs(hero!.y + hero!.height - frame!.y - frame!.height)).toBeLessThan(2)
   })
 
   test('desktop feed grids use four columns', async ({ page }) => {
@@ -145,9 +98,9 @@ test.describe('Frontend homepage', () => {
       return
     }
 
-    expect(Math.abs(natural.naturalRatio - natural.renderedRatio) / natural.naturalRatio).toBeLessThan(
-      0.08,
-    )
+    expect(
+      Math.abs(natural.naturalRatio - natural.renderedRatio) / natural.naturalRatio,
+    ).toBeLessThan(0.08)
   })
 
   test('mobile feed collapses to one column', async ({ page }) => {
@@ -181,13 +134,13 @@ test.describe('Frontend homepage', () => {
       'linear-gradient',
     )
     // Preview count follows the CMS block limit.
-    expect(await page.locator('[data-feed-type="projects"] [data-project-item]').count()).toBeLessThanOrEqual(
-      12,
-    )
-    // Movement handles exist for every project.
-    expect(await page.locator('[data-feed-type="projects"] [data-project-drag-handle]').count()).toBe(
+    expect(
       await page.locator('[data-feed-type="projects"] [data-project-item]').count(),
-    )
+    ).toBeLessThanOrEqual(12)
+    // Movement handles exist for every project.
+    expect(
+      await page.locator('[data-feed-type="projects"] [data-project-drag-handle]').count(),
+    ).toBe(await page.locator('[data-feed-type="projects"] [data-project-item]').count())
   })
 
   test('project images use object-fit contain and are not cropped', async ({ page }) => {
@@ -347,9 +300,7 @@ test.describe('Frontend homepage', () => {
     }
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
-    await expect
-      .poll(async () => items.count(), { timeout: 10000 })
-      .toBeGreaterThan(initialCount)
+    await expect.poll(async () => items.count(), { timeout: 10000 }).toBeGreaterThan(initialCount)
   })
 
   test('cursor popup follows section under the pointer', async ({ page }) => {

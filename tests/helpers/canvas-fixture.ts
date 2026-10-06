@@ -73,6 +73,8 @@ export function createCanvasFixture(kind: 'projects' | 'things') {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>${css}
           :root {
+            --outer-line-weight: 1.5px;
+            --inner-line-weight: 1px;
             --background: #fbfbfb;
             --accent: #3b5bdb;
             --accent-foreground: #fff;
