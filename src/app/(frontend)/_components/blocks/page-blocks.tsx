@@ -78,12 +78,27 @@ export function PageBlocks({
   if (blocks.length === 0) return null
 
   return (
-    <div className={cn('flex flex-col gap-y-(--section-gap-y)', className)}>
+    <div className={cn('page-blocks flex flex-col gap-y-(--section-gap-y)', className)}>
       <SiteHeader siteName={siteName} locale={locale} navigation={navigation ?? []} />
-      {blocks.map((block) => {
+      {blocks.map((block, index) => {
         switch (block.blockType) {
           case 'pageHero':
-            return <Hero key={block.id} hero={block} />
+            return (
+              <Hero
+                key={block.id}
+                hero={block}
+                locale={locale}
+                hasFollowingContent={blocks
+                  .slice(index + 1)
+                  .some((next) =>
+                    next.blockType === 'templatePost'
+                      ? currentView?.kind === 'post'
+                      : next.blockType === 'templateProject'
+                        ? currentView?.kind === 'project'
+                        : true,
+                  )}
+              />
+            )
 
           case 'pageFeedSection': {
             const ids = sectionDomIds(block.id)

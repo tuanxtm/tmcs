@@ -1,104 +1,90 @@
 import Link from 'next/link'
+import { IconArrowDown } from '@tabler/icons-react'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import { trimUrlScheme } from '@/app/(frontend)/_lib/social-icons'
 import type { PageHeroBlockView, NavChildView } from '@/app/(frontend)/_lib/types'
+import type { LocaleCode } from '@/lib/locales'
+import { Scales } from '@/components/ui/scales'
 import { cn } from '@/lib/utils'
+import styles from './hero.module.css'
 
 type HeroProps = {
   hero: PageHeroBlockView
+  locale: LocaleCode
+  hasFollowingContent: boolean
   className?: string
 }
 
 type LinkListVariant = 'social' | 'destination'
 
-function LinkList({ links, variant }: { links: NavChildView[]; variant: LinkListVariant }) {
+function LinkList({
+  links,
+  variant,
+  label,
+}: {
+  links: NavChildView[]
+  variant: LinkListVariant
+  label: string | null
+}) {
   if (links.length === 0) return null
   return (
-    <ul className={cn('flex flex-col', 'gap-y-1')}>
-      {links.map((link) => {
-        const display = variant === 'social' ? trimUrlScheme(link.href) : link.href
-        return (
+    <div className={styles.linkGroup}>
+      {label ? <p className={styles.linkLabel}>{label}</p> : null}
+      <ul className={styles.linkList}>
+        {links.map((link) => (
           <li key={link.id}>
             <Link
               href={link.href}
               target={link.newTab ? '_blank' : undefined}
               rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
-              className={cn(
-                'text-foreground focus-visible:ring-ring flex items-center gap-1 md:gap-2',
-                'focus-visible:ring-2 focus-visible:outline-none',
-              )}
-              data-cursor-popup={''}
+              className={styles.heroLink}
+              data-cursor-popup=""
             >
-              <span
-                className={cn(
-                  'text-primary hover:text-foreground font-mono',
-                  'text-xs md:text-base',
-                )}
-              >
+              <span aria-hidden="true" className="text-accent font-mono">
                 &gt;
               </span>
-              <span
-                className={cn(
-                  'text-sm font-medium tracking-tight lowercase md:text-base lg:text-lg',
-                  'hover:text-primary transition-colors duration-300',
-                )}
-              >
-                {display}
-              </span>
+              <span>{variant === 'social' ? trimUrlScheme(link.href) : link.href}</span>
             </Link>
           </li>
-        )
-      })}
-    </ul>
+        ))}
+      </ul>
+    </div>
   )
 }
 
-export function Hero({ hero, className }: HeroProps) {
+export function Hero({ hero, locale, hasFollowingContent, className }: HeroProps) {
+  const targetId = `after-hero-${hero.id}`
+  const scrollLabel = locale === 'vi' ? 'CUỘN XUỐNG' : 'SCROLL DOWN'
+  const scrollContent = (
+    <>
+      <span>{scrollLabel}</span>
+      <IconArrowDown aria-hidden="true" />
+    </>
+  )
   return (
     <section
       id="hero"
-      className={cn(
-        'relative flex min-h-auto md:h-[calc(var(--hero-fold-height)*0.6)] lg:h-[calc(var(--hero-fold-height)*0.9)]',
-        className,
-      )}
+      className={cn(styles.hero, className)}
       aria-label="Hero"
       data-cursor-popup={hero.cursorPopup || 'scroll down'}
     >
-      <div className="flex h-full w-full flex-col-reverse items-stretch justify-between md:flex-row">
-        <div className="relative isolate min-h-0 flex-1 overflow-hidden">
-          <div className={cn('relative z-10 h-full overflow-y-auto', 'px-2 py-4 md:p-4 lg:p-5')}>
-            {hero.paragraph ? (
-              <CmsRichText
-                data={hero.paragraph}
-                className={cn('text-foreground/90 font-serif', 'text-xl md:text-2xl lg:text-5xl')}
-                lineSpacing="uniform"
-              />
-            ) : null}
-
-            {hero.socialLinks.length > 0 ? (
-              <LinkList links={hero.socialLinks} variant="social" />
-            ) : null}
-
-            {hero.otherLinks.length > 0 ? (
-              <LinkList links={hero.otherLinks} variant="destination" />
-            ) : null}
-          </div>
+      <div className={styles.stage}>
+        <div className={styles.richText} data-hero-rich-text>
+          {hero.paragraph ? (
+            <CmsRichText
+              data={hero.paragraph}
+              className="text-secondary font-serif text-xl md:text-2xl lg:text-5xl"
+              lineSpacing="uniform"
+            />
+          ) : null}
         </div>
-
-        <div
-          className={cn(
-            'relative overflow-hidden md:h-full',
-            'h-40 w-full md:w-2/5',
-            'max-sm:pl-2',
-            className,
-          )}
-        >
+        <div className={styles.image} data-hero-image>
           {hero.heroImage ? (
             <CmsImage
               media={hero.heroImage}
               fill
-              sizes="(min-width: 768px) 40vw, 100vw"
+              sizes="(min-width: 1024px) 40vw, 100vw"
               className="h-full w-full"
               imgClassName="object-cover"
               priority
@@ -106,6 +92,43 @@ export function Hero({ hero, className }: HeroProps) {
           ) : null}
         </div>
       </div>
+      <div className={styles.bottom}>
+        <div className={styles.decoration} aria-hidden="true" data-hero-decoration />
+        <div className={styles.links} data-hero-links>
+          <LinkList links={hero.socialLinks} variant="social" label={hero.labelSocialLinks} />
+          <LinkList links={hero.otherLinks} variant="destination" label={hero.labelOtherLinks} />
+        </div>
+        {hasFollowingContent ? (
+          <a
+            href={`#${targetId}`}
+            className={cn(styles.scroll, 'site-cell-hover')}
+            data-cursor-popup=""
+            data-hero-scroll
+          >
+            {scrollContent}
+          </a>
+        ) : (
+          <button
+            type="button"
+            className={cn(styles.scroll, 'site-cell-hover')}
+            disabled
+            data-cursor-popup=""
+            data-hero-scroll
+          >
+            {scrollContent}
+          </button>
+        )}
+        <div className={styles.scales} aria-hidden="true" data-hero-scales>
+          <Scales
+            orientation="diagonal"
+            size={10}
+            color="var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))"
+          />
+        </div>
+      </div>
+      {hasFollowingContent ? (
+        <span id={targetId} className={styles.scrollTarget} aria-hidden="true" />
+      ) : null}
     </section>
   )
 }
