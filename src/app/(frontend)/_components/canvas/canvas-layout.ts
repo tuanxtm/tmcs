@@ -19,7 +19,7 @@ export function getCanvasLayout(
   count: number,
   kind: 'project' | 'thing' = 'project',
 ) {
-  const columns = width >= 1024 ? 3 : 2
+  const columns = width >= 1536 ? 4 : width >= 1024 ? 3 : 2
   const padding = width >= 640 ? 24 : 16
   const rowHeight =
     kind === 'thing'

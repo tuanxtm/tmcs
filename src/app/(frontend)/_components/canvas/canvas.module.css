@@ -2,10 +2,14 @@
   background: transparent;
 }
 
+.section:has(.frame > [data-projects-canvas-root]:last-child),
+.section:has(.frame > [data-things-canvas-root]:last-child) {
+  box-shadow: none;
+}
+
 .frame {
   container-type: inline-size;
   width: 100%;
-  max-width: 1440px;
   margin-inline: auto;
 }
 
@@ -76,6 +80,7 @@
 /* Canvas geometry mirrors getCanvasLayout so server-rendered items are
    positioned before hydration. Manual drags add --manual-x / --manual-y. */
 .canvas {
+  box-sizing: border-box;
   position: relative;
   isolation: isolate;
   width: 100%;
@@ -94,17 +99,20 @@
   --v-slack: calc(var(--row-height) - var(--item-height) - 24px);
   height: calc(var(--padding) * 2 + var(--rows) * var(--row-height));
   background-color: transparent;
-  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 10%, transparent);
+  box-shadow: inset 0 calc(-1 * var(--outer-line-weight, 1.5px))
+    var(--site-rule-color, var(--accent));
   background-image:
     linear-gradient(
       to right,
-      color-mix(in oklch, var(--accent) 10%, transparent) 1px,
-      transparent 1px
+      var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))
+        var(--inner-line-weight, 1px),
+      transparent var(--inner-line-weight, 1px)
     ),
     linear-gradient(
       to bottom,
-      color-mix(in oklch, var(--accent) 10%, transparent) 1px,
-      transparent 1px
+      var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))
+        var(--inner-line-weight, 1px),
+      transparent var(--inner-line-weight, 1px)
     );
   background-size: var(--grid-size) var(--grid-size);
   background-repeat: round;
@@ -131,10 +139,17 @@
     --row-height: 280px;
     --padding: 24px;
     --rows: var(--rows-desktop);
-    --item-width: min(480px, calc((100cqw - 48px) / 3 * 0.9));
+    --item-width: min(480px, calc(var(--lane-width) * 0.9));
     --item-height: 240px;
     --item-gap: 12px;
     --image-ratio: 0.6;
+  }
+}
+
+@container (min-width: 1536px) {
+  .canvas {
+    --columns: 4;
+    --rows: var(--rows-wide);
   }
 }
 
@@ -185,6 +200,13 @@
   }
 }
 
+@container (min-width: 1536px) {
+  .item {
+    --column: var(--column-wide);
+    --row: var(--row-wide);
+  }
+}
+
 .imageArea {
   position: relative;
   display: block;
@@ -218,7 +240,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  border: 1px dashed color-mix(in oklch, var(--accent) 40%, transparent);
+  border: var(--inner-line-weight, 1px) dashed var(--site-rule-color, var(--accent));
   border-radius: 2px;
 }
 
@@ -322,7 +344,7 @@
   gap: 2px;
   padding: 2px;
   background: var(--background);
-  border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+  border: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
 }
 
 .movement button {
@@ -383,26 +405,52 @@
 }
 
 .viewAll {
-  display: flex;
-  min-height: 3rem;
-  align-items: center;
-  justify-content: center;
-  padding: 0.375rem 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  height: var(--site-header-height, 56px);
+}
+
+.viewAllScales {
+  position: relative;
+  overflow: hidden;
 }
 
 .viewAllLink {
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  padding: 8px var(--site-cell-padding, 12px) 28px;
+  border-left: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  line-height: 1;
-  letter-spacing: 0.04em;
+  font-size: var(--site-nav-font-size, 0.875rem);
+  line-height: 1.25;
+  text-align: left;
+  text-transform: uppercase;
   text-decoration: none;
+  overflow-wrap: anywhere;
 }
 
-.viewAllLink:hover,
+.viewAllLink svg {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  width: 24px;
+  height: 24px;
+  color: inherit;
+}
+
 .viewAllLink:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+
+@media (min-width: 1024px) {
+  .viewAll {
+    grid-template-columns: minmax(0, 1fr) var(--site-action-tile-width, 10%);
+  }
 }
 
 .srOnly {
@@ -447,11 +495,11 @@
   grid-template-columns: auto minmax(0, 1fr);
   grid-template-rows: auto auto auto;
   align-content: end;
-  align-items: center;
+  align-items: end;
   justify-items: end;
   min-width: 0;
   max-width: var(--label-width);
-  gap: 1px 4px;
+  gap: 4px;
   text-align: right;
 }
 
@@ -462,23 +510,37 @@
 
 .thingLabel > .number {
   grid-column: 2;
+  line-height: 14px;
+}
+
+.thingPrimaryLink {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.thingLabel > .dragHandle {
+  z-index: 2;
 }
 .thingTitle:hover {
   text-decoration: none;
 }
 
 .thingActions {
+  position: relative;
+  z-index: 2;
   grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0 8px;
-  align-items: center;
+  align-items: flex-end;
+  pointer-events: none;
 }
 
 .thingAction {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-end;
   min-height: 28px;
   padding: 0;
   border: 0;
@@ -486,8 +548,12 @@
   color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.625rem;
+  line-height: 14px;
+  text-transform: uppercase;
+  white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .thingAction:hover,

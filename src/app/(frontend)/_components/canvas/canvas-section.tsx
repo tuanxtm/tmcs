@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
 import Link from 'next/link'
+import { IconArrowRight } from '@tabler/icons-react'
 
 import { loadFeedPage } from '@/app/(frontend)/_lib/actions'
 import type { FeedDecorationView, FeedPaginationMode } from '@/app/(frontend)/_lib/types'
+import { Scales } from '@/components/ui/scales'
 import type { LocaleCode } from '@/lib/locales'
 
 import styles from './canvas.module.css'
@@ -311,14 +313,23 @@ export function CanvasSection<T extends { id: number }>({
         ) : null}
 
         {showViewAll && viewAllHref && resolvedViewAllLabel ? (
-          <div className={styles.viewAll}>
+          <div className={styles.viewAll} data-canvas-view-all>
+            <div className={styles.viewAllScales} aria-hidden="true" data-canvas-view-all-scales>
+              <Scales
+                orientation="diagonal"
+                size={10}
+                color="var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))"
+              />
+            </div>
             <Link
               href={viewAllHref}
               transitionTypes={['nav-forward']}
               data-cursor-popup={cursorPopupViewAll || resolvedViewAllLabel.toLowerCase()}
-              className={styles.viewAllLink}
+              className={`${styles.viewAllLink} site-cell-hover`}
+              data-canvas-view-all-link
             >
-              {resolvedViewAllLabel}
+              <span>{resolvedViewAllLabel}</span>
+              <IconArrowRight aria-hidden="true" />
             </Link>
           </div>
         ) : null}

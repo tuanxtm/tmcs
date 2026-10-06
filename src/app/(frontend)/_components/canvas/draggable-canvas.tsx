@@ -299,6 +299,7 @@ export function DraggableCanvas<T extends CanvasDoc>({
         node.style.setProperty('--rows-mobile', String(Math.ceil(items.length / 2)))
         node.style.setProperty('--rows-tablet', String(Math.ceil(items.length / 2)))
         node.style.setProperty('--rows-desktop', String(Math.ceil(items.length / 3)))
+        node.style.setProperty('--rows-wide', String(Math.ceil(items.length / 4)))
       }
 
       if (!previous || Math.abs(previous.canvas.width - geometry.canvas.width) < RESIZE_EPSILON_PX)
@@ -849,6 +850,7 @@ export function DraggableCanvas<T extends CanvasDoc>({
             '--rows-mobile': Math.ceil(items.length / 2),
             '--rows-tablet': Math.ceil(items.length / 2),
             '--rows-desktop': Math.ceil(items.length / 3),
+            '--rows-wide': Math.ceil(items.length / 4),
           } as CSSProperties
         }
       >

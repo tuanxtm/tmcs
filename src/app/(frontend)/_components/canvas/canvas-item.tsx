@@ -26,6 +26,8 @@ export function canvasItemStyle(
     '--row-tablet': Math.floor(index / 2),
     '--column-desktop': index % 3,
     '--row-desktop': Math.floor(index / 3),
+    '--column-wide': index % 4,
+    '--row-wide': Math.floor(index / 4),
     '--offset-x': OFFSET_X[index % OFFSET_X.length],
     '--offset-y': OFFSET_Y[index % OFFSET_Y.length],
     '--image-scale': IMAGE_SCALE[index % IMAGE_SCALE.length],
