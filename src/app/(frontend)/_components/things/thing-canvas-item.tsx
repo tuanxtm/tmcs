@@ -35,7 +35,7 @@ export function ThingCanvasItem(
   } = props
   const [open, setOpen] = useState(false)
   const detailRef = useRef<HTMLButtonElement | null>(null)
-  const buy = locale === 'vi' ? 'Mua' : 'Buy'
+  const buy = locale === 'vi' ? 'Mua ngay' : 'Buy now'
   const detail = locale === 'vi' ? 'Xem thêm' : 'Detail'
 
   function changeOpen(next: boolean) {
@@ -53,6 +53,17 @@ export function ThingCanvasItem(
       data-cursor-popup={cursorPopup || undefined}
       onFocusCapture={onItemFocusCapture}
     >
+      {thing.primaryUrl ? (
+        <a
+          href={thing.primaryUrl}
+          aria-label={thing.name}
+          title={thing.name}
+          draggable={false}
+          className={styles.thingPrimaryLink}
+          data-thing-drag-surface=""
+          onPointerDown={onImagePointerDown}
+        />
+      ) : null}
       <div className={styles.thingLabel} data-thing-label="">
         <CanvasHandle
           item={thing}
@@ -90,25 +101,13 @@ export function ThingCanvasItem(
           </button>
         </div>
       </div>
-      {thing.primaryUrl ? (
-        <a
-          href={thing.primaryUrl}
-          aria-label={thing.name}
-          className={styles.imageArea}
-          data-thing-drag-surface=""
-          onPointerDown={onImagePointerDown}
-        >
-          {image}
-        </a>
-      ) : (
-        <span
-          className={styles.imageArea}
-          data-thing-drag-surface=""
-          onPointerDown={onImagePointerDown}
-        >
-          {image}
-        </span>
-      )}
+      <span
+        className={styles.imageArea}
+        data-thing-drag-surface={thing.primaryUrl ? undefined : ''}
+        onPointerDown={thing.primaryUrl ? undefined : onImagePointerDown}
+      >
+        {image}
+      </span>
       <ThingDetail
         open={open}
         onOpenChangeAction={changeOpen}
