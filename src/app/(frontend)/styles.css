@@ -4,6 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --outer-line-weight: 1.5px;
+  --inner-line-weight: 1px;
   --background: oklch(0.9702 0 0);
   --secondary-background: oklch(0.9249 0 0);
   --inverted-background: oklch(0.3867 0 0);
@@ -101,58 +103,108 @@
   }
 }
 
-/* Scrollbar - outside @layer so Chromium picks up webkit rules.
-   Do NOT set scrollbar-width/color on Chromium: those force the native
-   (rounded + arrows) scrollbar and ignore ::-webkit-scrollbar. */
+/* Hide document scrollbars while retaining native and Lenis scrolling. */
 html {
-  /* Always reserve classic-scrollbar width so splash/Lenis lock
-     (overflow hidden/clip) doesn't shift the layout when unlocking. */
-  scrollbar-gutter: stable;
+  scrollbar-width: none;
+  scrollbar-gutter: auto;
 }
-
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-html::-webkit-scrollbar-button,
-body::-webkit-scrollbar-button,
-html::-webkit-scrollbar-button:start:decrement,
-html::-webkit-scrollbar-button:end:increment,
-body::-webkit-scrollbar-button:start:decrement,
-body::-webkit-scrollbar-button:end:increment {
   display: none;
   width: 0;
   height: 0;
 }
 
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track {
-  background: var(--background);
-  border-radius: 0;
+:root {
+  --site-frame-inset: 8px;
+  --site-header-height: 56px;
+  --site-cell-padding: 12px;
+  --site-rule-color: color-mix(in oklch, var(--accent) 50%, transparent);
+  --site-grid-line-color: color-mix(in oklch, var(--accent) 10%, transparent);
+  --site-action-tile-width: 10%;
+  --site-scales-height: 24px;
+  --site-nav-font-size: 0.875rem;
+  --site-frame-top: max(var(--site-frame-inset), env(safe-area-inset-top, 0px));
+  --site-frame-right: max(var(--site-frame-inset), env(safe-area-inset-right, 0px));
+  --site-frame-bottom: max(var(--site-frame-inset), env(safe-area-inset-bottom, 0px));
+  --site-frame-left: max(var(--site-frame-inset), env(safe-area-inset-left, 0px));
 }
-
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklch, var(--foreground) 20%, transparent);
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  min-height: 20px;
-}
-
-html::-webkit-scrollbar-corner,
-body::-webkit-scrollbar-corner {
-  background: var(--background);
-  border-radius: 0;
-}
-
-@supports (-moz-appearance: none) {
-  html {
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in oklch, var(--foreground) 20%, transparent) var(--background);
+@media (min-width: 1024px) {
+  :root {
+    --site-frame-inset: 10px;
+    --site-header-height: 72px;
+    --site-cell-padding: 16px;
+    --site-nav-font-size: 0.6875rem;
   }
+}
+@media (min-width: 1440px) {
+  :root {
+    --site-nav-font-size: 0.8125rem;
+  }
+}
+[data-cursor-cross-root],
+[data-cursor-popup-root] {
+  clip-path: inset(
+    calc(var(--site-frame-top) + var(--outer-line-weight))
+      calc(var(--site-frame-right) + var(--outer-line-weight))
+      calc(var(--site-frame-bottom) + var(--outer-line-weight))
+      calc(var(--site-frame-left) + var(--outer-line-weight))
+  );
+}
+[data-cursor-cross-root] > :first-child {
+  height: var(--inner-line-weight);
+}
+[data-cursor-cross-root] > :last-child {
+  width: var(--inner-line-weight);
+}
+[data-cursor-popup-bubble] {
+  border-width: var(--inner-line-weight);
+}
+.site-cell-hover {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: color 260ms ease;
+}
+.site-cell-hover::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: var(--accent);
+  content: '';
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 260ms ease;
+  pointer-events: none;
+}
+.site-cell-hover:is(:hover, :focus-visible, [data-expanded='true']):not(:disabled) {
+  color: var(--accent-foreground);
+}
+.site-cell-hover:is(:hover, :focus-visible, [data-expanded='true']):not(:disabled)::before {
+  transform: scaleY(1);
+}
+.site-shell {
+  overflow-x: clip;
+  padding: var(--site-frame-top) var(--site-frame-right) var(--site-frame-bottom)
+    var(--site-frame-left);
+}
+.site-frame {
+  position: fixed;
+  z-index: 60;
+  top: var(--site-frame-top);
+  right: var(--site-frame-right);
+  bottom: var(--site-frame-bottom);
+  left: var(--site-frame-left);
+  box-shadow:
+    inset 0 0 0 var(--outer-line-weight) var(--site-rule-color),
+    0 0 0 100vmax var(--background);
+  pointer-events: none;
+}
+.page-blocks > header + #hero {
+  margin-top: calc(-1 * var(--section-gap-y));
+}
+.page-blocks > :not(header) {
+  box-shadow: inset 0 calc(-1 * var(--outer-line-weight)) var(--site-rule-color);
 }
 
 @layer utilities {
@@ -183,8 +235,7 @@ body::-webkit-scrollbar-corner {
     overflow: hidden;
   }
 
-  /* Lenis uses overflow:clip when stopped, which can drop the gutter.
-   Match splash lock so scrollbar-gutter: stable keeps width stable. */
+  /* Keep the existing splash and Lenis document locks consistent. */
   html.lenis:not(.lenis-autoToggle).lenis-stopped {
     overflow: hidden;
   }

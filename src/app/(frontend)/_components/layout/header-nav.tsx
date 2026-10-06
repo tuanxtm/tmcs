@@ -1,334 +1,209 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useLenis } from 'lenis/react'
-import { IconChevronLeft, IconMenu2, IconX } from '@tabler/icons-react'
-import { Button } from '@/components/ui/button'
-import { Logo } from '@/components/icons/logo'
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer'
+import { IconArrowRight, IconMenu2, IconMinus } from '@tabler/icons-react'
 import { externalLinkProps } from '@/app/(frontend)/_lib/link-props'
-import { homeHref, switchLocalePath } from '@/app/(frontend)/_lib/locale'
-import { LOCALES, type LocaleCode } from '@/lib/locales'
-import type { NavChildView, NavItemView } from '@/app/(frontend)/_lib/types'
+import { switchLocalePath } from '@/app/(frontend)/_lib/locale'
+import type { NavItemView } from '@/app/(frontend)/_lib/types'
+import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
+import styles from './site-header.module.css'
 
-type HeaderNavProps = {
-  items: NavItemView[]
-  siteName: string
-  locale: LocaleCode
-  className?: string
-}
+type HeaderNavProps = { items: NavItemView[]; locale: LocaleCode; className?: string }
 
-export function HeaderNav({ items, siteName, locale, className }: HeaderNavProps) {
-  const [open, setOpen] = useState(false)
+export function HeaderNav({ items, locale, className }: HeaderNavProps) {
   const pathname = usePathname()
-  const lenis = useLenis()
-  const pausedLenisRef = useRef(false)
+  const routeKey = `${locale}:${pathname}`
+  const [state, setState] = useState({ routeKey, open: false, submenu: null as string | null })
+  if (state.routeKey !== routeKey) {
+    setState({ routeKey, open: false, submenu: null })
+  }
+  const open = state.routeKey === routeKey && state.open
+  const submenu = state.routeKey === routeKey ? state.submenu : null
+  const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const submenuTriggers = useRef(new Map<string, HTMLAnchorElement>())
+  const panelId = useId()
+  const isVi = locale === 'vi'
+  const close = () => setState({ routeKey, open: false, submenu: null })
 
-  // Pause Lenis while the mobile drawer is open. Drawer locks <body>, but Lenis
-  // still owns the wheel via its own RAF loop and would otherwise scroll the
-  // page underneath the drawer.
   useEffect(() => {
-    if (!lenis) return
-    if (open && !pausedLenisRef.current) {
-      lenis.stop()
-      pausedLenisRef.current = true
-    } else if (!open && pausedLenisRef.current) {
-      lenis.start()
-      pausedLenisRef.current = false
-    }
-  }, [lenis, open])
+    const media = window.matchMedia('(min-width: 1024px)')
+    const reset = () => setState({ routeKey, open: false, submenu: null })
+    media.addEventListener('change', reset)
+    return () => media.removeEventListener('change', reset)
+  }, [routeKey])
 
-  // Safety net: if the nav unmounts while open, restore Lenis.
   useEffect(() => {
-    return () => {
-      if (pausedLenisRef.current) {
-        lenis?.start()
-        pausedLenisRef.current = false
+    if (!open && !submenu) return
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && !rootRef.current?.contains(event.target)) {
+        setState({ routeKey, open: false, submenu: null })
       }
     }
-  }, [lenis])
-
-  const localeSwitcherTarget = switchLocalePath(pathname ?? '/', locale === 'vi' ? 'en' : 'vi')
-  const closeOuter = () => setOpen(false)
-
-  return (
-    <div className={cn('flex shrink-0 items-center md:hidden', className)}>
-      <Drawer swipeDirection="down" open={open} onOpenChange={setOpen}>
-        <DrawerTrigger
-          render={(triggerProps) => (
-            <Button
-              {...triggerProps}
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Open menu"
-              className={cn(
-                'text-primary rounded-none border-none',
-                'hover:bg-transparent hover:text-primary/80',
-              )}
-            >
-              <IconMenu2 aria-hidden="true" className="size-4" />
-            </Button>
-          )}
-        />
-        <DrawerContent className={cn('bg-background text-foreground', 'mx-auto w-full items-center rounded-none py-5')}>
-          <DrawerTitle className="sr-only">Site navigation</DrawerTitle>
-          <DrawerDescription className="sr-only">Primary site navigation menu</DrawerDescription>
-          <DrawerChrome
-            onClose={closeOuter}
-            siteName={siteName}
-            locale={locale}
-            closeIcon={<IconX className="size-5" />}
-            closeLabel="Close menu"
-          />
-          {items.length > 0 ? (
-            <NavList
-              items={items}
-              direction="column"
-              onNavigate={closeOuter}
-              locale={locale}
-              className="items-center"
-            />
-          ) : null}
-          <LocaleSwitcher
-            currentLocale={locale}
-            targetPath={localeSwitcherTarget}
-            onNavigate={closeOuter}
-          />
-        </DrawerContent>
-      </Drawer>
-    </div>
-  )
-}
-
-type DrawerChromeProps = {
-  onClose: () => void
-  siteName: string
-  locale: LocaleCode
-  /**
-   * Icon shown on the close/back button. Use `IconX` for the outermost drawer
-   * and `IconChevronLeft` for nested drawers so the affordance matches the
-   * stack level.
-   */
-  closeIcon: React.ReactNode
-  /** Accessible label for the close/back button. */
-  closeLabel: string
-}
-
-function DrawerChrome({ onClose, siteName, locale, closeIcon, closeLabel }: DrawerChromeProps) {
-  return (
-    <div className={cn('-mt-1 mb-5 flex flex-col items-center', 'gap-3.5')}>
-      <DrawerClose
-        render={(closeProps) => (
-          <Button
-            {...closeProps}
-            type="button"
-            variant="ghost"
-            aria-label={closeLabel}
-            className={cn(
-              'text-foreground m-0 cursor-pointer rounded-none border-0 border-none p-0',
-              'hover:bg-transparent',
-            )}
-          >
-            <span aria-hidden="true" className="text-primary flex items-center">
-              {closeIcon}
-            </span>
-          </Button>
-        )}
-      />
-      <Link
-        href={homeHref(locale)}
-        aria-label={siteName}
-        className="text-primary inline-flex items-center"
-        onClick={onClose}
-      >
-        <Logo size={20} aria-label={siteName} />
-      </Link>
-    </div>
-  )
-}
-
-type NavListProps = {
-  items: NavItemView[]
-  direction: 'row' | 'column'
-  onNavigate: () => void
-  locale: LocaleCode
-  className?: string
-}
-
-function NavList({ items, direction, onNavigate, locale, className }: NavListProps) {
-  return (
-    <nav aria-label="Primary">
-      <ul
-        className={cn(
-          'flex items-center',
-          direction === 'row'
-            ? 'flex-row flex-wrap justify-end gap-x-4 gap-y-5'
-            : 'flex-col items-start gap-5',
-          className,
-        )}
-      >
-        {items.map((item, itemIndex) => (
-          <NavItemRow
-            key={`${itemIndex}-${item.id}`}
-            item={item}
-            direction={direction}
-            onNavigate={onNavigate}
-            locale={locale}
-          />
-        ))}
-      </ul>
-    </nav>
-  )
-}
-
-type NavItemRowProps = {
-  item: NavItemView
-  direction: 'row' | 'column'
-  onNavigate: () => void
-  locale: LocaleCode
-}
-
-function NavItemRow({ item, direction, onNavigate, locale }: NavItemRowProps) {
-  const [nestedOpen, setNestedOpen] = useState(false)
-  const hasChildren = item.children.length > 0
-
-  const labelClassName =
-    'text-foreground hover:text-primary inline-flex items-center text-xl leading-none font-medium tracking-tight lowercase transition-colors'
-
-  const rowClassName = cn(
-    'flex',
-    direction === 'row' ? 'items-center gap-1' : 'flex-col items-start gap-1',
-  )
-
-  if (!hasChildren) {
-    return (
-      <li className={rowClassName}>
-        <Link
-          href={item.href}
-          {...externalLinkProps(item)}
-          onClick={onNavigate}
-          {...(item.newTab || item.external
-            ? {}
-            : { transitionTypes: ['nav-forward'] as string[] })}
-          className={labelClassName}
-        >
-          {item.label}
-        </Link>
-      </li>
-    )
-  }
-
-  const closeNestedAndOuter = () => {
-    setNestedOpen(false)
-    onNavigate()
-  }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      if (submenu) {
+        setState({ routeKey, open, submenu: null })
+        submenuTriggers.current.get(submenu)?.focus()
+      } else {
+        setState({ routeKey, open: false, submenu: null })
+        triggerRef.current?.focus()
+      }
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open, submenu, routeKey])
 
   return (
-    <li className={rowClassName}>
-      <Drawer swipeDirection="down" open={nestedOpen} onOpenChange={setNestedOpen}>
-        <DrawerTrigger
-          render={(triggerProps) => (
-            <Button
-              {...triggerProps}
-              type="button"
-              variant="ghost"
-              aria-label={`Open ${item.label} submenu`}
-              className={cn(
-                labelClassName,
-                'm-0 cursor-pointer rounded-none border-0 border-none p-0 hover:bg-transparent',
-              )}
-            >
-              <span>{item.label}</span>
-            </Button>
-          )}
-        />
-        <DrawerContent className={cn('bg-background text-foreground', 'mx-auto w-full items-center rounded-none py-5')}>
-          <DrawerTitle className="sr-only">{item.label} submenu</DrawerTitle>
-          <DrawerDescription className="sr-only">
-            Items belonging to {item.label}.
-          </DrawerDescription>
-          <DrawerChrome
-            onClose={closeNestedAndOuter}
-            siteName={item.label}
-            locale={locale}
-            closeIcon={<IconChevronLeft className="size-5" />}
-            closeLabel={`Back from ${item.label} submenu`}
-          />
-          <ul className="flex flex-col items-center gap-5">
-            {item.children.map((child, childIndex) => (
-              <NavChildLink
-                key={`${item.id}-${childIndex}-${child.id}`}
-                child={child}
-                onNavigate={closeNestedAndOuter}
-              />
-            ))}
-          </ul>
-        </DrawerContent>
-      </Drawer>
-    </li>
-  )
-}
-
-type NavChildLinkProps = {
-  child: NavChildView
-  onNavigate: () => void
-}
-
-function NavChildLink({ child, onNavigate }: NavChildLinkProps) {
-  return (
-    <li>
-      <Link
-        href={child.href}
-        {...externalLinkProps(child)}
-        onClick={onNavigate}
-        {...(child.newTab || child.external
-          ? {}
-          : { transitionTypes: ['nav-forward'] as string[] })}
-        className={cn(
-          'text-foreground hover:text-primary inline-flex items-center text-xl',
-          'leading-none font-medium tracking-tight lowercase',
-          'transition-colors',
-        )}
-      >
-        {child.label}
-      </Link>
-    </li>
-  )
-}
-
-type LocaleSwitcherProps = {
-  currentLocale: LocaleCode
-  targetPath: string
-  onNavigate: () => void
-}
-
-function LocaleSwitcher({ currentLocale, targetPath, onNavigate }: LocaleSwitcherProps) {
-  const targetLocale = LOCALES.find((l) => l.code !== currentLocale)
-  if (!targetLocale) return null
-
-  return (
-    <Link
-      href={targetPath}
-      onClick={onNavigate}
-      aria-label={`Switch language to ${targetLocale.label}`}
-      className={cn(
-        'text-foreground hover:text-primary',
-        'mx-auto mt-5 items-center justify-center',
-        'transition-colors',
-      )}
+    <div
+      ref={rootRef}
+      className={cn(styles.navigation, className)}
+      style={{ '--site-nav-cell-count': items.length + 1 } as CSSProperties}
+      data-open={open}
     >
-      <span className="text-xl leading-none font-medium tracking-tight lowercase">en/vi</span>
-    </Link>
+      <button
+        ref={triggerRef}
+        type="button"
+        className={cn(styles.menuTrigger, 'site-cell-hover')}
+        aria-label={isVi ? (open ? 'Đóng menu' : 'Mở menu') : open ? 'Close menu' : 'Open menu'}
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setState({ routeKey, open: !open, submenu: null })}
+      >
+        {open ? <IconMinus aria-hidden="true" /> : <IconMenu2 aria-hidden="true" />}
+      </button>
+      <nav
+        id={panelId}
+        className={styles.panel}
+        aria-label={isVi ? 'Điều hướng chính' : 'Primary'}
+        data-lenis-prevent
+      >
+        <ul className={styles.navList}>
+          <li className={styles.localeCell}>
+            <Link
+              href={switchLocalePath(pathname ?? '/', isVi ? 'en' : 'vi')}
+              aria-label={isVi ? 'Switch language to English' : 'Switch language to Vietnamese'}
+              className={cn(styles.navLink, 'site-cell-hover')}
+              onClick={close}
+            >
+              EN/VI
+            </Link>
+          </li>
+          {items.map((item, index) => {
+            const expanded = submenu === item.id
+            const childId = `${panelId}-${index}`
+            const final = index === items.length - 1
+            const hasChildren = item.children.length > 0
+            return (
+              <li
+                key={item.id}
+                className={styles.navItem}
+                data-final={final}
+                onPointerEnter={(event) => {
+                  if (
+                    hasChildren &&
+                    event.pointerType === 'mouse' &&
+                    window.matchMedia('(min-width: 1024px)').matches
+                  ) {
+                    setState({ routeKey, open, submenu: item.id })
+                  }
+                }}
+                onPointerLeave={(event) => {
+                  if (
+                    window.matchMedia('(min-width: 1024px)').matches &&
+                    !event.currentTarget.contains(document.activeElement)
+                  ) {
+                    setState((current) =>
+                      current.submenu === item.id ? { ...current, submenu: null } : current,
+                    )
+                  }
+                }}
+                onBlur={(event) => {
+                  if (
+                    window.matchMedia('(min-width: 1024px)').matches &&
+                    !event.currentTarget.contains(event.relatedTarget)
+                  ) {
+                    setState((current) =>
+                      current.submenu === item.id ? { ...current, submenu: null } : current,
+                    )
+                  }
+                }}
+              >
+                <div className={styles.navRow}>
+                  <Link
+                    ref={(element) => {
+                      if (hasChildren && element) submenuTriggers.current.set(item.id, element)
+                      else submenuTriggers.current.delete(item.id)
+                    }}
+                    href={item.href}
+                    {...externalLinkProps(item)}
+                    {...(item.external || item.newTab ? {} : { transitionTypes: ['nav-forward'] })}
+                    className={cn(styles.navLink, 'site-cell-hover')}
+                    aria-expanded={hasChildren ? expanded : undefined}
+                    aria-controls={hasChildren ? childId : undefined}
+                    data-expanded={expanded}
+                    onClick={(event) => {
+                      if (
+                        hasChildren &&
+                        !window.matchMedia('(min-width: 1024px)').matches &&
+                        !event.metaKey &&
+                        !event.ctrlKey &&
+                        !event.shiftKey &&
+                        !event.altKey
+                      ) {
+                        event.preventDefault()
+                        setState({ routeKey, open, submenu: expanded ? null : item.id })
+                      } else close()
+                    }}
+                    onKeyDown={(event) => {
+                      if (!hasChildren || (event.key !== 'ArrowDown' && event.key !== ' ')) return
+                      event.preventDefault()
+                      setState({ routeKey, open, submenu: item.id })
+                      requestAnimationFrame(() => {
+                        document.getElementById(childId)?.querySelector('a')?.focus()
+                      })
+                    }}
+                  >
+                    {item.label}
+                    {hasChildren ? (
+                      <span className={styles.corner} aria-hidden="true" />
+                    ) : final ? (
+                      <IconArrowRight className={styles.arrow} aria-hidden="true" />
+                    ) : null}
+                  </Link>
+                </div>
+                {hasChildren ? (
+                  <ul id={childId} className={styles.submenu} hidden={!expanded}>
+                    {item.children.map((child) => (
+                      <li key={child.id}>
+                        <Link
+                          href={child.href}
+                          {...externalLinkProps(child)}
+                          {...(child.external || child.newTab
+                            ? {}
+                            : { transitionTypes: ['nav-forward'] })}
+                          className={cn(styles.childLink, 'site-cell-hover')}
+                          onClick={close}
+                        >
+                          {child.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+    </div>
   )
 }

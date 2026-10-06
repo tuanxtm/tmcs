@@ -33,24 +33,28 @@ const LENIS_OPTIONS: LenisOptions = {
  * `ssr: false` keeps the URL-data hook out of the prerender pass while
  * still mounting it as soon as React hydrates on the client.
  */
-const LenisRouteSync = dynamic(
-  () => import('./lenis-route-sync').then((m) => m.LenisRouteSync),
-  { ssr: false },
-)
+const LenisRouteSync = dynamic(() => import('./lenis-route-sync').then((m) => m.LenisRouteSync), {
+  ssr: false,
+})
 
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const reduceMotion = useReducedMotion()
 
-  if (reduceMotion) {
-    return children
-  }
-
-  return (
-    <ReactLenis root options={LENIS_OPTIONS}>
+  // Preserve the server-rendered boundaries when native scrolling is preferred.
+  const content = (
+    <>
       <Suspense fallback={null}>
         <LenisRouteSync />
       </Suspense>
       {children}
+    </>
+  )
+
+  return reduceMotion ? (
+    content
+  ) : (
+    <ReactLenis root options={LENIS_OPTIONS}>
+      {content}
     </ReactLenis>
   )
 }
