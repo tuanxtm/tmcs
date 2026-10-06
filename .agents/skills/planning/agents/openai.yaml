@@ -1,0 +1,4 @@
+interface:
+  display_name: "Planning"
+  short_description: "Create detailed plans with scoped tasks and validation"
+  default_prompt: "Use $planning to create a detailed implementation plan and save it in the repository plans folder."
