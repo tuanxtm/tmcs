@@ -50,7 +50,7 @@ test('heading, grid lines, and image-left name-right composition', async ({ page
     await page.setViewportSize({ width, height: 900 })
     const item = page.locator('[data-project-item]').first()
     const image = item.locator('[data-project-image]').first()
-    const title = item.locator('a[title], span[title]').last()
+    const title = item.locator('a[data-project-title], span[data-project-title]').last()
     const imageBox = await image.boundingBox()
     const titleBox = await title.boundingBox()
     expect(imageBox).not.toBeNull()
@@ -88,7 +88,7 @@ test('compact controls, bottom-aligned labels, and complete transparent grid', a
   const handle = item.locator('[data-project-drag-handle]')
   await expect(handle).toHaveCSS('clip-path', 'inset(50%)')
   const image = (await item.locator('[data-project-image]').boundingBox())!
-  const title = (await item.locator('a[title]').boundingBox())!
+  const title = (await item.locator('a[data-project-title]').boundingBox())!
   expect(title.y + title.height).toBeCloseTo(image.y + image.height, 0)
 
   const description = page.getByText('Drag any project to rearrange the workshop wall.')
@@ -227,7 +227,7 @@ test('mouse drag moves a project and a normal click still navigates', async ({ p
   expect(Math.abs(after!.y - before!.y)).toBeGreaterThan(20)
 
   // A plain click on the title still navigates.
-  const title = item.locator('a[title]').first()
+  const title = item.locator('a[data-project-title]').first()
   await title.click()
   await page.waitForURL(/fixture-project-/)
 })
