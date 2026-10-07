@@ -1,0 +1,357 @@
+/* Cover the shared frame only within this drawer's surface. */
+:global([data-slot='drawer-viewport']):has(.popup) {
+  z-index: 70;
+}
+
+.popup {
+  /* Override the primitive defaults regardless of CSS chunk order. */
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: var(--drawer-height, 70dvh) !important;
+  max-height: var(--drawer-content-max-height, 70dvh) !important;
+  --drawer-height: 70dvh;
+  --drawer-content-max-height: 70dvh;
+  background: var(--background, #fbfbfb) !important;
+  color: var(--secondary) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: var(--site-frame-top, 8px) var(--site-frame-right, 8px) var(--site-frame-bottom, 8px)
+    var(--site-frame-left, 8px) !important;
+  transition-duration: 520ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.popup[data-ending-style] {
+  transition-duration: calc(var(--drawer-swipe-strength, 1) * 400ms) !important;
+}
+
+.popup[data-swiping],
+.popup[data-swipe-axis='y'][data-swiping] {
+  transition-duration: 0ms !important;
+}
+
+.frame {
+  position: relative;
+  display: grid;
+  box-sizing: border-box;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border: var(--outer-line-weight, 1.5px) solid var(--site-rule-color, var(--accent));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 1024px) {
+  .frame {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+
+/* Image half. */
+.image {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  border-bottom: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
+  touch-action: none;
+}
+
+@media (min-width: 1024px) {
+  .image {
+    border-bottom: 0;
+    border-right: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
+  }
+}
+
+/* Background grid behind the product image. Mirrors the canvas recipe. */
+.imageGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-color: transparent;
+  background-image:
+    linear-gradient(
+      to right,
+      var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))
+        var(--inner-line-weight, 1px),
+      transparent var(--inner-line-weight, 1px)
+    ),
+    linear-gradient(
+      to bottom,
+      var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))
+        var(--inner-line-weight, 1px),
+      transparent var(--inner-line-weight, 1px)
+    );
+  background-size: 24px 24px;
+  background-repeat: round;
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .imageGrid {
+    background-size: 30px 30px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .imageGrid {
+    background-size: 42px 42px;
+  }
+}
+
+/* Focusable inspection region. */
+.region {
+  position: absolute;
+  inset: 0;
+  outline: none;
+  touch-action: none;
+}
+
+.region:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.region[data-failed='true'] {
+  touch-action: manipulation;
+}
+
+.layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+  touch-action: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.layer > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.anchorLink {
+  display: block;
+  position: absolute;
+  inset: 0;
+  outline-offset: -3px;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--site-cell-padding, 12px);
+  color: var(--secondary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Help text for screen readers. */
+.help {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Account for the 12px around each icon inside its 44px button. */
+.controls {
+  position: absolute;
+  top: calc(var(--site-cell-padding, 12px) - 12px);
+  right: calc(var(--site-cell-padding, 12px) - 12px);
+  z-index: 5;
+  display: flex;
+  gap: 4px;
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--secondary);
+  background: var(--background);
+  border: 0;
+  cursor: pointer;
+}
+
+.control svg {
+  width: 20px;
+  height: 20px;
+}
+
+.control:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+
+/* Content half. */
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.scroller {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--site-cell-padding, 12px);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--site-cell-padding, 12px);
+  margin-block: auto;
+  flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+  .scroller {
+    padding-top: calc(var(--site-cell-padding, 16px));
+  }
+}
+
+.title {
+  margin: 0;
+  color: var(--secondary);
+  font-family: var(--font-serif);
+  font-size: clamp(2.25rem, 4vw, 4rem);
+  font-weight: 300;
+  line-height: 1.05;
+  text-align: left;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  margin: 0;
+  color: var(--secondary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: left;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* Link cells - contiguous square cells. */
+.links {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  flex: 0 0 auto;
+  max-height: 60%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-top: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.links > li {
+  min-width: 0;
+}
+
+.links > li + li {
+  border-top: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
+}
+
+@media (min-width: 1024px) {
+  .links {
+    grid-auto-columns: minmax(0, 1fr);
+    grid-template-columns: none;
+    grid-auto-flow: column;
+  }
+
+  .links > li + li {
+    border-top: 0;
+    border-left: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
+  }
+}
+
+.link {
+  box-sizing: border-box;
+  height: 100%;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-start;
+  min-height: var(--site-header-height, 56px);
+  padding: var(--site-cell-padding, 12px) calc(var(--site-cell-padding, 12px) + 22px)
+    calc(var(--site-cell-padding, 12px) + 22px) var(--site-cell-padding, 12px);
+  color: var(--accent);
+  background: var(--background);
+  border: 0;
+  font-family: var(--font-mono);
+  font-size: var(--site-nav-font-size, 0.875rem);
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 260ms ease;
+  overflow-wrap: anywhere;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+
+@media (min-width: 1024px) {
+  .link {
+    min-height: var(--site-header-height, 72px);
+  }
+}
+
+.arrow {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  width: 22px;
+  height: 22px;
+  color: inherit;
+}
+
+/* Reduced motion - collapse every transition to a snap. */
+@media (prefers-reduced-motion: reduce) {
+  .popup,
+  .popup[data-ending-style] {
+    transition-duration: 0ms !important;
+  }
+  .link,
+  .link::before {
+    transition: none !important;
+  }
+}

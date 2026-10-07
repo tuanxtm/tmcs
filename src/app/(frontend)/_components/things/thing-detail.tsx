@@ -1,15 +1,9 @@
 'use client'
 
-import { useEffect, useRef, type ComponentType, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import { useLenis } from 'lenis/react'
-import {
-  IconBrandAmazon,
-  IconBrandShopee,
-  IconShoppingBag,
-  IconShoppingBagCheck,
-  IconX,
-} from '@tabler/icons-react'
-import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
+import { motion, useReducedMotion } from 'motion/react'
+import { IconArrowRight, IconX } from '@tabler/icons-react'
 import {
   Drawer,
   DrawerClose,
@@ -20,39 +14,23 @@ import {
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
+import { ThingImageViewer } from './thing-image-viewer'
+import styles from './thing-detail.module.css'
 
 const COPY = {
-  en: { close: 'Close', thing: 'Thing detail' },
-  vi: { close: 'Đóng', thing: 'Chi tiết' },
+  en: {
+    close: 'Close',
+    closeCursor: 'CLOSE',
+    description: 'Product description',
+  },
+  vi: {
+    close: 'Đóng',
+    closeCursor: 'ĐÓNG',
+    description: 'Mô tả sản phẩm',
+  },
 } as const
 
-type TablerIcon = ComponentType<{
-  className?: string
-  size?: string | number
-  stroke?: string | number
-}>
-
-// Map a platform link URL to its marketplace icon. Hosts are matched
-// case-insensitively; a missing/invalid URL falls back to the generic bag.
-function getPlatformIcon(url: string): TablerIcon {
-  try {
-    const host = new URL(url).hostname.toLowerCase().replace(/^www\./, '')
-    if (host.includes('amazon')) return IconBrandAmazon
-    if (host.includes('shopee')) return IconBrandShopee
-    if (host.includes('aliexpress')) return IconShoppingBagCheck
-  } catch {
-    // not a parseable absolute URL - fall through to default
-  }
-  return IconShoppingBag
-}
-
-/**
- * Bottom-sheet detail view for a Thing card. Mirrors the navigation drawer's
- * chrome (rounded-none, full-width, centered) so both overlays feel like part
- * of the same surface. The sheet is 80dvh tall on mobile (sm and below) and
- * 60dvh on md+, leaving enough of the underlying page visible to stay
- * contextual.
- */
+// Framed detail sheet with equal image and content halves.
 export function ThingDetail({
   open,
   onOpenChangeAction,
@@ -69,7 +47,8 @@ export function ThingDetail({
   const copy = COPY[locale]
   const image = thing.primaryImage
   const lenis = useLenis()
-  // Track whether we've paused Lenis so we only resume on the open→closed
+  const reducedMotion = useReducedMotion()
+  // Track whether we've paused Lenis so we only resume on the open->closed
   // transition, not on lenis-init or identity changes.
   const pausedRef = useRef(false)
 
@@ -98,93 +77,76 @@ export function ThingDetail({
     }
   }, [lenis])
 
+  const frameMotion = reducedMotion
+    ? { initial: { opacity: 1 }, animate: { opacity: 1 } }
+    : {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        transition: { duration: 0.36, delay: 0.06, ease: [0.22, 1, 0.36, 1] as const },
+      }
+  const textMotion = reducedMotion
+    ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 } }
+    : {
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.36, delay: 0.12, ease: [0.22, 1, 0.36, 1] as const },
+      }
+
   return (
     <Drawer swipeDirection="down" open={open} onOpenChange={onOpenChangeAction}>
-      <DrawerContent
-        finalFocus={returnFocus}
-        className={cn(
-          'bg-background text-foreground mx-auto flex w-full flex-col overflow-hidden',
-          'rounded-none border-none p-0',
-          '[--drawer-height:80dvh] md:[--drawer-height:60dvh]',
-        )}
-      >
-        <DrawerTitle className="sr-only">{copy.thing}</DrawerTitle>
-        <DrawerDescription className="sr-only">{thing.name}</DrawerDescription>
+      <DrawerContent finalFocus={returnFocus} className={cn(styles.popup)}>
+        {!thing.description ? (
+          <DrawerDescription className="sr-only">{copy.description}</DrawerDescription>
+        ) : null}
 
-        {/* Close: use render to produce a bare <button> — DrawerClose renders a
-            button, so wrapping it in <Button> (which also renders a button) would
-            create nested buttons. */}
-        <DrawerClose
-          render={(closeProps) => (
-            <button
-              {...closeProps}
-              type="button"
+        <motion.div {...frameMotion} className={styles.frame} data-thing-detail-frame="">
+          <ThingImageViewer
+            key={`${thing.id}:${image?.id ?? 'none'}:${image?.url ?? 'none'}`}
+            image={image}
+            primaryUrl={thing.primaryUrl}
+            name={thing.name}
+            locale={locale}
+            active={open}
+          >
+            <DrawerClose
+              className={styles.control}
               aria-label={copy.close}
-              className={cn(
-                'text-primary hover:text-primary/80 absolute top-3 right-3 z-10',
-                'cursor-pointer rounded-none border-0 bg-transparent p-0',
-                'hover:bg-transparent',
-              )}
+              data-cursor-popup={copy.closeCursor}
             >
-              <IconX aria-hidden="true" className="size-5" />
-            </button>
-          )}
-        />
+              <IconX aria-hidden="true" />
+            </DrawerClose>
+          </ThingImageViewer>
 
-        <div className="grid min-h-0 flex-1 grid-rows-[1fr_auto] overflow-y-auto md:grid-cols-2 md:grid-rows-1">
-          {image ? (
-            <div className="relative min-h-0 w-full overflow-hidden md:aspect-auto">
-              <CmsImage
-                media={image}
-                fill
-                sizes="(min-width: 768px) 50vw, 100vw"
-                className="bg-transparent!"
-                imgClassName="object-contain"
-              />
-            </div>
-          ) : null}
-
-          {/* Content cell: name, description, and platform links. */}
-          <div className="flex flex-col gap-4 p-4 md:justify-center md:p-5">
-            <h2 className="text-foreground text-lg leading-none font-medium tracking-tight lowercase">
-              {thing.name}
-            </h2>
-
-            {thing.description ? <p className="text-primary text-sm">{thing.description}</p> : null}
-
+          <div className={styles.content} data-thing-detail-content="">
+            <motion.div {...textMotion} className={styles.scroller} data-lenis-prevent>
+              <div className={styles.copy}>
+                <DrawerTitle className={styles.title}>{thing.name}</DrawerTitle>
+                {thing.description ? (
+                  <DrawerDescription className={styles.description}>
+                    {thing.description}
+                  </DrawerDescription>
+                ) : null}
+              </div>
+            </motion.div>
             {thing.links.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {thing.links.map((link, i) => {
-                  const PlatformIcon = getPlatformIcon(link.url)
-                  return (
+              <ul className={styles.links} data-thing-detail-links="">
+                {thing.links.map((link, i) => (
+                  <li key={i}>
                     <a
-                      key={i}
                       href={link.url}
                       target="_blank"
                       rel="sponsored noopener noreferrer"
-                      className={cn(
-                        'focus-visible:border-ring focus-visible:ring-ring/30',
-                        'aria-invalid:border-destructive aria-invalid:ring-destructive/20',
-                        'dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40',
-                        'border-border bg-background text-foreground hover:bg-muted',
-                        'inline-flex w-full shrink-0 touch-manipulation items-center justify-center rounded-none border bg-clip-padding',
-                        'text-xs/relaxed font-medium whitespace-nowrap',
-                        'transition-all outline-none select-none',
-                        'focus-visible:ring-2 active:translate-y-px',
-                        'disabled:pointer-events-none disabled:opacity-50',
-                        'aria-invalid:ring-2',
-                        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-                      )}
+                      className={cn(styles.link, 'site-cell-hover')}
                     >
-                      <PlatformIcon aria-hidden="true" className="size-4" />
                       {link.label}
+                      <IconArrowRight className={styles.arrow} aria-hidden="true" />
                     </a>
-                  )
-                })}
-              </div>
+                  </li>
+                ))}
+              </ul>
             ) : null}
           </div>
-        </div>
+        </motion.div>
       </DrawerContent>
     </Drawer>
   )
