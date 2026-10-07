@@ -11,6 +11,8 @@ alwaysApply: true
 
 3. IMPORTANT: ENGLISH ONLY!
 
+4. Testing: Always use subagent with low cost like gpt-6-luna or sonnet for testing with Playwright, etc.
+
 ## Codegraph (local CLI only)
 
 A dedicated rule lives at `.cursor/rules/codegraph.mdc` (`alwaysApply: true`). It is the single source of truth for how Cursor must use codegraph in this project. Summary:
