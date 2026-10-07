@@ -10,6 +10,7 @@ type FixtureOptions = {
   font?: 'serif' | 'sans' | 'mono'
   multiple?: boolean
   edgeImages?: boolean
+  fitToContainer?: boolean
 }
 
 const imageURL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
@@ -134,8 +135,15 @@ window.renderRichTextFixture = (options = {}) => {
   flushSync(() =>
     root.render(
       <>
-        <div id="uniform">
-          <CmsRichText data={data} lineSpacing="uniform" />
+        <div
+          id="uniform"
+          style={
+            options.fitToContainer
+              ? { width: '60vw', height: 300, padding: 16, boxSizing: 'border-box' }
+              : undefined
+          }
+        >
+          <CmsRichText data={data} lineSpacing="uniform" fitToContainer={options.fitToContainer} />
         </div>
         <div id="natural">
           <CmsRichText data={data} />

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { BlankSpaceBlock } from '@/app/(frontend)/_components/blocks/blank-space'
 import { ContentMediaBlock } from '@/app/(frontend)/_components/blocks/content-media'
 import { DetailPostBlock } from '@/app/(frontend)/_components/blocks/detail-post'
@@ -78,7 +79,10 @@ export function PageBlocks({
   if (blocks.length === 0) return null
 
   return (
-    <div className={cn('page-blocks flex flex-col gap-y-(--section-gap-y)', className)}>
+    <div
+      className={cn('page-blocks flex flex-col gap-y-(--section-gap-y)', className)}
+      style={{ '--site-nav-cell-count': (navigation?.length ?? 0) + 1 } as CSSProperties}
+    >
       <SiteHeader siteName={siteName} locale={locale} navigation={navigation ?? []} />
       {blocks.map((block, index) => {
         switch (block.blockType) {

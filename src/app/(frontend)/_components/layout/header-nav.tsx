@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { IconArrowRight, IconMenu2, IconMinus } from '@tabler/icons-react'
@@ -25,27 +25,43 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const submenuTriggers = useRef(new Map<string, HTMLAnchorElement>())
+  const submenuCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const panelId = useId()
   const isVi = locale === 'vi'
-  const close = () => setState({ routeKey, open: false, submenu: null })
+  const cancelSubmenuClose = useCallback(() => {
+    if (submenuCloseTimer.current) clearTimeout(submenuCloseTimer.current)
+    submenuCloseTimer.current = null
+  }, [])
+  const close = () => {
+    cancelSubmenuClose()
+    setState({ routeKey, open: false, submenu: null })
+  }
 
   useEffect(() => {
     const media = window.matchMedia('(min-width: 1024px)')
-    const reset = () => setState({ routeKey, open: false, submenu: null })
+    const reset = () => {
+      cancelSubmenuClose()
+      setState({ routeKey, open: false, submenu: null })
+    }
     media.addEventListener('change', reset)
-    return () => media.removeEventListener('change', reset)
-  }, [routeKey])
+    return () => {
+      cancelSubmenuClose()
+      media.removeEventListener('change', reset)
+    }
+  }, [cancelSubmenuClose, routeKey])
 
   useEffect(() => {
     if (!open && !submenu) return
     const onPointerDown = (event: PointerEvent) => {
       if (event.target instanceof Node && !rootRef.current?.contains(event.target)) {
+        cancelSubmenuClose()
         setState({ routeKey, open: false, submenu: null })
       }
     }
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
       event.preventDefault()
+      cancelSubmenuClose()
       if (submenu) {
         setState({ routeKey, open, submenu: null })
         submenuTriggers.current.get(submenu)?.focus()
@@ -60,7 +76,7 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
       document.removeEventListener('pointerdown', onPointerDown)
       document.removeEventListener('keydown', onKeyDown)
     }
-  }, [open, submenu, routeKey])
+  }, [cancelSubmenuClose, open, submenu, routeKey])
 
   return (
     <div
@@ -113,24 +129,32 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
                     event.pointerType === 'mouse' &&
                     window.matchMedia('(min-width: 1024px)').matches
                   ) {
+                    cancelSubmenuClose()
                     setState({ routeKey, open, submenu: item.id })
                   }
                 }}
                 onPointerLeave={(event) => {
                   if (
+                    hasChildren &&
                     window.matchMedia('(min-width: 1024px)').matches &&
                     !event.currentTarget.contains(document.activeElement)
                   ) {
-                    setState((current) =>
-                      current.submenu === item.id ? { ...current, submenu: null } : current,
-                    )
+                    cancelSubmenuClose()
+                    submenuCloseTimer.current = setTimeout(() => {
+                      setState((current) =>
+                        current.submenu === item.id ? { ...current, submenu: null } : current,
+                      )
+                      submenuCloseTimer.current = null
+                    }, 120)
                   }
                 }}
                 onBlur={(event) => {
                   if (
+                    hasChildren &&
                     window.matchMedia('(min-width: 1024px)').matches &&
                     !event.currentTarget.contains(event.relatedTarget)
                   ) {
+                    cancelSubmenuClose()
                     setState((current) =>
                       current.submenu === item.id ? { ...current, submenu: null } : current,
                     )
@@ -166,6 +190,7 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
                     onKeyDown={(event) => {
                       if (!hasChildren || (event.key !== 'ArrowDown' && event.key !== ' ')) return
                       event.preventDefault()
+                      cancelSubmenuClose()
                       setState({ routeKey, open, submenu: item.id })
                       requestAnimationFrame(() => {
                         document.getElementById(childId)?.querySelector('a')?.focus()
@@ -181,7 +206,13 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
                   </Link>
                 </div>
                 {hasChildren ? (
-                  <ul id={childId} className={styles.submenu} hidden={!expanded}>
+                  <ul
+                    id={childId}
+                    className={styles.submenu}
+                    data-expanded={expanded}
+                    aria-hidden={!expanded}
+                    inert={!expanded}
+                  >
                     {item.children.map((child) => (
                       <li key={child.id}>
                         <Link

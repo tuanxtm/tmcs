@@ -205,3 +205,64 @@ test('multiple images, linked images and mixed fonts share the same line metrics
   await page.setViewportSize({ width: 1280, height: 900 })
   await assertUniformBaselines(page)
 })
+
+test('fitted text and inline images stay inside the cell through content, size, and font changes', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.evaluate(() =>
+    window.renderRichTextFixture({ fitToContainer: true, multiple: true, edgeImages: true }),
+  )
+  const text = page.locator('#uniform > div')
+  const assertFits = async () => {
+    await expect
+      .poll(() =>
+        text.evaluate((element) => {
+          const parent = element.parentElement!
+          const style = getComputedStyle(parent)
+          const bounds = parent.getBoundingClientRect()
+          const bottom = bounds.bottom - parseFloat(style.paddingBottom)
+          const top = bounds.top + parseFloat(style.paddingTop)
+          return (
+            element.getBoundingClientRect().bottom <= bottom + 1 &&
+            element.scrollWidth <=
+              parent.clientWidth -
+                parseFloat(style.paddingLeft) -
+                parseFloat(style.paddingRight) +
+                1 &&
+            Array.from(element.querySelectorAll('img')).every((image) => {
+              const rect = image.getBoundingClientRect()
+              return rect.top >= top - 1 && rect.bottom <= bottom + 1
+            })
+          )
+        }),
+      )
+      .toBe(true)
+  }
+  await assertFits()
+  expect(
+    await text.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)),
+  ).toBeLessThan(48)
+  await page.locator('#uniform').evaluate((element) => {
+    ;(element as HTMLElement).style.height = '180px'
+  })
+  await assertFits()
+  await page.evaluate(() => {
+    document.getElementById('fixture')!.style.fontFamily = 'monospace'
+    document.fonts.dispatchEvent(new Event('loadingdone'))
+  })
+  await assertFits()
+  await page.evaluate(() =>
+    window.renderRichTextFixture({ fitToContainer: true, scales: [3, 1], font: 'sans' }),
+  )
+  await assertFits()
+  await page.setViewportSize({ width: 1920, height: 1080 })
+  await assertFits()
+  await page.locator('#uniform').evaluate((element) => {
+    ;(element as HTMLElement).style.height = '2000px'
+  })
+  await expect(text).toHaveCSS('font-size', '48px')
+  await page.setViewportSize({ width: 390, height: 844 })
+  await expect(text).toHaveCSS('font-size', '20px')
+  expect(await text.evaluate((element) => (element as HTMLElement).style.fontSize)).toBe('')
+})

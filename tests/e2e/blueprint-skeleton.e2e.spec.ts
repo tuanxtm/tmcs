@@ -4,7 +4,7 @@ import { createHeaderNavFixture } from '../helpers/header-nav-fixture'
 const openHeaderNavFixture = createHeaderNavFixture()
 
 async function ready(page: Page, path = '/') {
-  await page.goto(`http://localhost:3000${path}`)
+  await page.goto(`${process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000'}${path}`)
   await expect(page.locator('html')).toHaveClass(/boot-ready/)
   await expect(page.locator('.boot-splash')).toHaveCount(0)
   await page.evaluate(() => document.fonts.ready)
@@ -83,9 +83,12 @@ test('outer and inner tokens control frame, separators, grids, and cursor', asyn
 
 for (const locale of ['en', 'vi']) {
   for (const [width, height] of [
+    [3840, 2160],
+    [3072, 1728],
     [1440, 900],
     [1920, 1080],
     [1024, 768],
+    [1440, 600],
     [768, 1024],
     [390, 844],
     [320, 568],
@@ -99,6 +102,7 @@ for (const locale of ['en', 'vi']) {
           hero: document.querySelector('#hero')!.getBoundingClientRect().toJSON(),
           frame: document.querySelector('[data-site-frame]')!.getBoundingClientRect().toJSON(),
           image: document.querySelector('[data-hero-image]')!.getBoundingClientRect().toJSON(),
+          locale: document.querySelector('header nav > ul > li')!.getBoundingClientRect().toJSON(),
           text: document.querySelector('[data-hero-rich-text]')!.getBoundingClientRect().toJSON(),
           links: document.querySelector('[data-hero-links]')!.getBoundingClientRect().toJSON(),
           scroll: document.querySelector('[data-hero-scroll]')!.getBoundingClientRect().toJSON(),
@@ -109,6 +113,9 @@ for (const locale of ['en', 'vi']) {
       expect(geometry.width).toBe(geometry.viewport)
       expect(Math.abs(geometry.hero.top - geometry.header.bottom)).toBeLessThan(2)
       expect(geometry.frame.top).toBe(width < 1024 ? 8 : 10)
+      expect(geometry.header.height).toBe(
+        width < 1024 ? 56 : width >= 3200 && height >= 1440 ? 72 : 64,
+      )
       await expect(page.locator('[data-hero-scroll]')).toHaveText(
         locale === 'vi' ? 'CUỘN XUỐNG' : 'SCROLL DOWN',
       )
@@ -130,20 +137,34 @@ for (const locale of ['en', 'vi']) {
         await expect(page.locator('header nav')).toBeHidden()
       } else {
         expect(geometry.image.left).toBeGreaterThan(geometry.text.left)
+        expect(Math.abs(geometry.image.left - geometry.locale.left)).toBeLessThan(1)
+        expect(Math.abs(geometry.links.left - geometry.locale.left)).toBeLessThan(1)
+        await expect(page.locator('[data-hero-decoration]')).toHaveCSS('border-right-width', '0px')
+        await expect(page.locator('[data-hero-links]')).toHaveCSS('border-left-width', '1px')
+        await expect(page.locator('[data-hero-scales]')).toHaveCSS('border-left-width', '1px')
+        expect(geometry.image.right).toBeCloseTo(geometry.hero.right, 0)
+        expect(geometry.image.top).toBeCloseTo(geometry.hero.top, 0)
         await expect(page.locator('[data-hero-scales]')).toBeVisible()
-        // Short content must fill the fold; long content remains unconstrained.
-        await page.locator('[data-hero-rich-text]').evaluate((element) => {
-          element.textContent = 'Short hero content'
-        })
-        const hero = await page.locator('#hero').boundingBox()
-        expect(Math.abs(hero!.y + hero!.height - geometry.frame.bottom)).toBeLessThan(2)
+        expect(Math.abs(geometry.hero.bottom - geometry.frame.bottom)).toBeLessThan(2)
+        const text = page.locator('[data-hero-rich-text] > div')
+        if (await text.count()) {
+          const fits = await text.evaluate((element) => {
+            const cell = element.parentElement!
+            const style = getComputedStyle(cell)
+            return (
+              element.scrollHeight <=
+              cell.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) + 1
+            )
+          })
+          expect(fits).toBe(true)
+        }
       }
       await page.screenshot({ path: `/tmp/tmcs-blueprint-${locale}-${width}.png` })
     })
   }
 }
 
-test('fixed frame, native scroll, scroll control, and long content growth', async ({ page }) => {
+test('fixed frame, native scroll, scroll control, and fitted Hero text', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   await page.emulateMedia({ reducedMotion: 'reduce' })
@@ -169,13 +190,26 @@ test('fixed frame, native scroll, scroll control, and long content growth', asyn
     .toBeLessThan(2)
   await page.evaluate(() => window.scrollTo(0, 0))
   const before = await page.locator('#hero').boundingBox()
-  await page.locator('[data-hero-rich-text]').evaluate((element) => {
-    element.textContent = 'Long content that must remain readable. '.repeat(150)
-    ;(element as HTMLElement).style.fontSize = '48px'
+  const richText = page.locator('[data-hero-rich-text] > div')
+  await richText.evaluate((element) => {
+    element.querySelector('p')!.textContent =
+      'Designing thoughtful spaces, building useful things, and sharing what I learn. '.repeat(8)
+    window.dispatchEvent(new Event('resize'))
   })
+  await expect
+    .poll(() => richText.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)))
+    .toBeLessThan(48)
   const after = await page.locator('#hero').boundingBox()
-  expect(after!.height).toBeGreaterThan(before!.height)
+  expect(after!.height).toBe(before!.height)
+  expect(after!.y + after!.height).toBeCloseTo(frame!.y + frame!.height, 0)
   await expect(page.locator('[data-hero-rich-text]')).not.toHaveCSS('overflow-y', 'auto')
+  await richText.evaluate((element) => {
+    element.replaceChildren(
+      Object.assign(document.createElement('p'), { textContent: 'Short Hero copy.' }),
+    )
+    window.dispatchEvent(new Event('resize'))
+  })
+  await expect(richText).toHaveCSS('font-size', '48px')
   await page.evaluate(() => window.scrollTo(0, 500))
   const header = await page.locator('.page-blocks > header').boundingBox()
   expect(header!.y).toBeLessThan(0)
@@ -400,6 +434,15 @@ test('desktop navigation hover keeps the pointer path into the submenu', async (
   await expect(parent).toHaveAttribute('aria-expanded', 'true')
   const child = page.getByRole('link', { name: 'Posts' })
   await expect(child).toBeVisible()
+  const submenu = page.locator('header nav ul ul').first()
+  await expect(submenu).toHaveCSS('transition-duration', '0.18s, 0.18s, 0s')
+  await expect(submenu).toHaveCSS('opacity', '1')
+  await expect
+    .poll(() => parent.evaluate((element) => getComputedStyle(element, '::before').transform))
+    .toBe('matrix(1, 0, 0, 1, 0, 0)')
+  const normalParentColor = await parent
+    .locator('xpath=..')
+    .evaluate((element) => getComputedStyle(element).color)
   await child.hover()
   await expect(parent).toHaveAttribute('aria-expanded', 'true')
   const parentFill = await parent.evaluate((element) => ({
@@ -410,10 +453,23 @@ test('desktop navigation hover keeps the pointer path into the submenu', async (
   }))
   await expect
     .poll(() => parent.evaluate((element) => getComputedStyle(element, '::before').transform))
-    .toBe('matrix(1, 0, 0, 1, 0, 0)')
+    .toBe('matrix(1, 0, 0, 0, 0, 0)')
+  await expect(parent).toHaveCSS('color', normalParentColor)
   expect(parentFill.corner).toBe('matrix(0, -1, 1, 0, 0, 0)')
   expect(parentFill.cornerTop).toBe('10px')
   await page.screenshot({ path: '/tmp/tmcs-nav-desktop-open.png' })
+
+  await parent.hover()
+  await expect
+    .poll(() => parent.evaluate((element) => getComputedStyle(element, '::before').transform))
+    .toBe('matrix(1, 0, 0, 1, 0, 0)')
+  await child.hover()
+  await page.mouse.move(800, 500)
+  await expect(parent).toHaveAttribute('aria-expanded', 'false')
+  await expect(parent.locator('span')).toHaveCSS('bottom', '10px')
+  await expect(parent.locator('span')).toHaveCSS('transform', 'none')
+  await parent.hover()
+  await expect(parent).toHaveAttribute('aria-expanded', 'true')
 
   await child.focus()
   await page.mouse.move(800, 500)
@@ -421,6 +477,41 @@ test('desktop navigation hover keeps the pointer path into the submenu', async (
   await page.keyboard.press('Escape')
   await expect(parent).toHaveAttribute('aria-expanded', 'false')
   await expect(parent).toBeFocused()
+  await expect(submenu).toHaveAttribute('inert', '')
+  await expect(submenu).toHaveCSS('visibility', 'hidden')
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await parent.press('ArrowDown')
+  await expect(child).toBeFocused()
+  await expect(submenu).toHaveCSS('transition-duration', '0s')
+})
+
+test('crossing a nav item without children preserves the pending submenu close', async ({
+  page,
+}) => {
+  await openHeaderNavFixture(page)
+  const parent = page.getByRole('link', { name: 'Work', exact: true })
+  await parent.hover()
+  await expect(parent).toHaveAttribute('aria-expanded', 'true')
+  await page.evaluate(() => {
+    const items = document.querySelectorAll('header nav > ul > li')
+    const parentItem = items[1]
+    const nextItem = items[2]
+    parentItem.dispatchEvent(
+      new PointerEvent('pointerout', {
+        bubbles: true,
+        pointerType: 'mouse',
+        relatedTarget: nextItem,
+      }),
+    )
+    nextItem.dispatchEvent(
+      new PointerEvent('pointerout', {
+        bubbles: true,
+        pointerType: 'mouse',
+        relatedTarget: document.body,
+      }),
+    )
+  })
+  await expect(parent).toHaveAttribute('aria-expanded', 'false')
 })
 
 test('mobile navigation rows share height and the parent toggles without navigation', async ({

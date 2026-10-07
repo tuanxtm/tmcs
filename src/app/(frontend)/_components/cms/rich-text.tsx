@@ -48,6 +48,8 @@ type CmsRichTextProps = {
   /** Custom outer layout for natural spacing. Uniform spacing uses block flow. */
   wrapperLayoutClassName?: string
   lineSpacing?: 'natural' | 'uniform'
+  /** Fit the desktop Hero's fixed text cell. */
+  fitToContainer?: boolean
 }
 
 function buildParagraphConverter(
@@ -97,36 +99,75 @@ export function CmsRichText({
   paragraphClassName,
   wrapperLayoutClassName,
   lineSpacing = 'natural',
+  fitToContainer = false,
 }: CmsRichTextProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const uniform = lineSpacing === 'uniform'
 
-  // Sync responsive image alignment after content or fonts change.
+  // Fit text and sync inline images after layout, content, or fonts change.
   useLayoutEffect(() => {
     const el = wrapperRef.current
     if (!el) return
 
     let disposed = false
+    let frame = 0
+    const updateMetrics = () => {
+      el.style.setProperty('--rich-text-font-size', getComputedStyle(el).fontSize)
+      if (uniform) syncUniformInlineImages(el)
+    }
     const sync = () => {
       if (disposed) return
-      const px = window.getComputedStyle(el).fontSize
-      el.style.setProperty('--rich-text-font-size', px)
-      if (uniform) {
-        syncUniformInlineImages(el)
+      if (fitToContainer) el.style.removeProperty('font-size')
+      updateMetrics()
+      const parent = el.parentElement
+      if (fitToContainer && parent && window.matchMedia('(min-width: 1024px)').matches) {
+        const parentStyle = getComputedStyle(parent)
+        const height =
+          parent.clientHeight -
+          parseFloat(parentStyle.paddingTop) -
+          parseFloat(parentStyle.paddingBottom)
+        const width =
+          parent.clientWidth -
+          parseFloat(parentStyle.paddingLeft) -
+          parseFloat(parentStyle.paddingRight)
+        if (height <= 0 || width <= 0) return
+        const fits = () => el.scrollHeight <= height && el.scrollWidth <= width
+        if (fits()) return
+        let lower = 1
+        let upper = parseFloat(getComputedStyle(el).fontSize)
+        // Find the largest size that fits, preserving normal text wrapping.
+        for (let step = 0; step < 10; step++) {
+          const size = (lower + upper) / 2
+          el.style.fontSize = `${size}px`
+          updateMetrics()
+          if (fits()) lower = size
+          else upper = size
+        }
+        el.style.fontSize = `${lower}px`
+        updateMetrics()
       }
     }
+    const schedule = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(sync)
+    }
+    const observer = fitToContainer ? new ResizeObserver(schedule) : null
+    if (el.parentElement) observer?.observe(el.parentElement)
     sync()
-    window.addEventListener('resize', sync)
-    if (uniform) {
+    window.addEventListener('resize', schedule)
+    if (uniform || fitToContainer) {
       void document.fonts.ready.then(sync)
-      document.fonts.addEventListener('loadingdone', sync)
+      document.fonts.addEventListener('loadingdone', schedule)
     }
     return () => {
       disposed = true
-      window.removeEventListener('resize', sync)
-      if (uniform) document.fonts.removeEventListener('loadingdone', sync)
+      cancelAnimationFrame(frame)
+      observer?.disconnect()
+      window.removeEventListener('resize', schedule)
+      if (uniform || fitToContainer) document.fonts.removeEventListener('loadingdone', schedule)
+      if (fitToContainer) el.style.removeProperty('font-size')
     }
-  }, [className, data, paragraphClassName, uniform])
+  }, [className, data, fitToContainer, paragraphClassName, uniform, wrapperLayoutClassName])
 
   const converters: JSXConvertersFunction = ({ defaultConverters }) => {
     const inlineBlockConverter: JSXConverter<InlineBlockNode> = ({ node }) => (
