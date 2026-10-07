@@ -57,7 +57,6 @@ export function ThingCanvasItem(
         <a
           href={thing.primaryUrl}
           aria-label={thing.name}
-          title={thing.name}
           draggable={false}
           className={styles.thingPrimaryLink}
           data-thing-drag-surface=""
@@ -77,7 +76,7 @@ export function ThingCanvasItem(
           onHandleClick={onHandleClick}
         />
         <span className={styles.number}>{canvasNumber(index)}</span>
-        <span title={thing.name} className={`${styles.title} ${styles.thingTitle}`}>
+        <span data-thing-title="" className={`${styles.title} ${styles.thingTitle}`}>
           {thing.name}
         </span>
         <div className={styles.thingActions}>
@@ -86,6 +85,7 @@ export function ThingCanvasItem(
               href={thing.primaryUrl}
               className={styles.thingAction}
               aria-label={`${buy}: ${thing.name}`}
+              data-cursor-popup=""
             >
               {buy}
             </a>
@@ -95,6 +95,7 @@ export function ThingCanvasItem(
             type="button"
             className={styles.thingAction}
             aria-label={`${detail}: ${thing.name}`}
+            data-cursor-popup=""
             onClick={() => changeOpen(true)}
           >
             {detail}

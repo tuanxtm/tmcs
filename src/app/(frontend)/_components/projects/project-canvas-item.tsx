@@ -96,13 +96,14 @@ export function ProjectCanvasItem({
           <Link
             href={project.href}
             transitionTypes={['nav-forward']}
-            title={project.title}
+            data-cursor-popup=""
+            data-project-title=""
             className={styles.title}
           >
             {project.title}
           </Link>
         ) : (
-          <span title={project.title} className={styles.title}>
+          <span data-cursor-popup="" data-project-title="" className={styles.title}>
             {project.title}
           </span>
         )}
