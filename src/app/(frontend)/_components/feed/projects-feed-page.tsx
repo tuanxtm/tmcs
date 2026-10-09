@@ -6,10 +6,10 @@ import {
   createProjectsArchiveBlock,
   prepareProjectsArchiveBlocks,
 } from '@/app/(frontend)/_lib/projects-feed'
-import type { FeedDecorationView, ProjectsPageView } from '@/app/(frontend)/_lib/types'
+import type { ProjectsPageView } from '@/app/(frontend)/_lib/types'
 
 /** Fallback archive block used when the CMS Projects page has no project block. */
-function buildArchiveFallback(page: ProjectsPageView, decorations?: FeedDecorationView[]) {
+function buildArchiveFallback(page: ProjectsPageView) {
   return createProjectsArchiveBlock({
     page,
     defaults: {
@@ -18,7 +18,6 @@ function buildArchiveFallback(page: ProjectsPageView, decorations?: FeedDecorati
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.projects.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.projects.defaultCursorPopupItem,
     },
-    decorations,
   })
 }
 
@@ -28,11 +27,11 @@ const { Page: ProjectsFeedPage, generateMetadata: generateProjectsFeedMetadata }
     label: 'Projects',
     feedType: 'projects',
     loadFeed: (locale) => getProjectsPage(locale, null),
-    transformPageBlocks: ({ blocks, feed, decorations }) => {
+    transformPageBlocks: ({ blocks, feed }) => {
       const page = feed as ProjectsPageView
-      return prepareProjectsArchiveBlocks(blocks, page, buildArchiveFallback(page, decorations))
+      return prepareProjectsArchiveBlocks(blocks, page, buildArchiveFallback(page))
     },
-    renderFeed: ({ locale, feed, adapter, decorations }) => {
+    renderFeed: ({ locale, feed, adapter }) => {
       const { docs, nextCursor, hasNextPage } = feed as ProjectsPageView
       return (
         <ProjectsSection
@@ -50,7 +49,6 @@ const { Page: ProjectsFeedPage, generateMetadata: generateProjectsFeedMetadata }
           hasNextPage={hasNextPage}
           showViewAll={false}
           docs={docs}
-          decorations={decorations}
         />
       )
     },

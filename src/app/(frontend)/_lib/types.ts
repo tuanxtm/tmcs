@@ -42,7 +42,6 @@ export type SiteShellView = {
   /** Website / social links from Site Settings (for contact dialogs, etc.). */
   profileLinks: NavChildView[]
   navigation: NavItemView[]
-  activeDecorationPackId: number
   robotsIndex: boolean
   defaultSocialImage: MediaView | null
   seo: {
@@ -132,15 +131,6 @@ export type ShortStoryCardView = {
   allowedShapes: StoryShape[] | null
   href: string | null
   newTab: boolean
-}
-
-export type FeedDecorationView = {
-  /** Pack item row id (string) or legacy numeric id in tests. */
-  id: string | number
-  packId: number
-  imageUrl: string
-  allowedShapes: StoryShape[]
-  weight: number
 }
 
 export type PostsPageView = {
@@ -251,8 +241,6 @@ type FeedSectionBase = {
   cursorPopupEmpty: string | null
   cursorPopupItem: string | null
   cursorPopupViewAll: string | null
-  /** Decoration images from the active decoration pack. */
-  decorations?: FeedDecorationView[]
 }
 
 export type FeedSectionBlockView =
@@ -322,7 +310,6 @@ export type PageFooterBlockView = {
   labelOtherLinks: string | null
   otherLinks: NavChildView[]
   cursorPopup: string | null
-  footerDecoration: FeedDecorationView | null
   copyright: string | null
 }
 

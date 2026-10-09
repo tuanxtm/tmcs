@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 
-import { getFeedDecorations, getSiteShell } from '@/app/(frontend)/_lib/cms'
+import { getSiteShell } from '@/app/(frontend)/_lib/cms'
 import { PageTransition } from '@/app/(frontend)/_components/layout/page-transition'
 import { PageBlocks } from '@/app/(frontend)/_components/blocks/page-blocks'
 import { getPageBySlug } from '@/app/(frontend)/_lib/page-data'
 import { FEED_SOURCE_REGISTRY } from '@/app/(frontend)/_lib/feed-registry'
-import type { FeedDecorationView, FeedType, ResolvedBlockView } from '@/app/(frontend)/_lib/types'
+import type { FeedType, ResolvedBlockView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 
 type FeedPageShellOptions = {
@@ -23,7 +23,6 @@ type FeedPageShellOptions = {
     feed: unknown
     shell: SiteShell
     adapter: (typeof FEED_SOURCE_REGISTRY)[FeedType]
-    decorations?: FeedDecorationView[]
   }) => React.ReactNode
   /**
    * Server-only rewrite used by canvas archives to promote their first feed block.
@@ -32,7 +31,6 @@ type FeedPageShellOptions = {
     blocks: ResolvedBlockView[]
     locale: LocaleCode
     feed: unknown
-    decorations?: FeedDecorationView[]
   }) => ResolvedBlockView[]
 }
 
@@ -97,13 +95,9 @@ export function createFeedPageShell({
       loadFeed(locale),
     ])
 
-    const decorations = shell.activeDecorationPackId
-      ? await getFeedDecorations(shell.activeDecorationPackId)
-      : undefined
-
     if (page) {
       const blocks = transformPageBlocks
-        ? transformPageBlocks({ blocks: page.blocks, locale, feed, decorations })
+        ? transformPageBlocks({ blocks: page.blocks, locale, feed })
         : page.blocks
 
       return (
@@ -118,7 +112,7 @@ export function createFeedPageShell({
       )
     }
 
-    return <PageTransition>{renderFeed({ locale, feed, shell, adapter, decorations })}</PageTransition>
+    return <PageTransition>{renderFeed({ locale, feed, shell, adapter })}</PageTransition>
   }
 
   return { Page: FeedPage, generateMetadata }

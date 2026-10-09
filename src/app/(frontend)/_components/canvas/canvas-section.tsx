@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { IconArrowRight } from '@tabler/icons-react'
 
 import { loadFeedPage } from '@/app/(frontend)/_lib/actions'
-import type { FeedDecorationView, FeedPaginationMode } from '@/app/(frontend)/_lib/types'
+import type { FeedPaginationMode } from '@/app/(frontend)/_lib/types'
 import { Scales } from '@/components/ui/scales'
 import type { LocaleCode } from '@/lib/locales'
 
@@ -16,7 +16,6 @@ export type CanvasContentProps<T> = {
   locale: LocaleCode
   description: string | null
   cursorPopupItem?: string | null
-  decorations?: FeedDecorationView[]
   onMovementChange: (moving: boolean) => void
   onOverlayChange: (open: boolean) => void
 }
@@ -38,7 +37,6 @@ export type CanvasSectionProps<T extends { id: number }> = {
   cursorPopupEmpty?: string | null
   cursorPopupItem?: string | null
   cursorPopupViewAll?: string | null
-  decorations?: FeedDecorationView[]
   className?: string
 }
 
@@ -79,7 +77,6 @@ export function CanvasSection<T extends { id: number }>({
   cursorPopupEmpty,
   cursorPopupViewAll,
   cursorPopupItem,
-  decorations,
   className,
 }: CanvasSectionProps<T> & {
   feedType: 'projects' | 'things'
@@ -269,7 +266,6 @@ export function CanvasSection<T extends { id: number }>({
           locale={locale}
           description={description}
           cursorPopupItem={cursorPopupItem}
-          decorations={decorations}
           onMovementChange={handleMovementChange}
           onOverlayChange={handleOverlayChange}
         />

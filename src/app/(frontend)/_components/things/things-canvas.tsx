@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import type { FeedDecorationView, ThingCardView } from '@/app/(frontend)/_lib/types'
+import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { DraggableCanvas } from '../canvas/draggable-canvas'
 import { ThingCanvasItem } from './thing-canvas-item'
@@ -16,7 +16,6 @@ export function ThingsCanvas({
   locale: LocaleCode
   description?: string | null
   cursorPopupItem?: string | null
-  decorations?: FeedDecorationView[]
   onMovementChange?: (moving: boolean) => void
   onDetailOpenChange?: (open: boolean) => void
 }) {

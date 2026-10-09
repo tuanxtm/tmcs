@@ -1,5 +1,4 @@
 import type {
-  FeedDecorationView,
   FeedSectionBlockView,
   ProjectsPageView,
   ResolvedBlockView,
@@ -63,7 +62,6 @@ export function createProjectsArchiveBlock(args: {
     cursorPopupEmpty: string
     cursorPopupItem: string
   }
-  decorations?: FeedDecorationView[]
 }): ProjectsBlock {
   return {
     blockType: 'pageFeedSection',
@@ -82,6 +80,5 @@ export function createProjectsArchiveBlock(args: {
     cursorPopupItem: args.defaults.cursorPopupItem,
     cursorPopupViewAll: null,
     docs: args.page.docs,
-    decorations: args.decorations,
   }
 }

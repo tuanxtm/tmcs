@@ -6,10 +6,10 @@ import {
   createThingsArchiveBlock,
   prepareThingsArchiveBlocks,
 } from '@/app/(frontend)/_lib/things-feed'
-import type { FeedDecorationView, ThingsPageView } from '@/app/(frontend)/_lib/types'
+import type { ThingsPageView } from '@/app/(frontend)/_lib/types'
 
 /** Fallback archive block used when the CMS Things page has no Things block. */
-function buildArchiveFallback(page: ThingsPageView, decorations?: FeedDecorationView[]) {
+function buildArchiveFallback(page: ThingsPageView) {
   return createThingsArchiveBlock({
     page,
     defaults: {
@@ -18,7 +18,6 @@ function buildArchiveFallback(page: ThingsPageView, decorations?: FeedDecoration
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.things.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.things.defaultCursorPopupItem,
     },
-    decorations,
   })
 }
 
@@ -27,11 +26,11 @@ const { Page: ThingsFeedPage, generateMetadata: generateThingsFeedMetadata } = c
   label: 'Things',
   feedType: 'things',
   loadFeed: (locale) => getThingsPage(locale, null),
-  transformPageBlocks: ({ blocks, feed, decorations }) => {
+  transformPageBlocks: ({ blocks, feed }) => {
     const page = feed as ThingsPageView
-    return prepareThingsArchiveBlocks(blocks, page, buildArchiveFallback(page, decorations))
+    return prepareThingsArchiveBlocks(blocks, page, buildArchiveFallback(page))
   },
-  renderFeed: ({ locale, feed, adapter, decorations }) => {
+  renderFeed: ({ locale, feed, adapter }) => {
     const { docs, nextCursor, hasNextPage } = feed as ThingsPageView
     return (
       <ThingsSection
@@ -49,7 +48,6 @@ const { Page: ThingsFeedPage, generateMetadata: generateThingsFeedMetadata } = c
         hasNextPage={hasNextPage}
         showViewAll={false}
         docs={docs}
-        decorations={decorations}
       />
     )
   },

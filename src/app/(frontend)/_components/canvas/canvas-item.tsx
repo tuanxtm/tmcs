@@ -1,13 +1,9 @@
 import type { CSSProperties } from 'react'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
-import type { FeedDecorationView, MediaView } from '@/app/(frontend)/_lib/types'
+import type { MediaView } from '@/app/(frontend)/_lib/types'
 import { IMAGE_SCALE, OFFSET_X, OFFSET_Y } from './canvas-layout'
 import type { CanvasItemProps } from './draggable-canvas'
 import styles from './canvas.module.css'
-
-export function pickCanvasDecoration(decorations: FeedDecorationView[] | undefined, id: number) {
-  return decorations?.length ? (decorations[Math.abs(id) % decorations.length] ?? null) : null
-}
 
 export function canvasNumber(index: number) {
   return `${String(index + 1).padStart(2, '0')}.`
@@ -51,11 +47,9 @@ export function canvasItemStyle(
 
 export function CanvasImage({
   image,
-  decoration,
   kind,
 }: {
   image: MediaView | null
-  decoration: FeedDecorationView | null
   kind: 'project' | 'thing'
 }) {
   return (
@@ -70,29 +64,12 @@ export function CanvasImage({
           fill
           sizes={
             kind === 'project'
-              ? '(min-width: 640px) 288px, 180px'
-              : '(min-width: 1024px) 400px, (min-width: 640px) 280px, 180px'
+              ? '(min-width: 640px) 288px, 45vw'
+              : '(min-width: 1024px) 400px, (min-width: 640px) 280px, 45vw'
           }
           className="bg-transparent!"
           imgClassName="object-contain object-bottom"
         />
-      ) : decoration ? (
-        <span className={styles.deco} aria-hidden="true">
-          <span
-            className="block h-full w-full"
-            style={{
-              maskImage: `url("${decoration.imageUrl}")`,
-              WebkitMaskImage: `url("${decoration.imageUrl}")`,
-              maskSize: 'contain',
-              maskRepeat: 'no-repeat',
-              maskPosition: 'center',
-              WebkitMaskSize: 'contain',
-              WebkitMaskRepeat: 'no-repeat',
-              WebkitMaskPosition: 'center',
-              backgroundColor: 'var(--accent)',
-            }}
-          />
-        </span>
       ) : (
         <span className={styles.placeholder} aria-hidden="true" />
       )}

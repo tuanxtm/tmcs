@@ -15,7 +15,6 @@ function ThingsContent({
   locale,
   description,
   cursorPopupItem,
-  decorations,
   onMovementChange,
   onOverlayChange,
 }: CanvasContentProps<ThingCardView>) {
@@ -25,7 +24,6 @@ function ThingsContent({
       locale={locale}
       description={description}
       cursorPopupItem={cursorPopupItem}
-      decorations={decorations}
       onMovementChange={onMovementChange}
       onDetailOpenChange={onOverlayChange}
     />

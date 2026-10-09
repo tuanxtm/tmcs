@@ -2,11 +2,7 @@ import { cacheLife } from 'next/cache'
 import Link from 'next/link'
 import Image from 'next/image'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
-import type {
-  FeedDecorationView,
-  NavChildView,
-  PageFooterBlockView,
-} from '@/app/(frontend)/_lib/types'
+import type { NavChildView, PageFooterBlockView } from '@/app/(frontend)/_lib/types'
 import { trimUrlScheme } from '@/app/(frontend)/_lib/social-icons'
 import { homeHref } from '@/app/(frontend)/_lib/locale'
 import type { LocaleCode } from '@/lib/locales'
@@ -75,29 +71,6 @@ async function getCurrentYear(): Promise<number> {
   return new Date().getFullYear()
 }
 
-function FooterDecoration({ decoration }: { decoration: FeedDecorationView }) {
-  return (
-    <div
-      className={cn(
-        'aspect-square h-full shrink-0',
-        'max-md:relative max-md:bottom-0 max-md:left-0',
-        'bg-primary max-md:bg-primary/25',
-      )}
-      aria-hidden="true"
-      style={{
-        WebkitMaskImage: `url("${decoration.imageUrl}")`,
-        maskImage: `url("${decoration.imageUrl}")`,
-        WebkitMaskSize: 'contain',
-        maskSize: 'contain',
-        WebkitMaskRepeat: 'no-repeat',
-        maskRepeat: 'no-repeat',
-        WebkitMaskPosition: 'center',
-        maskPosition: 'center',
-      }}
-    />
-  )
-}
-
 export async function FooterBlock({ block, siteName, locale }: FooterBlockProps) {
   const currentYear = await getCurrentYear()
   const copyright = (block.copyright ?? `© ${currentYear} ${siteName}`).replace(
@@ -130,15 +103,12 @@ export async function FooterBlock({ block, siteName, locale }: FooterBlockProps)
             </div>
           ) : null}
 
-          <div className="relative flex h-full md:items-end md:justify-between">
-            {block.footerDecoration ? (
-              <FooterDecoration decoration={block.footerDecoration} />
-            ) : null}
+          <div className="relative flex h-full md:items-end md:justify-end">
             <div
               className={cn(
                 'flex flex-col gap-8 md:flex-row md:gap-12 lg:gap-16',
                 'pb-2 md:pb-3 lg:pb-4',
-                'origin-bottom-right max-md:absolute max-md:right-0 max-md:bottom-0',
+                'origin-bottom-right',
               )}
             >
               <FooterLinkList

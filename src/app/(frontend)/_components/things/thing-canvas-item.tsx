@@ -18,7 +18,6 @@ export function ThingCanvasItem(
     item: thing,
     index,
     locale,
-    decoration,
     manual,
     zIndex,
     onDetailOpenChange,
@@ -43,7 +42,7 @@ export function ThingCanvasItem(
     setOpen(next)
   }
 
-  const image = <CanvasImage kind="thing" image={thing.primaryImage} decoration={decoration} />
+  const image = <CanvasImage kind="thing" image={thing.primaryImage} />
   return (
     <article
       ref={registerItemRef}

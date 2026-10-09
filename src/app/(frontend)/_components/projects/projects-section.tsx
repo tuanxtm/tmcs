@@ -15,14 +15,12 @@ function ProjectsContent({
   onMovementChange,
   description,
   cursorPopupItem,
-  decorations,
 }: CanvasContentProps<ProjectCardView>) {
   return (
     <ProjectsCanvas
       projects={docs}
       description={description}
       cursorPopupItem={cursorPopupItem}
-      decorations={decorations}
       onMovementChangeAction={onMovementChange}
     />
   )

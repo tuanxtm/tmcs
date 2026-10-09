@@ -15,9 +15,6 @@ import {
   type FeedSourceMode,
 } from '@/app/(frontend)/_lib/feed-registry'
 import {
-  getActiveFooterItemId,
-  getFeedDecorations,
-  getFooterDecoration,
   getHero,
   getPostsPage,
   getProjectsPage,
@@ -303,14 +300,6 @@ async function resolveFeedSectionBlock(
   // (canonical archive grid) keep the original `loadCards` adapter call.
   const useProviderRows = feedType === 'videos' && videosLayout === 'provider-rows'
 
-  // Fetch shell (needed for decorations + metadata) in parallel with the docs
-  // load and the decorations lookup. Decorations depend on the resolved
-  // shell, so we chain the lookup off `shellPromise`; everything else kicks
-  // off in parallel and we await once.
-  const shellPromise = getSiteShell(locale)
-  const decorationsPromise = shellPromise.then((s) =>
-    s.activeDecorationPackId ? getFeedDecorations(s.activeDecorationPackId) : undefined,
-  )
   const docsPromise =
     effectivePagination === 'infinite'
       ? feedType === 'posts'
@@ -329,11 +318,7 @@ async function resolveFeedSectionBlock(
           })
         : adapter.loadCards({ locale, source, limit, manualIds })
 
-  const [_shell, docsResult, decorations] = await Promise.all([
-    shellPromise,
-    docsPromise,
-    decorationsPromise,
-  ])
+  const [_shell, docsResult] = await Promise.all([getSiteShell(locale), docsPromise])
   // Infinite pages return `{ docs, nextCursor, hasNextPage }`; static returns
   // the card array directly. `Array.isArray` discriminates the two without a
   // runtime `'docs' in ...` probe.
@@ -354,7 +339,6 @@ async function resolveFeedSectionBlock(
     cursorPopupViewAll: showViewAll
       ? (block.cursorPopupViewAll ?? adapter.defaultCursorPopupViewAll)
       : null,
-    decorations,
   }
 
   if (effectivePagination === 'infinite') {
@@ -519,18 +503,10 @@ async function resolveFooterBlock(
   locale: LocaleCode,
   index: number,
 ): Promise<PageFooterBlockView> {
-  // Start the link resolution, the shell, and (via shell) the active pack's
-  // footerItem + decoration lookup all in parallel. Each step only depends
-  // on the previous one, so Promise.all above gives us one round trip.
-  const shellPromise = getSiteShell(locale)
-  const [socialLinks, otherLinks, shell] = await Promise.all([
+  const [socialLinks, otherLinks] = await Promise.all([
     resolveLinkIds(block.socialLinks, locale, `footer-${index}-social`),
     resolveLinkIds(block.otherLinks, locale, `footer-${index}-other`),
-    shellPromise,
   ])
-
-  const footerItemId = await getActiveFooterItemId(shell.activeDecorationPackId)
-  const footerDecoration = await getFooterDecoration(shell.activeDecorationPackId, footerItemId)
 
   return {
     blockType: 'pageFooter',
@@ -541,7 +517,6 @@ async function resolveFooterBlock(
     labelOtherLinks: block.labelOtherLinks ?? null,
     otherLinks,
     cursorPopup: block.cursorPopup ?? 'footer',
-    footerDecoration,
     copyright: block.copyright ?? null,
   }
 }
@@ -738,14 +713,7 @@ function toCmsPageView(
 }
 
 async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> {
-  // Start shell early so the decorations lookup can chain off it. Both
-  // promises resolve in parallel with the rest of the array - previously
-  // decorations was awaited serially after the Promise.all below.
-  const shellPromise = getSiteShell(locale)
-  const decorationsPromise = shellPromise.then((s) =>
-    s.activeDecorationPackId ? getFeedDecorations(s.activeDecorationPackId) : undefined,
-  )
-  const [hero, projects, posts, things, videos, _shell, decorations] = await Promise.all([
+  const [hero, projects, posts, things, videos] = await Promise.all([
     getHero(locale),
     getProjectsPage(locale, null),
     getPostsPage(locale, null),
@@ -763,9 +731,6 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       limitPerProvider: 10,
       manualIds: [],
     }),
-    shellPromise,
-    // Shared across every fallback section; same array is passed to all four.
-    decorationsPromise,
   ])
 
   if (process.env.NODE_ENV !== 'production') {
@@ -801,7 +766,6 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.projects.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.projects.defaultCursorPopupItem,
       cursorPopupViewAll: FEED_SOURCE_REGISTRY.projects.defaultCursorPopupViewAll,
-      decorations,
     },
     {
       blockType: 'pageFeedSection',
@@ -820,7 +784,6 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.posts.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.posts.defaultCursorPopupItem,
       cursorPopupViewAll: FEED_SOURCE_REGISTRY.posts.defaultCursorPopupViewAll,
-      decorations,
     },
     {
       blockType: 'pageFeedSection',
@@ -839,7 +802,6 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupEmpty: FEED_SOURCE_REGISTRY.things.defaultCursorPopupEmpty,
       cursorPopupItem: FEED_SOURCE_REGISTRY.things.defaultCursorPopupItem,
       cursorPopupViewAll: null,
-      decorations,
     },
     {
       blockType: 'pageFeedSection',
@@ -859,7 +821,6 @@ async function buildFallbackHomePage(locale: LocaleCode): Promise<HomePageView> 
       cursorPopupItem: FEED_SOURCE_REGISTRY.videos.defaultCursorPopupItem,
       cursorPopupViewAll: null,
       videosLayout: 'provider-rows',
-      decorations,
     },
   ]
 

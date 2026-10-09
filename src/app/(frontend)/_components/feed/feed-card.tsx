@@ -1,13 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { useReducedMotion } from 'motion/react'
 
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
-import type { FeedDecorationView, PostCardView, ProjectCardView } from '@/app/(frontend)/_lib/types'
+import type { PostCardView, ProjectCardView } from '@/app/(frontend)/_lib/types'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
 import { getImageAspect } from '@/app/(frontend)/_components/media/image-aspect'
 import { formatDate } from '@/app/(frontend)/_lib/formatters'
@@ -17,18 +16,6 @@ type FeedCardProps = {
   locale: LocaleCode
   className?: string
   cursorPopup?: string | null
-  decorations?: FeedDecorationView[]
-}
-
-// Stable per-card deco pick: same id always picks the same decoration,
-// and the choice is stable across renders so React doesn't re-render the
-// decoration image. Defined at module scope so it isn't recreated per render.
-function pickDecoration(
-  decorations: FeedDecorationView[] | undefined,
-  docId: number,
-): FeedDecorationView | null {
-  if (!decorations?.length) return null
-  return decorations[Math.abs(docId) % decorations.length] ?? null
 }
 
 export function FeedCard({
@@ -36,14 +23,9 @@ export function FeedCard({
   locale,
   className,
   cursorPopup = 'view details',
-  decorations,
 }: FeedCardProps) {
   const reduceMotion = useReducedMotion()
   const dateLabel = formatDate(doc.publishedAt, locale)
-  // Lazy state init picks the deco on first render only. The decoration image
-  // itself is loaded by next/image (lazy by default), so nothing deco-related
-  // ships in the initial HTML payload.
-  const [deco] = useState(() => pickDecoration(decorations, doc.id))
 
   // Same aspect class on the feed card image and the detail hero image so the
   // detail page can mount the hero at the same dimensions.
@@ -62,22 +44,6 @@ export function FeedCard({
             !reduceMotion && 'group-hover:scale-[1.01] group-focus-visible:scale-[1.01]',
           )}
         />
-      ) : deco ? (
-        <div
-          className="relative h-full w-full overflow-hidden"
-          aria-hidden="true"
-          style={{
-            WebkitMaskImage: `url("${deco.imageUrl}")`,
-            maskImage: `url("${deco.imageUrl}")`,
-            WebkitMaskSize: 'contain',
-            maskSize: 'contain',
-            WebkitMaskRepeat: 'no-repeat',
-            maskRepeat: 'no-repeat',
-            WebkitMaskPosition: 'center',
-            maskPosition: 'center',
-            backgroundColor: 'var(--primary)',
-          }}
-        />
       ) : (
         <div
           className={cn(
@@ -87,27 +53,6 @@ export function FeedCard({
           aria-hidden="true"
         />
       )}
-      {dateLabel &&
-        (() => {
-          const parts = dateLabel.split('/')
-          return (
-            <div
-              className={cn(
-                'absolute top-0 right-0 flex flex-col items-center',
-                'bg-background text-primary font-mono text-[0.5rem] md:text-[0.625rem]',
-                'pl-px md:pl-0.5',
-                'leading-tight tracking-tight',
-                parts[0] === '0' && 'text-primary',
-              )}
-            >
-              <span>{parts[0]}</span>
-              <span className="rotate-45">/</span>
-              <span>{parts[1]}</span>
-              <span className="rotate-45">/</span>
-              <span>{parts[2]}</span>
-            </div>
-          )
-        })()}
     </div>
   )
 

@@ -9,7 +9,7 @@ const { Page: VideosFeedPage, generateMetadata: generateVideosFeedMetadata } =
     label: 'Videos',
     feedType: 'videos',
     loadFeed: (locale) => getVideosPage(locale, null),
-    renderFeed: ({ locale, feed, adapter, decorations }) => {
+    renderFeed: ({ locale, feed, adapter }) => {
       const { docs, nextCursor, hasNextPage } = feed as VideosPageView
       return (
         <FeedSection
@@ -26,7 +26,6 @@ const { Page: VideosFeedPage, generateMetadata: generateVideosFeedMetadata } =
           hasNextPage={hasNextPage}
           feedType="videos"
           docs={docs}
-          decorations={decorations}
         />
       )
     },

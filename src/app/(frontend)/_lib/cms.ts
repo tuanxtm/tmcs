@@ -10,8 +10,6 @@ import { lexicalToPlainText } from '@/lib/readingTime'
 import { PROJECTS_BATCH_SIZE } from './projects-feed'
 import { THINGS_BATCH_SIZE, THINGS_PREVIEW_LIMIT } from './things-feed'
 import type {
-  DecorationPack,
-  FeedDecoration,
   Media,
   Page,
   Post,
@@ -26,7 +24,6 @@ import { resolveCmsLink } from './links'
 import { pageHref } from './locale'
 import { cursorFromPost, decodePostsCursor } from './posts-cursor'
 import type {
-  FeedDecorationView,
   MediaView,
   NavChildView,
   NavItemView,
@@ -50,23 +47,11 @@ export const POSTS_PAGE_SIZE = 11
 export const PROJECTS_PAGE_SIZE = PROJECTS_BATCH_SIZE
 export const VIDEOS_PAGE_SIZE = 11
 export const SHORT_STORIES_POOL_LIMIT = 48
-export const FEED_DECORATIONS_POOL_LIMIT = 48
 export const FEED_POOL_LIMIT = 48
 /** Default Things preview count. */
 export const THINGS_HOMEPAGE_LIMIT = THINGS_PREVIEW_LIMIT
 
-/** Fields selected for public decoration-pack reads (not the full collection doc). */
-type SlimDecorationPack = {
-  id: number
-  items?: DecorationPack['items']
-  footerItem?: DecorationPack['footerItem']
-}
-
 function isMedia(value: unknown): value is Media {
-  return Boolean(value && typeof value === 'object' && 'url' in value)
-}
-
-function isFeedDecorationFile(value: unknown): value is FeedDecoration {
   return Boolean(value && typeof value === 'object' && 'url' in value)
 }
 
@@ -122,34 +107,6 @@ function toLinkChild(
 }
 
 const getPayloadClient = cache(async () => getPayload({ config }))
-
-function packIdFromValue(value: unknown): number {
-  if (typeof value === 'object' && value && 'id' in value) {
-    const id = (value as { id: unknown }).id
-    return typeof id === 'number' ? id : 0
-  }
-  return typeof value === 'number' ? value : 0
-}
-
-function toFeedDecorationView(
-  packId: number,
-  item: NonNullable<SlimDecorationPack['items']>[number],
-): FeedDecorationView | null {
-  if (!item.id) return null
-
-  const file = item.file
-  const imageUrl = isFeedDecorationFile(file) ? file.url : null
-  if (!imageUrl) return null
-
-  return {
-    id: item.id,
-    packId,
-    imageUrl,
-    // Packer default until the feed layout is redesigned.
-    allowedShapes: ['1x1'],
-    weight: typeof item.weight === 'number' && item.weight > 0 ? item.weight : 1,
-  }
-}
 
 function toPostCard(post: Post, locale: LocaleCode): PostCardView {
   const image = toMediaView(post.featuredImage)
@@ -374,32 +331,6 @@ function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCard
   }
 }
 
-async function loadDecorationPack(packId: number): Promise<SlimDecorationPack | null> {
-  if (!packId) return null
-  const payload = await getPayloadClient()
-  try {
-    return (await payload.findByID({
-      collection: 'decoration-packs',
-      id: packId,
-      depth: 1,
-      overrideAccess: false,
-      select: {
-        items: true,
-        footerItem: true,
-      },
-    })) as SlimDecorationPack
-  } catch {
-    return null
-  }
-}
-
-async function cachedLoadDecorationPack(packId: number): Promise<SlimDecorationPack | null> {
-  'use cache'
-  cacheLife('days')
-  cacheTag(CACHE_TAGS.decorationPacks)
-  return loadDecorationPack(packId)
-}
-
 async function loadSiteSettings(locale: LocaleCode) {
   const payload = await getPayloadClient()
   return payload.findGlobal({
@@ -413,7 +344,7 @@ async function loadSiteSettings(locale: LocaleCode) {
 async function cachedLoadSiteSettings(locale: LocaleCode) {
   'use cache'
   cacheLife('days')
-  cacheTag(CACHE_TAGS.siteShell, CACHE_TAGS.media, CACHE_TAGS.decorationPacks, CACHE_TAGS.links)
+  cacheTag(CACHE_TAGS.siteShell, CACHE_TAGS.media, CACHE_TAGS.links)
   return loadSiteSettings(locale)
 }
 
@@ -750,56 +681,8 @@ export const getHero = cache(async (locale: LocaleCode): Promise<HeroView> => {
   }
 })
 
-export const getFeedDecorations = cache(async (packId: number): Promise<FeedDecorationView[]> => {
-  if (!packId) return []
-
-  const pack = await cachedLoadDecorationPack(packId)
-  if (!pack?.items?.length) return []
-
-  return pack.items
-    .map((item) => toFeedDecorationView(pack.id, item))
-    .filter((doc): doc is FeedDecorationView => Boolean(doc))
-    .slice(0, FEED_DECORATIONS_POOL_LIMIT)
-})
-
-/**
- * Resolve the single Feed decoration selected by the active decoration pack's
- * `footerItem` row id. Returns null when no pack is active, the pack has no
- * footer item, or the referenced row is missing/has no image.
- *
- * Cached per pack id + footer item id pair via `React.cache()` so the home,
- * feed, and detail pages share a single Payload read per request when the
- * footer block is rendered more than once.
- */
-export const getFooterDecoration = cache(
-  async (packId: number, footerItemId: string | null): Promise<FeedDecorationView | null> => {
-    if (!packId || !footerItemId) return null
-    const pack = await cachedLoadDecorationPack(packId)
-    if (!pack?.items?.length) return null
-    const item = pack.items.find((row) => row?.id === footerItemId)
-    if (!item) return null
-    return toFeedDecorationView(pack.id, item)
-  },
-)
-
-/**
- * Resolve the active decoration pack's `footerItem` row id for a locale.
- * Returns null when no pack is active or the pack does not nominate a
- * footer item. Reads through `cachedLoadDecorationPack` so the same
- * `'use cache'` boundary + tag invalidation applies as for the rest of
- * the decoration pipeline.
- */
-export const getActiveFooterItemId = cache(async (packId: number): Promise<string | null> => {
-  if (!packId) return null
-  const pack = await cachedLoadDecorationPack(packId)
-  const raw = pack?.footerItem
-  return typeof raw === 'string' && raw.length > 0 ? raw : null
-})
-
 export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellView> => {
   const siteSettings = await cachedLoadSiteSettings(locale)
-
-  const packId = packIdFromValue(siteSettings.activeDecorationPack)
 
   const navItems: NavItemView[] = (siteSettings.navigation || []).flatMap((item, index) => {
     const parent = toLinkChild(item.link, locale, index, `nav-${index}`)
@@ -832,7 +715,6 @@ export const getSiteShell = cache(async (locale: LocaleCode): Promise<SiteShellV
     contactEmail: siteSettings.contactEmail ?? null,
     profileLinks,
     navigation: navItems,
-    activeDecorationPackId: packId,
     robotsIndex: siteSettings.robots?.indexSite !== false,
     defaultSocialImage: toMediaView(siteSettings.defaultSocialImage),
     seo: {

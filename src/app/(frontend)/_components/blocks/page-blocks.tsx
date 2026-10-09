@@ -146,7 +146,6 @@ export function PageBlocks({
                   cursorPopupEmpty={block.cursorPopupEmpty}
                   cursorPopupItem={block.cursorPopupItem}
                   cursorPopupViewAll={block.cursorPopupViewAll}
-                  decorations={block.decorations}
                 />
               )
             }
@@ -174,7 +173,6 @@ export function PageBlocks({
                   pagination={block.pagination}
                   nextCursor={block.nextCursor}
                   hasNextPage={block.hasNextPage}
-                  decorations={block.decorations}
                   docs={block.docs}
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}
@@ -184,9 +182,20 @@ export function PageBlocks({
             }
 
             if (block.feedType === 'posts') {
+              // Full server snapshot identity: any server change (locale,
+              // docs metadata, pagination cursor) remounts FeedSection so
+              // client infinite-scroll state resets; client appends do not
+              // change the key, so the section stays mounted across pages.
               return (
                 <FeedSection
-                  key={feedKey}
+                  key={JSON.stringify([
+                    locale,
+                    ids.sectionId,
+                    block.docs,
+                    block.pagination,
+                    block.nextCursor,
+                    block.hasNextPage,
+                  ])}
                   locale={locale}
                   sectionId={ids.sectionId}
                   headingId={ids.headingId}
@@ -204,7 +213,6 @@ export function PageBlocks({
                   showViewAll={block.showViewAll}
                   viewAllLabel={block.viewAllLabel}
                   viewAllHref={block.viewAllHref}
-                  decorations={block.decorations}
                 />
               )
             }
@@ -231,7 +239,6 @@ export function PageBlocks({
                     showViewAll={block.showViewAll}
                     viewAllLabel={block.viewAllLabel}
                     viewAllHref={block.viewAllHref}
-                    decorations={block.decorations}
                   />
                 )
               }
