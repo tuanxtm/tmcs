@@ -1,26 +1,22 @@
 /* Videos section - provider rows redesign. */
 
 .section {
+  --provider-gap: 2rem;
+  padding-bottom: var(--provider-gap);
+  color: var(--secondary);
   background: transparent;
 }
 
 .headerFrame {
   container-type: inline-size;
   width: 100%;
-  max-width: 1440px;
   margin-inline: auto;
-  padding-inline: 16px;
-}
-
-@media (min-width: 640px) {
-  .headerFrame {
-    padding-inline: 24px;
-  }
+  padding-inline: var(--site-cell-padding);
 }
 
 .heading {
   margin: 0;
-  color: var(--accent);
+  color: var(--secondary);
   font-family: var(--font-serif);
   font-size: clamp(2.25rem, 6vw, 6rem);
   font-weight: 300;
@@ -31,7 +27,7 @@
 .description {
   margin: 0.75rem auto 0;
   max-width: 42rem;
-  color: var(--accent);
+  color: var(--secondary);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.5;
@@ -43,41 +39,30 @@
   display: block;
   margin: 2rem auto 0;
   width: 100%;
-  max-width: 1440px;
-  padding-inline: 16px;
-  color: var(--accent);
+  padding-inline: var(--site-cell-padding);
+  color: var(--secondary);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.5;
   text-align: center;
 }
 
-@media (min-width: 640px) {
-  .emptyMessage {
-    padding-inline: 24px;
-  }
-}
-
 .rows {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--provider-gap);
   margin: 2rem auto 0;
   width: 100%;
-  max-width: 1440px;
-  padding-inline: 16px;
-}
-
-@media (min-width: 640px) {
-  .rows {
-    padding-inline: 24px;
-  }
+  padding-inline: var(--site-cell-padding);
 }
 
 @media (min-width: 1024px) {
+  .section {
+    --provider-gap: 3rem;
+  }
+
   .rows {
     margin-top: 3rem;
-    gap: 3rem;
   }
 }
 
@@ -124,7 +109,9 @@
   background: transparent;
   border: 0;
   cursor: pointer;
-  transition: color 150ms ease, opacity 150ms ease;
+  transition:
+    color 150ms ease,
+    opacity 150ms ease;
 }
 
 .rowArrow:disabled {
@@ -159,6 +146,11 @@
 
 .rowScroller::-webkit-scrollbar {
   display: none;
+}
+
+/* Lenis contains both axes; let vertical gestures continue to the page. */
+.section .rowScroller[data-video-scroller] {
+  overscroll-behavior-y: auto;
 }
 
 .rowScroller:focus-visible {
@@ -204,7 +196,7 @@
 
 @media (min-width: 1024px) {
   .rowItem {
-    width: 320px;
+    width: calc((100% - 80px) * 3 / 13);
   }
 }
 
@@ -299,7 +291,7 @@
   height: 2.75rem;
   border-radius: 9999px;
   background: color-mix(in oklch, var(--background) 85%, transparent);
-  color: var(--foreground);
+  color: var(--secondary);
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
 }
 
@@ -313,7 +305,8 @@
 
 .rowTitle {
   margin: 0;
-  color: var(--foreground);
+  color: var(--secondary);
+  font-family: var(--font-serif);
   font-size: 0.75rem;
   line-height: 1.25;
   font-weight: 500;
@@ -337,7 +330,7 @@
 }
 
 .rowDate {
-  color: var(--muted-foreground);
+  color: var(--secondary);
   font-family: var(--font-mono);
   font-size: 0.625rem;
   line-height: 1.5;
@@ -352,7 +345,7 @@
   align-items: center;
   gap: 0.25rem;
   margin-top: 0.5rem;
-  color: var(--primary);
+  color: var(--secondary);
   font-size: 0.75rem;
   line-height: 1.25;
   font-weight: 500;
@@ -374,20 +367,13 @@
   align-items: center;
   justify-content: flex-end;
   width: 100%;
-  max-width: 1440px;
   margin: 2rem auto 0;
-  padding: 0.75rem 16px;
+  padding: 0.75rem var(--site-cell-padding);
   min-height: var(--header-height, 3rem);
 }
 
-@media (min-width: 640px) {
-  .viewAll {
-    padding-inline: 24px;
-  }
-}
-
 .viewAllLink {
-  color: var(--accent);
+  color: var(--secondary);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1;

@@ -66,7 +66,7 @@ export function VideoRowCard({
             <CmsImage
               media={doc.image}
               fill
-              sizes="(min-width: 1024px) 320px, (min-width: 640px) 280px, min(80vw, 320px)"
+              sizes="(min-width: 1024px) 23vw, (min-width: 640px) 280px, min(80vw, 320px)"
               className={styles.rowImage}
               imgClassName={cn(
                 styles.rowImageInner,
@@ -75,7 +75,7 @@ export function VideoRowCard({
             />
           ) : (
             <div className={styles.rowPlaceholder} aria-hidden="true">
-              <IconPlayerPlay className="text-muted-foreground size-6" />
+              <IconPlayerPlay className="size-6" />
             </div>
           )}
           <span className={styles.rowPlayBadge} aria-hidden="true">
@@ -90,7 +90,7 @@ export function VideoRowCard({
 
   const meta = (
     <div className={styles.rowMeta}>
-      <h4 id={titleId} className={cn(styles.rowTitle, 'lowercase')} title={doc.title}>
+      <h4 id={titleId} className={styles.rowTitle} title={doc.title}>
         {doc.title}
       </h4>
       {dateLabel ? (
