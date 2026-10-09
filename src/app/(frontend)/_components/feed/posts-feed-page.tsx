@@ -9,10 +9,18 @@ const { Page: PostsFeedPage, generateMetadata: generatePostsFeedMetadata } =
     label: 'Posts',
     feedType: 'posts',
     loadFeed: (locale) => getPostsPage(locale, null),
-    renderFeed: ({ locale, feed, adapter, decorations }) => {
+    renderFeed: ({ locale, feed, adapter }) => {
       const { docs, nextCursor, hasNextPage } = feed as PostsPageView
       return (
         <FeedSection
+          key={JSON.stringify([
+            locale,
+            'posts-feed',
+            docs,
+            'infinite',
+            nextCursor,
+            hasNextPage,
+          ])}
           locale={locale}
           sectionId="posts-feed"
           headingId="posts-feed-heading"
@@ -27,7 +35,6 @@ const { Page: PostsFeedPage, generateMetadata: generatePostsFeedMetadata } =
           showViewAll={false}
           feedType="posts"
           docs={docs}
-          decorations={decorations}
         />
       )
     },

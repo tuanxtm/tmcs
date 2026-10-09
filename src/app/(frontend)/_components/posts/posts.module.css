@@ -1,0 +1,99 @@
+/* Viewport for the FlexCarousel. Reserved height so the engine has a real
+   container before WebGL mounts; the engine itself sizes to fill h-full. */
+.viewport {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: clamp(24rem, 70svh, 48rem);
+  margin-top: 1.5rem;
+  color: var(--secondary);
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.description {
+  margin: 0.75rem auto 0;
+  max-width: 42rem;
+  padding: 0 1rem;
+  color: var(--secondary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.carousel {
+  font-family: var(--font-mono);
+}
+
+.fallbackCaption {
+  position: absolute;
+  inset-inline: 1rem;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  max-width: 100%;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.date {
+  opacity: 0.6;
+}
+
+.openPostLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-decoration: none;
+  text-underline-offset: 4px;
+  pointer-events: auto;
+  cursor: pointer;
+  outline: none;
+}
+
+.openPostLink:hover {
+  text-decoration: underline;
+}
+
+.openPostLink:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}

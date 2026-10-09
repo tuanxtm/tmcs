@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { IconArrowRight } from '@tabler/icons-react'
 
 import { FeedCard } from '@/app/(frontend)/_components/feed/feed-card'
 import { VideoFeedCard } from '@/app/(frontend)/_components/feed/video-feed-card'
@@ -11,9 +12,11 @@ import {
   useGridColumnCount,
 } from '@/app/(frontend)/_components/layout/reveal-grid-item'
 import { SectionHeader } from '@/app/(frontend)/_components/layout/section-header'
+import { PostsCarousel } from '@/app/(frontend)/_components/posts/posts-carousel'
+import canvasStyles from '@/app/(frontend)/_components/canvas/canvas.module.css'
+import postsStyles from '@/app/(frontend)/_components/posts/posts.module.css'
 import { loadFeedPage } from '@/app/(frontend)/_lib/actions'
 import type {
-  FeedDecorationView,
   FeedPaginationMode,
   FeedType,
   PostCardView,
@@ -21,6 +24,7 @@ import type {
   VideoCardView,
 } from '@/app/(frontend)/_lib/types'
 import { Button } from '@/components/ui/button'
+import { Scales } from '@/components/ui/scales'
 import type { LocaleCode } from '@/lib/locales'
 import { cn } from '@/lib/utils'
 
@@ -43,7 +47,6 @@ type FeedSectionBaseProps = {
   viewAllLabel?: Record<LocaleCode, string> | string | null
   viewAllHref?: string | null
   className?: string
-  decorations?: FeedDecorationView[]
 }
 
 type FeedSectionProps =
@@ -80,7 +83,6 @@ export function FeedSection(props: FeedSectionProps) {
     feedType,
     docs: initialDocs,
     className,
-    decorations,
   } = props
 
   const [docs, setDocs] = useState<FeedCardDoc[]>(initialDocs)
@@ -108,7 +110,11 @@ export function FeedSection(props: FeedSectionProps) {
         }
         setDocs((current) => {
           const seen = new Set(current.map((doc) => doc.id))
-          const appended = page.docs.filter((doc) => !seen.has(doc.id))
+          const appended = page.docs.filter((doc) => {
+            if (seen.has(doc.id)) return false
+            seen.add(doc.id)
+            return true
+          })
           return [...current, ...appended]
         })
         setNextCursor(page.nextCursor)
@@ -148,6 +154,27 @@ export function FeedSection(props: FeedSectionProps) {
       : (viewAllLabel?.[locale] ?? viewAllLabel?.['en'] ?? '')
 
   if (docs.length === 0) {
+    if (feedType === 'posts') {
+      return (
+        <section
+          id={sectionId}
+          aria-labelledby={headingId}
+          data-feed-type={feedType}
+          data-cursor-popup={sectionCursor}
+          className={cn(canvasStyles.section, className)}
+        >
+          <div className={canvasStyles.frame}>
+            <h2 id={headingId} className={canvasStyles.heading}>
+              {heading}
+            </h2>
+            {description ? <p className={canvasStyles.description}>{description}</p> : null}
+            <p className={canvasStyles.status} role="status" aria-live="polite">
+              No posts yet
+            </p>
+          </div>
+        </section>
+      )
+    }
     return (
       <section
         id={sectionId}
@@ -157,6 +184,89 @@ export function FeedSection(props: FeedSectionProps) {
         className={className}
       >
         <SectionHeader id={headingId} heading={heading} />
+      </section>
+    )
+  }
+
+  if (feedType === 'posts') {
+    return (
+      <section
+        id={sectionId}
+        aria-labelledby={headingId}
+        data-feed-type={feedType}
+        data-cursor-popup={sectionCursor}
+        className={cn(canvasStyles.section, className)}
+      >
+        <div className={canvasStyles.frame}>
+          <h2 id={headingId} className={canvasStyles.heading}>
+            {heading}
+          </h2>
+          {description ? <p className={postsStyles.description}>{description}</p> : null}
+          <PostsCarousel
+            docs={docs as PostCardView[]}
+            locale={locale}
+            cursorPopupItem={cursorPopupItem}
+          />
+          {pagination === 'infinite' ? (
+            <div
+              className={cn(
+                'bg-background flex min-h-(--header-height) flex-col items-center justify-center',
+                'gap-3',
+                'px-1.5 py-4',
+              )}
+            >
+              <div ref={sentinelRef} className="h-1 w-full" aria-hidden="true" />
+              <p
+                role="status"
+                aria-live="polite"
+                className="text-muted-foreground text-xs tracking-wide uppercase"
+              >
+                {isPending ? 'Loading…' : hasNextPage ? 'There are more ...' : 'End of feed'}
+              </p>
+              {error ? (
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <p role="alert" className="text-destructive text-xs">
+                    {error}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={loadMore}
+                    disabled={isPending}
+                    aria-busy={isPending}
+                  >
+                    Try again
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          {showViewAll && viewAllHref && resolvedViewAllLabel ? (
+            <div className={canvasStyles.viewAll} data-canvas-view-all>
+              <div
+                className={canvasStyles.viewAllScales}
+                aria-hidden="true"
+                data-canvas-view-all-scales
+              >
+                <Scales
+                  orientation="diagonal"
+                  size={10}
+                  color="var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))"
+                />
+              </div>
+              <Link
+                href={viewAllHref}
+                transitionTypes={['nav-forward']}
+                data-cursor-popup={cursorPopupViewAll || resolvedViewAllLabel.toLowerCase()}
+                className={cn(canvasStyles.viewAllLink, 'site-cell-hover')}
+                data-canvas-view-all-link
+              >
+                <span>{resolvedViewAllLabel}</span>
+                <IconArrowRight aria-hidden="true" />
+              </Link>
+            </div>
+          ) : null}
+        </div>
       </section>
     )
   }
@@ -181,10 +291,6 @@ export function FeedSection(props: FeedSectionProps) {
             className={cn('relative z-0 min-w-0')}
           >
             {feedType === 'videos' ? (
-              // Videos intentionally skip the decoration fallback - the
-              // YouTube icon placeholder communicates "video tile" more
-              // clearly than an ornament would, and video cards always
-              // carry a thumbnail in practice.
               <VideoFeedCard
                 doc={doc as VideoCardView}
                 locale={locale}
@@ -198,7 +304,6 @@ export function FeedSection(props: FeedSectionProps) {
                 doc={doc as PostCardView | ProjectCardView}
                 locale={locale}
                 cursorPopup={cursorPopupItem}
-                decorations={decorations}
               />
             )}
           </RevealGridItem>
