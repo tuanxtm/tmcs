@@ -11,19 +11,21 @@
   display: grid;
   grid-template-areas: 'image' 'text';
   min-width: 0;
+  padding: var(--site-cell-padding);
+  row-gap: var(--site-cell-padding);
   border-bottom: var(--inner-line-weight) solid var(--site-rule-color);
 }
 .richText {
   grid-area: text;
   min-width: 0;
-  padding: 24px var(--site-cell-padding);
+  padding: 0;
 }
 .image {
   position: relative;
   grid-area: image;
   min-width: 0;
   aspect-ratio: 5 / 4;
-  margin: 24px;
+  margin: 0;
 }
 .bottom {
   display: grid;
@@ -35,7 +37,10 @@
 }
 .links {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
   gap: 8px;
+  column-gap: 24px;
   min-width: 0;
   padding: var(--site-cell-padding);
   border-bottom: var(--inner-line-weight) solid var(--site-rule-color);
@@ -61,16 +66,20 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 44px;
+  min-height: 28px;
+  font-family: var(--font-serif);
   font-size: 0.875rem;
+  text-decoration: none;
   overflow-wrap: anywhere;
 }
 .heroLink span:last-child {
   min-width: 0;
 }
-.heroLink:hover {
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
+.linkMarker {
+  flex-shrink: 0;
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
 }
 .scroll {
   position: relative;
@@ -122,10 +131,11 @@
     grid-template-rows: minmax(0, 1fr);
     min-height: 0;
     padding: 0;
+    row-gap: 0;
   }
   .richText {
     min-height: 0;
-    padding: 16px;
+    padding: var(--site-cell-padding);
     overflow-wrap: anywhere;
   }
   .image {
@@ -144,12 +154,8 @@
     display: block;
     grid-row: span 2;
   }
-  .heroLink {
-    min-height: 28px;
-  }
   .links {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-content: start;
+    column-gap: 8px;
     border-left: var(--inner-line-weight) solid var(--site-rule-color);
   }
   .scroll {

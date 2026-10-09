@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { IconArrowRight, IconMenu2, IconMinus } from '@tabler/icons-react'
+import { IconArrowRight } from '@tabler/icons-react'
 import { externalLinkProps } from '@/app/(frontend)/_lib/link-props'
 import { switchLocalePath } from '@/app/(frontend)/_lib/locale'
 import type { NavItemView } from '@/app/(frontend)/_lib/types'
@@ -24,6 +24,7 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
   const submenu = state.routeKey === routeKey ? state.submenu : null
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLElement>(null)
   const submenuTriggers = useRef(new Map<string, HTMLAnchorElement>())
   const submenuCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const panelId = useId()
@@ -39,8 +40,10 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
 
   useEffect(() => {
     const media = window.matchMedia('(min-width: 1024px)')
+    if (panelRef.current) panelRef.current.inert = !media.matches && !open
     const reset = () => {
       cancelSubmenuClose()
+      if (panelRef.current) panelRef.current.inert = !media.matches
       setState({ routeKey, open: false, submenu: null })
     }
     media.addEventListener('change', reset)
@@ -48,7 +51,7 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
       cancelSubmenuClose()
       media.removeEventListener('change', reset)
     }
-  }, [cancelSubmenuClose, routeKey])
+  }, [cancelSubmenuClose, open, routeKey])
 
   useEffect(() => {
     if (!open && !submenu) return
@@ -91,12 +94,18 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
         className={cn(styles.menuTrigger, 'site-cell-hover')}
         aria-label={isVi ? (open ? 'Đóng menu' : 'Mở menu') : open ? 'Close menu' : 'Open menu'}
         aria-expanded={open}
+        data-expanded={open}
         aria-controls={panelId}
         onClick={() => setState({ routeKey, open: !open, submenu: null })}
       >
-        {open ? <IconMinus aria-hidden="true" /> : <IconMenu2 aria-hidden="true" />}
+        <span className={styles.menuIcon} aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
       </button>
       <nav
+        ref={panelRef}
         id={panelId}
         className={styles.panel}
         aria-label={isVi ? 'Điều hướng chính' : 'Primary'}
@@ -206,29 +215,31 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
                   </Link>
                 </div>
                 {hasChildren ? (
-                  <ul
+                  <div
                     id={childId}
                     className={styles.submenu}
                     data-expanded={expanded}
                     aria-hidden={!expanded}
                     inert={!expanded}
                   >
-                    {item.children.map((child) => (
-                      <li key={child.id}>
-                        <Link
-                          href={child.href}
-                          {...externalLinkProps(child)}
-                          {...(child.external || child.newTab
-                            ? {}
-                            : { transitionTypes: ['nav-forward'] })}
-                          className={cn(styles.childLink, 'site-cell-hover')}
-                          onClick={close}
-                        >
-                          {child.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+                    <ul className={styles.submenuList}>
+                      {item.children.map((child) => (
+                        <li key={child.id}>
+                          <Link
+                            href={child.href}
+                            {...externalLinkProps(child)}
+                            {...(child.external || child.newTab
+                              ? {}
+                              : { transitionTypes: ['nav-forward'] })}
+                            className={cn(styles.childLink, 'site-cell-hover')}
+                            onClick={close}
+                          >
+                            {child.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ) : null}
               </li>
             )

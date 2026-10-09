@@ -1,4 +1,5 @@
 import { SiteFrame } from '@/app/(frontend)/_components/layout/site-frame'
+import { BackToTop } from '@/app/(frontend)/_components/layout/back-to-top'
 import { Background } from '@/app/(frontend)/_components/layout/background'
 import { BootSplash } from '@/app/(frontend)/_components/layout/boot-splash'
 import { CursorPopup } from '@/app/(frontend)/_components/layout/cursor-popup'
@@ -27,6 +28,7 @@ export async function LocaleAwareShell({ children }: { children: React.ReactNode
         </div>
       </BootRevealContent>
       <CursorPopup />
+      <BackToTop />
     </LocaleProvider>
   )
 }

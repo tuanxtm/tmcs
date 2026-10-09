@@ -41,9 +41,7 @@ function LinkList({
               className={styles.heroLink}
               data-cursor-popup=""
             >
-              <span aria-hidden="true" className="text-accent font-mono">
-                &gt;
-              </span>
+              <span aria-hidden="true" className={styles.linkMarker} />
               <span>{variant === 'social' ? trimUrlScheme(link.href) : link.href}</span>
             </Link>
           </li>
