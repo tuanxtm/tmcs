@@ -12,16 +12,14 @@ import {
 } from 'react'
 import { useLenis } from 'lenis/react'
 
-import type { FeedDecorationView } from '@/app/(frontend)/_lib/types'
-
 import {
   clampCanvasPosition,
   getCanvasLayout,
+  OFFSET_Y,
   remapCanvasPosition,
   type Point,
   type Size,
 } from './canvas-layout'
-import { pickCanvasDecoration } from './canvas-item'
 import styles from './canvas.module.css'
 
 /** Pointer travel before a gesture counts as a drag. */
@@ -69,7 +67,6 @@ export type CanvasDoc = { id: number; title: string }
 export type CanvasItemProps<T> = {
   item: T
   index: number
-  decoration: FeedDecorationView | null
   cursorPopup?: string | null
   manual: Point | null
   zIndex: number | null
@@ -90,7 +87,6 @@ type DraggableCanvasProps<T extends CanvasDoc> = {
   renderItem: (props: CanvasItemProps<T>) => ReactNode
   description?: string | null
   cursorPopupItem?: string | null
-  decorations?: FeedDecorationView[]
   /** Pauses new automatic pagination requests while a visitor is moving. */
   onMovementChange?: (moving: boolean) => void
 }
@@ -234,7 +230,6 @@ export function DraggableCanvas<T extends CanvasDoc>({
   renderItem,
   description,
   cursorPopupItem,
-  decorations,
   onMovementChange,
 }: DraggableCanvasProps<T>) {
   const lenis = useLenis()
@@ -259,11 +254,6 @@ export function DraggableCanvas<T extends CanvasDoc>({
   const interactiveRef = useRef(false)
   const cancelDragRef = useRef<() => void>(() => {})
 
-  const decorationByItem = useMemo(
-    () => items.map((item) => pickCanvasDecoration(decorations, item.id)),
-    [decorations, items],
-  )
-
   // ---- geometry ------------------------------------------------------------
 
   const measure = useCallback((): CanvasGeometry | null => {
@@ -277,13 +267,36 @@ export function DraggableCanvas<T extends CanvasDoc>({
     const first = layout.placements[0]
     if (!first) return null
 
+    const itemSizes = Object.fromEntries(
+      items.map((item) => [item.id, readItemSize(itemElements.get(item.id), first)]),
+    )
+    let height = layout.height
+    if (width < 640) {
+      const tops: number[] = []
+      let rowTop = layout.padding
+      for (let index = 0; index < items.length; index += 2) {
+        let rowBottom = rowTop
+        for (let column = 0; column < 2 && index + column < items.length; column++) {
+          const itemIndex = index + column
+          const top = rowTop + OFFSET_Y[itemIndex % OFFSET_Y.length] * 12
+          tops[itemIndex] = top
+          rowBottom = Math.max(rowBottom, top + itemSizes[items[itemIndex].id].height)
+        }
+        height = rowBottom + layout.padding
+        rowTop = rowBottom + 24
+      }
+      // Measure all cards before writing their compact row positions.
+      items.forEach((item, index) => {
+        itemElements.get(item.id)?.style.setProperty('--compact-top', `${tops[index]}px`)
+      })
+      canvas.style.setProperty('--compact-height', `${height}px`)
+    }
+
     return {
-      canvas: { width: layout.width, height: layout.height },
+      canvas: { width: layout.width, height },
       padding: layout.padding,
       itemSize: { width: first.width, height: first.height },
-      itemSizes: Object.fromEntries(
-        items.map((item) => [item.id, readItemSize(itemElements.get(item.id), first)]),
-      ),
+      itemSizes,
     }
   }, [items, itemElements, kind])
 
@@ -352,11 +365,15 @@ export function DraggableCanvas<T extends CanvasDoc>({
     const observer = new ResizeObserver(syncGeometry)
 
     observer.observe(node)
+    for (const item of items) {
+      const element = itemElements.get(item.id)
+      if (element) observer.observe(element)
+    }
     return () => {
       observer.disconnect()
       interactiveRef.current = false
     }
-  }, [applyGeometry, measure, kind])
+  }, [applyGeometry, measure, kind, items, itemElements])
 
   // ---- movement math -------------------------------------------------------
 
@@ -861,7 +878,6 @@ export function DraggableCanvas<T extends CanvasDoc>({
               {renderItem({
                 item,
                 index,
-                decoration: decorationByItem[index] ?? null,
                 cursorPopup: cursorPopupItem,
                 manual: manual[item.id] ?? null,
                 zIndex: zOrder[item.id] ?? null,

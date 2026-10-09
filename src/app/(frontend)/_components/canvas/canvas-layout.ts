@@ -22,17 +22,7 @@ export function getCanvasLayout(
   const columns = width >= 1536 ? 4 : width >= 1024 ? 3 : 2
   const padding = width >= 640 ? 24 : 16
   const rowHeight =
-    kind === 'thing'
-      ? width >= 1024
-        ? 360
-        : width >= 640
-          ? 340
-          : 280
-      : width >= 1024
-        ? 280
-        : width >= 640
-          ? 260
-          : 220
+    width < 640 ? 360 : kind === 'thing' ? (width >= 1024 ? 360 : 340) : width >= 1024 ? 280 : 260
   const laneWidth = Math.max(1, width - padding * 2) / columns
   const itemWidth =
     width < 640 ? Math.min(laneWidth * 0.92, laneWidth - 16) : Math.min(480, laneWidth * 0.9)
@@ -50,8 +40,8 @@ export function getCanvasLayout(
       y: padding + row * rowHeight + verticalSlack * OFFSET_Y[index % OFFSET_Y.length],
       width: itemWidth,
       height: itemHeight,
-      imageWidth: itemWidth * (width < 640 ? 0.55 : 0.6) * scale,
-      imageHeight: (kind === 'thing' ? itemHeight - 100 : itemHeight) * scale,
+      imageWidth: itemWidth * (width < 640 ? 1 : 0.6) * scale,
+      imageHeight: (width < 640 ? 220 : kind === 'thing' ? itemHeight - 100 : itemHeight) * scale,
     }
   })
 
