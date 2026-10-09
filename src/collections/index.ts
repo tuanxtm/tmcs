@@ -3,8 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { Authors } from './Authors'
 import { Categories } from './Categories'
 import { ContactSubmissions } from './ContactSubmissions'
-import { DecorationPacks } from './DecorationPacks'
-import { FeedDecorations } from './FeedDecorations'
+import { InlineImages } from './InlineImages'
 import { Links } from './Links'
 import { Media } from './Media'
 import { Pages } from './Pages'
@@ -19,18 +18,17 @@ import { Videos } from './Videos'
 /**
  * Collection registration order.
  * Auth collection first, then media, then content dependencies.
- * FeedDecorations (WebP upload) before DecorationPacks (items upload to it).
+ * InlineImages after Media so the dedicated Hero picker resolves first.
  */
 export const collections: CollectionConfig[] = [
   Users,
   Media,
+  InlineImages,
   Authors,
   Categories,
   Tags,
   Posts,
   ShortStories,
-  FeedDecorations,
-  DecorationPacks,
   Projects,
   Things,
   Videos,

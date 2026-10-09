@@ -68,6 +68,35 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   `)
   await db.run(sql`CREATE UNIQUE INDEX \`media_locales_locale_parent_id_unique\` ON \`media_locales\` (\`_locale\`,\`_parent_id\`);`)
+  await db.run(sql`CREATE TABLE \`inline_images\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uploaded_by_id\` integer,
+  	\`prefix\` text DEFAULT 'inline-images',
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`url\` text,
+  	\`thumbnail_u_r_l\` text,
+  	\`filename\` text,
+  	\`mime_type\` text,
+  	\`filesize\` numeric,
+  	\`width\` numeric,
+  	\`height\` numeric,
+  	FOREIGN KEY (\`uploaded_by_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE set null
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`inline_images_uploaded_by_idx\` ON \`inline_images\` (\`uploaded_by_id\`);`)
+  await db.run(sql`CREATE INDEX \`inline_images_updated_at_idx\` ON \`inline_images\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`inline_images_created_at_idx\` ON \`inline_images\` (\`created_at\`);`)
+  await db.run(sql`CREATE UNIQUE INDEX \`inline_images_filename_idx\` ON \`inline_images\` (\`filename\`);`)
+  await db.run(sql`CREATE TABLE \`inline_images_locales\` (
+  	\`alt\` text NOT NULL,
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`_locale\` text NOT NULL,
+  	\`_parent_id\` integer NOT NULL,
+  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`inline_images\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE UNIQUE INDEX \`inline_images_locales_locale_parent_id_unique\` ON \`inline_images_locales\` (\`_locale\`,\`_parent_id\`);`)
   await db.run(sql`CREATE TABLE \`authors_social_links\` (
   	\`_order\` integer NOT NULL,
   	\`_parent_id\` integer NOT NULL,
@@ -197,7 +226,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`feed_type\` text DEFAULT 'posts',
   	\`source\` text DEFAULT 'latest',
   	\`pagination\` text DEFAULT 'static',
-  	\`limit\` numeric DEFAULT 11,
+  	\`limit\` numeric DEFAULT 12,
   	\`show_view_all\` integer DEFAULT true,
   	\`view_all_page_id\` integer,
   	\`block_name\` text,
@@ -546,7 +575,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`feed_type\` text DEFAULT 'posts',
   	\`source\` text DEFAULT 'latest',
   	\`pagination\` text DEFAULT 'static',
-  	\`limit\` numeric DEFAULT 11,
+  	\`limit\` numeric DEFAULT 12,
   	\`show_view_all\` integer DEFAULT true,
   	\`view_all_page_id\` integer,
   	\`_uuid\` text,
@@ -973,53 +1002,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   );
   `)
   await db.run(sql`CREATE UNIQUE INDEX \`_short_stories_v_locales_locale_parent_id_unique\` ON \`_short_stories_v_locales\` (\`_locale\`,\`_parent_id\`);`)
-  await db.run(sql`CREATE TABLE \`feed_decorations\` (
-  	\`id\` integer PRIMARY KEY NOT NULL,
-  	\`alt\` text,
-  	\`uploaded_by_id\` integer,
-  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
-  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
-  	\`url\` text,
-  	\`thumbnail_u_r_l\` text,
-  	\`filename\` text,
-  	\`mime_type\` text,
-  	\`filesize\` numeric,
-  	\`width\` numeric,
-  	\`height\` numeric,
-  	FOREIGN KEY (\`uploaded_by_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE set null
-  );
-  `)
-  await db.run(sql`CREATE INDEX \`feed_decorations_uploaded_by_idx\` ON \`feed_decorations\` (\`uploaded_by_id\`);`)
-  await db.run(sql`CREATE INDEX \`feed_decorations_updated_at_idx\` ON \`feed_decorations\` (\`updated_at\`);`)
-  await db.run(sql`CREATE INDEX \`feed_decorations_created_at_idx\` ON \`feed_decorations\` (\`created_at\`);`)
-  await db.run(sql`CREATE UNIQUE INDEX \`feed_decorations_filename_idx\` ON \`feed_decorations\` (\`filename\`);`)
-  await db.run(sql`CREATE TABLE \`decoration_packs_items\` (
-  	\`_order\` integer NOT NULL,
-  	\`_parent_id\` integer NOT NULL,
-  	\`id\` text PRIMARY KEY NOT NULL,
-  	\`title\` text NOT NULL,
-  	\`file_id\` integer NOT NULL,
-  	\`weight\` numeric DEFAULT 1,
-  	FOREIGN KEY (\`file_id\`) REFERENCES \`feed_decorations\`(\`id\`) ON UPDATE no action ON DELETE set null,
-  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`decoration_packs\`(\`id\`) ON UPDATE no action ON DELETE cascade
-  );
-  `)
-  await db.run(sql`CREATE INDEX \`decoration_packs_items_order_idx\` ON \`decoration_packs_items\` (\`_order\`);`)
-  await db.run(sql`CREATE INDEX \`decoration_packs_items_parent_id_idx\` ON \`decoration_packs_items\` (\`_parent_id\`);`)
-  await db.run(sql`CREATE INDEX \`decoration_packs_items_file_idx\` ON \`decoration_packs_items\` (\`file_id\`);`)
-  await db.run(sql`CREATE TABLE \`decoration_packs\` (
-  	\`id\` integer PRIMARY KEY NOT NULL,
-  	\`title\` text NOT NULL,
-  	\`slug\` text NOT NULL,
-  	\`slug_lock\` integer DEFAULT true,
-  	\`footer_item\` text,
-  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
-  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
-  );
-  `)
-  await db.run(sql`CREATE INDEX \`decoration_packs_slug_idx\` ON \`decoration_packs\` (\`slug\`);`)
-  await db.run(sql`CREATE INDEX \`decoration_packs_updated_at_idx\` ON \`decoration_packs\` (\`updated_at\`);`)
-  await db.run(sql`CREATE INDEX \`decoration_packs_created_at_idx\` ON \`decoration_packs\` (\`created_at\`);`)
   await db.run(sql`CREATE TABLE \`projects_blocks_page_hero\` (
   	\`_order\` integer NOT NULL,
   	\`_parent_id\` integer NOT NULL,
@@ -1055,7 +1037,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`feed_type\` text DEFAULT 'posts',
   	\`source\` text DEFAULT 'latest',
   	\`pagination\` text DEFAULT 'static',
-  	\`limit\` numeric DEFAULT 11,
+  	\`limit\` numeric DEFAULT 12,
   	\`show_view_all\` integer DEFAULT true,
   	\`view_all_page_id\` integer,
   	\`block_name\` text,
@@ -1399,7 +1381,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`feed_type\` text DEFAULT 'posts',
   	\`source\` text DEFAULT 'latest',
   	\`pagination\` text DEFAULT 'static',
-  	\`limit\` numeric DEFAULT 11,
+  	\`limit\` numeric DEFAULT 12,
   	\`show_view_all\` integer DEFAULT true,
   	\`view_all_page_id\` integer,
   	\`_uuid\` text,
@@ -1952,7 +1934,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`feed_type\` text DEFAULT 'posts',
   	\`source\` text DEFAULT 'latest',
   	\`pagination\` text DEFAULT 'static',
-  	\`limit\` numeric DEFAULT 11,
+  	\`limit\` numeric DEFAULT 12,
   	\`show_view_all\` integer DEFAULT true,
   	\`view_all_page_id\` integer,
   	\`block_name\` text,
@@ -2280,7 +2262,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`feed_type\` text DEFAULT 'posts',
   	\`source\` text DEFAULT 'latest',
   	\`pagination\` text DEFAULT 'static',
-  	\`limit\` numeric DEFAULT 11,
+  	\`limit\` numeric DEFAULT 12,
   	\`show_view_all\` integer DEFAULT true,
   	\`view_all_page_id\` integer,
   	\`_uuid\` text,
@@ -2720,13 +2702,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`path\` text NOT NULL,
   	\`users_id\` integer,
   	\`media_id\` integer,
+  	\`inline_images_id\` integer,
   	\`authors_id\` integer,
   	\`categories_id\` integer,
   	\`tags_id\` integer,
   	\`posts_id\` integer,
   	\`short_stories_id\` integer,
-  	\`feed_decorations_id\` integer,
-  	\`decoration_packs_id\` integer,
   	\`projects_id\` integer,
   	\`things_id\` integer,
   	\`videos_id\` integer,
@@ -2736,13 +2717,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	FOREIGN KEY (\`parent_id\`) REFERENCES \`payload_locked_documents\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`media_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`inline_images_id\`) REFERENCES \`inline_images\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`authors_id\`) REFERENCES \`authors\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`categories_id\`) REFERENCES \`categories\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`tags_id\`) REFERENCES \`tags\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`posts_id\`) REFERENCES \`posts\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`short_stories_id\`) REFERENCES \`short_stories\`(\`id\`) ON UPDATE no action ON DELETE cascade,
-  	FOREIGN KEY (\`feed_decorations_id\`) REFERENCES \`feed_decorations\`(\`id\`) ON UPDATE no action ON DELETE cascade,
-  	FOREIGN KEY (\`decoration_packs_id\`) REFERENCES \`decoration_packs\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`projects_id\`) REFERENCES \`projects\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`things_id\`) REFERENCES \`things\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`videos_id\`) REFERENCES \`videos\`(\`id\`) ON UPDATE no action ON DELETE cascade,
@@ -2756,13 +2736,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_path_idx\` ON \`payload_locked_documents_rels\` (\`path\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_users_id_idx\` ON \`payload_locked_documents_rels\` (\`users_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_media_id_idx\` ON \`payload_locked_documents_rels\` (\`media_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_inline_images_id_idx\` ON \`payload_locked_documents_rels\` (\`inline_images_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_authors_id_idx\` ON \`payload_locked_documents_rels\` (\`authors_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_categories_id_idx\` ON \`payload_locked_documents_rels\` (\`categories_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_tags_id_idx\` ON \`payload_locked_documents_rels\` (\`tags_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_posts_id_idx\` ON \`payload_locked_documents_rels\` (\`posts_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_short_stories_id_idx\` ON \`payload_locked_documents_rels\` (\`short_stories_id\`);`)
-  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_feed_decorations_id_idx\` ON \`payload_locked_documents_rels\` (\`feed_decorations_id\`);`)
-  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_decoration_packs_id_idx\` ON \`payload_locked_documents_rels\` (\`decoration_packs_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_projects_id_idx\` ON \`payload_locked_documents_rels\` (\`projects_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_things_id_idx\` ON \`payload_locked_documents_rels\` (\`things_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_videos_id_idx\` ON \`payload_locked_documents_rels\` (\`videos_id\`);`)
@@ -2833,7 +2812,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`site_url\` text NOT NULL,
   	\`contact_email\` text,
   	\`cover_image_id\` integer,
-  	\`active_decoration_pack_id\` integer NOT NULL,
   	\`analytics_provider\` text DEFAULT 'none',
   	\`analytics_site_id\` text,
   	\`default_social_image_id\` integer,
@@ -2846,13 +2824,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`updated_at\` text,
   	\`created_at\` text,
   	FOREIGN KEY (\`cover_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null,
-  	FOREIGN KEY (\`active_decoration_pack_id\`) REFERENCES \`decoration_packs\`(\`id\`) ON UPDATE no action ON DELETE set null,
   	FOREIGN KEY (\`default_social_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null,
   	FOREIGN KEY (\`seo_og_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null
   );
   `)
   await db.run(sql`CREATE INDEX \`site_settings_cover_image_idx\` ON \`site_settings\` (\`cover_image_id\`);`)
-  await db.run(sql`CREATE INDEX \`site_settings_active_decoration_pack_idx\` ON \`site_settings\` (\`active_decoration_pack_id\`);`)
   await db.run(sql`CREATE INDEX \`site_settings_default_social_image_idx\` ON \`site_settings\` (\`default_social_image_id\`);`)
   await db.run(sql`CREATE INDEX \`site_settings_seo_seo_og_image_idx\` ON \`site_settings\` (\`seo_og_image_id\`);`)
   await db.run(sql`CREATE TABLE \`site_settings_locales\` (
@@ -2916,7 +2892,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`version_site_url\` text NOT NULL,
   	\`version_contact_email\` text,
   	\`version_cover_image_id\` integer,
-  	\`version_active_decoration_pack_id\` integer NOT NULL,
   	\`version_analytics_provider\` text DEFAULT 'none',
   	\`version_analytics_site_id\` text,
   	\`version_default_social_image_id\` integer,
@@ -2931,13 +2906,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	FOREIGN KEY (\`version_cover_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null,
-  	FOREIGN KEY (\`version_active_decoration_pack_id\`) REFERENCES \`decoration_packs\`(\`id\`) ON UPDATE no action ON DELETE set null,
   	FOREIGN KEY (\`version_default_social_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null,
   	FOREIGN KEY (\`version_seo_og_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null
   );
   `)
   await db.run(sql`CREATE INDEX \`_site_settings_v_version_version_cover_image_idx\` ON \`_site_settings_v\` (\`version_cover_image_id\`);`)
-  await db.run(sql`CREATE INDEX \`_site_settings_v_version_version_active_decoration_pack_idx\` ON \`_site_settings_v\` (\`version_active_decoration_pack_id\`);`)
   await db.run(sql`CREATE INDEX \`_site_settings_v_version_version_default_social_image_idx\` ON \`_site_settings_v\` (\`version_default_social_image_id\`);`)
   await db.run(sql`CREATE INDEX \`_site_settings_v_version_seo_version_seo_og_image_idx\` ON \`_site_settings_v\` (\`version_seo_og_image_id\`);`)
   await db.run(sql`CREATE INDEX \`_site_settings_v_created_at_idx\` ON \`_site_settings_v\` (\`created_at\`);`)
@@ -2979,6 +2952,8 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.run(sql`DROP TABLE \`users\`;`)
   await db.run(sql`DROP TABLE \`media\`;`)
   await db.run(sql`DROP TABLE \`media_locales\`;`)
+  await db.run(sql`DROP TABLE \`inline_images\`;`)
+  await db.run(sql`DROP TABLE \`inline_images_locales\`;`)
   await db.run(sql`DROP TABLE \`authors_social_links\`;`)
   await db.run(sql`DROP TABLE \`authors_social_links_locales\`;`)
   await db.run(sql`DROP TABLE \`authors\`;`)
@@ -3037,9 +3012,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.run(sql`DROP TABLE \`short_stories_locales\`;`)
   await db.run(sql`DROP TABLE \`_short_stories_v\`;`)
   await db.run(sql`DROP TABLE \`_short_stories_v_locales\`;`)
-  await db.run(sql`DROP TABLE \`feed_decorations\`;`)
-  await db.run(sql`DROP TABLE \`decoration_packs_items\`;`)
-  await db.run(sql`DROP TABLE \`decoration_packs\`;`)
   await db.run(sql`DROP TABLE \`projects_blocks_page_hero\`;`)
   await db.run(sql`DROP TABLE \`projects_blocks_page_hero_locales\`;`)
   await db.run(sql`DROP TABLE \`projects_blocks_page_feed_section\`;`)

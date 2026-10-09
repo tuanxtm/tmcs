@@ -126,23 +126,37 @@ export const revalidateMediaDelete = createCollectionRevalidateDeleteHook(
   { always: true },
 )
 
-export const revalidateDecorationPacks = createCollectionRevalidateHook([
-  CACHE_TAGS.decorationPacks,
-  CACHE_TAGS.siteShell,
-])
-export const revalidateDecorationPacksDelete = createCollectionRevalidateDeleteHook(
-  [CACHE_TAGS.decorationPacks, CACHE_TAGS.siteShell],
-  { always: true },
-)
+// Inline Images have no draft status. Any create/update/delete changes the
+// public Hero rendering, so we always revalidate - mirroring the existing
+// collection factory with the same `disableRevalidate` context escape hatch.
+const INLINE_IMAGES_TAGS: CacheTag[] = [
+  CACHE_TAGS.inlineImages,
+  CACHE_TAGS.pages,
+  CACHE_TAGS.posts,
+  CACHE_TAGS.projects,
+]
 
-export const revalidateFeedDecorations = createCollectionRevalidateHook([
-  CACHE_TAGS.decorationPacks,
-  CACHE_TAGS.siteShell,
-])
-export const revalidateFeedDecorationsDelete = createCollectionRevalidateDeleteHook(
-  [CACHE_TAGS.decorationPacks, CACHE_TAGS.siteShell],
-  { always: true },
-)
+function revalidateInlineImagesChange(
+  args: Parameters<CollectionAfterChangeHook>[0],
+): ReturnType<CollectionAfterChangeHook> {
+  const { doc, req } = args
+  if (shouldSkip(req.context)) return doc
+  revalidateTags(INLINE_IMAGES_TAGS, req.payload?.logger)
+  return doc
+}
+
+function revalidateInlineImagesDeleteInner(
+  args: Parameters<CollectionAfterDeleteHook>[0],
+): ReturnType<CollectionAfterDeleteHook> {
+  const { doc, req } = args
+  if (shouldSkip(req.context)) return doc
+  revalidateTags(INLINE_IMAGES_TAGS, req.payload?.logger)
+  return doc
+}
+
+export const revalidateInlineImages: CollectionAfterChangeHook = revalidateInlineImagesChange
+export const revalidateInlineImagesDelete: CollectionAfterDeleteHook =
+  revalidateInlineImagesDeleteInner
 
 // Links are public reads and consumed by navigation, hero, CTA, and footer blocks.
 // Treat links like a site-shell concern so any reference stays warm.
@@ -155,7 +169,4 @@ export const revalidateLinksDelete = createCollectionRevalidateDeleteHook(
   { always: true },
 )
 
-export const revalidateSiteShellGlobal = createGlobalRevalidateHook([
-  CACHE_TAGS.siteShell,
-  CACHE_TAGS.decorationPacks,
-])
+export const revalidateSiteShellGlobal = createGlobalRevalidateHook([CACHE_TAGS.siteShell])

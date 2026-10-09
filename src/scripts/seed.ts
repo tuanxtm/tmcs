@@ -79,6 +79,51 @@ function richText(...paragraphs: string[]) {
   }
 }
 
+/**
+ * Hero paragraph that hosts a single inline image between two text runs.
+ * Mirrors the shape `heroRichText` editor stores in D1.
+ */
+function heroParagraphWithInlineImage(args: {
+  before: string
+  inlineImageId: number
+  after: string
+  inlineNodeId: string
+}) {
+  const inlineBlock = {
+    type: 'inlineBlock' as const,
+    version: 2 as const,
+    fields: {
+      id: args.inlineNodeId,
+      blockName: null,
+      blockType: 'heroInlineImage' as const,
+      image: args.inlineImageId,
+      caption: null,
+      scale: 1,
+      align: 'text-bottom' as const,
+    },
+  }
+  return {
+    root: {
+      type: 'root' as const,
+      children: [
+        {
+          type: 'paragraph' as const,
+          children: [
+            { type: 'text' as const, text: args.before, version: 1 as const },
+            inlineBlock,
+            { type: 'text' as const, text: args.after, version: 1 as const },
+          ],
+          version: 1 as const,
+        },
+      ],
+      direction: 'ltr' as const,
+      format: '' as const,
+      indent: 0,
+      version: 1 as const,
+    },
+  }
+}
+
 function daysAgo(days: number): string {
   const date = new Date()
   date.setDate(date.getDate() - days)
@@ -127,37 +172,6 @@ async function upsertUser(
     },
     overrideAccess: true,
   })
-}
-
-async function upsertPackBySlug(
-  payload: Payload,
-  slug: string,
-  data: { title: string },
-): Promise<{ id: number }> {
-  const existing = await payload.find({
-    collection: 'decoration-packs',
-    where: { slug: { equals: slug } },
-    limit: 1,
-    depth: 0,
-    overrideAccess: true,
-  })
-
-  if (existing.docs[0]) {
-    const updated = await payload.update({
-      collection: 'decoration-packs',
-      id: existing.docs[0].id,
-      data: { title: data.title },
-      overrideAccess: true,
-    })
-    return { id: updated.id }
-  }
-
-  const created = await payload.create({
-    collection: 'decoration-packs',
-    data: { slug, title: data.title },
-    overrideAccess: true,
-  })
-  return { id: created.id }
 }
 
 async function upsertBySlug(
@@ -285,6 +299,53 @@ async function upsertSeedMedia(payload: Payload, filename: string, alt: string):
   })
 
   return created.id
+}
+
+async function upsertSeedInlineImage(
+  payload: Payload,
+  filename: string,
+  alt: string,
+  uploadedBy: number,
+): Promise<number> {
+  const existing = await payload.find({
+    collection: 'inline-images',
+    where: { filename: { equals: filename } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+  if (existing.docs[0]) return existing.docs[0].id
+
+  const localPath = path.join(process.cwd(), 'src/assets/images', filename)
+  const buffer = await readFile(localPath)
+  const bytes = new Uint8Array(buffer)
+
+  const created = await payload.create({
+    collection: 'inline-images',
+    data: {
+      alt,
+      uploadedBy,
+    },
+    file: {
+      data: bytes as unknown as Buffer,
+      mimetype: 'image/webp',
+      name: filename,
+      size: bytes.byteLength,
+    },
+    overrideAccess: true,
+    context: { disableRevalidate: true },
+  })
+
+  const vi = await payload.update({
+    collection: 'inline-images',
+    id: created.id,
+    data: { alt },
+    locale: 'vi',
+    overrideAccess: true,
+    context: { disableRevalidate: true },
+  })
+
+  return vi.id
 }
 
 /**
@@ -1822,18 +1883,9 @@ async function seed() {
   }
 
   // Globals
-  // Create the decoration packs BEFORE the first site-settings update so
-  // `activeDecorationPack` (required) can point to a valid pack id from
-  // the start. Packs are intentionally left empty - no feed-decorations
-  // are uploaded by the seed.
-  const plantPack = await upsertPackBySlug(payload, 'plant', { title: 'Plant' })
-  await upsertPackBySlug(payload, 'new-year', { title: 'New Year' })
-  await upsertPackBySlug(payload, 'christmas', { title: 'Christmas' })
-
   await payload.updateGlobal({
     slug: 'site-settings',
     data: {
-      activeDecorationPack: plantPack.id,
       siteName: 'tuantm',
       tagline: 'DIY builds, tech workspace, and maker notes',
       description: 'Seed site - workshop projects, desk setups, and electronics experiments.',
@@ -1863,26 +1915,6 @@ async function seed() {
     locale: 'vi',
     overrideAccess: true,
   })
-
-  // Make sure the new-year and christmas packs stay empty (no items uploaded).
-  // The plant pack is the active one and stays empty by design.
-  for (const slug of ['new-year', 'christmas'] as const) {
-    const pack = await payload.find({
-      collection: 'decoration-packs',
-      where: { slug: { equals: slug } },
-      limit: 1,
-      depth: 0,
-      overrideAccess: true,
-    })
-    if (pack.docs[0]) {
-      await payload.update({
-        collection: 'decoration-packs',
-        id: pack.docs[0].id,
-        data: { items: [], footerItem: null },
-        overrideAccess: true,
-      })
-    }
-  }
 
   const categoryIds = Object.values(categories).map((c) => c.id)
   const tagSlugs = TAG_SEEDS.map((t) => t.slug)
@@ -2377,6 +2409,18 @@ async function seed() {
     height: '30vh',
   })
 
+  // Single shared inline image for the Home Hero paragraph in both
+  // locales. Stable filename keeps the seed idempotent across runs.
+  const seedHeroInlineImageId = await upsertSeedInlineImage(
+    payload,
+    'seed-inline-beam_1x1.webp',
+    'Seed inline image',
+    admin.id,
+  )
+  // Default node id embedded in both home layouts; the inline block keeps
+  // it on every seed re-run.
+  const SEED_HERO_INLINE_NODE_ID = 'seed-home-hero-inline-image'
+
   const homePage = await upsertBySlug(payload, 'pages', 'home', {
     title: 'Home',
     summary: 'DIY builds, tech workspace, and maker notes',
@@ -2385,7 +2429,12 @@ async function seed() {
       {
         id: 'seed-home-hero',
         blockType: 'pageHero',
-        paragraph: richText('Documenting builds, failures, and the tools that survive them.'),
+        paragraph: heroParagraphWithInlineImage({
+          before: 'Documenting builds, failures, and the tools that survive them. ',
+          inlineImageId: seedHeroInlineImageId,
+          after: 'A small home workshop and a public log of every fix.',
+          inlineNodeId: SEED_HERO_INLINE_NODE_ID,
+        }),
         cursorPopup: 'scroll down',
         labelSocialLinks: 'Socials',
         socialLinks: [linkIds.en.about],
@@ -2461,6 +2510,17 @@ async function seed() {
         cursorPopupItem: 'play',
       },
       blankSpace('seed-home-gap-4'),
+      {
+        id: 'seed-home-footer',
+        blockType: 'pageFooter',
+        footerText: richText('DIY builds, tech workspace, and maker notes'),
+        labelSocialLinks: 'Socials',
+        socialLinks: [linkIds.en.instagram, linkIds.en.youtube, linkIds.en.github],
+        labelOtherLinks: 'Links',
+        otherLinks: [linkIds.en.projects, linkIds.en.posts, linkIds.en.about],
+        cursorPopup: 'footer',
+        copyright: '© {{year}} tuantm',
+      },
     ],
     _status: 'published',
     publishedAt: daysAgo(120),
@@ -2614,7 +2674,12 @@ async function seed() {
         {
           id: 'seed-home-hero',
           blockType: 'pageHero',
-          paragraph: richText('Ghi lại bản build, thất bại và dụng cụ còn sót lại.'),
+          paragraph: heroParagraphWithInlineImage({
+            before: 'Ghi lại bản build, thất bại và dụng cụ còn sót lại. ',
+            inlineImageId: seedHeroInlineImageId,
+            after: 'Một xưởng nhỏ tại nhà và nhật ký công khai cho mỗi lần sửa.',
+            inlineNodeId: SEED_HERO_INLINE_NODE_ID,
+          }),
           cursorPopup: 'kéo xuống',
           labelSocialLinks: 'Mạng xã hội',
           socialLinks: [linkIds.vi.about],
@@ -2690,6 +2755,17 @@ async function seed() {
           cursorPopupItem: 'phát',
         },
         blankSpace('seed-home-gap-4'),
+        {
+          id: 'seed-home-footer',
+          blockType: 'pageFooter',
+          footerText: richText('Dự án DIY, không gian tech và ghi chú maker'),
+          labelSocialLinks: 'Mạng xã hội',
+          socialLinks: [linkIds.vi.instagram, linkIds.vi.youtube, linkIds.vi.github],
+          labelOtherLinks: 'Liên kết',
+          otherLinks: [linkIds.vi.projects, linkIds.vi.posts, linkIds.vi.about],
+          cursorPopup: 'footer',
+          copyright: '© {{year}} tuantm',
+        },
       ],
       seo: {
         metaTitle: 'tuantm',

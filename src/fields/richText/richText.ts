@@ -12,12 +12,15 @@ export const richText = lexicalEditor({
   features: ({ defaultFeatures }) => [
     ...defaultFeatures,
     FixedToolbarFeature(),
+    // Allowlist the picker to Media so the dedicated Inline Images collection
+    // does not appear in the block-level upload menu for ordinary rich text.
     UploadFeature({
       collections: {
         media: {
           fields: [],
         },
       },
+      enabledCollections: ['media'],
     }),
     TextStateFeature({ state: textStateConfig }),
     BlocksFeature({
@@ -36,6 +39,7 @@ export const richTextWithoutBlock = lexicalEditor({
           fields: [],
         },
       },
+      enabledCollections: ['media'],
     }),
     TextStateFeature({ state: textStateConfig }),
   ],

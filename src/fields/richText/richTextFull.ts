@@ -59,6 +59,7 @@ export const richTextFull = lexicalEditor({
           fields: [],
         },
       },
+      enabledCollections: ['media'],
     }),
   ],
 })

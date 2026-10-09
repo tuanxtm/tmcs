@@ -1,1 +1,1 @@
-export { InlineImageBlock } from './inline-image'
+export { InlineImageBlock, HeroInlineImageBlock } from './inline-image'

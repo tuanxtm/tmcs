@@ -1,19 +1,15 @@
 import type { Block } from 'payload'
 
 import { linkPickerField } from '@/fields/common'
-import { richText } from '@/fields/richText/richText'
+import { heroRichText } from '@/fields/richText/heroRichText'
 
 /**
  * Page block rendered near the top of a page.
  *
- * `paragraph` uses the global `richText` editor so authors can insert
- * inline blocks (currently `inlineImage`) inside the hero paragraph via
- * the Lexical `+ Add` menu. Row-level page blocks are intentionally NOT
- * exposed here - that would re-introduce the schema recursion during
- * `generate:types` (`pageBlocks` includes `PageHeroBlock`; the walker
- * would loop). When row-level block insertion becomes a real need in the
- * hero, split `pageBlocks` into a recursive-safe subset (see
- * `src/blocks/index.ts`) and pass the safe subset to `richText.blocks`.
+ * `paragraph` uses the Hero-only `heroRichText` editor so authors can
+ * insert inline images (the `heroInlineImage` block) sourced from the
+ * dedicated Inline Images collection. The Lexical `+ Add` menu inside the
+ * Hero paragraph exposes only that one inline block.
  */
 export const PageHeroBlock: Block = {
   slug: 'pageHero',
@@ -26,7 +22,7 @@ export const PageHeroBlock: Block = {
       name: 'paragraph',
       type: 'richText',
       localized: true,
-      editor: richText,
+      editor: heroRichText,
     },
     {
       name: 'heroImage',

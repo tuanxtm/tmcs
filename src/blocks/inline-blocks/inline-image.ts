@@ -1,4 +1,4 @@
-import type { Block } from 'payload'
+import type { Block, Field } from 'payload'
 
 /**
  * Inline image block - inserts an image inline inside a rich-text paragraph.
@@ -9,27 +9,26 @@ import type { Block } from 'payload'
  * `src/fields/richText.ts` via `BlocksFeature({ inlineBlocks: [...] })` and by
  * generated Payload types as `InlineImageBlock`.
  *
+ * The `image` field's `relationTo` is parameterized at build time so the same
+ * fields are reused for the Hero-specific editor (relationTo `inline-images`).
+ * Ordinary rich text uses `media`; the Hero editor uses `inline-images`.
+ *
  * Field contract:
- *   - image: required media upload (relationTo 'media').
+ *   - image: required upload. relationTo passed in by the factory.
  *   - caption: optional short caption shown below the image.
  *   - scale: optional real-layout size multiplier (default 1). Allocates
- *     actual inline-flow space (em × scale) so text reflows around the
- *     visible image — no overlap with same-line text. Vertical bleed
- *     into the leading/descender of adjacent lines is intentional, and
- *     matches printed-media behavior for inline figures.
- *     Common picks: 1.05, 1.1, 1.25, 1.5.
+ *     actual inline-flow space (em x scale) so text reflows around the
+ *     visible image - no overlap with same-line text.
  *   - align: optional vertical alignment on the text line. Maps to CSS
  *     `vertical-align`; default `text-bottom` keeps the image rooted at
  *     the descender line of the surrounding text.
  */
-export const InlineImageBlock: Block = {
-  slug: 'inlineImage',
-  interfaceName: 'InlineImageBlock',
-  fields: [
+function createInlineImageFields(imageCollection: 'media' | 'inline-images'): Field[] {
+  return [
     {
       name: 'image',
       type: 'upload',
-      relationTo: 'media',
+      relationTo: imageCollection,
       required: true,
     },
     {
@@ -60,8 +59,31 @@ export const InlineImageBlock: Block = {
         { label: 'Bottom', value: 'bottom' },
       ],
       admin: {
-        description: 'Vertical alignment on the text line. Default: text-bottom (rooted at descender line).',
+        description:
+          'Vertical alignment on the text line. Default: text-bottom (rooted at descender line).',
       },
     },
-  ],
+  ]
+}
+
+/** Ordinary rich-text inline image block: uses Media. */
+export const InlineImageBlock: Block = {
+  slug: 'inlineImage',
+  interfaceName: 'InlineImageBlock',
+  labels: {
+    singular: 'Inline Image',
+    plural: 'Inline Images',
+  },
+  fields: createInlineImageFields('media'),
+}
+
+/** Hero-only inline image block: uses the dedicated Inline Images collection. */
+export const HeroInlineImageBlock: Block = {
+  slug: 'heroInlineImage',
+  interfaceName: 'HeroInlineImageBlock',
+  labels: {
+    singular: 'Inline Image',
+    plural: 'Inline Images',
+  },
+  fields: createInlineImageFields('inline-images'),
 }

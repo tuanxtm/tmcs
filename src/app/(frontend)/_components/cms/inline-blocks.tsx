@@ -23,6 +23,16 @@ export type InlineImageFields = {
   align?: ('baseline' | 'top' | 'bottom' | 'middle' | 'text-top' | 'text-bottom') | null
 }
 
+export type HeroInlineImageFields = {
+  blockType: 'heroInlineImage'
+  blockName?: string | null
+  id?: string
+  image?: number | string | MediaLite | null
+  caption?: string | null
+  scale?: number | null
+  align?: ('baseline' | 'top' | 'bottom' | 'middle' | 'text-top' | 'text-bottom') | null
+}
+
 type PageBlankSpaceFields = {
   blockType: 'pageBlankSpace'
   blockName?: string | null
@@ -30,7 +40,7 @@ type PageBlankSpaceFields = {
   height?: string | null
 }
 
-export type InlineBlockFields = InlineImageFields | PageBlankSpaceFields
+export type InlineBlockFields = InlineImageFields | HeroInlineImageFields | PageBlankSpaceFields
 
 type InlineBlockProps = {
   fields: InlineBlockFields
@@ -48,13 +58,13 @@ function InlineImageInlineBlock({
   fields,
   uniform,
 }: {
-  fields: InlineImageFields
+  fields: InlineImageFields | HeroInlineImageFields
   uniform?: boolean
 }) {
   const media = asMedia(fields.image)
   if (!media?.url) {
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('[InlineBlock] inlineImage missing media url; skipped.', fields)
+      console.warn('[InlineBlock] missing media url; skipped.', fields)
     }
     return null
   }
@@ -120,7 +130,8 @@ export function InlineBlock({ fields, uniform }: InlineBlockProps) {
       return <div style={{ height }} aria-hidden />
     }
 
-    case 'inlineImage': {
+    case 'inlineImage':
+    case 'heroInlineImage': {
       return <InlineImageInlineBlock fields={fields} uniform={uniform} />
     }
 

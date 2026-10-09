@@ -1,11 +1,11 @@
-import * as migration_20260801_000000_blocks_v2 from './20260801_000000_blocks_v2';
+import * as migration_20260101_000000_inline_images_schema from './20260101_000000_inline_images_schema';
 import * as migration_20260809_160100_slug_reservations from './20260809_160100_slug_reservations';
 
 export const migrations = [
   {
-    up: migration_20260801_000000_blocks_v2.up,
-    down: migration_20260801_000000_blocks_v2.down,
-    name: '20260801_000000_blocks_v2',
+    up: migration_20260101_000000_inline_images_schema.up,
+    down: migration_20260101_000000_inline_images_schema.down,
+    name: '20260101_000000_inline_images_schema',
   },
   {
     up: migration_20260809_160100_slug_reservations.up,

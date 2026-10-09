@@ -195,6 +195,7 @@ export function CmsRichText({
       },
       inlineBlocks: {
         inlineImage: inlineBlockConverter,
+        heroInlineImage: inlineBlockConverter,
       },
     }
   }

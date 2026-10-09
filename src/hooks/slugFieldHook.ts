@@ -9,7 +9,6 @@ const COLLECTION_SINGULAR_LABEL: Record<ReservedCollection, string> = {
   projects: 'project',
   tags: 'tag',
   categories: 'category',
-  'decoration-packs': 'decoration pack',
   things: 'thing',
 }
 

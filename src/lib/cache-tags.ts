@@ -10,9 +10,12 @@ export const CACHE_TAGS = {
   things: 'things',
   videos: 'videos',
   shortStories: 'short-stories',
-  decorationPacks: 'decoration-packs',
   links: 'links',
   media: 'media',
+  // Hero inline images: invalidates whenever an inline-images upload is
+  // created, updated, or deleted. Has no draft status, so changes always
+  // propagate to public caches.
+  inlineImages: 'inline-images',
   // Raw D1 lookup table that backs the per-slug dispatcher on the frontend
   // (`/[slug]`, `/vi/[slug]`, `/[slug]/vi`). Cached on the data cache so the
   // dispatcher participates in the static shell; invalidated by the slug

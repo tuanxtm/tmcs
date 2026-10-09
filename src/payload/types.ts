@@ -69,13 +69,12 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    'inline-images': InlineImage;
     authors: Author;
     categories: Category;
     tags: Tag;
     posts: Post;
     'short-stories': ShortStory;
-    'feed-decorations': FeedDecoration;
-    'decoration-packs': DecorationPack;
     projects: Project;
     things: Thing;
     videos: Video;
@@ -92,13 +91,12 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'inline-images': InlineImagesSelect<false> | InlineImagesSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'short-stories': ShortStoriesSelect<false> | ShortStoriesSelect<true>;
-    'feed-decorations': FeedDecorationsSelect<false> | FeedDecorationsSelect<true>;
-    'decoration-packs': DecorationPacksSelect<false> | DecorationPacksSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     things: ThingsSelect<false> | ThingsSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
@@ -220,6 +218,30 @@ export interface Media {
    */
   dominantColor?: string | null;
   uploadedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+}
+/**
+ * Image-only uploads for Hero inline blocks. Distinct from Media so authors cannot pick a generic Media image inside a Hero paragraph. Stored in R2 under the `inline-images` prefix.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inline-images".
+ */
+export interface InlineImage {
+  id: number;
+  /**
+   * Required accessibility text for images.
+   */
+  alt: string;
+  uploadedBy?: (number | null) | User;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1494,68 +1516,6 @@ export interface ShortStory {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "feed-decorations".
- */
-export interface FeedDecoration {
-  id: number;
-  /**
-   * Optional label for admin (defaults from filename).
-   */
-  alt?: string | null;
-  uploadedBy?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-}
-/**
- * Themed SVG ornament sets for the feed and footer. Activate one from Site settings → Appearance.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "decoration-packs".
- */
-export interface DecorationPack {
-  id: number;
-  /**
-   * Admin label (e.g. Plant, New Year).
-   */
-  title: string;
-  slug: string;
-  slugLock?: boolean | null;
-  /**
-   * Ornaments in this pack. Upload WebP images; they are stored as Feed decorations.
-   */
-  items?:
-    | {
-        /**
-         * Admin label only (e.g. Monstera leaf).
-         */
-        title: string;
-        /**
-         * SVG file stored in R2. Loaded on demand on the public site.
-         */
-        file: number | FeedDecoration;
-        /**
-         * Higher weight = more likely to be picked.
-         */
-        weight?: number | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Which ornament from Items appears in the bottom right corner of the footer while this pack is active.
-   */
-  footerItem?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * Visitor contact form submissions. Email notification is a later enhancement.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1716,6 +1676,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'inline-images';
+        value: number | InlineImage;
+      } | null)
+    | ({
         relationTo: 'authors';
         value: number | Author;
       } | null)
@@ -1734,14 +1698,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'short-stories';
         value: number | ShortStory;
-      } | null)
-    | ({
-        relationTo: 'feed-decorations';
-        value: number | FeedDecoration;
-      } | null)
-    | ({
-        relationTo: 'decoration-packs';
-        value: number | DecorationPack;
       } | null)
     | ({
         relationTo: 'projects';
@@ -1848,6 +1804,24 @@ export interface MediaSelect<T extends boolean = true> {
   sourceUrl?: T;
   dominantColor?: T;
   uploadedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inline-images_select".
+ */
+export interface InlineImagesSelect<T extends boolean = true> {
+  alt?: T;
+  uploadedBy?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -2116,43 +2090,6 @@ export interface ShortStoriesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "feed-decorations_select".
- */
-export interface FeedDecorationsSelect<T extends boolean = true> {
-  alt?: T;
-  uploadedBy?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "decoration-packs_select".
- */
-export interface DecorationPacksSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  slugLock?: T;
-  items?:
-    | T
-    | {
-        title?: T;
-        file?: T;
-        weight?: T;
-        id?: T;
-      };
-  footerItem?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2711,10 +2648,6 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Which decoration pack to display on the site.
-   */
-  activeDecorationPack: number | DecorationPack;
   analytics?: {
     provider?: ('none' | 'plausible' | 'umami' | 'ga' | 'other') | null;
     /**
@@ -2789,7 +2722,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
             };
         id?: T;
       };
-  activeDecorationPack?: T;
   analytics?:
     | T
     | {
@@ -2885,6 +2817,25 @@ export interface InlineImageBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'inlineImage';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroInlineImageBlock".
+ */
+export interface HeroInlineImageBlock {
+  image: number | InlineImage;
+  caption?: string | null;
+  /**
+   * Visual size multiplier. Cap-height: 1. Step: 0.05. Min: 0.5. Max: 3.
+   */
+  scale?: number | null;
+  /**
+   * Vertical alignment on the text line. Default: text-bottom (rooted at descender line).
+   */
+  align?: ('text-bottom' | 'baseline' | 'middle' | 'text-top' | 'top' | 'bottom') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heroInlineImage';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

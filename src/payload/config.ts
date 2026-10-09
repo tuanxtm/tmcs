@@ -126,7 +126,9 @@ export default buildConfig({
       bucket: cloudflare.env.R2,
       collections: {
         media: true,
-        'feed-decorations': true,
+        'inline-images': {
+          prefix: 'inline-images',
+        },
       },
     }),
   ],

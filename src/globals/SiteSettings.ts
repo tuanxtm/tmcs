@@ -135,21 +135,6 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
-          label: 'Appearance',
-          fields: [
-            {
-              name: 'activeDecorationPack',
-              label: 'Active decoration pack',
-              type: 'relationship',
-              relationTo: 'decoration-packs',
-              required: true,
-              admin: {
-                description: 'Which decoration pack to display on the site.',
-              },
-            },
-          ],
-        },
-        {
           label: 'Analytics',
           fields: [
             {

@@ -14,7 +14,6 @@ export type ReservedCollection =
   | 'projects'
   | 'tags'
   | 'categories'
-  | 'decoration-packs'
   | 'things'
 
 type Locale = 'en' | 'vi'
@@ -42,8 +41,7 @@ function revalidateSlugReservations(): void {
 /**
  * Pull every localized slug string out of a doc's `slug` field. Handles both
  * the localized shape (`{ en, vi }`) and the plain string shape used by
- * non-localized collections like `decoration-packs`. Empty / missing values
- * are skipped.
+ * non-localized collections. Empty / missing values are skipped.
  */
 function collectLocales(slugValue: unknown): Array<{ locale: Locale; slug: string }> {
   if (typeof slugValue === 'string' && slugValue.length > 0) {

@@ -258,6 +258,37 @@ const LAYOUT_RICHTEXT_FIELDS_BY_BLOCK: Record<
   pageFooter: [{ path: ['footerText'] }],
 }
 
+/**
+ * Throws when a pageHero paragraph contains any legacy `type: 'inlineImage'`
+ * node. Hero paragraphs must be migrated through the dedicated Hero content
+ * migration, not through `findOrCreateMedia`, because the Hero block now
+ * targets the Inline Images collection rather than Media.
+ */
+export function assertNoLegacyHeroImages(layout: unknown): void {
+  function walk(node: unknown): void {
+    if (!node || typeof node !== 'object') return
+    const n = node as Record<string, unknown>
+    if (n.type === 'inlineImage' && n.version === 1) {
+      throw new Error(
+        'Hero inline images require the dedicated Hero content migration. ' +
+          'Legacy inlineImage nodes were found in a pageHero paragraph; ' +
+          'run the dedicated Hero migration first, then re-run this script.',
+      )
+    }
+    if (Array.isArray(n.children)) {
+      for (const child of n.children) walk(child)
+    }
+  }
+
+  if (!Array.isArray(layout)) return
+  for (const block of layout) {
+    if (!block || typeof block !== 'object') continue
+    const b = block as { blockType?: string; paragraph?: unknown }
+    if (b.blockType !== 'pageHero') continue
+    walk(b.paragraph)
+  }
+}
+
 function getAtPath(
   obj: unknown,
   path: ReadonlyArray<string>,
@@ -380,6 +411,12 @@ async function migrateCollection(
       let dirty = false
       let localizedUpdate: Record<string, unknown> = {}
 
+      // Preflight: any pageHero paragraph carrying a legacy inlineImage
+      // node would be mis-migrated because Hero inline images now target
+      // the dedicated Inline Images collection. Bail before any mutation.
+      const prefetchedLayout = getAtPath(localized, ['layout'])
+      assertNoLegacyHeroImages(prefetchedLayout)
+
       for (const field of scope.fields) {
         const value = getAtPath(localized, field.path) as SerializedLexicalNode | null
         if (!nodeHasLegacyImage(value)) continue
@@ -460,6 +497,45 @@ async function main() {
   const payload = await getPayload({ config })
 
   console.log('Migrating legacy inlineImage nodes -> inlineBlock (inlineImage)...\n')
+  console.log('Preflight: scanning for legacy Hero inline images...')
+
+  let preflightHits = 0
+  for (const scope of COLLECTION_SCOPES) {
+    const docs = await payload.find({
+      collection: scope.collection,
+      limit: 0,
+      pagination: false,
+      overrideAccess: true,
+    })
+    for (const docRaw of docs.docs as unknown as DocumentRecord[]) {
+      for (const locale of LOCALES) {
+        const localized = await payload.findByID({
+          collection: scope.collection,
+          id: docRaw.id,
+          locale,
+          overrideAccess: true,
+          depth: 0,
+          fallbackLocale: false,
+        })
+        const layout = getAtPath(localized, ['layout'])
+        try {
+          assertNoLegacyHeroImages(layout)
+        } catch (err) {
+          preflightHits++
+          console.error(
+            `[preflight] ${scope.collection}#${docRaw.id} (${locale}) contains a legacy Hero inline image.`,
+          )
+        }
+      }
+    }
+  }
+  if (preflightHits > 0) {
+    throw new Error(
+      `Preflight failed: ${preflightHits} document/locale(s) still carry legacy Hero inline images. ` +
+        'Run the dedicated Hero content migration first, then re-run this script.',
+    )
+  }
+  console.log('Preflight OK.\n')
 
   let totalReplaced = 0
   let totalUpdated = 0
@@ -491,3 +567,4 @@ main().catch((err) => {
   console.error('migrate:inline-images failed:', err)
   process.exit(1)
 })
+
