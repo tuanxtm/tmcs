@@ -4,8 +4,7 @@ const { loadCards } = vi.hoisted(() => ({ loadCards: vi.fn() }))
 
 vi.mock('@payload-config', () => ({ default: {} }))
 vi.mock('@/app/(frontend)/_lib/cms', () => ({
-  getSiteShell: vi.fn(async () => ({ activeDecorationPackId: null })),
-  getFeedDecorations: vi.fn(async () => []),
+  getSiteShell: vi.fn(async () => ({})),
 }))
 vi.mock('@/app/(frontend)/_lib/feed-registry', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/app/(frontend)/_lib/feed-registry')>()

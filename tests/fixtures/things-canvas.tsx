@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom'
 import LenisProvider from 'lenis/react'
 
 import { ThingsCanvas } from '@/app/(frontend)/_components/things/things-canvas'
-import type { FeedDecorationView, ThingCardView } from '@/app/(frontend)/_lib/types'
+import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import styles from '@/app/(frontend)/_components/canvas/canvas.module.css'
 
@@ -15,7 +15,6 @@ type FixtureOptions = {
   /** Edge scrolling runs through Lenis when true, native scroll otherwise. */
   lenis?: boolean
   reducedMotion?: boolean
-  decorations?: boolean
   locale?: LocaleCode
   drawerCase?: DrawerCase
   /** Force a specific link count on the first thing. */
@@ -23,7 +22,7 @@ type FixtureOptions = {
 }
 
 const TRANSPARENT_PNG =
-  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZjBmIiBmaWx0ZXI9InVybCgjYikiLz48L3N2Zz4='
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+PHJlY3Qgd2lkdGg9IjYwIiBoZWpnaHQ9IjYwIiBmaWxsPSIjZjBmIiBmaWx0ZXI9InVybCgjYikiLz48L3N2Zz4='
 
 const OPAQUE_PNG =
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzIzYjlmMSIvPjwvc3ZnPg=='
@@ -151,11 +150,6 @@ function makeThings(count: number, options: FixtureOptions): ThingCardView[] {
   return Array.from({ length: count }, (_, index) => makeThing(index, options))
 }
 
-const DECORATIONS: FeedDecorationView[] = [
-  { id: 1, packId: 1, imageUrl: TRANSPARENT_PNG, allowedShapes: [], weight: 1 },
-  { id: 2, packId: 1, imageUrl: OPAQUE_PNG, allowedShapes: [], weight: 1 },
-]
-
 const host = document.getElementById('fixture')!
 const root = createRoot(host)
 
@@ -168,7 +162,6 @@ declare global {
 window.renderThingsFixture = (options = {}) => {
   const count = options.count ?? 25
   const things = makeThings(count, options)
-  const decorations = options.decorations === false ? undefined : DECORATIONS
   const locale = options.locale ?? 'en'
 
   const section = (
@@ -182,7 +175,6 @@ window.renderThingsFixture = (options = {}) => {
           locale={locale}
           description="Drag any thing to rearrange the workshop wall."
           cursorPopupItem="view details"
-          decorations={decorations}
           onMovementChange={(moving) => {
             document.documentElement.dataset.thingMoving = String(moving)
           }}

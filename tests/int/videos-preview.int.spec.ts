@@ -7,8 +7,7 @@ const { loadCards, loadVideoPreviewCards } = vi.hoisted(() => ({
 
 vi.mock('@payload-config', () => ({ default: {} }))
 vi.mock('@/app/(frontend)/_lib/cms', () => ({
-  getSiteShell: vi.fn(async () => ({ activeDecorationPackId: null })),
-  getFeedDecorations: vi.fn(async () => []),
+  getSiteShell: vi.fn(async () => ({})),
   getPostsPage: vi.fn(async () => ({ docs: [], nextCursor: null, hasNextPage: false })),
   getProjectsPage: vi.fn(async () => ({ docs: [], nextCursor: null, hasNextPage: false })),
   getVideosPage: vi.fn(async () => ({ docs: [], nextCursor: null, hasNextPage: false })),

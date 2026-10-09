@@ -65,14 +65,13 @@ describe('revalidateFrontend hooks', () => {
   })
 
   it('always revalidates globals unless disabled', () => {
-    const hook = createGlobalRevalidateHook([CACHE_TAGS.siteShell, CACHE_TAGS.decorationPacks])
+    const hook = createGlobalRevalidateHook([CACHE_TAGS.siteShell])
     hook({
       doc: {},
       req: { context: {}, payload: { logger: { info: vi.fn() } } },
     } as never)
 
     expect(revalidateTag).toHaveBeenCalledWith(CACHE_TAGS.siteShell, 'max')
-    expect(revalidateTag).toHaveBeenCalledWith(CACHE_TAGS.decorationPacks, 'max')
   })
 
   it('revalidates pages and site shell when a page publishes', () => {

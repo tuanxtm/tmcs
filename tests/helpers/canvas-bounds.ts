@@ -68,3 +68,44 @@ export async function expectTightCanvasBounds(page: Page, kind: 'project' | 'thi
     })
     .toBe(true)
 }
+
+export async function expectPackedCanvasRows(page: Page, kind: 'project' | 'thing') {
+  const items = page.locator(`[data-${kind}-item]`)
+
+  async function rowGap() {
+    const boxes = await items.evaluateAll((elements) =>
+      elements.slice(0, 4).map((element) => {
+        const { y, height } = element.getBoundingClientRect()
+        return { y, bottom: y + height }
+      }),
+    )
+    return Math.min(boxes[2].y, boxes[3].y) - Math.max(boxes[0].bottom, boxes[1].bottom)
+  }
+
+  await page.setViewportSize({ width: 390, height: 900 })
+  await expect.poll(rowGap).toBeGreaterThanOrEqual(23)
+  await expect.poll(rowGap).toBeLessThanOrEqual(37)
+
+  await page.setViewportSize({ width: 320, height: 900 })
+  await expect
+    .poll(async () => {
+      const boxes = await items.evaluateAll((elements) =>
+        elements.map((element, index) => {
+          const { x, y, width, height } = element.getBoundingClientRect()
+          return { row: Math.floor(index / 2), x, y, width, height }
+        }),
+      )
+      let minGap = Number.POSITIVE_INFINITY
+      for (const before of boxes.filter((item) => item.row < 3)) {
+        for (const after of boxes.filter((item) => item.row === before.row + 1)) {
+          if (
+            Math.min(before.x + before.width, after.x + after.width) <= Math.max(before.x, after.x)
+          )
+            continue
+          minGap = Math.min(minGap, after.y - before.y - before.height)
+        }
+      }
+      return minGap
+    })
+    .toBeGreaterThanOrEqual(0)
+}

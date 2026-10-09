@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom'
 import LenisProvider from 'lenis/react'
 
 import { ProjectsCanvas } from '@/app/(frontend)/_components/projects/projects-canvas'
-import type { FeedDecorationView, ProjectCardView } from '@/app/(frontend)/_lib/types'
+import type { ProjectCardView } from '@/app/(frontend)/_lib/types'
 import styles from '@/app/(frontend)/_components/canvas/canvas.module.css'
 
 /**
@@ -16,7 +16,6 @@ type FixtureOptions = {
   /** Edge scrolling runs through Lenis when true, native scroll otherwise. */
   lenis?: boolean
   reducedMotion?: boolean
-  decorations?: boolean
 }
 
 const TRANSPARENT_PNG =
@@ -65,11 +64,6 @@ function makeProjects(count: number): ProjectCardView[] {
   return Array.from({ length: count }, (_, index) => makeProject(index))
 }
 
-const DECORATIONS: FeedDecorationView[] = [
-  { id: 1, packId: 1, imageUrl: TRANSPARENT_PNG, allowedShapes: [], weight: 1 },
-  { id: 2, packId: 1, imageUrl: OPAQUE_PNG, allowedShapes: [], weight: 1 },
-]
-
 const host = document.getElementById('fixture')!
 const root = createRoot(host)
 
@@ -82,7 +76,6 @@ declare global {
 window.renderProjectsFixture = (options = {}) => {
   const count = options.count ?? 25
   const projects = makeProjects(count)
-  const decorations = options.decorations === false ? undefined : DECORATIONS
 
   const section = (
     <section id="fixture-projects" aria-labelledby="fixture-projects-heading">
@@ -94,7 +87,6 @@ window.renderProjectsFixture = (options = {}) => {
           projects={projects}
           description="Drag any project to rearrange the workshop wall."
           cursorPopupItem="view details"
-          decorations={decorations}
           onMovementChangeAction={(moving) => {
             document.documentElement.dataset.projectMoving = String(moving)
           }}

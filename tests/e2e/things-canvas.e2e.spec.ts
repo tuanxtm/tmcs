@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { createCanvasFixture } from '../helpers/canvas-fixture'
-import { expectTightCanvasBounds } from '../helpers/canvas-bounds'
+import { expectPackedCanvasRows, expectTightCanvasBounds } from '../helpers/canvas-bounds'
 
 const fixtureApi = createCanvasFixture('things')
 const openFixture = fixtureApi
@@ -33,9 +33,14 @@ test('content fits its drag bounds and can reach every canvas edge', async ({ pa
   await expectTightCanvasBounds(page, 'thing')
 })
 
-test('heading, transparent complete grid, and metadata left of original-color images', async ({
+test('mobile thing rows pack below tall and missing-image cards without overlap', async ({
   page,
 }) => {
+  await openFixture(page, { width: 390, height: 900, count: 8 })
+  await expectPackedCanvasRows(page, 'thing')
+})
+
+test('heading, transparent grid, and responsive label-image composition', async ({ page }) => {
   await openFixture(page, { count: 6 })
   await expect(page.locator('#fixture-things-heading')).toHaveCSS('text-align', 'center')
   const canvas = page.locator('[data-thing-canvas]')
@@ -50,13 +55,18 @@ test('heading, transparent complete grid, and metadata left of original-color im
     const image = (await item.locator('[data-thing-image]').boundingBox())!
     const label = (await item.locator('[data-thing-label]').boundingBox())!
     const title = item.locator('[data-thing-title]')
-    expect(label.x + label.width).toBeLessThanOrEqual(image.x)
-    expect(label.y + label.height).toBeCloseTo(image.y + image.height, 0)
-    await expect(item.locator('[data-thing-label]')).toHaveCSS('text-align', 'right')
+    if (width < 640) {
+      expect(label.y).toBeGreaterThanOrEqual(image.y + image.height - 1)
+      await expect(item.locator('[data-thing-label]')).toHaveCSS('text-align', 'left')
+    } else {
+      expect(label.x + label.width).toBeLessThanOrEqual(image.x)
+      expect(label.y + label.height).toBeCloseTo(image.y + image.height, 0)
+      await expect(item.locator('[data-thing-label]')).toHaveCSS('text-align', 'right')
+    }
     await expect(title).toHaveCSS('-webkit-line-clamp', '3')
     const handle = item.locator('[data-thing-drag-handle]')
     if (width < 1024) {
-      await expect(handle).toHaveCSS('width', '28px')
+      await expect(handle).toHaveCSS('width', width < 640 ? '24px' : '28px')
       await expect(handle.locator('svg')).toHaveCSS('width', '14px')
     }
     const first = (await item.boundingBox())!
@@ -68,7 +78,13 @@ test('heading, transparent complete grid, and metadata left of original-color im
     expect(first.height).toBeLessThan(expectedHeight)
     const action = (await item.getByRole('button', { name: /^Detail:/ }).boundingBox())!
     expect(label.y).toBeGreaterThanOrEqual(first.y)
-    expect(action.x + action.width).toBeLessThanOrEqual(image.x)
+    if (width < 640) {
+      expect(action.y).toBeGreaterThanOrEqual(image.y + image.height - 1)
+      expect(action.x).toBeGreaterThanOrEqual(first.x - 1)
+      expect(action.x + action.width).toBeLessThanOrEqual(first.x + first.width + 1)
+    } else {
+      expect(action.x + action.width).toBeLessThanOrEqual(image.x)
+    }
     expect(action.y + action.height).toBeLessThanOrEqual(first.y + first.height + 1)
     const img = item.locator('img')
     await expect(img).toHaveCSS('object-fit', 'contain')
@@ -450,7 +466,9 @@ test('Detail locks scrolling, restores focus, and uses only Primary Image on hov
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(scrollY)
 })
 
-test('purchase action aligns with the image and missing URL omits it', async ({ page }) => {
+test('purchase action follows responsive label placement and missing URL omits it', async ({
+  page,
+}) => {
   await openFixture(page, { count: 6 })
   const item = page.locator('[data-thing-item="1"]')
   for (const width of [320, 390, 1440]) {
@@ -460,10 +478,19 @@ test('purchase action aligns with the image and missing URL omits it', async ({ 
     const number = (await item.locator('[class*="number"]').boundingBox())!
     const title = (await item.locator('[data-thing-title]').boundingBox())!
     const actions = (await item.locator('[class*="thingActions"]').boundingBox())!
-    expect(label.y + label.height).toBeCloseTo(image.y + image.height, 0)
-    expect(actions.y + actions.height).toBeCloseTo(image.y + image.height, 0)
-    for (const part of [number, title, actions]) {
-      expect(part.x + part.width).toBeCloseTo(label.x + label.width, 0)
+    if (width < 640) {
+      expect(label.y).toBeGreaterThanOrEqual(image.y + image.height - 1)
+      expect(actions.y).toBeGreaterThanOrEqual(title.y + title.height - 1)
+      for (const part of [number, title, actions]) {
+        expect(part.x).toBeGreaterThanOrEqual(label.x - 1)
+        expect(part.x + part.width).toBeLessThanOrEqual(label.x + label.width + 1)
+      }
+    } else {
+      expect(label.y + label.height).toBeCloseTo(image.y + image.height, 0)
+      expect(actions.y + actions.height).toBeCloseTo(image.y + image.height, 0)
+      for (const part of [number, title, actions]) {
+        expect(part.x + part.width).toBeCloseTo(label.x + label.width, 0)
+      }
     }
     if (width === 320 || width === 1440) {
       await page.screenshot({ path: `/tmp/tmcs-things-row-${width}.png` })

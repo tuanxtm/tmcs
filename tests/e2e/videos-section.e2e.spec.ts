@@ -70,9 +70,7 @@ test.describe('Videos provider rows', () => {
     await scroller.focus()
     const before = await scroller.evaluate((el) => el.scrollLeft)
     await page.keyboard.press('ArrowRight')
-    await expect
-      .poll(async () => scroller.evaluate((el) => el.scrollLeft))
-      .toBeGreaterThan(before)
+    await expect.poll(async () => scroller.evaluate((el) => el.scrollLeft)).toBeGreaterThan(before)
   })
 
   test('canonical /videos archive keeps the original grid + infinite pagination', async ({

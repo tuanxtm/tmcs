@@ -256,7 +256,6 @@ function footer(id: string): ResolvedBlockView {
     labelOtherLinks: null,
     otherLinks: [],
     cursorPopup: null,
-    footerDecoration: null,
     copyright: null,
   }
 }

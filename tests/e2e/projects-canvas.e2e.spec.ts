@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { createCanvasFixture } from '../helpers/canvas-fixture'
-import { expectTightCanvasBounds } from '../helpers/canvas-bounds'
+import { expectPackedCanvasRows, expectTightCanvasBounds } from '../helpers/canvas-bounds'
 
 const openFixture = createCanvasFixture('projects')
 
@@ -31,7 +31,12 @@ test('content fits its drag bounds and can reach every canvas edge', async ({ pa
   await expectTightCanvasBounds(page, 'project')
 })
 
-test('heading, grid lines, and image-left name-right composition', async ({ page }) => {
+test('mobile project rows pack to the tallest card with a safe gutter', async ({ page }) => {
+  await openFixture(page, { width: 390, height: 900, count: 8 })
+  await expectPackedCanvasRows(page, 'project')
+})
+
+test('heading, grid lines, and responsive image-label composition', async ({ page }) => {
   await openFixture(page)
 
   const heading = page.locator('#fixture-projects-heading')
@@ -45,7 +50,7 @@ test('heading, grid lines, and image-left name-right composition', async ({ page
   const backgroundImage = await canvas.evaluate((el) => getComputedStyle(el).backgroundImage)
   expect(backgroundImage).toContain('linear-gradient')
 
-  // Names sit to the right of their image on desktop, tablet, and mobile.
+  // Names sit beside images above mobile and below them on mobile.
   for (const width of [1440, 768, 390]) {
     await page.setViewportSize({ width, height: 900 })
     const item = page.locator('[data-project-item]').first()
@@ -55,7 +60,11 @@ test('heading, grid lines, and image-left name-right composition', async ({ page
     const titleBox = await title.boundingBox()
     expect(imageBox).not.toBeNull()
     expect(titleBox).not.toBeNull()
-    expect(titleBox!.x).toBeGreaterThanOrEqual(imageBox!.x + imageBox!.width - 1)
+    if (width < 640) {
+      expect(titleBox!.y).toBeGreaterThanOrEqual(imageBox!.y + imageBox!.height - 1)
+    } else {
+      expect(titleBox!.x).toBeGreaterThanOrEqual(imageBox!.x + imageBox!.width - 1)
+    }
   }
 })
 
@@ -99,13 +108,14 @@ test('compact controls, bottom-aligned labels, and complete transparent grid', a
   ).toBeLessThan(12)
 
   await page.setViewportSize({ width: 390, height: 844 })
-  await expect(handle).toHaveCSS('width', '28px')
+  await expect(handle).toHaveCSS('width', '24px')
   const first = (await item.boundingBox())!
-  const second = (await page.locator('[data-project-item]').nth(1).boundingBox())!
-  const third = (await page.locator('[data-project-item]').nth(2).boundingBox())!
+  const items = page.locator('[data-project-item]')
+  const second = (await items.nth(1).boundingBox())!
+  const third = (await items.nth(2).boundingBox())!
   expect(second.x).toBeGreaterThan(first.x + first.width)
-  expect(Math.abs(first.y - second.y)).toBeLessThan(80)
-  expect(third.y).toBeGreaterThan(first.y + first.height)
+  expect(Math.abs(first.y + first.height - (second.y + second.height))).toBeLessThan(80)
+  expect(third.y).toBeGreaterThan(Math.max(first.y + first.height, second.y + second.height))
   const handleBox = (await handle.boundingBox())!
   const number = (await item
     .locator('span')
