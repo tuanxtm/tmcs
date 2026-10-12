@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Renderer, Program, Mesh, Triangle, Plane, Texture, RenderTarget } from 'ogl';
+import { RollingDigits } from './rolling-digits';
 
 type BendPreset = 'liquid' | 'ribbon' | 'vortex' | 'arch';
 type CurlMode = 'twist' | 'rise' | 'fall';
@@ -46,6 +47,7 @@ export interface FlexCarouselProps extends Partial<PresetValues> {
   onChange?: (index: number, item: FlexCarouselItem) => void;
   onSelect?: (index: number, item: FlexCarouselItem) => void;
   renderCaption?: (item: FlexCarouselItem, index: number) => ReactNode;
+  renderMetadata?: (item: FlexCarouselItem, index: number) => ReactNode;
   className?: string;
   style?: CSSProperties;
 }
@@ -364,28 +366,6 @@ void main() {
 }
 `;
 
-const Digits = ({ value }: { value: number }) => (
-  <span className="inline-flex">
-    {String(value)
-      .padStart(2, '0')
-      .split('')
-      .map((digit, index) => (
-        <span key={index} className="inline-block h-[1em] overflow-hidden">
-          <span
-            className="flex flex-col transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
-            style={{ transform: `translateY(${-Number(digit) * 10}%)` }}
-          >
-            {'0123456789'.split('').map(n => (
-              <span key={n} className="h-[1em]">
-                {n}
-              </span>
-            ))}
-          </span>
-        </span>
-      ))}
-  </span>
-);
-
 const FlexCarousel = ({
   items = DEFAULT_ITEMS,
   preset = 'liquid',
@@ -413,10 +393,12 @@ const FlexCarousel = ({
   onChange,
   onSelect,
   renderCaption,
+  renderMetadata,
   className = '',
   style
 }: FlexCarouselProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<Settings | null>(null);
   const itemsRef = useRef<FlexCarouselItem[]>(items);
   const engineRef = useRef<Engine | null>(null);
@@ -466,7 +448,8 @@ const FlexCarousel = ({
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return undefined;
+    const stage = stageRef.current;
+    if (!container || !stage) return undefined;
 
     const renderer = new Renderer({
       dpr: Math.min(window.devicePixelRatio || 1, 2),
@@ -486,7 +469,7 @@ const FlexCarousel = ({
     canvas.style.width = '100%';
     canvas.style.height = '100%';
     canvas.setAttribute('aria-hidden', 'true');
-    container.insertBefore(canvas, container.firstChild);
+    stage.appendChild(canvas);
 
     const cardProgram = new Program(gl, {
       vertex: cardVertex,
@@ -572,6 +555,7 @@ const FlexCarousel = ({
     let resnap = false;
     let hover = '';
     let lift = 1;
+    let captionTop = -1;
     let energy = 0;
     let lastPos = 0;
     const lens = { x: 0, y: 0, vx: 0, vy: 0, ready: false };
@@ -824,8 +808,8 @@ const FlexCarousel = ({
     };
 
     const resize = () => {
-      width = Math.max(1, container.clientWidth);
-      height = Math.max(1, container.clientHeight);
+      width = Math.max(1, stage.clientWidth);
+      height = Math.max(1, stage.clientHeight);
       renderer.dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(PIXEL_BUDGET / (width * height)));
       renderer.setSize(width, height);
       target.setSize(Math.max(2, Math.round(width * renderer.dpr)), Math.max(2, Math.round(height * renderer.dpr)));
@@ -997,6 +981,13 @@ const FlexCarousel = ({
         animating = true;
 
       const cardH = m.cardH;
+      // Reserve three title lines and extra clearance below the focused card.
+      const captionImageHeight = Math.max(cardH, Math.min(cardH * 1.3, height * 0.84));
+      const nextCaptionTop = stage.offsetTop + homeY + captionImageHeight / 2 + 58;
+      if (Math.abs(nextCaptionTop - captionTop) > 0.1) {
+        captionTop = nextCaptionTop;
+        container.style.setProperty('--flex-carousel-caption-top', `${captionTop}px`);
+      }
       let halfW = (s.lensWidth * width) / 2;
       let halfH = (s.lensHeight * width) / 2;
       const squash = Math.abs(deform) * liquidAmount;
@@ -1121,7 +1112,7 @@ const FlexCarousel = ({
     };
 
     const localPoint = (e: PointerEvent) => {
-      const rect = container.getBoundingClientRect();
+      const rect = stage.getBoundingClientRect();
       return [e.clientX - rect.left, e.clientY - rect.top];
     };
 
@@ -1329,7 +1320,7 @@ const FlexCarousel = ({
     document.addEventListener('visibilitychange', onVisibility);
 
     const resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(container);
+    resizeObserver.observe(stage);
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       start();
@@ -1386,30 +1377,42 @@ const FlexCarousel = ({
       tabIndex={0}
     >
       <style>{STYLE}</style>
-      {captions && current && revealed && (
+      <div
+        ref={stageRef}
+        className={`absolute inset-x-0 ${captions && renderMetadata ? 'top-16 bottom-32' : 'inset-y-0'}`}
+        data-flex-carousel-stage
+      />
+      {captions && current && (revealed || renderMetadata) && (
         <div
-          className="pointer-events-none absolute inset-x-0 top-[calc(50%_+_var(--flex-carousel-half)_*_var(--flex-carousel-lift,1)_+_22px)] flex flex-col items-center gap-1.5 px-4 text-center animate-[flex-carousel-reveal_900ms_ease_both] motion-reduce:animate-none"
-          aria-hidden={renderCaption ? undefined : true}
+          className={`pointer-events-none absolute inset-x-0 flex flex-col items-center gap-1.5 px-4 text-center ${renderMetadata ? 'top-[var(--flex-carousel-caption-top,80%)]' : 'top-[calc(50%_+_var(--flex-carousel-half)_*_var(--flex-carousel-lift,1)_+_22px)] animate-[flex-carousel-reveal_900ms_ease_both] motion-reduce:animate-none'}`}
+          aria-hidden={renderCaption || renderMetadata ? undefined : true}
           data-flex-carousel-caption
         >
-          <span
-            key={active}
-            className="flex max-w-full flex-col items-center text-[15px] font-medium leading-[1.35] animate-[flex-carousel-title_520ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none"
-          >
-            {renderCaption ? renderCaption(current, currentIndex) : (
-              <>
-                {current.title || current.alt}
-                {current.subtitle && <span className="font-normal opacity-60">{current.subtitle}</span>}
-              </>
-            )}
-          </span>
+          {revealed && (
+            <span
+              key={active}
+              className={`flex max-w-full flex-col items-center text-[15px] font-medium leading-[1.35] animate-[flex-carousel-title_520ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none ${renderMetadata ? 'absolute inset-x-4 bottom-[calc(100%_+_6px)]' : ''}`}
+            >
+              {renderCaption ? renderCaption(current, currentIndex) : (
+                <>
+                  {current.title || current.alt}
+                  {current.subtitle && <span className="font-normal opacity-60">{current.subtitle}</span>}
+                </>
+              )}
+            </span>
+          )}
+          {renderMetadata && (
+            <div className="flex min-h-6 max-w-full items-center" data-flex-carousel-metadata>
+              {renderMetadata(current, currentIndex)}
+            </div>
+          )}
           <span
             className="inline-flex items-center gap-[3px] text-[12px] leading-none tabular-nums opacity-50 transition-opacity duration-[400ms] data-[hidden]:opacity-0"
-            data-hidden={focusOpen ? '' : undefined}
+            data-hidden={focusOpen && !renderMetadata ? '' : undefined}
             data-flex-carousel-counter
             aria-hidden="true"
           >
-            <Digits value={currentIndex + 1} />
+            <RollingDigits value={currentIndex + 1} />
             <span className="opacity-60">/</span>
             <span>{String(list.length).padStart(2, '0')}</span>
           </span>

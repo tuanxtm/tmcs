@@ -5,6 +5,7 @@ import type { ComponentType } from 'react'
 import Link from 'next/link'
 
 import type { FlexCarouselItem, FlexCarouselProps } from '@/components/ui/flex-carousel'
+import { RollingDigits } from '@/components/ui/rolling-digits'
 import { formatDate } from '@/app/(frontend)/_lib/formatters'
 import type { PostCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
@@ -80,33 +81,36 @@ export function PostsCarousel({ docs, locale, cursorPopupItem }: PostsCarouselPr
 
   if (ordered.length === 0) return null
 
-  const renderCaption = (item: FlexCarouselItem, index: number) => {
+  const renderCaption = (item: FlexCarouselItem) => (
+    <span className={styles.title}>{item.title || item.alt}</span>
+  )
+
+  const renderMetadata = (item: FlexCarouselItem, index: number) => {
     const post = ordered[index]
-    return (
-      <>
-        <span className={styles.title}>{item.title || item.alt}</span>
-        {item.subtitle || post?.href ? (
-          <span className={styles.metadata}>
-            {item.subtitle ? (
-              <time className={styles.date} dateTime={post?.publishedAt ?? undefined}>
-                {item.subtitle}
-              </time>
-            ) : null}
-            {post?.href ? (
-              <Link
-                href={post.href}
-                transitionTypes={['nav-forward']}
-                className={styles.openPostLink}
-                data-cursor-popup={cursorPopupItem || 'open post'}
-                aria-label={`Open post: ${post.title}`}
-              >
-                Open post
-              </Link>
-            ) : null}
-          </span>
+    return item.subtitle || post?.href ? (
+      <span className={styles.metadata}>
+        {item.subtitle ? (
+          <time
+            className={styles.date}
+            dateTime={post?.publishedAt ?? undefined}
+            aria-label={item.subtitle}
+          >
+            <RollingDigits value={item.subtitle} />
+          </time>
         ) : null}
-      </>
-    )
+        {post?.href ? (
+          <Link
+            href={post.href}
+            transitionTypes={['nav-forward']}
+            className={styles.openPostLink}
+            data-cursor-popup={cursorPopupItem || 'open post'}
+            aria-label={`Open post: ${post.title}`}
+          >
+            Open post
+          </Link>
+        ) : null}
+      </span>
+    ) : null
   }
 
   return (
@@ -118,13 +122,17 @@ export function PostsCarousel({ docs, locale, cursorPopupItem }: PostsCarouselPr
           captureWheel={false}
           className={styles.carousel}
           renderCaption={renderCaption}
+          renderMetadata={renderMetadata}
         />
       ) : (
         <>
           <div className={styles.loading} role="status">
             Loading…
           </div>
-          <div className={styles.fallbackCaption}>{renderCaption(items[0], 0)}</div>
+          <div className={styles.fallbackCaption}>
+            {renderCaption(items[0])}
+            {renderMetadata(items[0], 0)}
+          </div>
         </>
       )}
     </div>
