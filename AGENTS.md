@@ -11,7 +11,7 @@ alwaysApply: true
 
 3. IMPORTANT: ENGLISH ONLY!
 
-4. Testing: Always use subagent with low cost like gpt-6-luna or sonnet for testing with Playwright, etc.
+4. Don't use subagents.
 
 ## Codegraph (local CLI only)
 
