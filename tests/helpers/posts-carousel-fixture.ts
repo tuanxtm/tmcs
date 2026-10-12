@@ -29,7 +29,7 @@ test.beforeAll(async () => {
     { cwd: process.cwd() },
   )
   const stylesPath = path.resolve('tests/fixtures/posts-carousel-tailwind.css')
-  const tailwindEntry = "@import 'tailwindcss';\n@source '../../src';"
+  const tailwindEntry = "@import '../../src/app/(frontend)/styles.css';\n@source '../../src';"
   const tailwindCss = await postcss([tailwindcss({ base: process.cwd() })]).process(tailwindEntry, {
     from: stylesPath,
   })
@@ -95,6 +95,10 @@ export async function openPostsCarouselFixture(page: Page, options: OpenPostsCar
             --font-mono: monospace;
             --site-cell-padding: 12px;
             --header-height: 48px;
+            --inner-line-weight: 1px;
+            --outer-line-weight: 1.5px;
+            --site-grid-line-color: rgb(59 91 219 / 10%);
+            --site-rule-color: rgb(59 91 219 / 50%);
           }
           @media (min-width: 1024px) { :root { --site-cell-padding: 16px; } }
           *, *::before, *::after { box-sizing: border-box; }

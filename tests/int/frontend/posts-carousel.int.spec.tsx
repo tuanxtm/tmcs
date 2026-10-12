@@ -14,6 +14,10 @@ vi.mock('@/components/ui/flex-carousel', async () => {
       item: { title?: string; src?: string; subtitle?: string },
       index: number,
     ) => React.ReactNode
+    renderMetadata?: (
+      item: { title?: string; src?: string; subtitle?: string },
+      index: number,
+    ) => React.ReactNode
     onChange?: (i: number) => void
     captureWheel?: boolean
     className?: string
@@ -49,6 +53,9 @@ vi.mock('@/components/ui/flex-carousel', async () => {
         </button>
         <div data-testid="active-caption">
           {activeItem && props.renderCaption?.(activeItem, activeIndex)}
+        </div>
+        <div data-testid="active-metadata">
+          {activeItem && props.renderMetadata?.(activeItem, activeIndex)}
         </div>
       </div>
     )
@@ -166,7 +173,9 @@ describe('PostsCarousel adapter', () => {
     expect(screen.getByRole('link', { name: 'Open post: Portrait' }).getAttribute('href')).toBe(
       '/portrait',
     )
-    expect(screen.getByText('01/02/26').tagName.toLowerCase()).toBe('time')
+    const date = document.querySelector('time')
+    expect(date?.getAttribute('aria-label')).toBe('01/02/26')
+    expect(date?.tagName.toLowerCase()).toBe('time')
     expect(screen.getAllByRole('link', { name: /^Open post:/ })).toHaveLength(1)
     expect(screen.getByTestId('flex-carousel-stub').className).toBeTruthy()
 
@@ -179,7 +188,7 @@ describe('PostsCarousel adapter', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Next item' }))
     expect(screen.getByText('No link or date')).toBeTruthy()
     expect(screen.queryByRole('link', { name: /^Open post:/ })).toBeNull()
-    expect(screen.queryByText(/^01\/|^01\/03/)).toBeNull()
+    expect(document.querySelector('time')).toBeNull()
   })
 
   it('opts out of wheel capture while preserving the carousel defaults', async () => {
@@ -188,6 +197,7 @@ describe('PostsCarousel adapter', () => {
     expect(lastCarouselProps?.captureWheel).toBe(false)
     expect(lastCarouselProps?.className).toBeTruthy()
     expect(lastCarouselProps?.renderCaption).toEqual(expect.any(Function))
+    expect(lastCarouselProps?.renderMetadata).toEqual(expect.any(Function))
     expect(lastCarouselProps?.focusOnClick).toBeUndefined()
     expect(lastCarouselProps?.autoplay).toBeUndefined()
     expect(lastCarouselProps?.preset).toBeUndefined()

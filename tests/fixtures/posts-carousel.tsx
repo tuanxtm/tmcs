@@ -4,6 +4,7 @@ import { ReactLenis } from 'lenis/react'
 import 'lenis/dist/lenis.css'
 
 import { PostsCarousel } from '@/app/(frontend)/_components/posts/posts-carousel'
+import { PostsSectionHeader } from '@/app/(frontend)/_components/posts/posts-section-header'
 import { BootReveal } from '@/app/(frontend)/_components/providers/boot-reveal'
 import type { PostCardView } from '@/app/(frontend)/_lib/types'
 
@@ -139,7 +140,11 @@ root.render(
   <ReactLenis root options={{ autoRaf: true, syncTouch: false, respectReducedMotion: false }}>
     <BootReveal.Provider>
       <MarkBootReady>
-        <main className="fixture-page" data-case={getCaseFromUrl()}>
+        <main
+          className="fixture-page page-blocks flex flex-col gap-y-(--section-gap-y)"
+          data-case={getCaseFromUrl()}
+        >
+          <div aria-hidden="true" className="h-(--header-height)" />
           <section
             id="fixture-posts"
             data-feed-type="posts"
@@ -147,9 +152,11 @@ root.render(
             className="canvas-section"
           >
             <div className="canvas-frame">
-              <h2 id="fixture-posts-heading" className="canvas-heading">
-                Posts
-              </h2>
+              <PostsSectionHeader
+                headingId="fixture-posts-heading"
+                heading="posts"
+                description="Latest writing from the studio"
+              />
               <PostsCarousel docs={docs} locale="en" />
             </div>
           </section>

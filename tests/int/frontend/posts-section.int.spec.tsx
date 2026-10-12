@@ -4,6 +4,7 @@ import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 
 import canvasStyles from '@/app/(frontend)/_components/canvas/canvas.module.css'
+import postsStyles from '@/app/(frontend)/_components/posts/posts.module.css'
 
 import type {
   PostCardView,
@@ -167,16 +168,20 @@ describe('FeedSection Posts branch', () => {
     vi.unstubAllGlobals()
   })
 
-  it('renders the h2 with the Projects heading class', () => {
+  it('renders the h2 with the Posts heading class', () => {
     render(<FeedSection {...basePostsProps([post(1), post(2)])} />)
     const heading = screen.getByRole('heading', { level: 2, name: 'Posts' })
     expect(heading).toBeTruthy()
-    expect(heading.classList.contains(canvasStyles.heading)).toBe(true)
+    expect(heading.classList.contains(postsStyles.heading)).toBe(true)
+    expect(heading.closest('[data-posts-header]')).toBeTruthy()
   })
 
   it('shows the empty status without mounting the carousel', () => {
     render(<FeedSection {...basePostsProps([])} />)
     expect(screen.getByRole('status').textContent).toBe('No posts yet')
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Posts' }).closest('[data-posts-header]'),
+    ).toBeTruthy()
     // No viewport (which only PostsCarousel renders).
     expect(document.querySelector('[role="region"][aria-roledescription="carousel"]')).toBeNull()
   })
