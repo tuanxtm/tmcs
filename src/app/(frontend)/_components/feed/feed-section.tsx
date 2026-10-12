@@ -13,8 +13,8 @@ import {
 } from '@/app/(frontend)/_components/layout/reveal-grid-item'
 import { SectionHeader } from '@/app/(frontend)/_components/layout/section-header'
 import { PostsCarousel } from '@/app/(frontend)/_components/posts/posts-carousel'
+import { PostsSectionHeader } from '@/app/(frontend)/_components/posts/posts-section-header'
 import canvasStyles from '@/app/(frontend)/_components/canvas/canvas.module.css'
-import postsStyles from '@/app/(frontend)/_components/posts/posts.module.css'
 import { loadFeedPage } from '@/app/(frontend)/_lib/actions'
 import type {
   FeedPaginationMode,
@@ -164,10 +164,7 @@ export function FeedSection(props: FeedSectionProps) {
           className={cn(canvasStyles.section, className)}
         >
           <div className={canvasStyles.frame}>
-            <h2 id={headingId} className={canvasStyles.heading}>
-              {heading}
-            </h2>
-            {description ? <p className={canvasStyles.description}>{description}</p> : null}
+            <PostsSectionHeader headingId={headingId} heading={heading} description={description} />
             <p className={canvasStyles.status} role="status" aria-live="polite">
               No posts yet
             </p>
@@ -198,10 +195,7 @@ export function FeedSection(props: FeedSectionProps) {
         className={cn(canvasStyles.section, className)}
       >
         <div className={canvasStyles.frame}>
-          <h2 id={headingId} className={canvasStyles.heading}>
-            {heading}
-          </h2>
-          {description ? <p className={postsStyles.description}>{description}</p> : null}
+          <PostsSectionHeader headingId={headingId} heading={heading} description={description} />
           <PostsCarousel
             docs={docs as PostCardView[]}
             locale={locale}
