@@ -11,8 +11,8 @@ export function SectionHeader({ id, heading, className }: SectionHeaderProps) {
     <div className={cn('bg-background', className)}>
       <div
         className={cn(
-        'relative h-(--header-height) bg-transparent',
-        'grid items-center',
+          'relative h-(--header-height) bg-transparent',
+          'grid items-center',
           'grid-cols-1',
           'gap-x-1 lg:gap-x-2',
         )}
@@ -22,7 +22,7 @@ export function SectionHeader({ id, heading, className }: SectionHeaderProps) {
         <h2
           id={id}
           className={cn(
-            'text-foreground text-sm leading-none font-medium tracking-tight lowercase md:text-base lg:text-lg',
+            'text-foreground text-sm leading-none font-medium lowercase md:text-base lg:text-lg',
             className,
           )}
         >

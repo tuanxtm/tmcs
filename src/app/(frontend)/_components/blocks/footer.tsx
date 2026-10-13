@@ -25,10 +25,12 @@ function FooterLinkList({ label, links, variant }: FooterLinkListProps) {
   return (
     <div className="flex flex-col gap-1">
       {label ? (
-        <p className={cn(
-            'text-muted-foreground/80 font-mono tracking-tight uppercase',
+        <p
+          className={cn(
+            'text-muted-foreground/80 font-mono uppercase',
             'text-[0.625rem] md:text-xs',
-          )}>
+          )}
+        >
           {label}
         </p>
       ) : null}
@@ -38,10 +40,12 @@ function FooterLinkList({ label, links, variant }: FooterLinkListProps) {
           return (
             <li key={link.id}>
               <div className="flex items-center gap-x-1">
-                <span className={cn(
-                  'text-primary hover:text-foreground font-mono',
-                  'text-xs md:text-base',
-                )}>
+                <span
+                  className={cn(
+                    'text-primary hover:text-foreground font-mono',
+                    'text-xs md:text-base',
+                  )}
+                >
                   &gt;
                 </span>
                 <Link
@@ -49,7 +53,7 @@ function FooterLinkList({ label, links, variant }: FooterLinkListProps) {
                   target={link.newTab ? '_blank' : undefined}
                   rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
                   className={cn(
-                    'text-sm font-medium tracking-tight lowercase md:text-base lg:text-lg',
+                    'font-mono text-sm font-medium lowercase md:text-base lg:text-lg',
                     'hover:text-primary transition-colors duration-300',
                   )}
                   data-cursor-popup={''}
@@ -132,10 +136,12 @@ export async function FooterBlock({ block, siteName, locale }: FooterBlockProps)
             'px-2 md:px-3 lg:px-4',
           )}
         >
-          <p className={cn(
-              'text-foreground leading-none font-medium pt-0.5',
+          <p
+            className={cn(
+              'text-foreground pt-0.5 font-mono leading-none font-medium',
               'text-xs md:text-sm',
-            )}>
+            )}
+          >
             {copyright}
           </p>
           <Link href={homeHref(locale)}>

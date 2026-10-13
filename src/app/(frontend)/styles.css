@@ -4,6 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --cal-optical-size: 0;
   --outer-line-weight: 1.5px;
   --inner-line-weight: 1px;
   --background: oklch(0.9802 0 0); /* previous: 0.9702 */
@@ -37,8 +38,6 @@
   --page-gutter: var(--scrollbar-size);
   --fold-height: 100lvh;
   --hero-fold-height: calc(var(--fold-height) - (2 * var(--header-height)));
-  --font-serif: var(--font-bitter), ui-serif, Georgia, serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 @theme inline {
@@ -69,9 +68,14 @@
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
   --radius-xl: calc(var(--radius) + 6px);
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Cal Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
-  --font-serif: var(--font-bitter), ui-serif, Georgia, serif;
+}
+
+@utility italic {
+  font-variation-settings:
+    'opsz' var(--cal-optical-size),
+    'ital' 1;
 }
 
 @layer base {
@@ -87,9 +91,15 @@
   body {
     @apply text-foreground font-sans;
     background: transparent;
-    font-feature-settings:
-      'ss01' on,
-      'cv11' on;
+    font-optical-sizing: auto;
+    font-variation-settings: 'opsz' var(--cal-optical-size);
+  }
+
+  em,
+  i {
+    font-variation-settings:
+      'opsz' var(--cal-optical-size),
+      'ital' 1;
   }
 
   ::selection {

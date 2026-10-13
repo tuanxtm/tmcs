@@ -72,7 +72,7 @@ export function Hero({ hero, locale, hasFollowingContent, className }: HeroProps
           {hero.paragraph ? (
             <CmsRichText
               data={hero.paragraph}
-              className="text-secondary font-serif text-xl md:text-2xl lg:text-5xl"
+              className="text-secondary text-xl md:text-2xl lg:text-5xl"
               lineSpacing="uniform"
               fitToContainer
             />

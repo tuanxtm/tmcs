@@ -19,10 +19,7 @@ export default async function NotFound() {
   return (
     <section
       id="not-found"
-      className={cn(
-        'relative flex min-h-0 flex-auto',
-        'bg-background',
-      )}
+      className={cn('relative flex min-h-0 flex-auto', 'bg-background')}
       aria-labelledby="not-found-heading"
       data-cursor-popup={'not-found'}
     >
@@ -45,16 +42,19 @@ export default async function NotFound() {
               <h1
                 id="not-found-heading"
                 className={cn(
-                'text-primary font-medium whitespace-pre-wrap',
-                'text-sm md:text-base lg:text-lg',
-              )}
+                  'text-primary font-medium whitespace-pre-wrap',
+                  'text-sm md:text-base lg:text-lg',
+                )}
               >
-                {heading}
+                <span className="font-mono">404.</span>
+                {heading.slice(4)}
               </h1>
-              <p className={cn(
-                'text-primary mb-1 text-left font-medium whitespace-pre-wrap',
-                'text-sm md:text-base lg:text-lg',
-              )}>
+              <p
+                className={cn(
+                  'text-primary mb-1 text-left font-medium whitespace-pre-wrap',
+                  'text-sm md:text-base lg:text-lg',
+                )}
+              >
                 {description}
               </p>
               <div
@@ -74,7 +74,7 @@ export default async function NotFound() {
                 </span>
                 <span
                   className={cn(
-                    'text-primary inline-flex items-baseline leading-none font-semibold',
+                    'text-primary inline-flex items-baseline font-mono leading-none font-semibold',
                     'pt-px text-xs uppercase md:text-sm lg:text-base',
                     'hover:text-foreground hover:underline hover:underline-offset-4',
                   )}
@@ -97,10 +97,9 @@ export default async function NotFound() {
             className={cn('flex h-full w-full items-center justify-center py-4', 'font-mono')}
             aria-hidden="true"
           >
-            <span className={cn(
-              'text-primary font-mono leading-none',
-              'text-[clamp(6rem,20vw,8rem)]',
-            )}>
+            <span
+              className={cn('text-primary font-mono leading-none', 'text-[clamp(6rem,20vw,8rem)]')}
+            >
               <span className="inline md:block">4</span>
               <span className="inline md:block">0</span>
               <span className="inline md:block">4</span>

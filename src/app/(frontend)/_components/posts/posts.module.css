@@ -11,15 +11,14 @@
 }
 
 .loading {
+  font-family: var(--font-mono);
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--secondary);
-  font-family: var(--font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.04em;
   text-transform: uppercase;
   opacity: 0.6;
 }
@@ -43,9 +42,8 @@
   padding: 1rem;
   border-right: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
   color: var(--secondary);
-  font-family: var(--font-serif);
   font-size: clamp(2.25rem, 6vw, 6rem);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.05;
   text-align: center;
   overflow-wrap: anywhere;
@@ -64,15 +62,10 @@
   padding: 1rem;
   border-top: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
   color: var(--secondary);
-  font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.5;
   text-align: left;
   overflow-wrap: anywhere;
-}
-
-.carousel {
-  font-family: var(--font-mono);
 }
 
 .fallbackCaption {
@@ -92,7 +85,6 @@
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
-  font-family: var(--font-serif);
   font-size: 15px;
   font-weight: 500;
   line-height: 1.35;
@@ -100,13 +92,13 @@
 }
 
 .metadata {
+  font-family: var(--font-mono);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
   min-height: 24px;
-  font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 400;
   line-height: 1.5;
@@ -117,11 +109,11 @@
 }
 
 .openPostLink {
+  font-family: var(--font-mono);
   display: inline-flex;
   align-items: center;
   min-height: 24px;
   color: var(--accent);
-  font-family: var(--font-mono);
   font-size: 0.75rem;
   text-decoration: none;
   text-underline-offset: 4px;

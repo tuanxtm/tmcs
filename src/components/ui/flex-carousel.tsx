@@ -1407,7 +1407,7 @@ const FlexCarousel = ({
             </div>
           )}
           <span
-            className="inline-flex items-center gap-[3px] text-[12px] leading-none tabular-nums opacity-50 transition-opacity duration-[400ms] data-[hidden]:opacity-0"
+            className="font-mono inline-flex items-center gap-[3px] text-[12px] leading-none tabular-nums opacity-50 transition-opacity duration-[400ms] data-[hidden]:opacity-0"
             data-hidden={focusOpen && !renderMetadata ? '' : undefined}
             data-flex-carousel-counter
             aria-hidden="true"

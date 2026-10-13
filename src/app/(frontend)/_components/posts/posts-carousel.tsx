@@ -120,7 +120,6 @@ export function PostsCarousel({ docs, locale, cursorPopupItem }: PostsCarouselPr
           Component={FlexCarousel}
           items={items}
           captureWheel={false}
-          className={styles.carousel}
           renderCaption={renderCaption}
           renderMetadata={renderMetadata}
         />

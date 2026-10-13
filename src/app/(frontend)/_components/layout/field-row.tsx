@@ -18,10 +18,7 @@ export function FieldRow({ label, className, children }: FieldRowProps) {
   return (
     <div className={cn('flex flex-col', className)}>
       {label ? (
-        <p className={cn(
-          'text-primary/90 font-mono tracking-tight uppercase',
-          'text-[0.625rem] md:text-xs',
-        )}>
+        <p className={cn('text-primary/90 font-mono uppercase', 'text-[0.625rem] md:text-xs')}>
           {label}
         </p>
       ) : null}

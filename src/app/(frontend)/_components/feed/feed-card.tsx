@@ -18,12 +18,7 @@ type FeedCardProps = {
   cursorPopup?: string | null
 }
 
-export function FeedCard({
-  doc,
-  locale,
-  className,
-  cursorPopup = 'view details',
-}: FeedCardProps) {
+export function FeedCard({ doc, locale, className, cursorPopup = 'view details' }: FeedCardProps) {
   const reduceMotion = useReducedMotion()
   const dateLabel = formatDate(doc.publishedAt, locale)
 
@@ -46,10 +41,7 @@ export function FeedCard({
         />
       ) : (
         <div
-          className={cn(
-            'flex aspect-square w-full items-center justify-center',
-            'bg-white/80',
-          )}
+          className={cn('flex aspect-square w-full items-center justify-center', 'bg-white/80')}
           aria-hidden="true"
         />
       )}
@@ -64,7 +56,7 @@ export function FeedCard({
         <div className="h-full w-full object-cover">{imageWrapper}</div>
         <h3
           className={cn(
-            'text-foreground text-xs leading-none font-medium tracking-tight md:text-sm lg:text-base',
+            'text-foreground text-xs leading-none font-medium md:text-sm lg:text-base',
             'lowercase',
           )}
         >

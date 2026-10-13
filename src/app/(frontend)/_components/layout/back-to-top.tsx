@@ -46,7 +46,7 @@ export function BackToTop() {
   return (
     <button
       type="button"
-      className={`${styles.button} bg-background/20 text-accent font-mono text-[0.625rem] leading-none font-medium tracking-[-0.015em] uppercase backdrop-blur-xs`}
+      className={`${styles.button} bg-background/20 text-accent font-mono text-[0.625rem] leading-none font-medium uppercase backdrop-blur-xs`}
       aria-label={label}
       aria-hidden={!visible}
       inert={!visible}

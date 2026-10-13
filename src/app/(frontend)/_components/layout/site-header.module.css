@@ -24,10 +24,10 @@
   padding: var(--site-cell-padding);
 }
 .navigation {
+  font-family: var(--font-mono);
   position: relative;
   min-width: 0;
   border-left: var(--inner-line-weight) solid var(--site-rule-color);
-  font-family: var(--font-mono);
   font-size: var(--site-nav-font-size);
   text-transform: uppercase;
 }

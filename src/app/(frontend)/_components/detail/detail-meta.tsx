@@ -20,9 +20,7 @@ export function DetailMeta({ view, locale, siteName, navigation }: DetailMetaPro
   const hasReadingTime = typeof readingTime === 'number' && readingTime > 0
 
   return (
-    <section
-      className={cn('bg-background')}
-    >
+    <section className={cn('bg-background')}>
       <div className="pt-2 md:pt-1 md:pb-1.5">
         <div
           className={cn(
@@ -40,13 +38,15 @@ export function DetailMeta({ view, locale, siteName, navigation }: DetailMetaPro
 
             {view.publishedAt ? (
               <FieldRow label="published">
-                <time dateTime={view.publishedAt}>{formatDate(view.publishedAt)}</time>
+                <time className="font-mono" dateTime={view.publishedAt}>
+                  {formatDate(view.publishedAt)}
+                </time>
               </FieldRow>
             ) : null}
 
             {hasReadingTime ? (
               <FieldRow label="reading time">
-                <span>{readingTime} min read</span>
+                <span className="font-mono">{readingTime} min read</span>
               </FieldRow>
             ) : null}
 
@@ -69,10 +69,7 @@ export function DetailMeta({ view, locale, siteName, navigation }: DetailMetaPro
             {view.content ? (
               <CmsRichText
                 data={view.content}
-                className={cn(
-              'text-foreground leading-relaxed',
-              'text-sm md:text-base',
-            )}
+                className={cn('text-foreground leading-relaxed', 'text-sm md:text-base')}
               />
             ) : null}
             {view.blocks.length > 0 ? (
@@ -112,10 +109,7 @@ function AuthorFieldRow({
         <span className="flex flex-col leading-tight">
           <span>{author.name}</span>
           {author.jobTitle ? (
-            <span className={cn(
-              'text-muted-foreground/70 tracking-tight',
-              'text-[0.75rem]',
-            )}>
+            <span className={cn('text-muted-foreground/70', 'text-[0.75rem]')}>
               {author.jobTitle}
             </span>
           ) : null}

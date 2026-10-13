@@ -31,10 +31,7 @@ export default function Error({
   return (
     <section
       id="error"
-      className={cn(
-        'relative flex min-h-0 flex-auto',
-        'bg-background',
-      )}
+      className={cn('relative flex min-h-0 flex-auto', 'bg-background')}
       aria-labelledby="error-heading"
       data-cursor-popup={'error'}
     >
@@ -58,12 +55,15 @@ export default function Error({
                   'text-sm md:text-base lg:text-lg',
                 )}
               >
-                {heading}
+                <span className="font-mono">500.</span>
+                {heading.slice(4)}
               </h1>
-              <p className={cn(
+              <p
+                className={cn(
                   'text-primary mb-1 text-left font-medium whitespace-pre-wrap',
                   'text-sm md:text-base lg:text-lg',
-                )}>
+                )}
+              >
                 {description}
               </p>
               <div className="flex items-center gap-8">
@@ -85,7 +85,7 @@ export default function Error({
                   </span>
                   <span
                     className={cn(
-                      'text-primary inline-flex items-baseline leading-none font-semibold',
+                      'text-primary inline-flex items-baseline font-mono leading-none font-semibold',
                       'pt-px text-xs uppercase md:text-sm lg:text-base',
                       'hover:text-foreground hover:underline hover:underline-offset-4',
                     )}
@@ -110,7 +110,7 @@ export default function Error({
                   </span>
                   <span
                     className={cn(
-                      'text-primary inline-flex items-baseline leading-none font-semibold',
+                      'text-primary inline-flex items-baseline font-mono leading-none font-semibold',
                       'pt-px text-xs uppercase md:text-sm lg:text-base',
                       'hover:text-foreground hover:underline hover:underline-offset-4',
                     )}
@@ -134,10 +134,9 @@ export default function Error({
             className={cn('flex h-full w-full items-center justify-center py-4', 'font-mono')}
             aria-hidden="true"
           >
-            <span className={cn(
-                'text-primary font-mono leading-none',
-                'text-[clamp(6rem,18vw,8rem)]',
-              )}>
+            <span
+              className={cn('text-primary font-mono leading-none', 'text-[clamp(6rem,18vw,8rem)]')}
+            >
               <span className="inline md:block">5</span>
               <span className="inline md:block">0</span>
               <span className="inline md:block">0</span>

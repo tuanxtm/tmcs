@@ -100,10 +100,12 @@ export function VideoFeedCard({
             className="pointer-events-none absolute inset-0 flex items-center justify-center"
             aria-hidden="true"
           >
-            <span className={cn(
-                  'bg-background/85 text-foreground flex size-11 items-center justify-center',
-                  'rounded-full shadow-sm',
-                )}>
+            <span
+              className={cn(
+                'bg-background/85 text-foreground flex size-11 items-center justify-center',
+                'rounded-full shadow-sm',
+              )}
+            >
               <IconPlayerPlay className="size-5 translate-x-px" />
             </span>
           </span>
@@ -115,7 +117,7 @@ export function VideoFeedCard({
   const meta = (
     <span
       className={cn(
-        'text-primary font-mono text-[0.5rem] leading-none tracking-tight uppercase md:text-[0.625rem]',
+        'text-primary font-mono text-[0.5rem] leading-none uppercase md:text-[0.625rem]',
         'absolute top-0 left-0',
         'bg-background pr-0.5 pb-0.5',
       )}
@@ -129,7 +131,7 @@ export function VideoFeedCard({
     <h3
       id={titleId}
       className={cn(
-        'text-foreground text-xs leading-none font-medium tracking-tight md:text-sm lg:text-base',
+        'text-foreground text-xs leading-none font-medium md:text-sm lg:text-base',
         'lowercase',
       )}
     >
@@ -167,7 +169,7 @@ export function VideoFeedCard({
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                'text-primary flex items-center gap-1 text-sm tracking-tight lowercase underline-offset-2 hover:underline',
+                'text-primary flex items-center gap-1 text-sm lowercase underline-offset-2 hover:underline',
                 'font-medium',
               )}
               data-cursor-popup={undefined}

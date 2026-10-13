@@ -1,14 +1,16 @@
-import { Bitter, Geist, JetBrains_Mono } from 'next/font/google'
+import { JetBrains_Mono } from 'next/font/google'
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 
 import { getSiteShell } from '@/app/(frontend)/_lib/cms'
+import { Background } from '@/app/(frontend)/_components/layout/background'
 import { LocaleAwareShell } from '@/app/(frontend)/_components/layout/locale-aware-shell'
 import { LocaleMeta } from '@/app/(frontend)/_components/layout/locale-meta'
 import { LenisProvider } from '@/app/(frontend)/_components/providers/lenis-provider'
 import { MotionProvider } from '@/app/(frontend)/_components/providers/motion-provider'
 import { BootRevealProvider } from '@/app/(frontend)/_components/providers/boot-reveal'
 
+import 'cal-sans'
 import './styles.css'
 
 // Cache Components requires `generateMetadata()` to be prerenderable when the
@@ -21,23 +23,10 @@ import './styles.css'
 // `generateMetadata()` overrides these defaults with locale-aware OG/Twitter
 // metadata of its own.
 
-const geist = Geist({
-  subsets: ['latin'],
-  variable: '--font-geist',
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
-})
-
-const bitter = Bitter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-bitter',
-})
-
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
   variable: '--font-jetbrains-mono',
+  display: 'swap',
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -70,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   // this render tree. `<html lang>` defaults to `en`; the inline script in
   // `<LocaleMeta />` updates it to the request-time locale before paint.
   return (
-    <html lang="en" className={`${geist.variable} ${bitter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={jetbrainsMono.variable}>
       <head>
         {/* Suspense fallback intentionally empty - if `headers()` blocks,
             the static shell still ships with the default lang and the script
@@ -79,7 +68,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <LocaleMeta />
         </Suspense>
       </head>
-      <body className="text-foreground relative min-h-dvh">
+      <body className="text-foreground relative isolate min-h-dvh">
+        <Background />
         <MotionProvider>
           <LenisProvider>
             <BootRevealProvider>

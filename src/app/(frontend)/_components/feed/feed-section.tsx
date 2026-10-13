@@ -213,7 +213,7 @@ export function FeedSection(props: FeedSectionProps) {
               <p
                 role="status"
                 aria-live="polite"
-                className="text-muted-foreground text-xs tracking-wide uppercase"
+                className="text-muted-foreground text-xs uppercase"
               >
                 {isPending ? 'Loading…' : hasNextPage ? 'There are more ...' : 'End of feed'}
               </p>
@@ -305,17 +305,15 @@ export function FeedSection(props: FeedSectionProps) {
       </FeedGrid>
 
       {pagination === 'infinite' ? (
-        <div className={cn(
-          'bg-background flex min-h-(--header-height) flex-col items-center justify-center',
-          'gap-3',
-          'px-1.5 py-4',
-        )}>
+        <div
+          className={cn(
+            'bg-background flex min-h-(--header-height) flex-col items-center justify-center',
+            'gap-3',
+            'px-1.5 py-4',
+          )}
+        >
           <div ref={sentinelRef} className="h-1 w-full" aria-hidden="true" />
-          <p
-            role="status"
-            aria-live="polite"
-            className="text-muted-foreground text-xs tracking-wide uppercase"
-          >
+          <p role="status" aria-live="polite" className="text-muted-foreground text-xs uppercase">
             {isPending ? 'Loading…' : hasNextPage ? 'There are more ...' : 'End of feed'}
           </p>
           {error ? (
@@ -336,18 +334,20 @@ export function FeedSection(props: FeedSectionProps) {
           ) : null}
         </div>
       ) : null}
-      <div className={cn(
-        'bg-background',
-        'flex h-(--header-height) items-center justify-end',
-        'px-1.5 md:px-2 lg:px-3',
-      )}>
+      <div
+        className={cn(
+          'bg-background',
+          'flex h-(--header-height) items-center justify-end',
+          'px-1.5 md:px-2 lg:px-3',
+        )}
+      >
         {showViewAll && viewAllHref && resolvedViewAllLabel ? (
           <Link
             href={viewAllHref}
             transitionTypes={['nav-forward']}
             data-cursor-popup={cursorPopupViewAll || resolvedViewAllLabel.toLowerCase()}
             className={cn(
-              'text-foreground/90 leading-none font-medium tracking-tight lowercase',
+              'text-foreground/90 leading-none font-medium lowercase',
               'hover:text-primary transition-colors',
               'text-xs md:text-sm lg:text-base',
             )}
