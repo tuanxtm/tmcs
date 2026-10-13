@@ -17,7 +17,6 @@
 .heading {
   margin: 0;
   color: var(--secondary);
-  font-family: var(--font-serif);
   font-size: clamp(2.25rem, 6vw, 6rem);
   font-weight: 300;
   line-height: 1.05;
@@ -28,11 +27,11 @@
   margin: 0;
   max-width: 42rem;
   color: var(--secondary);
-  font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.5;
-  text-align: center;
+  text-align: right;
   overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .descriptionRow {
@@ -42,10 +41,8 @@
   gap: 0.375rem;
   margin-top: 0.75rem;
   color: var(--secondary);
-  font-family: var(--font-mono);
   font-size: 0.625rem;
   line-height: 1.5;
-  letter-spacing: 0.04em;
   text-align: center;
 }
 
@@ -86,7 +83,7 @@
   isolation: isolate;
   width: 100%;
   margin-top: 1.5rem;
-  --grid-size: 16px;
+  --grid-size: 24px;
   --columns: 2;
   --row-height: 360px;
   --padding: 16px;
@@ -102,26 +99,69 @@
   background-color: transparent;
   box-shadow: inset 0 calc(-1 * var(--outer-line-weight, 1.5px))
     var(--site-rule-color, var(--accent));
+}
+
+.canvasGrid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  container-type: size;
+  --grid-fade: clamp(24px, 6cqw, 80px);
+  --grid-line-color: color-mix(in oklch, var(--accent) 13%, transparent);
+  mask-image:
+    linear-gradient(
+      to right,
+      transparent,
+      #000 var(--grid-fade),
+      #000 calc(100% - var(--grid-fade)),
+      transparent
+    ),
+    linear-gradient(
+      to bottom,
+      transparent,
+      #000 var(--grid-fade),
+      #000 calc(100% - var(--grid-fade)),
+      transparent
+    );
+  mask-composite: intersect;
+}
+
+.canvasGrid::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  --grid-tilt-x: 66deg;
+  --grid-rotation-z: 33deg;
+  /* Account for both rotations to cover every canvas corner. */
+  width: calc(
+    100cqw * cos(var(--grid-rotation-z)) + 100cqh * sin(var(--grid-rotation-z)) /
+      cos(var(--grid-tilt-x)) + 2px
+  );
+  height: calc(
+    100cqw * sin(var(--grid-rotation-z)) + 100cqh * cos(var(--grid-rotation-z)) /
+      cos(var(--grid-tilt-x)) + 2px
+  );
+  transform: translate(-50%, -50%) rotateX(var(--grid-tilt-x)) rotateZ(var(--grid-rotation-z));
   background-image:
     linear-gradient(
       to right,
-      var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))
-        var(--inner-line-weight, 1px),
+      var(--grid-line-color) var(--inner-line-weight, 1px),
       transparent var(--inner-line-weight, 1px)
     ),
     linear-gradient(
       to bottom,
-      var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))
-        var(--inner-line-weight, 1px),
+      var(--grid-line-color) var(--inner-line-weight, 1px),
       transparent var(--inner-line-weight, 1px)
     );
   background-size: var(--grid-size) var(--grid-size);
-  background-repeat: round;
 }
 
 @container (min-width: 640px) and (max-width: 1023.98px) {
   .canvas {
-    --grid-size: 20px;
+    --grid-size: 30px;
     --columns: 2;
     --row-height: 260px;
     --padding: 24px;
@@ -135,7 +175,7 @@
 
 @container (min-width: 1024px) {
   .canvas {
-    --grid-size: 28px;
+    --grid-size: 42px;
     --columns: 3;
     --row-height: 280px;
     --padding: 24px;
@@ -254,11 +294,10 @@
 }
 
 .number {
-  color: var(--secondary);
   font-family: var(--font-mono);
+  color: var(--secondary);
   font-size: 0.625rem;
   line-height: 1.5;
-  letter-spacing: 0.08em;
 }
 
 .title {
@@ -267,9 +306,9 @@
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   color: var(--secondary);
-  font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 1rem;
   line-height: 1.5;
   text-decoration: none;
 }
@@ -366,6 +405,7 @@
 }
 
 .status {
+  font-family: var(--font-mono);
   display: flex;
   min-height: 3rem;
   align-items: center;
@@ -374,23 +414,20 @@
   flex-wrap: wrap;
   padding: 1rem 0.375rem;
   color: var(--secondary);
-  font-family: var(--font-mono);
   font-size: 0.625rem;
   line-height: 1.5;
-  letter-spacing: 0.04em;
   text-align: center;
 }
 
 .statusAction {
+  font-family: var(--font-mono);
   cursor: pointer;
   min-height: 44px;
   padding: 0.5rem;
   color: var(--secondary);
   background: none;
   border: 0;
-  font-family: var(--font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.04em;
   text-transform: uppercase;
   text-decoration: underline;
   text-decoration-color: var(--accent);
@@ -421,6 +458,7 @@
 }
 
 .viewAllLink {
+  font-family: var(--font-mono);
   position: relative;
   display: block;
   min-width: 0;
@@ -428,7 +466,6 @@
   padding: 8px var(--site-cell-padding, 12px) 28px;
   border-left: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
   color: var(--secondary);
-  font-family: var(--font-mono);
   font-size: var(--site-nav-font-size, 0.875rem);
   line-height: 1.25;
   text-align: left;
@@ -538,6 +575,7 @@
 }
 
 .thingAction {
+  font-family: var(--font-mono);
   position: relative;
   display: inline-flex;
   align-items: flex-end;
@@ -546,7 +584,6 @@
   border: 0;
   background: transparent;
   color: var(--accent);
-  font-family: var(--font-mono);
   font-size: 0.625rem;
   line-height: 14px;
   text-transform: uppercase;

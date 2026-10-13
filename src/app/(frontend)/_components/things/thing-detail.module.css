@@ -54,6 +54,7 @@
 /* Image half. */
 .image {
   position: relative;
+  isolation: isolate;
   min-height: 0;
   min-width: 0;
   overflow: hidden;
@@ -68,38 +69,22 @@
   }
 }
 
-/* Background grid behind the product image. Mirrors the canvas recipe. */
+/* Reuse the canvas grid behind the product image. */
 .imageGrid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-color: transparent;
-  background-image:
-    linear-gradient(
-      to right,
-      var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))
-        var(--inner-line-weight, 1px),
-      transparent var(--inner-line-weight, 1px)
-    ),
-    linear-gradient(
-      to bottom,
-      var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))
-        var(--inner-line-weight, 1px),
-      transparent var(--inner-line-weight, 1px)
-    );
-  background-size: 24px 24px;
-  background-repeat: round;
+  composes: canvasGrid from '../canvas/canvas.module.css';
+  --grid-size: 24px;
+  --grid-line-color: color-mix(in oklch, var(--accent) 15%, transparent);
 }
 
 @media (min-width: 640px) and (max-width: 1023.98px) {
   .imageGrid {
-    background-size: 30px 30px;
+    --grid-size: 30px;
   }
 }
 
 @media (min-width: 1024px) {
   .imageGrid {
-    background-size: 42px 42px;
+    --grid-size: 42px;
   }
 }
 
@@ -156,7 +141,6 @@
   place-items: center;
   padding: var(--site-cell-padding, 12px);
   color: var(--secondary);
-  font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.5;
   text-align: center;
@@ -246,9 +230,8 @@
 .title {
   margin: 0;
   color: var(--secondary);
-  font-family: var(--font-serif);
   font-size: clamp(2.25rem, 4vw, 4rem);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.05;
   text-align: left;
   text-transform: none;
@@ -258,7 +241,6 @@
 .description {
   margin: 0;
   color: var(--secondary);
-  font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.5;
   text-align: left;
@@ -302,6 +284,7 @@
 }
 
 .link {
+  font-family: var(--font-mono);
   box-sizing: border-box;
   height: 100%;
   position: relative;
@@ -314,10 +297,8 @@
   color: var(--accent);
   background: var(--background);
   border: 0;
-  font-family: var(--font-mono);
   font-size: var(--site-nav-font-size, 0.875rem);
   line-height: 1.1;
-  letter-spacing: 0.04em;
   text-transform: uppercase;
   text-decoration: none;
   transition: color 260ms ease;

@@ -871,6 +871,7 @@ export function DraggableCanvas<T extends CanvasDoc>({
           } as CSSProperties
         }
       >
+        <div className={styles.canvasGrid} aria-hidden="true" />
         {items.map((item, index) => {
           const handlers = getItemHandlers(store, item.id)
           return (
