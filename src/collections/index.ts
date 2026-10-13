@@ -9,7 +9,6 @@ import { Media } from './Media'
 import { Pages } from './Pages'
 import { Posts } from './Posts'
 import { Projects } from './Projects'
-import { ShortStories } from './ShortStories'
 import { Tags } from './Tags'
 import { Things } from './Things'
 import { Users } from './Users'
@@ -28,7 +27,6 @@ export const collections: CollectionConfig[] = [
   Categories,
   Tags,
   Posts,
-  ShortStories,
   Projects,
   Things,
   Videos,

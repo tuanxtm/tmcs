@@ -6,8 +6,6 @@ import {
   PageHeroBlock,
   PageRelatedItemsBlock,
   PageRichTextBlock,
-  PageScrambleHoverBlock,
-  PageTypewriterBlock,
 } from './page-blocks'
 import { TemplatePostBlock, TemplateProjectBlock } from './template-blocks'
 import { InlineImageBlock } from './inline-blocks'
@@ -21,8 +19,6 @@ export {
   PageHeroBlock,
   PageRelatedItemsBlock,
   PageRichTextBlock,
-  PageScrambleHoverBlock,
-  PageTypewriterBlock,
   TemplatePostBlock,
   TemplateProjectBlock,
 }
@@ -34,8 +30,6 @@ export const pageBlocks = [
   ContentMediaBlock,
   ContentGalleryBlock,
   PageRelatedItemsBlock,
-  PageTypewriterBlock,
-  PageScrambleHoverBlock,
   PageBlankSpaceBlock,
   PageFooterBlock,
   TemplatePostBlock,

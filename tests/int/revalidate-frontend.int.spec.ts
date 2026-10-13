@@ -55,13 +55,13 @@ describe('revalidateFrontend hooks', () => {
   })
 
   it('revalidates on delete of published docs', () => {
-    const hook = createCollectionRevalidateDeleteHook([CACHE_TAGS.shortStories])
+    const hook = createCollectionRevalidateDeleteHook([CACHE_TAGS.posts])
     hook({
       doc: { _status: 'published' },
       req: { context: {}, payload: { logger: { info: vi.fn() } } },
     } as never)
 
-    expect(revalidateTag).toHaveBeenCalledWith(CACHE_TAGS.shortStories, 'max')
+    expect(revalidateTag).toHaveBeenCalledWith(CACHE_TAGS.posts, 'max')
   })
 
   it('always revalidates globals unless disabled', () => {

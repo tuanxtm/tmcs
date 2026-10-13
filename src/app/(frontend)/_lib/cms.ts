@@ -6,18 +6,9 @@ import { CACHE_TAGS } from '@/lib/cache-tags'
 import { getServerURL } from '@/lib/env'
 import type { LocaleCode } from '@/lib/locales'
 import { publishedStatusWhere } from '@/lib/payload-queries'
-import { lexicalToPlainText } from '@/lib/readingTime'
 import { PROJECTS_BATCH_SIZE } from './projects-feed'
 import { THINGS_BATCH_SIZE, THINGS_PREVIEW_LIMIT } from './things-feed'
-import type {
-  Media,
-  Page,
-  Post,
-  Project,
-  ShortStory,
-  Thing,
-  Video,
-} from '@payload-types'
+import type { Media, Page, Post, Project, Thing, Video } from '@payload-types'
 import config from '@payload-config'
 
 import { resolveCmsLink } from './links'
@@ -32,7 +23,6 @@ import type {
   ProjectCardView,
   ProjectsPageView,
   HeroView,
-  ShortStoryCardView,
   SiteShellView,
   ThingCardView,
   ThingsPageView,
@@ -46,7 +36,6 @@ import { parseYouTubeVideoId } from '@/lib/youtube'
 export const POSTS_PAGE_SIZE = 11
 export const PROJECTS_PAGE_SIZE = PROJECTS_BATCH_SIZE
 export const VIDEOS_PAGE_SIZE = 11
-export const SHORT_STORIES_POOL_LIMIT = 48
 export const FEED_POOL_LIMIT = 48
 /** Default Things preview count. */
 export const THINGS_HOMEPAGE_LIMIT = THINGS_PREVIEW_LIMIT
@@ -298,38 +287,6 @@ async function cachedLoadThingBySlug(
 }
 
 export { cachedLoadThingBySlug as loadThingBySlug }
-
-function toShortStoryCard(story: ShortStory, locale: LocaleCode): ShortStoryCardView {
-  let href: string | null = null
-  let newTab = false
-  if (story.link?.enabled) {
-    const resolved = resolveCmsLink(
-      {
-        label: story.link.label || story.title,
-        linkType: story.link.linkType,
-        page: isPage(story.link.page) ? story.link.page : null,
-        url: story.link.url,
-        newTab: story.link.newTab,
-      },
-      locale,
-    )
-    if (resolved) {
-      href = resolved.href
-      newTab = resolved.newTab
-    }
-  }
-
-  return {
-    id: story.id,
-    title: story.title,
-    text: lexicalToPlainText(story.content),
-    variant: story.variant,
-    // Packer default: allow every footprint until the feed layout is redesigned.
-    allowedShapes: null,
-    href,
-    newTab,
-  }
-}
 
 async function loadSiteSettings(locale: LocaleCode) {
   const payload = await getPayloadClient()
@@ -607,64 +564,6 @@ async function cachedLoadVideosPage(
   return loadVideosPage(locale, cursorRaw)
 }
 
-async function loadShortStories(locale: LocaleCode): Promise<ShortStoryCardView[]> {
-  const payload = await getPayloadClient()
-
-  const result = await payload.find({
-    collection: 'short-stories',
-    locale,
-    where: publishedStatusWhere,
-    sort: '-publishedAt,-id',
-    limit: SHORT_STORIES_POOL_LIMIT,
-    depth: 1,
-    overrideAccess: false,
-    select: {
-      title: true,
-      content: true,
-      variant: true,
-      link: true,
-    },
-  })
-
-  return result.docs.map((story) => toShortStoryCard(story as ShortStory, locale))
-}
-
-async function cachedLoadShortStories(locale: LocaleCode): Promise<ShortStoryCardView[]> {
-  'use cache'
-  cacheLife('days')
-  cacheTag(CACHE_TAGS.shortStories)
-  return loadShortStories(locale)
-}
-
-async function loadShortStoryTextsInner(locale: LocaleCode, ids: number[]): Promise<string[]> {
-  if (ids.length === 0) return []
-
-  const payload = await getPayloadClient()
-
-  const result = await payload.find({
-    collection: 'short-stories',
-    locale,
-    where: {
-      and: [publishedStatusWhere, { id: { in: ids } }],
-    },
-    sort: '-publishedAt',
-    limit: ids.length,
-    depth: 0,
-    overrideAccess: false,
-    select: {
-      id: true,
-      content: true,
-    },
-  })
-
-  const byId = new Map<number, string>()
-  for (const doc of result.docs) {
-    byId.set((doc as ShortStory).id, lexicalToPlainText((doc as ShortStory).content))
-  }
-
-  return ids.map((id) => byId.get(id) ?? '')
-}
-
 export const getHero = cache(async (locale: LocaleCode): Promise<HeroView> => {
   const siteSettings = await cachedLoadSiteSettings(locale)
 
@@ -747,23 +646,5 @@ export const getThingsPage = cache(
 export const getVideosPage = cache(
   async (locale: LocaleCode, cursor: string | null = null): Promise<VideosPageView> => {
     return cachedLoadVideosPage(locale, cursor)
-  },
-)
-
-export const getShortStories = cache(async (locale: LocaleCode): Promise<ShortStoryCardView[]> => {
-  return cachedLoadShortStories(locale)
-})
-
-async function cachedLoadShortStoryTexts(locale: LocaleCode, ids: number[]): Promise<string[]> {
-  'use cache'
-  cacheLife('days')
-  cacheTag(CACHE_TAGS.shortStories)
-  return loadShortStoryTextsInner(locale, ids)
-}
-
-export const loadShortStoryTexts = cache(
-  async (locale: LocaleCode, ids: number[]): Promise<string[]> => {
-    if (ids.length === 0) return []
-    return cachedLoadShortStoryTexts(locale, ids)
   },
 )

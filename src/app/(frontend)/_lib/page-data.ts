@@ -23,7 +23,6 @@ import {
   loadPostBySlug,
   loadProjectBySlug,
   loadThingBySlug,
-  loadShortStoryTexts,
   toMediaView,
 } from '@/app/(frontend)/_lib/cms'
 import { resolveCmsLink, resolvePageHref } from '@/app/(frontend)/_lib/links'
@@ -40,8 +39,6 @@ import type {
   PageFooterBlockView,
   PageHeroBlockView,
   PageRichTextBlockView,
-  PageScrambleHoverBlockView,
-  PageTypewriterBlockView,
   PostCardView,
   PostDetailView,
   ProjectCardView,
@@ -460,44 +457,6 @@ async function resolveBlankSpaceBlock(
   }
 }
 
-async function resolveTypewriterBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'pageTypewriter' }>,
-  locale: LocaleCode,
-  index: number,
-): Promise<PageTypewriterBlockView | null> {
-  const ids = relationIds(block.stories)
-  if (ids.length === 0) return null
-
-  const texts = await loadShortStoryTexts(locale, ids)
-  const filtered = texts.filter((text) => text.length > 0)
-  if (filtered.length === 0) return null
-
-  return {
-    blockType: 'pageTypewriter',
-    id: blockId(block, `typewriter-${index}`),
-    texts: filtered,
-  }
-}
-
-async function resolveScrambleHoverBlock(
-  block: Extract<PageLayoutBlock, { blockType: 'pageScrambleHover' }>,
-  locale: LocaleCode,
-  index: number,
-): Promise<PageScrambleHoverBlockView | null> {
-  const ids = relationIds(block.stories)
-  if (ids.length === 0) return null
-
-  const texts = await loadShortStoryTexts(locale, ids)
-  const filtered = texts.filter((text) => text.length > 0)
-  if (filtered.length === 0) return null
-
-  return {
-    blockType: 'pageScrambleHover',
-    id: blockId(block, `scramble-hover-${index}`),
-    texts: filtered,
-  }
-}
-
 async function resolveFooterBlock(
   block: Extract<PageLayoutBlock, { blockType: 'pageFooter' }>,
   locale: LocaleCode,
@@ -591,10 +550,6 @@ export async function resolvePageBlocks(
           // Frontend render is deferred until posts/projects detail routes
           // are implemented. Skip so editors can author now.
           return null
-        case 'pageTypewriter':
-          return resolveTypewriterBlock(typed, locale, index)
-        case 'pageScrambleHover':
-          return resolveScrambleHoverBlock(typed, locale, index)
         case 'pageBlankSpace':
           return resolveBlankSpaceBlock(typed, index)
         case 'pageFooter':

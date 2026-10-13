@@ -122,17 +122,6 @@ export type VideoCardView = {
   image: MediaView | null
 }
 
-export type ShortStoryCardView = {
-  id: number
-  title: string
-  /** Plain text extracted from Lexical for compact tile rendering. */
-  text: string
-  variant: 'note' | 'quote' | 'image'
-  allowedShapes: StoryShape[] | null
-  href: string | null
-  newTab: boolean
-}
-
 export type PostsPageView = {
   docs: PostCardView[]
   /** Opaque keyset cursor for the next page; null when exhausted. */
@@ -280,25 +269,11 @@ export type ContentMediaBlockView = {
   caption: string | null
 }
 
-export type PageTypewriterBlockView = {
-  blockType: 'pageTypewriter'
-  id: string
-  /** Pre-resolved plain-text strings ready for the Typewriter component. */
-  texts: string[]
-}
-
 export type PageBlankSpaceBlockView = {
   blockType: 'pageBlankSpace'
   id: string
   /** CSS height for the blank section (e.g. "60vh", "400px"). */
   height: string
-}
-
-export type PageScrambleHoverBlockView = {
-  blockType: 'pageScrambleHover'
-  id: string
-  /** Pre-resolved plain-text strings ready for the ScrambleHover component. */
-  texts: string[]
 }
 
 export type PageFooterBlockView = {
@@ -368,8 +343,6 @@ export type ResolvedBlockView =
   | ContentMediaBlockView
   | ContentGalleryBlockView
   | PageRelatedItemsBlockView
-  | PageTypewriterBlockView
-  | PageScrambleHoverBlockView
   | PageBlankSpaceBlockView
   | PageFooterBlockView
   | TemplatePostBlockView

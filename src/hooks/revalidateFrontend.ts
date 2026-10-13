@@ -90,11 +90,6 @@ export const revalidateThingsDelete = createCollectionRevalidateDeleteHook([CACH
 export const revalidateVideos = createCollectionRevalidateHook([CACHE_TAGS.videos])
 export const revalidateVideosDelete = createCollectionRevalidateDeleteHook([CACHE_TAGS.videos])
 
-export const revalidateShortStories = createCollectionRevalidateHook([CACHE_TAGS.shortStories])
-export const revalidateShortStoriesDelete = createCollectionRevalidateDeleteHook([
-  CACHE_TAGS.shortStories,
-])
-
 export const revalidatePages = createCollectionRevalidateHook([
   CACHE_TAGS.pages,
   CACHE_TAGS.siteShell,

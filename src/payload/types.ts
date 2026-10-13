@@ -74,7 +74,6 @@ export interface Config {
     categories: Category;
     tags: Tag;
     posts: Post;
-    'short-stories': ShortStory;
     projects: Project;
     things: Thing;
     videos: Video;
@@ -96,7 +95,6 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
-    'short-stories': ShortStoriesSelect<false> | ShortStoriesSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     things: ThingsSelect<false> | ThingsSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
@@ -529,24 +527,6 @@ export interface Post {
           }
         | {
             /**
-             * Pick the short stories to cycle through. Order is preserved.
-             */
-            stories: (number | ShortStory)[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'pageTypewriter';
-          }
-        | {
-            /**
-             * Pick the short stories to display. Each one scrambles on hover. Order is preserved.
-             */
-            stories: (number | ShortStory)[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'pageScrambleHover';
-          }
-        | {
-            /**
              * CSS height for the blank section (e.g. 60vh, 400px, 5rem).
              */
             height?: string | null;
@@ -894,24 +874,6 @@ export interface Page {
           }
         | {
             /**
-             * Pick the short stories to cycle through. Order is preserved.
-             */
-            stories: (number | ShortStory)[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'pageTypewriter';
-          }
-        | {
-            /**
-             * Pick the short stories to display. Each one scrambles on hover. Order is preserved.
-             */
-            stories: (number | ShortStory)[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'pageScrambleHover';
-          }
-        | {
-            /**
              * CSS height for the blank section (e.g. 60vh, 400px, 5rem).
              */
             height?: string | null;
@@ -1222,24 +1184,6 @@ export interface Project {
           }
         | {
             /**
-             * Pick the short stories to cycle through. Order is preserved.
-             */
-            stories: (number | ShortStory)[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'pageTypewriter';
-          }
-        | {
-            /**
-             * Pick the short stories to display. Each one scrambles on hover. Order is preserved.
-             */
-            stories: (number | ShortStory)[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'pageScrambleHover';
-          }
-        | {
-            /**
              * CSS height for the blank section (e.g. 60vh, 400px, 5rem).
              */
             height?: string | null;
@@ -1455,67 +1399,6 @@ export interface Video {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Compact feed fillers used to pack empty regions in the homepage bento grid.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "short-stories".
- */
-export interface ShortStory {
-  id: number;
-  title: string;
-  /**
-   * Keep this short - it appears inside a compact feed tile.
-   */
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  variant: 'note' | 'quote' | 'image';
-  /**
-   * Required for image-variant stories in practice; optional for others.
-   */
-  image?: (number | null) | Media;
-  /**
-   * Optional destination when the story tile is clicked.
-   */
-  link?: {
-    enabled?: boolean | null;
-    label?: string | null;
-    linkType?: ('external' | 'internal') | null;
-    page?: (number | null) | Page;
-    url?: string | null;
-    newTab?: boolean | null;
-  };
-  /**
-   * Set automatically on first publish. Managers may override.
-   */
-  publishedAt?: string | null;
-  /**
-   * Internal ownership for Creator access control. Hidden from public APIs via select.
-   */
-  owner?: (number | null) | User;
-  /**
-   * Editorial signal only.
-   */
-  translationReady?: {
-    vi?: boolean | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
  * Visitor contact form submissions. Email notification is a later enhancement.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1694,10 +1577,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
-      } | null)
-    | ({
-        relationTo: 'short-stories';
-        value: number | ShortStory;
       } | null)
     | ({
         relationTo: 'projects';
@@ -1976,20 +1855,6 @@ export interface PostsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
-        pageTypewriter?:
-          | T
-          | {
-              stories?: T;
-              id?: T;
-              blockName?: T;
-            };
-        pageScrambleHover?:
-          | T
-          | {
-              stories?: T;
-              id?: T;
-              blockName?: T;
-            };
         pageBlankSpace?:
           | T
           | {
@@ -2051,36 +1916,6 @@ export interface PostsSelect<T extends boolean = true> {
   readingTime?: T;
   publishedAt?: T;
   originalPublishedAt?: T;
-  owner?: T;
-  translationReady?:
-    | T
-    | {
-        vi?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "short-stories_select".
- */
-export interface ShortStoriesSelect<T extends boolean = true> {
-  title?: T;
-  content?: T;
-  variant?: T;
-  image?: T;
-  link?:
-    | T
-    | {
-        enabled?: T;
-        label?: T;
-        linkType?: T;
-        page?: T;
-        url?: T;
-        newTab?: T;
-      };
-  publishedAt?: T;
   owner?: T;
   translationReady?:
     | T
@@ -2182,20 +2017,6 @@ export interface ProjectsSelect<T extends boolean = true> {
               cursorPopup?: T;
               cursorPopupItem?: T;
               cursorPopupViewAll?: T;
-              id?: T;
-              blockName?: T;
-            };
-        pageTypewriter?:
-          | T
-          | {
-              stories?: T;
-              id?: T;
-              blockName?: T;
-            };
-        pageScrambleHover?:
-          | T
-          | {
-              stories?: T;
               id?: T;
               blockName?: T;
             };
@@ -2403,20 +2224,6 @@ export interface PagesSelect<T extends boolean = true> {
               cursorPopup?: T;
               cursorPopupItem?: T;
               cursorPopupViewAll?: T;
-              id?: T;
-              blockName?: T;
-            };
-        pageTypewriter?:
-          | T
-          | {
-              stories?: T;
-              id?: T;
-              blockName?: T;
-            };
-        pageScrambleHover?:
-          | T
-          | {
-              stories?: T;
               id?: T;
               blockName?: T;
             };
@@ -2773,10 +2580,6 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'posts';
           value: number | Post;
-        } | null)
-      | ({
-          relationTo: 'short-stories';
-          value: number | ShortStory;
         } | null)
       | ({
           relationTo: 'projects';

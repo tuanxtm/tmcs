@@ -9,7 +9,6 @@ export const CACHE_TAGS = {
   projects: 'projects',
   things: 'things',
   videos: 'videos',
-  shortStories: 'short-stories',
   links: 'links',
   media: 'media',
   // Hero inline images: invalidates whenever an inline-images upload is
@@ -35,4 +34,4 @@ export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS]
  * it forces a fresh read for every locale on the next request. Use it
  * sparingly - tag invalidation should handle the common case.
  */
-export const CMS_CACHE_VERSION = 2
+export const CMS_CACHE_VERSION = 3

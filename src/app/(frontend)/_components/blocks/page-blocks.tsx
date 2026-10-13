@@ -8,10 +8,8 @@ import { ProjectsSection } from '@/app/(frontend)/_components/projects/projects-
 import { FooterBlock } from '@/app/(frontend)/_components/blocks/footer'
 import { Hero } from '@/app/(frontend)/_components/blocks/hero'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
-import { ScrambleHoverBlock } from '@/app/(frontend)/_components/blocks/scramble-hover'
 import { SiteHeader } from '@/app/(frontend)/_components/layout/site-header'
 import { ThingsSection } from '@/app/(frontend)/_components/things/things-section'
-import { TypewriterBlock } from '@/app/(frontend)/_components/blocks/typewriter'
 import { VideosSection } from '@/app/(frontend)/_components/videos/videos-section'
 import type { CmsPageDetailView } from '@/app/(frontend)/_components/pages/cms-page'
 import type { NavItemView, ResolvedBlockView } from '@/app/(frontend)/_lib/types'
@@ -59,10 +57,10 @@ function DeferredBlockPlaceholder({
       aria-label={`${blockType} (placeholder)`}
       className={cn(
         'border-border bg-foreground/5 text-muted-foreground mx-auto my-8 max-w-3xl rounded border border-dashed',
-        'px-4 py-6 text-center text-xs tracking-wide uppercase',
+        'px-4 py-6 text-center text-xs uppercase',
       )}
     >
-      <span className="font-mono">{blockType}</span>
+      <span>{blockType}</span>
       <span className="text-foreground/60 ml-2">- coming soon</span>
     </aside>
   )
@@ -294,12 +292,6 @@ export function PageBlocks({
                 blockId={block.id}
               />
             )
-
-          case 'pageTypewriter':
-            return <TypewriterBlock key={block.id} block={block} />
-
-          case 'pageScrambleHover':
-            return <ScrambleHoverBlock key={block.id} block={block} />
 
           case 'pageBlankSpace':
             return <BlankSpaceBlock key={block.id} block={block} />

@@ -14,7 +14,6 @@
  * Scope (every localized rich text field that could carry a legacy node):
  *   - Posts.content (Posts.layout[].content/paragraph/footerText)
  *   - Projects.content (Projects.layout[].content/paragraph/footerText)
- *   - ShortStories.content
  *   - Pages.layout[].content/paragraph/footerText
  *   - SiteSettings.bio
  *
@@ -221,7 +220,7 @@ async function migrateRichTextJson(
 }
 
 type DocumentScope = {
-  collection: 'posts' | 'projects' | 'short-stories' | 'pages'
+  collection: 'posts' | 'projects' | 'pages'
   fields: ReadonlyArray<{ path: string[]; localized: boolean }>
 }
 
@@ -234,10 +233,6 @@ const COLLECTION_SCOPES: ReadonlyArray<DocumentScope> = [
   },
   {
     collection: 'projects',
-    fields: [{ path: ['content'], localized: true }],
-  },
-  {
-    collection: 'short-stories',
     fields: [{ path: ['content'], localized: true }],
   },
   {
