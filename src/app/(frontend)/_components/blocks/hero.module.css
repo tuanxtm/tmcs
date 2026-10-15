@@ -24,7 +24,7 @@
   position: relative;
   grid-area: image;
   min-width: 0;
-  aspect-ratio: 5 / 4;
+  aspect-ratio: 1;
   margin: 0;
 }
 .bottom {
@@ -32,6 +32,7 @@
   min-width: 0;
 }
 .decoration,
+.decorationScales,
 .scales {
   display: none;
 }
@@ -115,7 +116,6 @@
 }
 @media (min-width: 1024px) {
   .hero {
-    --hero-text-width: calc(100% - var(--site-action-tile-width) * var(--site-nav-cell-count, 4));
     flex-shrink: 0;
     height: calc(
       100vh - var(--site-frame-top) - var(--site-frame-bottom) - var(--site-header-height)
@@ -127,11 +127,12 @@
   .stage {
     flex: 1;
     grid-template-areas: 'text image';
-    grid-template-columns: minmax(0, var(--hero-text-width)) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-rows: minmax(0, 1fr);
     min-height: 0;
     padding: 0;
     row-gap: 0;
+    border-bottom: 0;
   }
   .richText {
     min-height: 0;
@@ -139,36 +140,60 @@
     overflow-wrap: anywhere;
   }
   .image {
-    aspect-ratio: auto;
+    height: 100%;
     min-height: 0;
     margin: 0;
   }
   .bottom {
     flex-shrink: 0;
-    grid-template-columns: minmax(0, var(--hero-text-width)) minmax(0, 1fr) var(
-        --site-action-tile-width
-      );
-    grid-template-rows: minmax(8rem, auto) var(--site-scales-height);
+    /* Blank space / (links + scroll) = golden ratio. */
+    grid-template-columns: minmax(0, 61.803398875%) minmax(0, 1fr) var(--site-action-tile-width);
+    grid-template-rows: var(--site-scales-height) minmax(8rem, auto) var(--site-scales-height);
   }
   .decoration {
     display: block;
-    grid-row: span 2;
+    grid-column: 1;
+    grid-row: 2;
+    border-top: var(--inner-line-weight) solid var(--site-rule-color);
+  }
+  .bottom::before {
+    content: '';
+    grid-column: 2 / 4;
+    grid-row: 1;
+    border-left: var(--inner-line-weight) solid var(--site-rule-color);
+    pointer-events: none;
   }
   .links {
+    grid-column: 2;
+    grid-row: 2;
     column-gap: 8px;
+    border-top: var(--inner-line-weight) solid var(--site-rule-color);
     border-left: var(--inner-line-weight) solid var(--site-rule-color);
   }
   .scroll {
+    grid-column: 3;
+    grid-row: 2;
     min-height: 0;
+    border-top: var(--inner-line-weight) solid var(--site-rule-color);
     border-bottom: var(--inner-line-weight) solid var(--site-rule-color);
     border-left: var(--inner-line-weight) solid var(--site-rule-color);
     font-size: var(--site-nav-font-size);
   }
+  .decorationScales,
   .scales {
     position: relative;
     display: block;
-    grid-column: 2 / 4;
     overflow: hidden;
+  }
+  .decorationScales {
+    grid-column: 1;
+    grid-row: 1;
+    height: var(--site-scales-height);
+    border-top: var(--inner-line-weight) solid var(--site-rule-color);
+  }
+  .scales {
+    grid-column: 2 / 4;
+    grid-row: 3;
     border-left: var(--inner-line-weight) solid var(--site-rule-color);
   }
 }

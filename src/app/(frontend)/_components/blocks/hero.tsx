@@ -53,7 +53,7 @@ function LinkList({
 
 export function Hero({ hero, locale, hasFollowingContent, className }: HeroProps) {
   const targetId = `after-hero-${hero.id}`
-  const scrollLabel = locale === 'vi' ? 'CUỘN XUỐNG' : 'SCROLL DOWN'
+  const scrollLabel = locale === 'vi' ? 'KHÁM PHÁ' : 'DISCOVER MORE'
   const scrollContent = (
     <>
       <span>{scrollLabel}</span>
@@ -83,7 +83,7 @@ export function Hero({ hero, locale, hasFollowingContent, className }: HeroProps
             <CmsImage
               media={hero.heroImage}
               fill
-              sizes="(min-width: 1024px) 40vw, 100vw"
+              sizes="(min-width: 1024px) 100dvh, 100vw"
               className="h-full w-full"
               imgClassName="object-cover"
               priority
@@ -92,6 +92,13 @@ export function Hero({ hero, locale, hasFollowingContent, className }: HeroProps
         </div>
       </div>
       <div className={styles.bottom}>
+        <div className={styles.decorationScales} aria-hidden="true" data-hero-decoration-scales>
+          <Scales
+            orientation="diagonal"
+            size={10}
+            color="var(--site-grid-line-color, color-mix(in oklch, var(--accent) 10%, transparent))"
+          />
+        </div>
         <div className={styles.decoration} aria-hidden="true" data-hero-decoration />
         <div className={styles.links} data-hero-links>
           <LinkList links={hero.socialLinks} variant="social" label={hero.labelSocialLinks} />

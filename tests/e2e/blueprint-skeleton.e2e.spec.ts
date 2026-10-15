@@ -102,7 +102,10 @@ for (const locale of ['en', 'vi']) {
           hero: document.querySelector('#hero')!.getBoundingClientRect().toJSON(),
           frame: document.querySelector('[data-site-frame]')!.getBoundingClientRect().toJSON(),
           image: document.querySelector('[data-hero-image]')!.getBoundingClientRect().toJSON(),
-          locale: document.querySelector('header nav > ul > li')!.getBoundingClientRect().toJSON(),
+          decoration: document
+            .querySelector('[data-hero-decoration]')!
+            .getBoundingClientRect()
+            .toJSON(),
           text: document.querySelector('[data-hero-rich-text]')!.getBoundingClientRect().toJSON(),
           links: document.querySelector('[data-hero-links]')!.getBoundingClientRect().toJSON(),
           scroll: document.querySelector('[data-hero-scroll]')!.getBoundingClientRect().toJSON(),
@@ -111,6 +114,7 @@ for (const locale of ['en', 'vi']) {
         }
       })
       expect(geometry.width).toBe(geometry.viewport)
+      expect(Math.abs(geometry.image.width - geometry.image.height)).toBeLessThan(1)
       expect(Math.abs(geometry.hero.top - geometry.header.bottom)).toBeLessThan(2)
       expect(geometry.frame.top).toBe(width < 1024 ? 8 : 10)
       expect(geometry.header.height).toBe(
@@ -137,8 +141,30 @@ for (const locale of ['en', 'vi']) {
         await expect(page.locator('header nav')).toBeHidden()
       } else {
         expect(geometry.image.left).toBeGreaterThan(geometry.text.left)
-        expect(Math.abs(geometry.image.left - geometry.locale.left)).toBeLessThan(1)
-        expect(Math.abs(geometry.links.left - geometry.locale.left)).toBeLessThan(1)
+        expect(Math.abs(geometry.image.height - geometry.text.height)).toBeLessThan(1)
+        expect(
+          geometry.decoration.width / (geometry.links.width + geometry.scroll.width),
+        ).toBeCloseTo((1 + Math.sqrt(5)) / 2, 3)
+        for (const count of [1, 3, 6]) {
+          await page.locator('.page-blocks').evaluate((element, count) => {
+            ;(element as HTMLElement).style.setProperty('--site-nav-cell-count', String(count))
+          }, count)
+          expect(await page.locator('[data-hero-image]').boundingBox()).toEqual({
+            x: geometry.image.x,
+            y: geometry.image.y,
+            width: geometry.image.width,
+            height: geometry.image.height,
+          })
+          expect(await page.locator('[data-hero-links]').boundingBox()).toEqual({
+            x: geometry.links.x,
+            y: geometry.links.y,
+            width: geometry.links.width,
+            height: geometry.links.height,
+          })
+        }
+        await page.locator('.page-blocks').evaluate((element) => {
+          ;(element as HTMLElement).style.removeProperty('--site-nav-cell-count')
+        })
         await expect(page.locator('[data-hero-decoration]')).toHaveCSS('border-right-width', '0px')
         await expect(page.locator('[data-hero-links]')).toHaveCSS('border-left-width', '1px')
         await expect(page.locator('[data-hero-scales]')).toHaveCSS('border-left-width', '1px')
