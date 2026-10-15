@@ -123,7 +123,12 @@ const Typewriter = ({
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
   const [hasCompleted, setHasCompleted] = useState(false)
 
-  const texts = useMemo(() => (Array.isArray(text) ? text : [text]), [text])
+  const texts = useMemo(() => {
+    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+    return (Array.isArray(text) ? text : [text]).map((value) =>
+      Array.from(segmenter.segment(value), ({ segment }) => segment),
+    )
+  }, [text])
 
   // Stable wrapper that always calls the latest `onComplete`. Excluded from
   // the effect's dependency array on purpose - see rule 8.4.
@@ -146,7 +151,8 @@ const Typewriter = ({
           timeout = setTimeout(() => {}, waitTime)
         } else {
           timeout = setTimeout(() => {
-            setDisplayText((prev) => prev.slice(0, -1))
+            setDisplayText(currentText.slice(0, currentIndex - 1).join(''))
+            setCurrentIndex((prev) => prev - 1)
           }, deleteSpeed)
         }
       } else {
