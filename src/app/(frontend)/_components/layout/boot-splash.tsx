@@ -44,7 +44,7 @@ export function BootSplash({ locale }: { locale: LocaleCode }) {
   const exitDuration = reduceMotion ? 0.05 : SPLASH_EXIT_DURATION_S
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={() => actionsRef.current.revealContent()}>
       {visible && (
         <motion.div
           key="boot-splash"
@@ -58,7 +58,6 @@ export function BootSplash({ locale }: { locale: LocaleCode }) {
             duration: exitDuration,
             ease: 'easeOut',
           }}
-          onAnimationComplete={() => actionsRef.current.revealContent()}
         >
           <div className="boot-splash-inner flex w-max flex-col items-center gap-6">
             <SiteHeaderLogo siteName="tuantm" />
