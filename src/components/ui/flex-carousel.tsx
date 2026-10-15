@@ -315,13 +315,25 @@ out vec4 fragColor;
 void main() {
   vec2 frag = gl_FragCoord.xy / uDpr;
   vec2 uv = frag / uResolution;
+  if (uStrength == 0.0 || uFlow == 0.0) {
+    fragColor = texture(tScene, uv) * uSceneAlpha;
+    return;
+  }
   vec2 rel = frag - vec2(uCenter.x, uResolution.y - uCenter.y);
   float ca = cos(uAngle);
   float sa = sin(uAngle);
   vec2 local = vec2(ca * rel.x + sa * rel.y, -sa * rel.x + ca * rel.y);
   vec2 k = max(abs(local) / uHalf, vec2(1e-5));
-  float nd = pow(pow(k.x, uExponent) + pow(k.y, uExponent), 1.0 / uExponent);
-  vec2 grad = pow(k, vec2(uExponent - 1.0)) * sign(local) / uHalf * pow(nd, 1.0 - uExponent);
+  float nd;
+  vec2 grad;
+  // All presets use an ellipse; avoid general superellipse powers in that case.
+  if (uExponent == 2.0) {
+    nd = length(k);
+    grad = k * sign(local) / (uHalf * nd);
+  } else {
+    nd = pow(pow(k.x, uExponent) + pow(k.y, uExponent), 1.0 / uExponent);
+    grad = pow(k, vec2(uExponent - 1.0)) * sign(local) / uHalf * pow(nd, 1.0 - uExponent);
+  }
   float glen = max(length(grad), 1e-6);
   float edge = (nd - 1.0) / glen;
   vec2 outward = grad / glen;
@@ -808,9 +820,13 @@ const FlexCarousel = ({
     };
 
     const resize = () => {
-      width = Math.max(1, stage.clientWidth);
-      height = Math.max(1, stage.clientHeight);
-      renderer.dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(PIXEL_BUDGET / (width * height)));
+      const nextWidth = Math.max(1, stage.clientWidth);
+      const nextHeight = Math.max(1, stage.clientHeight);
+      const nextDpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(PIXEL_BUDGET / (nextWidth * nextHeight)));
+      if (width === nextWidth && height === nextHeight && renderer.dpr === nextDpr) return;
+      width = nextWidth;
+      height = nextHeight;
+      renderer.dpr = nextDpr;
       renderer.setSize(width, height);
       target.setSize(Math.max(2, Math.round(width * renderer.dpr)), Math.max(2, Math.round(height * renderer.dpr)));
       lensUniforms.tScene.value = target.texture;
