@@ -16,6 +16,7 @@ import { getPayload } from 'payload'
 import type { Payload } from 'payload'
 
 import config from '@payload-config'
+import { seedLinkLibrary } from './seed-links'
 
 type Locale = 'en' | 'vi'
 type SeedRole = 'admin' | 'manager' | 'creator'
@@ -1443,63 +1444,6 @@ function slugify(title: string): string {
     .replace(/^-|-$/g, '')
 }
 
-async function upsertLink(
-  payload: Payload,
-  data: {
-    label: string
-    category: 'navigation' | 'social' | 'legal' | 'contact' | 'other'
-    linkType: 'internal' | 'external'
-    page?: number | null
-    url?: string | null
-    newTab: boolean
-  },
-  locale: Locale = 'en',
-): Promise<{ id: number }> {
-  const existing = await payload.find({
-    collection: 'links',
-    where: { label: { equals: data.label } },
-    limit: 1,
-    depth: 0,
-    locale,
-    overrideAccess: true,
-  })
-
-  const doc =
-    existing.docs[0] ||
-    (await payload.create({
-      collection: 'links',
-      data: {
-        label: data.label,
-        category: data.category,
-        linkType: data.linkType,
-        page: data.page ?? undefined,
-        url: data.url ?? undefined,
-        newTab: data.newTab,
-      },
-      locale,
-      overrideAccess: true,
-    }))
-
-  if (existing.docs[0]) {
-    await payload.update({
-      collection: 'links',
-      id: doc.id,
-      data: {
-        label: data.label,
-        category: data.category,
-        linkType: data.linkType,
-        page: data.page ?? undefined,
-        url: data.url ?? undefined,
-        newTab: data.newTab,
-      },
-      locale,
-      overrideAccess: true,
-    })
-  }
-
-  return { id: doc.id }
-}
-
 async function upsertAuthor(
   payload: Payload,
   seed: (typeof AUTHOR_SEEDS)[number],
@@ -2029,89 +1973,11 @@ async function seed() {
     },
   })
 
-  // Centralized link library. Created BEFORE the home page so the hero
-  // home-about link can reference the "About" link by id.
-  const seedLinkDefs = [
-    {
-      key: 'about',
-      category: 'navigation' as const,
-      en: { label: 'About', linkType: 'internal' as const, page: aboutPage.id },
-      vi: { label: 'Giới thiệu', linkType: 'internal' as const, page: aboutPage.id },
-      newTab: false,
-    },
-    {
-      key: 'projects',
-      category: 'navigation' as const,
-      en: { label: 'Projects', linkType: 'internal' as const, page: projectsPage.id },
-      vi: { label: 'Dự án', linkType: 'internal' as const, page: projectsPage.id },
-      newTab: false,
-    },
-    {
-      key: 'posts',
-      category: 'navigation' as const,
-      en: { label: 'Posts', linkType: 'internal' as const, page: postsPage.id },
-      vi: { label: 'Bài viết', linkType: 'internal' as const, page: postsPage.id },
-      newTab: false,
-    },
-    {
-      key: 'instagram',
-      category: 'social' as const,
-      en: {
-        label: 'Instagram',
-        linkType: 'external' as const,
-        url: 'https://instagram.com/tuantm',
-      },
-      vi: {
-        label: 'Instagram',
-        linkType: 'external' as const,
-        url: 'https://instagram.com/tuantm',
-      },
-      newTab: true,
-    },
-    {
-      key: 'youtube',
-      category: 'social' as const,
-      en: { label: 'YouTube', linkType: 'external' as const, url: 'https://youtube.com/@tuantm' },
-      vi: { label: 'YouTube', linkType: 'external' as const, url: 'https://youtube.com/@tuantm' },
-      newTab: true,
-    },
-    {
-      key: 'github',
-      category: 'social' as const,
-      en: { label: 'GitHub', linkType: 'external' as const, url: 'https://github.com/tuantm' },
-      vi: { label: 'GitHub', linkType: 'external' as const, url: 'https://github.com/tuantm' },
-      newTab: true,
-    },
-  ] as const
-
-  // Locale-aware maps: link ids stored per locale (pages use the same id; the
-  // displayed label is localized in the admin via the localized field).
-  const linkIds: Record<string, Record<(typeof seedLinkDefs)[number]['key'], number>> = {
-    en: {} as Record<(typeof seedLinkDefs)[number]['key'], number>,
-    vi: {} as Record<(typeof seedLinkDefs)[number]['key'], number>,
-  }
-  for (const def of seedLinkDefs) {
-    const baseEn = {
-      label: def.en.label,
-      category: def.category,
-      linkType: def.en.linkType,
-      page: 'page' in def.en ? def.en.page : undefined,
-      url: 'url' in def.en ? def.en.url : undefined,
-      newTab: def.newTab,
-    }
-    const baseVi = {
-      label: def.vi.label,
-      category: def.category,
-      linkType: def.vi.linkType,
-      page: 'page' in def.vi ? def.vi.page : undefined,
-      url: 'url' in def.vi ? def.vi.url : undefined,
-      newTab: def.newTab,
-    }
-    const en = await upsertLink(payload, baseEn, 'en')
-    const vi = await upsertLink(payload, baseVi, 'vi')
-    linkIds.en[def.key] = en.id
-    linkIds.vi[def.key] = vi.id
-  }
+  const linkIds = await seedLinkLibrary(payload, {
+    about: aboutPage.id,
+    projects: projectsPage.id,
+    posts: postsPage.id,
+  })
 
   // Home page layout: Hero → Projects feed → Blank space → Things feed →
   // Blank space → Posts feed → Blank space → Videos feed → Blank space →
