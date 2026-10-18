@@ -153,7 +153,7 @@ test('equal baselines survive all image alignments and responsive wrapping', asy
       )
       await assertUniformBaselines(page)
       await expect(page.locator('#natural .payload-richtext')).toHaveCount(1)
-      await expect(page.locator('#natural p').first()).toHaveClass(/overflow-hidden/)
+      await expect(page.locator('#natural p').first()).toHaveCSS('overflow', 'visible')
       await expect(page.locator('#uniform .payload-richtext')).toHaveCount(0)
     }
   }

@@ -207,9 +207,10 @@ test('fixed frame, native scroll, scroll control, and fitted Hero text', async (
   await expect
     .poll(() =>
       page.evaluate(() => {
-        const target = document.querySelector('[id^="after-hero-"]')!
+        const target = document.querySelector('#hero')!.nextElementSibling!
         return Math.abs(
-          target.getBoundingClientRect().top - parseFloat(getComputedStyle(target).scrollMarginTop),
+          target.getBoundingClientRect().top -
+            document.querySelector('[data-site-frame]')!.getBoundingClientRect().top,
         )
       }),
     )
@@ -455,12 +456,13 @@ test('desktop navigation hover keeps the pointer path into the submenu', async (
   await openHeaderNavFixture(page)
   const parent = page.getByRole('link', { name: 'Work', exact: true })
   await expect(parent).toHaveAttribute('href', '/projects')
+  await expect(parent.locator('.tabler-icon-chevron-down-right')).toBeVisible()
   const parentBox = (await parent.boundingBox())!
   await page.mouse.move(parentBox.x + parentBox.width / 2, parentBox.y + parentBox.height / 2)
   await expect(parent).toHaveAttribute('aria-expanded', 'true')
   const child = page.getByRole('link', { name: 'Posts' })
   await expect(child).toBeVisible()
-  const submenu = page.locator('header nav ul ul').first()
+  const submenu = page.locator('header nav [aria-hidden][data-expanded]').first()
   await expect(submenu).toHaveCSS('transition-duration', '0.18s, 0.18s, 0s')
   await expect(submenu).toHaveCSS('opacity', '1')
   await expect
@@ -471,18 +473,18 @@ test('desktop navigation hover keeps the pointer path into the submenu', async (
     .evaluate((element) => getComputedStyle(element).color)
   await child.hover()
   await expect(parent).toHaveAttribute('aria-expanded', 'true')
-  const parentFill = await parent.evaluate((element) => ({
-    color: getComputedStyle(element).color,
-    fill: getComputedStyle(element, '::before').transform,
-    corner: getComputedStyle(element.querySelector('span')!).transform,
-    cornerTop: getComputedStyle(element.querySelector('span')!).top,
-  }))
   await expect
     .poll(() => parent.evaluate((element) => getComputedStyle(element, '::before').transform))
     .toBe('matrix(1, 0, 0, 0, 0, 0)')
   await expect(parent).toHaveCSS('color', normalParentColor)
-  expect(parentFill.corner).toBe('matrix(0, -1, 1, 0, 0, 0)')
-  expect(parentFill.cornerTop).toBe('10px')
+  const chevron = parent.locator('.tabler-icon-chevron-down-right')
+  await expect(chevron).toHaveCSS('transition-duration', '0.28s')
+  await expect
+    .poll(async () => {
+      const iconBox = (await chevron.boundingBox())!
+      return Math.abs(iconBox.y - parentBox.y - 8)
+    })
+    .toBeLessThan(1)
   await page.screenshot({ path: '/tmp/tmcs-nav-desktop-open.png' })
 
   await parent.hover()
@@ -492,8 +494,8 @@ test('desktop navigation hover keeps the pointer path into the submenu', async (
   await child.hover()
   await page.mouse.move(800, 500)
   await expect(parent).toHaveAttribute('aria-expanded', 'false')
-  await expect(parent.locator('span')).toHaveCSS('bottom', '10px')
-  await expect(parent.locator('span')).toHaveCSS('transform', 'none')
+  await expect(parent.locator('.tabler-icon-chevron-down-right')).toHaveCSS('bottom', '8px')
+  await expect(chevron).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)')
   await parent.hover()
   await expect(parent).toHaveAttribute('aria-expanded', 'true')
 
@@ -509,6 +511,7 @@ test('desktop navigation hover keeps the pointer path into the submenu', async (
   await parent.press('ArrowDown')
   await expect(child).toBeFocused()
   await expect(submenu).toHaveCSS('transition-duration', '0s')
+  await expect(chevron).toHaveCSS('transition-duration', '0s')
 })
 
 test('crossing a nav item without children preserves the pending submenu close', async ({
