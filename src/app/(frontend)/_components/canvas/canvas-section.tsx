@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
+import { useCallback, useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react'
 import Link from 'next/link'
-import { IconArrowRight } from '@tabler/icons-react'
+import { IconArrowUpRight } from '@tabler/icons-react'
 
 import { loadFeedPage } from '@/app/(frontend)/_lib/actions'
 import type { FeedPaginationMode } from '@/app/(frontend)/_lib/types'
@@ -12,6 +12,7 @@ import type { LocaleCode } from '@/lib/locales'
 import styles from './canvas.module.css'
 
 export type CanvasContentProps<T> = {
+  header: ReactNode
   docs: T[]
   locale: LocaleCode
   description: string | null
@@ -239,10 +240,16 @@ export function CanvasSection<T extends { id: number }>({
         className={`${styles.section} ${className ?? ''}`}
       >
         <div className={styles.frame}>
-          <h2 id={headingId} className={styles.heading}>
-            {heading}
-          </h2>
-          {description ? <p className={styles.description}>{description}</p> : null}
+          <div className={styles.header}>
+            <h2 id={headingId} className={styles.heading}>
+              {heading}
+            </h2>
+            {description ? (
+              <div className={styles.descriptionRow}>
+                <p className={styles.description}>{description}</p>
+              </div>
+            ) : null}
+          </div>
           <p className={styles.status}>{EMPTY_MESSAGE}</p>
         </div>
       </section>
@@ -258,10 +265,12 @@ export function CanvasSection<T extends { id: number }>({
       className={`${styles.section} ${className ?? ''}`}
     >
       <div className={styles.frame}>
-        <h2 id={headingId} className={styles.heading}>
-          {heading}
-        </h2>
         <Canvas
+          header={
+            <h2 id={headingId} className={styles.heading}>
+              {heading}
+            </h2>
+          }
           docs={state.docs}
           locale={locale}
           description={description}
@@ -325,7 +334,7 @@ export function CanvasSection<T extends { id: number }>({
               data-canvas-view-all-link
             >
               <span>{resolvedViewAllLabel}</span>
-              <IconArrowRight aria-hidden="true" />
+              <IconArrowUpRight aria-hidden="true" />
             </Link>
           </div>
         ) : null}

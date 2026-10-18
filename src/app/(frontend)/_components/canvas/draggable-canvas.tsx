@@ -82,6 +82,7 @@ export type CanvasItemProps<T> = {
 }
 
 type DraggableCanvasProps<T extends CanvasDoc> = {
+  header?: ReactNode
   items: T[]
   kind: 'project' | 'thing'
   renderItem: (props: CanvasItemProps<T>) => ReactNode
@@ -225,6 +226,7 @@ function getItemHandlers(store: CanvasStore, id: number) {
 }
 
 export function DraggableCanvas<T extends CanvasDoc>({
+  header,
   items,
   kind,
   renderItem,
@@ -836,27 +838,30 @@ export function DraggableCanvas<T extends CanvasDoc>({
         closeMovement(movement.itemId)
       }}
     >
-      <div className={styles.descriptionRow}>
-        {description ? <p className={styles.description}>{description}</p> : null}
-        <button
-          type="button"
-          {...{ [`data-${kind}-reset`]: '' }}
-          aria-label={`Reset ${kind} layout`}
-          title={`Reset ${kind} layout`}
-          className={styles.reset}
-          onClick={resetLayout}
-          disabled={!hasManual}
-        >
-          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path
-              d="M2 7a6 6 0 1 1 1.4 5M2 2v5h5"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+      <div className={header ? styles.header : undefined}>
+        {header}
+        <div className={styles.descriptionRow}>
+          {description ? <p className={styles.description}>{description}</p> : null}
+          <button
+            type="button"
+            {...{ [`data-${kind}-reset`]: '' }}
+            aria-label={`Reset ${kind} layout`}
+            data-cursor-popup="RESET LAYOUT"
+            className={styles.reset}
+            onClick={resetLayout}
+            disabled={!hasManual}
+          >
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M2 7a6 6 0 1 1 1.4 5M2 2v5h5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
       <div
         ref={canvasRef}

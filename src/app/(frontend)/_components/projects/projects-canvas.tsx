@@ -1,6 +1,7 @@
 'use client'
 
 import type { ProjectCardView } from '@/app/(frontend)/_lib/types'
+import type { ReactNode } from 'react'
 import { DraggableCanvas, type CanvasItemProps } from '../canvas/draggable-canvas'
 import { ProjectCanvasItem } from './project-canvas-item'
 
@@ -9,6 +10,7 @@ function renderProject({ item, ...props }: CanvasItemProps<ProjectCardView>) {
 }
 
 export function ProjectsCanvas(props: {
+  header?: ReactNode
   projects: ProjectCardView[]
   description?: string | null
   cursorPopupItem?: string | null

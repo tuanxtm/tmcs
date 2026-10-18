@@ -11,6 +11,7 @@ import { ProjectsCanvas } from './projects-canvas'
 export type ProjectsSectionProps = CanvasSectionProps<ProjectCardView>
 
 function ProjectsContent({
+  header,
   docs,
   onMovementChange,
   description,
@@ -18,6 +19,7 @@ function ProjectsContent({
 }: CanvasContentProps<ProjectCardView>) {
   return (
     <ProjectsCanvas
+      header={header}
       projects={docs}
       description={description}
       cursorPopupItem={cursorPopupItem}

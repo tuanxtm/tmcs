@@ -11,6 +11,7 @@ import { ThingsCanvas } from './things-canvas'
 export type ThingsSectionProps = CanvasSectionProps<ThingCardView>
 
 function ThingsContent({
+  header,
   docs,
   locale,
   description,
@@ -20,6 +21,7 @@ function ThingsContent({
 }: CanvasContentProps<ThingCardView>) {
   return (
     <ThingsCanvas
+      header={header}
       things={docs}
       locale={locale}
       description={description}

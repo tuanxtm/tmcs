@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { DraggableCanvas } from '../canvas/draggable-canvas'
@@ -12,6 +12,7 @@ export function ThingsCanvas({
   onDetailOpenChange,
   ...props
 }: {
+  header?: ReactNode
   things: ThingCardView[]
   locale: LocaleCode
   description?: string | null
