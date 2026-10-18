@@ -1,15 +1,8 @@
 'use client'
 
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type KeyboardEvent,
-} from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react'
 import { motion, useInView, useReducedMotion } from 'motion/react'
-import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowUpRight } from '@tabler/icons-react'
 
 import { VideoRowCard } from '@/app/(frontend)/_components/videos/video-row-card'
 import { useBootReady } from '@/app/(frontend)/_components/providers/boot-reveal'
@@ -174,7 +167,7 @@ export function VideoProviderRow({
             aria-label={`Next ${label} videos`}
             className={styles.rowArrow}
           >
-            <IconArrowRight className="size-4" aria-hidden="true" />
+            <IconArrowUpRight className="size-4" aria-hidden="true" />
           </button>
         </div>
       </header>

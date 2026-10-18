@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { IconArrowRight } from '@tabler/icons-react'
+import { IconArrowUpRight, IconChevronDownRight } from '@tabler/icons-react'
 import { externalLinkProps } from '@/app/(frontend)/_lib/link-props'
 import { switchLocalePath } from '@/app/(frontend)/_lib/locale'
 import type { NavItemView } from '@/app/(frontend)/_lib/types'
@@ -208,9 +208,12 @@ export function HeaderNav({ items, locale, className }: HeaderNavProps) {
                   >
                     {item.label}
                     {hasChildren ? (
-                      <span className={styles.corner} aria-hidden="true" />
+                      <IconChevronDownRight
+                        className={cn(styles.arrow, styles.corner)}
+                        aria-hidden="true"
+                      />
                     ) : final ? (
-                      <IconArrowRight className={styles.arrow} aria-hidden="true" />
+                      <IconArrowUpRight className={styles.arrow} aria-hidden="true" />
                     ) : null}
                   </Link>
                 </div>

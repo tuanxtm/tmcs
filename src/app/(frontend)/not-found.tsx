@@ -46,7 +46,7 @@ export default async function NotFound() {
                   'text-sm md:text-base lg:text-lg',
                 )}
               >
-                <span className="font-mono">404.</span>
+                <span className="font-mono font-semibold">404.</span>
                 {heading.slice(4)}
               </h1>
               <p
@@ -66,7 +66,7 @@ export default async function NotFound() {
               >
                 <span
                   className={cn(
-                    'text-primary inline-flex items-baseline font-mono leading-none font-semibold',
+                    'text-primary inline-flex items-baseline font-mono leading-none font-bold',
                     'text-[0.625rem] uppercase md:text-xs lg:text-sm',
                   )}
                 >
@@ -74,7 +74,7 @@ export default async function NotFound() {
                 </span>
                 <span
                   className={cn(
-                    'text-primary inline-flex items-baseline font-mono leading-none font-semibold',
+                    'text-primary inline-flex items-baseline font-mono leading-none font-bold',
                     'pt-px text-xs uppercase md:text-sm lg:text-base',
                     'hover:text-foreground hover:underline hover:underline-offset-4',
                   )}

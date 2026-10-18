@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from 'react'
 import { useLenis } from 'lenis/react'
 import { useReducedMotion } from 'motion/react'
+import { IconArrowUpLeft } from '@tabler/icons-react'
 import { useBootReady } from '@/app/(frontend)/_components/providers/boot-reveal'
 import { useLocale } from '@/app/(frontend)/_components/providers/locale'
 import styles from './back-to-top.module.css'
@@ -46,26 +47,14 @@ export function BackToTop() {
   return (
     <button
       type="button"
-      className={`${styles.button} bg-background/20 text-accent font-mono text-[0.625rem] leading-none font-medium uppercase backdrop-blur-xs`}
+      className={`${styles.button} bg-background/20 text-accent font-mono text-[0.625rem] leading-none font-semibold uppercase backdrop-blur-xs`}
       aria-label={label}
       aria-hidden={!visible}
       inert={!visible}
       data-visible={visible}
       onClick={scrollToTop}
     >
-      <svg
-        width="8"
-        height="16"
-        viewBox="0 0 12 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="square"
-        strokeLinejoin="miter"
-        aria-hidden="true"
-      >
-        <path d="M11 5v14M5 11l6-6" />
-      </svg>
+      <IconArrowUpLeft size={16} aria-hidden="true" />
       <span className={styles.label} aria-hidden="true">
         {label.split(' ').map((word) => (
           <span key={word}>{word}</span>

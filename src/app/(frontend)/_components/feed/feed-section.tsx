@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { IconArrowRight } from '@tabler/icons-react'
+import { IconArrowUpRight } from '@tabler/icons-react'
 
 import { FeedCard } from '@/app/(frontend)/_components/feed/feed-card'
 import { VideoFeedCard } from '@/app/(frontend)/_components/feed/video-feed-card'
@@ -256,7 +256,7 @@ export function FeedSection(props: FeedSectionProps) {
                 data-canvas-view-all-link
               >
                 <span>{resolvedViewAllLabel}</span>
-                <IconArrowRight aria-hidden="true" />
+                <IconArrowUpRight aria-hidden="true" />
               </Link>
             </div>
           ) : null}

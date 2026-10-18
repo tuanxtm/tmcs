@@ -3,7 +3,7 @@
 import { useEffect, useRef, type RefObject } from 'react'
 import { useLenis } from 'lenis/react'
 import { motion, useReducedMotion } from 'motion/react'
-import { IconArrowRight, IconX } from '@tabler/icons-react'
+import { IconArrowUpRight, IconX } from '@tabler/icons-react'
 import {
   Drawer,
   DrawerClose,
@@ -139,7 +139,7 @@ export function ThingDetail({
                       className={cn(styles.link, 'site-cell-hover')}
                     >
                       {link.label}
-                      <IconArrowRight className={styles.arrow} aria-hidden="true" />
+                      <IconArrowUpRight className={styles.arrow} aria-hidden="true" />
                     </a>
                   </li>
                 ))}
