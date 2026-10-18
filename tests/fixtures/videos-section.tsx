@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ReactLenis } from 'lenis/react'
-import 'lenis/dist/lenis.css'
 
 import { VideosSection } from '@/app/(frontend)/_components/videos/videos-section'
 import { BootReveal } from '@/app/(frontend)/_components/providers/boot-reveal'

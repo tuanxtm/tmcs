@@ -1,15 +1,15 @@
+import { retireFrontendFixture, writeFrontendStyles } from './frontend-styles'
 import { test, type Page } from '@playwright/test'
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import postcss from 'postcss'
-import tailwindcss from '@tailwindcss/postcss'
 
 let outputDirectory: string
 
 test.beforeAll(async () => {
   outputDirectory = mkdtempSync(path.join(tmpdir(), 'tmcs-posts-carousel-'))
+  await writeFrontendStyles(outputDirectory)
   execFileSync(
     'bun',
     [
@@ -28,17 +28,10 @@ test.beforeAll(async () => {
     ],
     { cwd: process.cwd() },
   )
-  const stylesPath = path.resolve('tests/fixtures/posts-carousel-tailwind.css')
-  const tailwindEntry = "@import '../../src/app/(frontend)/styles.css';\n@source '../../src';"
-  const tailwindCss = await postcss([tailwindcss({ base: process.cwd() })]).process(tailwindEntry, {
-    from: stylesPath,
-  })
-  const generatedCssPath = path.join(outputDirectory, 'posts-carousel-tailwind.css')
-  writeFileSync(generatedCssPath, tailwindCss.css)
 })
 
 test.afterAll(() => {
-  if (outputDirectory) rmSync(outputDirectory, { recursive: true, force: true })
+  if (outputDirectory) retireFrontendFixture(outputDirectory)
 })
 
 type PostsCase = 'mixed' | 'empty' | 'missing' | 'broken'
@@ -101,21 +94,12 @@ export async function openPostsCarouselFixture(page: Page, options: OpenPostsCar
             --site-rule-color: rgb(59 91 219 / 50%);
           }
           @media (min-width: 1024px) { :root { --site-cell-padding: 16px; } }
+          @layer base {
           *, *::before, *::after { box-sizing: border-box; }
           html, body { margin: 0; min-height: 100%; background: var(--background); }
           body { color: var(--foreground); font-family: Arial, sans-serif; }
-          .fixture-page { min-height: 240vh; padding-top: 30vh; }
-          .canvas-section { color: var(--secondary); background: transparent; }
-          .canvas-frame { container-type: inline-size; width: 100%; margin-inline: auto; }
-          .canvas-heading {
-            margin: 0;
-            color: var(--secondary);
-            font-family: var(--font-serif);
-            font-size: clamp(2.25rem, 6vw, 6rem);
-            font-weight: 300;
-            line-height: 1.05;
-            text-align: center;
           }
+          .fixture-page { min-height: 240vh; padding-top: 30vh; }
         </style>
         <div id="fixture"></div>
         <script type="importmap">${JSON.stringify({

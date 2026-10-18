@@ -1,13 +1,15 @@
+import { retireFrontendFixture, writeFrontendStyles } from './frontend-styles'
 import { test, type Page } from '@playwright/test'
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
 let outputDirectory: string
 
-test.beforeAll(() => {
+test.beforeAll(async () => {
   outputDirectory = mkdtempSync(path.join(tmpdir(), 'tmcs-videos-'))
+  await writeFrontendStyles(outputDirectory)
   execFileSync(
     'bun',
     [
@@ -38,7 +40,7 @@ test.beforeAll(() => {
 })
 
 test.afterAll(() => {
-  if (outputDirectory) rmSync(outputDirectory, { recursive: true, force: true })
+  if (outputDirectory) retireFrontendFixture(outputDirectory)
 })
 
 export async function openVideosFixture(page: Page, width = 390, height = 844) {
@@ -79,14 +81,12 @@ export async function openVideosFixture(page: Page, width = 390, height = 844) {
             --header-height: 48px;
           }
           @media (min-width: 1024px) { :root { --site-cell-padding: 16px; } }
+          @layer base {
           *, *::before, *::after { box-sizing: border-box; }
           html, body { margin: 0; min-height: 100%; background: var(--background); }
           body { color: var(--foreground); font-family: Arial, sans-serif; }
+          }
           .fixture-page { min-height: 240vh; padding-top: 60vh; }
-          .relative { position: relative; }
-          .absolute { position: absolute; }
-          .size-4 { width: 1rem; height: 1rem; }
-          .size-3\\.5 { width: .875rem; height: .875rem; }
         </style>
         <div id="fixture"></div>
         <script type="importmap">${JSON.stringify({

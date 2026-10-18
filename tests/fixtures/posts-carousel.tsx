@@ -1,7 +1,8 @@
+import canvasStyles from '@/app/(frontend)/_components/canvas/_styles/canvas.module.css'
+import pageStyles from '@/app/(frontend)/_components/blocks/page-blocks/page-blocks.module.css'
 import { useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ReactLenis } from 'lenis/react'
-import 'lenis/dist/lenis.css'
 
 import { PostsCarousel } from '@/app/(frontend)/_components/posts/posts-carousel'
 import { PostsSectionHeader } from '@/app/(frontend)/_components/posts/posts-section-header'
@@ -141,7 +142,7 @@ root.render(
     <BootReveal.Provider>
       <MarkBootReady>
         <main
-          className="fixture-page page-blocks flex flex-col gap-y-(--section-gap-y)"
+          className={`fixture-page page-blocks ${pageStyles.root}`}
           data-case={getCaseFromUrl()}
         >
           <div aria-hidden="true" className="h-(--header-height)" />
@@ -149,9 +150,9 @@ root.render(
             id="fixture-posts"
             data-feed-type="posts"
             data-cursor-popup="view details"
-            className="canvas-section"
+            className={canvasStyles.section}
           >
-            <div className="canvas-frame">
+            <div className={canvasStyles.frame}>
               <PostsSectionHeader
                 headingId="fixture-posts-heading"
                 heading="posts"

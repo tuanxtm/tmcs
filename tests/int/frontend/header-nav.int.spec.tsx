@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { NavItemView } from '@/app/(frontend)/_lib/types'
 
 const route = vi.hoisted(() => ({ pathname: '/projects' }))
@@ -74,8 +74,7 @@ describe('Header navigation disclosure', () => {
     parent.focus()
     fireEvent.keyDown(parent, { key: 'ArrowDown' })
     const child = screen.getByRole('link', { name: 'Posts' })
-    await act(async () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())))
-    expect(document.activeElement).toBe(child)
+    await waitFor(() => expect(document.activeElement).toBe(child))
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(parent.getAttribute('aria-expanded')).toBe('false')
     expect(document.activeElement).toBe(parent)

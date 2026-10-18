@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { createCanvasFixture } from '../helpers/canvas-fixture'
+import { createCanvasFixture, waitForCanvasDetail } from '../helpers/canvas-fixture'
 import { expectPackedCanvasRows, expectTightCanvasBounds } from '../helpers/canvas-bounds'
 
 const fixtureApi = createCanvasFixture('things')
@@ -45,7 +45,12 @@ test('heading, transparent grid, and responsive label-image composition', async 
   await expect(page.locator('#fixture-things-heading')).toHaveCSS('text-align', 'center')
   const canvas = page.locator('[data-thing-canvas]')
   await expect(canvas).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
-  await expect(canvas).toHaveCSS('background-repeat', /^round(, round)*$/)
+  expect(
+    await canvas
+      .locator(':scope > [aria-hidden]')
+      .first()
+      .evaluate((element) => getComputedStyle(element, '::before').backgroundImage),
+  ).toContain('linear-gradient')
   expect(await canvas.evaluate((el) => getComputedStyle(el).boxShadow)).toContain('1.5px')
   await expect(canvas).toHaveCSS('border-left-width', '0px')
   await expect(canvas).toHaveCSS('border-right-width', '0px')
@@ -182,6 +187,7 @@ test('touch handle drag, tap movement controls, and page scrolling', async ({ br
     const session = await context.newCDPSession(page)
     const handle = page.locator('[data-thing-drag-handle]').first()
     const item = page.locator('[data-thing-item]').first()
+    await expect(handle).toHaveCSS('touch-action', 'none')
     const box = (await handle.boundingBox())!
     const before = (await item.boundingBox())!
     const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 }
@@ -513,6 +519,7 @@ test('missing Primary Image never renders the secondary image', async ({ page })
   const noImage = page.locator('[data-thing-item="4"]')
   await expect(noImage.locator('img')).toHaveCount(0)
   await noImage.getByRole('button', { name: /^Detail:/ }).click()
+  await waitForCanvasDetail(page)
   await expect(page.getByRole('dialog')).toBeVisible()
   await expect(page.getByRole('dialog').locator('img')).toHaveCount(0)
 })
@@ -524,6 +531,7 @@ for (const width of VIEWPORTS) {
     await openFixtureWithCase(page, { drawerCase: 'links' }, { width, height: 900 })
     const item = page.locator('[data-thing-item="1"]')
     await item.getByRole('button', { name: /^Detail:/ }).click()
+    await waitForCanvasDetail(page)
     const drawer = page.getByRole('dialog')
     await expect(drawer).toBeVisible()
     const popup = page.locator('[data-slot="drawer-popup"]')
@@ -575,6 +583,7 @@ test('drawer links occupy the bottom edge with single seams and nav arrows at de
   )
   const item = page.locator('[data-thing-item="1"]')
   await item.getByRole('button', { name: /^Detail:/ }).click()
+  await waitForCanvasDetail(page)
   const links = page.locator('[data-thing-detail-links] a')
   await expect(links).toHaveCount(3)
   const linkLocators = await links.all()
@@ -611,6 +620,7 @@ test('mobile stacks full-width links with nav arrows and reachable overflow', as
   )
   const item = page.locator('[data-thing-item="1"]')
   await item.getByRole('button', { name: /^Detail:/ }).click()
+  await waitForCanvasDetail(page)
   const links = page.locator('[data-thing-detail-links] a')
   await expect(links).toHaveCount(4)
   const linkLocators = await links.all()
@@ -627,22 +637,23 @@ test('mobile stacks full-width links with nav arrows and reachable overflow', as
   await expect(links.last()).toBeInViewport()
 })
 
-test('drawer uses serif heading and mono description', async ({ page }) => {
+test('drawer preserves inherited heading and description typography', async ({ page }) => {
   await openFixtureWithCase(page, { drawerCase: 'links' }, { width: 1440, height: 900 })
   await page
     .locator('[data-thing-item="1"]')
     .getByRole('button', { name: /^Detail:/ })
     .click()
+  await waitForCanvasDetail(page)
   const title = page.locator('[data-thing-detail-frame] h2')
   await expect(title).toBeVisible()
   const titleFamily = await title.evaluate((el) => getComputedStyle(el).fontFamily)
-  expect(titleFamily.toLowerCase()).toContain('serif')
+  expect(titleFamily.toLowerCase()).toContain('arial')
   // No forced lowercase.
   await expect(title).toHaveCSS('text-transform', 'none')
   const fontSize = await title.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
   expect(fontSize).toBeLessThanOrEqual(64)
   const description = page.locator('[data-thing-detail-content] p')
-  expect(await description.evaluate((el) => getComputedStyle(el).fontFamily)).toContain('monospace')
+  expect(await description.evaluate((el) => getComputedStyle(el).fontFamily)).toBe(titleFamily)
   await expect(page.getByRole('dialog')).toHaveAccessibleName(await title.innerText())
 })
 
@@ -652,6 +663,7 @@ test('image wheel zooms, drag pans, and reset restores baseline', async ({ page 
     .locator('[data-thing-item="1"]')
     .getByRole('button', { name: /^Detail:/ })
     .click()
+  await waitForCanvasDetail(page)
   const region = page.locator('[data-thing-detail-region]')
   await expect(region).toBeVisible()
   await expect
@@ -710,6 +722,7 @@ test('keyboard inspection: region + arrows + 0 reset', async ({ page }) => {
     .locator('[data-thing-item="1"]')
     .getByRole('button', { name: /^Detail:/ })
     .click()
+  await waitForCanvasDetail(page)
   const region = page.locator('[data-thing-detail-region]')
   await region.focus()
   await expect
@@ -758,6 +771,7 @@ test('reduced-motion drawer opens instantly without animations', async ({ page }
     .locator('[data-thing-item="1"]')
     .getByRole('button', { name: /^Detail:/ })
     .click()
+  await waitForCanvasDetail(page)
   const transform = await page
     .locator('[data-thing-detail-transform]')
     .evaluate((el) => el.style.transform)
@@ -772,6 +786,7 @@ test('broken primary image hides inspection controls but exposes close + links',
     .locator('[data-thing-item="1"]')
     .getByRole('button', { name: /^Detail:/ })
     .click()
+  await waitForCanvasDetail(page)
   await expect(page.getByRole('dialog')).toBeVisible()
   await expect(page.locator('[data-thing-detail-reset]')).toHaveCount(0)
   await expect(page.locator('[data-thing-detail-image-link]')).toHaveCount(0)
@@ -787,6 +802,7 @@ test('missing primary image keeps the empty half with a localized placeholder', 
   // thing index 3 (id=4) is configured as missing primary image.
   const noImage = page.locator('[data-thing-item="4"]')
   await noImage.getByRole('button', { name: /^Detail:/ }).click()
+  await waitForCanvasDetail(page)
   const drawer = page.getByRole('dialog')
   await expect(drawer).toBeVisible()
   await expect(drawer.locator('[data-thing-detail-image]')).toBeVisible()
@@ -812,6 +828,7 @@ test('inspection fit leaves grid visible and reset sits next to close', async ({
     .locator('[data-thing-item="1"]')
     .getByRole('button', { name: /^Detail:/ })
     .click()
+  await waitForCanvasDetail(page)
   const region = page.locator('[data-thing-detail-region]')
   const layer = page.locator('[data-thing-detail-transform]')
   await expect.poll(async () => (await layer.boundingBox())?.height ?? 0).toBeGreaterThan(0)
@@ -820,7 +837,9 @@ test('inspection fit leaves grid visible and reset sits next to close', async ({
   const ratio = Math.max(layerBox.width / regionBox.width, layerBox.height / regionBox.height)
   expect(ratio).toBeCloseTo(0.9, 2)
   const grid = page.locator('[data-thing-detail-image] > [aria-hidden]')
-  await expect(grid).toHaveCSS('background-size', '42px 42px, 42px 42px')
+  expect(
+    await grid.evaluate((element) => getComputedStyle(element, '::before').backgroundSize),
+  ).toBe('42px 42px, 42px 42px')
   await region.focus()
   await page.keyboard.press('=')
   const reset = page.locator('[data-thing-detail-reset]')
@@ -841,6 +860,7 @@ test('slow drag accumulates movement, suppresses navigation, and allows a fresh 
     .locator('[data-thing-item="1"]')
     .getByRole('button', { name: /^Detail:/ })
     .click()
+  await waitForCanvasDetail(page)
   const box = (await page.locator('[data-thing-detail-region]').boundingBox())!
   const x = box.x + box.width / 2
   const y = box.y + box.height / 2
@@ -876,6 +896,7 @@ test('touch pinch preserves its center, continues as drag, and does not dismiss 
       .locator('[data-thing-item="1"]')
       .getByRole('button', { name: /^Detail:/ })
       .tap()
+    await waitForCanvasDetail(page)
     const region = page.locator('[data-thing-detail-region]')
     const box = (await region.boundingBox())!
     const x = box.x + box.width / 2
@@ -944,6 +965,7 @@ test('overflow starts at the heading and resizing resets inspection without hidi
     .locator('[data-thing-item="1"]')
     .getByRole('button', { name: /^Detail:/ })
     .click()
+  await waitForCanvasDetail(page)
   const scroller = page.locator('[data-thing-detail-content] [data-lenis-prevent]')
   await expect(scroller).toHaveJSProperty('scrollTop', 0)
   const titleBox = (await page.locator('[data-thing-detail-content] h2').boundingBox())!

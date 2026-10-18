@@ -3,8 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 
-import canvasStyles from '@/app/(frontend)/_components/canvas/canvas.module.css'
-import postsStyles from '@/app/(frontend)/_components/posts/posts.module.css'
+import interactionStyles from '@/app/(frontend)/_components/_styles/interactions.module.css'
+import canvasStyles from '@/app/(frontend)/_components/canvas/_styles/canvas.module.css'
+import postsStyles from '@/app/(frontend)/_components/posts/_styles/posts.module.css'
 
 import type {
   PostCardView,
@@ -327,7 +328,7 @@ describe('FeedSection Posts branch', () => {
     const link = screen.getByText('view all').closest('a')
     expect(link?.getAttribute('href')).toBe('/posts')
     expect(link?.classList.contains(canvasStyles.viewAllLink)).toBe(true)
-    expect(link?.classList.contains('site-cell-hover')).toBe(true)
+    expect(link?.classList.contains(interactionStyles.cellHover)).toBe(true)
     const footer = link?.parentElement
     expect(footer?.classList.contains(canvasStyles.viewAll)).toBe(true)
     const scales = footer?.querySelector(

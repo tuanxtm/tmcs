@@ -64,7 +64,7 @@ async function dispatchSwipe(
 }
 
 test.describe('Videos section isolated fixture', () => {
-  test('uses the responsive gutter, growing desktop cards, serif titles, and requested colors', async ({
+  test('uses the responsive gutter, growing desktop cards, inherited title typography, and requested colors', async ({
     page,
   }) => {
     await openVideosFixture(page, 1440, 900)
@@ -95,7 +95,7 @@ test.describe('Videos section isolated fixture', () => {
     expect(metricsAt1440.headingColor).toBe('rgb(86, 86, 86)')
     expect(metricsAt1440.providerColor).toBe('rgb(59, 91, 219)')
     expect(metricsAt1440.arrowColor).toBe('rgb(59, 91, 219)')
-    expect(metricsAt1440.titleFont.toLowerCase()).toContain('georgia')
+    expect(metricsAt1440.titleFont.toLowerCase()).toContain('arial')
     expect(metricsAt1440.titleColor).toBe('rgb(86, 86, 86)')
     expect(metricsAt1440.dateColor).toBe('rgb(86, 86, 86)')
     expect(metricsAt1440.titleTransform).toBe('none')

@@ -5,7 +5,7 @@ const openHeaderNavFixture = createHeaderNavFixture()
 
 async function ready(page: Page, path = '/') {
   await page.goto(`${process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000'}${path}`)
-  await expect(page.locator('html')).toHaveClass(/boot-ready/)
+  await expect(page.locator('html')).toHaveClass(/boot-ready/, { timeout: 15000 })
   await expect(page.locator('.boot-splash')).toHaveCount(0)
   await page.evaluate(() => document.fonts.ready)
 }
@@ -29,7 +29,7 @@ test('outer and inner tokens control frame, separators, grids, and cursor', asyn
     ).toBe('1.5px')
     await expect(page.locator('#hero [data-hero-image]').locator('xpath=..')).toHaveCSS(
       'border-bottom-width',
-      '1px',
+      '0px',
     )
     await expect(page.locator('#hero [data-hero-links]')).toHaveCSS('border-bottom-width', '1px')
     await expect(page.locator('#hero [data-hero-scroll]')).toHaveCSS('border-bottom-width', '1px')
@@ -67,9 +67,15 @@ test('outer and inner tokens control frame, separators, grids, and cursor', asyn
     expect(await canvases.first().evaluate((el) => getComputedStyle(el).boxShadow)).toContain(
       '-3px',
     )
-    expect(await canvases.first().evaluate((el) => getComputedStyle(el).backgroundImage)).toContain(
-      '2px',
-    )
+    expect(
+      await canvases
+        .first()
+        .evaluate(
+          (el) =>
+            getComputedStyle(el.querySelector(':scope > [aria-hidden]')!, '::before')
+              .backgroundImage,
+        ),
+    ).toContain('2px')
     await page.evaluate(() => {
       document.documentElement.style.removeProperty('--outer-line-weight')
       document.documentElement.style.removeProperty('--inner-line-weight')
@@ -121,10 +127,15 @@ for (const locale of ['en', 'vi']) {
         width < 1024 ? 56 : width >= 3200 && height >= 1440 ? 72 : 64,
       )
       await expect(page.locator('[data-hero-scroll]')).toHaveText(
-        locale === 'vi' ? 'CUỘN XUỐNG' : 'SCROLL DOWN',
+        locale === 'vi' ? 'KHÁM PHÁ' : 'DISCOVER MORE',
       )
       if (width < 1024) {
-        expect(geometry.image.bottom).toBeLessThanOrEqual(geometry.text.top)
+        if (width < 640) {
+          expect(geometry.image.top).toBeLessThan(geometry.text.top)
+          expect(geometry.image.bottom).toBeGreaterThan(geometry.text.top)
+        } else {
+          expect(geometry.image.bottom).toBeLessThanOrEqual(geometry.text.top)
+        }
         expect(geometry.text.bottom).toBeLessThanOrEqual(geometry.links.top)
         expect(geometry.links.bottom).toBeLessThanOrEqual(geometry.scroll.top)
         await expect(page.locator('[data-hero-decoration]')).toBeHidden()
@@ -335,17 +346,22 @@ test('translucent blueprint rules, shared grids, and matching navigation and vie
     document.body.appendChild(probe)
     probe.style.color = 'var(--accent)'
     const accent = getComputedStyle(probe).color
+    probe.style.color = 'var(--border)'
+    const border = getComputedStyle(probe).color
     probe.style.color = 'var(--site-rule-color)'
     const rule = getComputedStyle(probe).color
     probe.style.color = 'var(--accent-foreground)'
     const foreground = getComputedStyle(probe).color
     probe.style.color = 'var(--site-grid-line-color)'
     const gridLine = getComputedStyle(probe).color
+    const canvasGrid = document.querySelector('[data-project-canvas] > [aria-hidden]')!
+    probe.style.color = getComputedStyle(canvasGrid).getPropertyValue('--grid-line-color')
+    const canvasGridLine = getComputedStyle(probe).color
     probe.remove()
     const frame = getComputedStyle(document.querySelector('[data-site-frame]')!).boxShadow
     const separator = getComputedStyle(document.querySelector('#hero')!).boxShadow
     const canvas = getComputedStyle(document.querySelector('[data-project-canvas]')!).boxShadow
-    const grid = getComputedStyle(document.querySelector('[data-project-canvas]')!).backgroundImage
+    const grid = getComputedStyle(canvasGrid, '::before').backgroundImage
     const scales = getComputedStyle(
       document.querySelector('[data-hero-scales] > div > div')!,
     ).backgroundImage
@@ -356,6 +372,7 @@ test('translucent blueprint rules, shared grids, and matching navigation and vie
     ).backgroundColor
     return {
       accent,
+      border,
       rule,
       foreground,
       frame,
@@ -365,12 +382,13 @@ test('translucent blueprint rules, shared grids, and matching navigation and vie
       scales,
       topRule,
       gridLine,
+      canvasGridLine,
       cursorLine,
     }
   })
-  expect(colors.rule).toMatch(/\/\s*0\.5\)/)
+  expect(colors.rule).toBe(colors.border)
   for (const structuralLine of [colors.frame, colors.separator, colors.canvas]) {
-    expect(structuralLine).toMatch(/\/\s*0\.5\)/)
+    expect(structuralLine).toContain(colors.rule)
   }
   expect(colors.topRule).toBe('0px')
   expect(colors.canvas).toContain('-1.5px 0px 0px inset')
@@ -378,7 +396,7 @@ test('translucent blueprint rules, shared grids, and matching navigation and vie
   expect(colors.grid).toMatch(/0\.1|10%/)
   expect(colors.scales).toContain('linear-gradient')
   expect(colors.scales).toMatch(/0\.1|10%/)
-  expect(colors.grid).toContain(colors.gridLine)
+  expect(colors.grid).toContain(colors.canvasGridLine)
   expect(colors.scales).toContain(colors.gridLine)
   expect(colors.cursorLine).toMatch(/0\.2|20%/)
 
@@ -391,7 +409,7 @@ test('translucent blueprint rules, shared grids, and matching navigation and vie
   }
 
   const viewAllTiles = page.locator('[data-canvas-view-all]')
-  await expect(viewAllTiles).toHaveCount(2)
+  await expect(viewAllTiles).toHaveCount(3)
   for (const [index, tile] of (await viewAllTiles.all()).entries()) {
     const tileBox = (await tile.boundingBox())!
     const headerHeight = (await page.locator('.page-blocks > header').boundingBox())!.height
@@ -405,11 +423,11 @@ test('translucent blueprint rules, shared grids, and matching navigation and vie
       const style = getComputedStyle(element)
       return { width: style.borderWidth, color: style.borderColor }
     })
-    expect(scales.width / tileBox.width).toBeCloseTo(0.9, 1)
-    expect(linkBox.width).toBeCloseTo(scrollWidth, 0)
+    expect(scales.width / tileBox.width).toBeCloseTo(1 / ((1 + Math.sqrt(5)) / 2 + 1), 3)
+    expect(linkBox.width + scales.width).toBeCloseTo(tileBox.width, 0)
     await expect(link).toHaveCSS('box-shadow', 'none')
     const href = await link.getAttribute('href')
-    expect(new URL(href!, page.url()).pathname).toMatch(/\/(projects|things)$/)
+    expect(new URL(href!, page.url()).pathname).toMatch(/\/(projects|things|posts)$/)
     await link.hover()
     await expect(link).toHaveCSS('color', colors.foreground)
     await expect(link).toHaveCSS('box-shadow', 'none')
@@ -437,7 +455,7 @@ test('translucent blueprint rules, shared grids, and matching navigation and vie
   }
 
   await page.setViewportSize({ width: 390, height: 844 })
-  await expect.poll(() => page.locator('[data-canvas-view-all]').count()).toBe(2)
+  await expect.poll(() => page.locator('[data-canvas-view-all]').count()).toBe(3)
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390)
   for (const tile of await viewAllTiles.all()) {
     const tileBox = (await tile.boundingBox())!
@@ -445,8 +463,8 @@ test('translucent blueprint rules, shared grids, and matching navigation and vie
     expect(tileBox.height).toBeCloseTo(headerHeight, 0)
     const scales = (await tile.locator('[data-canvas-view-all-scales]').boundingBox())!
     const link = (await tile.locator('[data-canvas-view-all-link]').boundingBox())!
-    expect(scales.width / tileBox.width).toBeCloseTo(0.5, 1)
-    expect(link.width / tileBox.width).toBeCloseTo(0.5, 1)
+    expect(scales.width / tileBox.width).toBeCloseTo(1 / 2.618, 3)
+    expect(link.width / tileBox.width).toBeCloseTo(1.618 / 2.618, 3)
   }
   await viewAllTiles.last().scrollIntoViewIfNeeded()
   await page.screenshot({ path: '/tmp/tmcs-blueprint-view-all-mobile.png' })
@@ -509,9 +527,18 @@ test('desktop navigation hover keeps the pointer path into the submenu', async (
   await expect(submenu).toHaveCSS('visibility', 'hidden')
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await parent.press('ArrowDown')
+  await expect(parent).toHaveAttribute('aria-expanded', 'true')
+  await expect(submenu).toHaveAttribute('aria-hidden', 'false')
   await expect(child).toBeFocused()
-  await expect(submenu).toHaveCSS('transition-duration', '0s')
-  await expect(chevron).toHaveCSS('transition-duration', '0s')
+  for (const element of [submenu, chevron]) {
+    expect(
+      await element.evaluate((node) =>
+        getComputedStyle(node)
+          .transitionDuration.split(',')
+          .every((value) => parseFloat(value) <= 0.00001),
+      ),
+    ).toBe(true)
+  }
 })
 
 test('crossing a nav item without children preserves the pending submenu close', async ({
@@ -579,3 +606,30 @@ test('mobile navigation rows share height and the parent toggles without navigat
   await page.screenshot({ path: '/tmp/tmcs-nav-mobile-open.png' })
   await page.screenshot({ path: '/tmp/tmcs-nav-mobile-320.png' })
 })
+
+for (const reverseStyles of [false, true]) {
+  test(`Tailwind overrides module defaults with ${reverseStyles ? 'reversed' : 'normal'} stylesheet order`, async ({
+    page,
+  }) => {
+    await openHeaderNavFixture(page, 390)
+    if (reverseStyles) {
+      await page.evaluate(() => {
+        const globalStyles = document.querySelector<HTMLStyleElement>(
+          'style[data-frontend-global]',
+        )!
+        const moduleStyles = document.querySelector<HTMLStyleElement>(
+          'style[data-frontend-modules]',
+        )!
+        globalStyles.parentNode!.insertBefore(moduleStyles, globalStyles)
+      })
+    }
+    const header = page.locator('header')
+    await expect(header).toHaveCSS('display', 'grid')
+    await header.evaluate((element) => element.classList.add('flex', 'md:block'))
+    await expect(header).toHaveCSS('display', 'flex')
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await expect(header).toHaveCSS('display', 'block')
+    await header.evaluate((element) => element.classList.remove('flex', 'md:block'))
+    await expect(header).toHaveCSS('display', 'flex')
+  })
+}

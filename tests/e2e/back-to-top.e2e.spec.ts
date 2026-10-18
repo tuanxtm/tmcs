@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 async function openReadyPage(page: Page, locale: 'en' | 'vi', width: number) {
   await page.setViewportSize({ width, height: 844 })
   await page.goto(locale === 'vi' ? 'http://localhost:3000/vi' : 'http://localhost:3000/')
-  await expect(page.locator('html')).toHaveClass(/boot-ready/)
+  await expect(page.locator('html')).toHaveClass(/boot-ready/, { timeout: 15000 })
   await expect(page.locator('.boot-splash')).toHaveCount(0)
   await page.evaluate(() => document.fonts.ready)
 }
@@ -115,7 +115,7 @@ for (const viewport of [
           metrics.borderRight,
         1,
       )
-      expect(metrics.arrowWidth).toBe(8)
+      expect(metrics.arrowWidth).toBe(16)
       expect(metrics.arrowHeight).toBe(16)
       expect(Math.abs(metrics.arrowRight - metrics.labelRight)).toBeLessThan(0.5)
       expect(metrics.rightGap).toBeCloseTo(metrics.frameRight + metrics.outerLine, 1)

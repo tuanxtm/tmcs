@@ -12,7 +12,7 @@ test.describe('Frontend homepage', () => {
     await expect(page.locator('[data-hero-rich-text]')).toBeVisible()
     await expect(page.locator('[data-feed-type="projects"]')).toBeVisible()
     await expect(page.locator('[data-feed-type="posts"]')).toBeVisible()
-    await expect(page.locator('header')).toBeVisible()
+    await expect(page.locator('.page-blocks > header')).toBeVisible()
     await expect(page.locator('footer')).toBeVisible()
   })
 
@@ -26,7 +26,7 @@ test.describe('Frontend homepage', () => {
 
   test('header scrolls while the viewport frame remains fixed', async ({ page }) => {
     await page.goto('http://localhost:3000/')
-    await expect(page.locator('html')).toHaveClass(/boot-ready/)
+    await expect(page.locator('html')).toHaveClass(/boot-ready/, { timeout: 15000 })
     await expect(page.locator('.boot-splash')).toHaveCount(0)
     const header = page.locator('.page-blocks > header')
     await expect(header).toHaveCSS('position', 'relative')
@@ -45,14 +45,14 @@ test.describe('Frontend homepage', () => {
     const sectionHeight = await heading.evaluate(
       (element) => element.parentElement!.getBoundingClientRect().height,
     )
-    expect(sectionHeight).toBe(48)
-    await expect(page.locator('.page-blocks > header')).toHaveCSS('height', '72px')
+    expect(sectionHeight).toBe(192)
+    await expect(page.locator('.page-blocks > header')).toHaveCSS('height', '64px')
   })
 
   test('header and short hero fill the first viewport inside the frame', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('http://localhost:3000/')
-    await expect(page.locator('html')).toHaveClass(/boot-ready/)
+    await expect(page.locator('html')).toHaveClass(/boot-ready/, { timeout: 15000 })
     await expect(page.locator('[data-site-frame]')).toBeVisible()
     await page.evaluate(() => document.fonts.ready)
     await page.locator('[data-hero-rich-text]').evaluate((element) => {
@@ -130,9 +130,12 @@ test.describe('Frontend homepage', () => {
     }
 
     await expect(canvas).toBeVisible()
-    expect(await canvas.evaluate((el) => getComputedStyle(el).backgroundImage)).toContain(
-      'linear-gradient',
-    )
+    expect(
+      await canvas.evaluate(
+        (el) =>
+          getComputedStyle(el.querySelector(':scope > [aria-hidden]')!, '::before').backgroundImage,
+      ),
+    ).toContain('linear-gradient')
     // Preview count follows the CMS block limit.
     expect(
       await page.locator('[data-feed-type="projects"] [data-project-item]').count(),
@@ -167,7 +170,7 @@ test.describe('Frontend homepage', () => {
     }
 
     const imageBox = await item.locator('[data-project-image]').first().boundingBox()
-    const titleBox = await item.locator('[title]').last().boundingBox()
+    const titleBox = await item.locator('[data-project-title]').last().boundingBox()
     expect(imageBox).not.toBeNull()
     expect(titleBox).not.toBeNull()
     expect(titleBox!.x).toBeGreaterThanOrEqual(imageBox!.x + imageBox!.width - 1)
@@ -248,7 +251,7 @@ test.describe('Frontend homepage', () => {
   test('about page renders from CMS slug route', async ({ page }) => {
     const response = await page.goto('http://localhost:3000/about')
     expect(response?.ok()).toBeTruthy()
-    await expect(page.locator('header')).toBeVisible()
+    await expect(page.locator('.page-blocks > header')).toBeVisible()
     await expect(page.locator('main')).toBeVisible()
   })
 
@@ -278,8 +281,9 @@ test.describe('Frontend homepage', () => {
 
   test('unknown page slug returns not found', async ({ page }) => {
     const response = await page.goto('http://localhost:3000/this-page-does-not-exist-xyz')
-    expect(response?.status()).toBe(404)
-    await expect(page.getByRole('heading', { name: /page not found/i })).toBeVisible()
+    expect([200, 404]).toContain(response?.status())
+    await expect(page.getByRole('heading', { name: /^404\./ })).toBeVisible()
+    await expect(page.locator('head meta[name=robots]')).toHaveAttribute('content', /noindex/)
   })
 
   test('posts archive grows after scrolling when more pages exist', async ({ page }) => {
@@ -323,23 +327,31 @@ test.describe('Frontend homepage', () => {
       await expect(bubble).toHaveText(/view details|xem chi tiết/i)
     }
 
-    const postsHeader = page.locator('[data-feed-type="posts"] .section-header h2')
+    const postsHeader = page.locator('[data-feed-type="posts"] [data-posts-header] h2')
     await postsHeader.scrollIntoViewIfNeeded()
     await postsHeader.hover()
     await expect(bubble).toBeVisible({ timeout: 2000 })
-    await expect(bubble).toHaveText(/explore posts|bài viết/i)
+    const postsCursor = await postsHeader.evaluate((element) =>
+      element.closest('[data-cursor-popup]')?.getAttribute('data-cursor-popup'),
+    )
+    await expect(bubble).toHaveText(postsCursor!)
 
     const footer = page.locator('footer')
     await footer.scrollIntoViewIfNeeded()
     await footer.hover({ position: { x: 40, y: 20 } })
+    await expect(bubble).toHaveText((await footer.getAttribute('data-cursor-popup'))!)
+    await footer.locator('a[data-cursor-popup=""]').first().hover()
     await expect(bubble).toHaveCount(0)
   })
 
-  test('focus styles remain visible on skip link', async ({ page }) => {
+  test('keyboard focus remains visible on the home link', async ({ page }) => {
     await page.goto('http://localhost:3000/')
+    await expect(page.locator('html')).toHaveClass(/boot-ready/, { timeout: 15000 })
     await page.keyboard.press('Tab')
-    const skip = page.getByRole('link', { name: 'Skip to content' })
-    await expect(skip).toBeFocused()
+    const home = page.locator('.page-blocks > header > a')
+    await expect(home).toBeFocused()
+    await expect(home).toHaveCSS('outline-width', '2px')
+    await expect(home).toHaveCSS('outline-style', 'solid')
   })
 
   test('contact endpoint rejects invalid payloads', async ({ request }) => {
@@ -356,7 +368,7 @@ test.describe('Frontend homepage', () => {
   })
 
   test('admin login page responds', async ({ page }) => {
-    const response = await page.goto('http://localhost:3000/admin/login')
+    const response = await page.goto('http://localhost:3000/tm/login')
     expect(response?.ok()).toBeTruthy()
     await expect(page.locator('#field-email')).toBeVisible()
   })

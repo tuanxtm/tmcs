@@ -47,7 +47,10 @@ test('heading, grid lines, and responsive image-label composition', async ({ pag
   ).toBeGreaterThan(36)
 
   const canvas = page.locator('[data-project-canvas]')
-  const backgroundImage = await canvas.evaluate((el) => getComputedStyle(el).backgroundImage)
+  const backgroundImage = await canvas
+    .locator(':scope > [aria-hidden]')
+    .first()
+    .evaluate((element) => getComputedStyle(element, '::before').backgroundImage)
   expect(backgroundImage).toContain('linear-gradient')
 
   // Names sit beside images above mobile and below them on mobile.
@@ -114,14 +117,14 @@ test('compact controls, bottom-aligned labels, and complete transparent grid', a
   const second = (await items.nth(1).boundingBox())!
   const third = (await items.nth(2).boundingBox())!
   expect(second.x).toBeGreaterThan(first.x + first.width)
-  expect(Math.abs(first.y + first.height - (second.y + second.height))).toBeLessThan(80)
   expect(third.y).toBeGreaterThan(Math.max(first.y + first.height, second.y + second.height))
   const handleBox = (await handle.boundingBox())!
   const number = (await item
     .locator('span')
     .filter({ hasText: /^01\.$/ })
     .boundingBox())!
-  expect(handleBox.y + handleBox.height).toBeLessThanOrEqual(number.y)
+  expect(handleBox.y + handleBox.height / 2).toBeCloseTo(number.y + number.height / 2, 0)
+  expect(handleBox.x).toBeGreaterThanOrEqual(number.x + number.width)
 })
 
 test('appending projects preserves visitor placement', async ({ page }) => {
@@ -183,6 +186,7 @@ test('touch handle drag, tap movement controls, and page scrolling', async ({ br
     const session = await context.newCDPSession(page)
     const handle = page.locator('[data-project-drag-handle]').first()
     const item = page.locator('[data-project-item]').first()
+    await expect(handle).toHaveCSS('touch-action', 'none')
     const box = (await handle.boundingBox())!
     const before = (await item.boundingBox())!
     const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 }

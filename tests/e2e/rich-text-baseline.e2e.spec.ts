@@ -1,13 +1,15 @@
+import { retireFrontendFixture, writeFrontendStyles } from '../helpers/frontend-styles'
 import { test, expect, type Page } from '@playwright/test'
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
 let outputDirectory: string
 
-test.beforeAll(() => {
+test.beforeAll(async () => {
   outputDirectory = mkdtempSync(path.join(tmpdir(), 'tmcs-rich-text-'))
+  await writeFrontendStyles(outputDirectory)
   execFileSync(
     'bun',
     [
@@ -22,7 +24,7 @@ test.beforeAll(() => {
 })
 
 test.afterAll(() => {
-  if (outputDirectory) rmSync(outputDirectory, { recursive: true, force: true })
+  if (outputDirectory) retireFrontendFixture(outputDirectory)
 })
 
 test.beforeEach(async ({ page }) => {
@@ -45,7 +47,7 @@ test.beforeEach(async ({ page }) => {
         body: `
         <!doctype html>
         <style>${css}
-          body { margin: 0; --font-sans: Arial; --font-mono: monospace; --font-bitter: Georgia; }
+          @layer base { body { margin: 0; --font-sans: Arial; --font-mono: monospace; --font-bitter: Georgia; } }
           #fixture { font-family: Georgia, serif; font-size: 20px; }
           @media (min-width: 768px) { #fixture { font-size: 24px; } }
           @media (min-width: 1024px) { #fixture { font-size: 48px; } }

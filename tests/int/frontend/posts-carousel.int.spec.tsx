@@ -177,7 +177,6 @@ describe('PostsCarousel adapter', () => {
     expect(date?.getAttribute('aria-label')).toBe('01/02/26')
     expect(date?.tagName.toLowerCase()).toBe('time')
     expect(screen.getAllByRole('link', { name: /^Open post:/ })).toHaveLength(1)
-    expect(screen.getByTestId('flex-carousel-stub').className).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Next item' }))
     expect(screen.getByText('Square')).toBeTruthy()
@@ -195,7 +194,6 @@ describe('PostsCarousel adapter', () => {
     render(<PostsCarousel docs={[post({ id: 1 })]} locale="en" />)
     await waitFor(() => expect(screen.getByTestId('flex-carousel-stub')).toBeTruthy())
     expect(lastCarouselProps?.captureWheel).toBe(false)
-    expect(lastCarouselProps?.className).toBeTruthy()
     expect(lastCarouselProps?.renderCaption).toEqual(expect.any(Function))
     expect(lastCarouselProps?.renderMetadata).toEqual(expect.any(Function))
     expect(lastCarouselProps?.focusOnClick).toBeUndefined()

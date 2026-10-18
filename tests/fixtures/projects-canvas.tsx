@@ -4,7 +4,7 @@ import LenisProvider from 'lenis/react'
 
 import { ProjectsCanvas } from '@/app/(frontend)/_components/projects/projects-canvas'
 import type { ProjectCardView } from '@/app/(frontend)/_lib/types'
-import styles from '@/app/(frontend)/_components/canvas/canvas.module.css'
+import styles from '@/app/(frontend)/_components/canvas/_styles/canvas.module.css'
 
 /**
  * Canvas-focused browser fixture. It renders ProjectsCanvas directly instead of

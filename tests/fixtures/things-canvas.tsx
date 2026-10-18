@@ -5,7 +5,7 @@ import LenisProvider from 'lenis/react'
 import { ThingsCanvas } from '@/app/(frontend)/_components/things/things-canvas'
 import type { ThingCardView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
-import styles from '@/app/(frontend)/_components/canvas/canvas.module.css'
+import styles from '@/app/(frontend)/_components/canvas/_styles/canvas.module.css'
 
 /** Browser fixture for Things canvas movement and drawer interactions. */
 type DrawerCase = 'default' | 'links' | 'long-copy' | 'empty-copy' | 'broken-image'

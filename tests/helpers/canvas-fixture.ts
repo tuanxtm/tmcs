@@ -1,10 +1,26 @@
+import { retireFrontendFixture, writeFrontendStyles } from './frontend-styles'
 import { test, expect, type Page } from '@playwright/test'
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
 const STUBBED_NEXT_MODULES = ['next/link', 'next/image'] as const
+
+export async function waitForCanvasDetail(page: Page) {
+  const popup = page.locator('[data-slot="drawer-popup"]')
+  await expect(popup).toBeVisible()
+  await expect(popup).not.toHaveAttribute('data-starting-style', '')
+  await expect
+    .poll(() =>
+      popup.evaluate((element) => {
+        const transform = getComputedStyle(element).transform
+        return new DOMMatrixReadOnly(transform === 'none' ? undefined : transform).isIdentity
+      }),
+    )
+    .toBe(true)
+  await expect(page.locator('[data-thing-detail-frame]')).toHaveCSS('opacity', '1')
+}
 
 export type OpenFixtureFn = (
   page: Page,
@@ -22,8 +38,9 @@ export type CanvasFixtureApi = OpenFixtureFn & {
 export function createCanvasFixture(kind: 'projects' | 'things'): CanvasFixtureApi {
   let outputDirectory: string
 
-  test.beforeAll(() => {
+  test.beforeAll(async () => {
     outputDirectory = mkdtempSync(path.join(tmpdir(), 'tmcs-canvas-'))
+    await writeFrontendStyles(outputDirectory)
     execFileSync(
       'bun',
       [
@@ -51,7 +68,7 @@ export function createCanvasFixture(kind: 'projects' | 'things'): CanvasFixtureA
   })
 
   test.afterAll(() => {
-    if (outputDirectory) rmSync(outputDirectory, { recursive: true, force: true })
+    if (outputDirectory) retireFrontendFixture(outputDirectory)
   })
 
   async function openFixture(
@@ -103,21 +120,12 @@ export function createCanvasFixture(kind: 'projects' | 'things'): CanvasFixtureA
             --header-height: 48px;
             --destructive: #e03131;
           }
-          body { margin: 0; background: var(--background); font-family: Arial; }
+          @layer base { body { margin: 0; background: var(--background); font-family: Arial; } }
           header { position: sticky; top: 0; height: 48px; background: #fff; z-index: 10; }
-          /* Tailwind utilities the components rely on, absent from the bundle. */
-          .relative { position: relative; }
-          .absolute { position: absolute; }
-          .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-          [data-slot="drawer-overlay"] { position: fixed; inset: 0; z-index: 50; background: #0008; }
-          [data-slot="drawer-viewport"] { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
-          [data-slot="drawer-content"] { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; height: 100%; }
           ${
             kind === 'things'
               ? `
-            /* Things fixture: real shared site tokens so CSS modules resolve to the
-               same baseline geometry as the production app. The local
-               thing-detail.module.css owns the popup height/gutter/split. */
+            /* Keep the controlled fixture geometry. */
             :root {
               --site-frame-inset: 8px;
               --site-frame-top: 8px;
@@ -145,28 +153,10 @@ export function createCanvasFixture(kind: 'projects' | 'things'): CanvasFixtureA
             @media (min-width: 1440px) {
               :root { --site-nav-font-size: 0.8125rem; }
             }
-            [data-slot="drawer-popup"] { position: fixed; inset-inline: 0; bottom: 0; width: 100%; background: var(--background); pointer-events: auto; }
-            .site-cell-hover { position: relative; isolation: isolate; overflow: hidden; transition: color 260ms ease; }
-            .site-cell-hover::before { position: absolute; z-index: -1; inset: 0; background: var(--accent); content: ''; transform: scaleY(0); transform-origin: bottom; transition: transform 260ms ease; pointer-events: none; }
-            .site-cell-hover:is(:hover, :focus-visible):not(:disabled) { color: var(--accent-foreground); }
-            .site-cell-hover:is(:hover, :focus-visible):not(:disabled)::before { transform: scaleY(1); }
             `
               : `
-            [data-slot="drawer-popup"] { position: fixed; inset-inline: 0; bottom: 0; height: 60vh; background: white; pointer-events: auto; }
-            [data-slot="drawer-content"] > .grid { height: 100%; display: grid; grid-template-columns: 1fr 1fr; }
-            [data-slot="drawer-close"] { position: absolute; right: 12px; top: 12px; z-index: 1; }
             `
           }
-          .inset-0 { inset: 0; }
-          .overflow-hidden { overflow: hidden; }
-          .block { display: block; }
-          .h-full { height: 100%; }
-          .w-full { width: 100%; }
-          .h-auto { height: auto; }
-          .object-contain { object-fit: contain; }
-          .object-bottom { object-position: bottom; }
-          .object-cover { object-fit: cover; }
-          .bg-transparent { background-color: transparent; }
         </style>
         <script>window.process = { env: {} };</script>
         <script type="importmap">${JSON.stringify({ imports })}</script>

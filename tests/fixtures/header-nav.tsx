@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import { HeaderNav } from '@/app/(frontend)/_components/layout/header-nav'
-import styles from '@/app/(frontend)/_components/layout/site-header.module.css'
+import styles from '@/app/(frontend)/_components/layout/_styles/site-header.module.css'
 import type { NavItemView } from '@/app/(frontend)/_lib/types'
 
 const items: NavItemView[] = [
