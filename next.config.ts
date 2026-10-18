@@ -1,4 +1,5 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import { wgslTurbopackRule } from '@vgpu/wgsl/next'
 
 function getAllowedDevOrigins(): string[] {
   const raw = process.env.ALLOWED_DEV_ORIGINS?.trim()
@@ -19,6 +20,9 @@ function getAllowedDevOrigins(): string[] {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {
+    rules: { '*.wgsl': wgslTurbopackRule({ minify: true }) },
+  },
   // Cache Components replaces the legacy `dynamic`/`revalidate`/`fetchCache`
   // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
   cacheComponents: true,
@@ -36,6 +40,11 @@ const nextConfig = {
   })(),
   // Your Next.js config here
   webpack: (webpackConfig: any) => {
+    webpackConfig.module.rules.push({
+      test: /\.wgsl$/,
+      loader: '@vgpu/wgsl/loader-webpack',
+      options: { minify: true },
+    })
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
