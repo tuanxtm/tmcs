@@ -3,15 +3,59 @@
   .content {
     display: flex;
     width: max-content;
-    flex-direction: column;
+    max-width: calc(100vw - 2rem);
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--border));
   }
   .text {
+    position: relative;
+    flex: none;
+    padding-right: calc(1ch + 0.25rem);
     font-weight: 500;
     white-space: pre;
     color: color-mix(in oklab, var(--foreground) 90%, transparent);
     text-transform: lowercase;
+  }
+  .character {
+    position: relative;
+  }
+  .ink {
+    display: inline-block;
+    opacity: 0;
+    animation: boot-typewriter-ink 1ms linear forwards;
+  }
+  .cursor,
+  .finalCursor,
+  .initialCursor {
+    position: absolute;
+    left: 100%;
+    margin-left: 0.25rem;
+    opacity: 0;
+    animation: boot-typewriter-ink 60ms linear;
+  }
+  .initialCursor {
+    left: 0;
+    margin-left: 0;
+  }
+  .finalCursor {
+    animation: boot-typewriter-blink 800ms step-end infinite;
+  }
+  @keyframes boot-typewriter-ink {
+    from,
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes boot-typewriter-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
   }
   .root {
     position: fixed;
@@ -23,8 +67,19 @@
     background: var(--background);
     pointer-events: auto;
   }
-  .line {
-    overflow: hidden;
+  @media (max-width: 400px) {
+    .content {
+      gap: 0.75rem;
+      padding: 0.875rem;
+    }
+    .text {
+      font-size: 0.75rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .finalCursor {
+      animation: boot-typewriter-ink 1ms step-end forwards;
+    }
   }
   @keyframes boot-splash-noscript-reveal {
     0%,
@@ -42,9 +97,14 @@
     .root {
       animation: boot-splash-noscript-reveal 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
+    .ink {
+      animation: none;
+      opacity: 1;
+    }
+    .cursor,
+    .finalCursor,
+    .initialCursor {
+      display: none;
+    }
   }
-}
-/* Keep the Typewriter primitive from restoring its wrapping default. */
-.text {
-  white-space: pre;
 }
