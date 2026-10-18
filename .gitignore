@@ -55,6 +55,10 @@ yarn-error.log*
 # Internal planning docs (local only)
 plans/
 docs/
+.context/
+
+# Local screenshots and drops
+.orca/
 
 backup_*
 
