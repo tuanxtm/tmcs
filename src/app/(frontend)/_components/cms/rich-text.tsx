@@ -54,12 +54,11 @@ type CmsRichTextProps = {
 
 function buildParagraphConverter(
   paragraphClassName?: string,
-  uniform = false,
 ): JSXConverter<SerializedParagraphNode> {
   const converter: JSXConverter<SerializedParagraphNode> = ({ node, nodesToJSX }) => {
     const children = nodesToJSX({ nodes: node.children })
     return (
-      <p className={cn('m-0', !uniform && 'overflow-hidden', paragraphClassName)}>
+      <p className={cn('m-0', paragraphClassName)}>
         {children && children.length > 0 ? children : <br />}
       </p>
     )
@@ -188,7 +187,7 @@ export function CmsRichText({
 
     return {
       ...defaultConverters,
-      paragraph: buildParagraphConverter(paragraphClassName, uniform),
+      paragraph: buildParagraphConverter(paragraphClassName),
       text: wrappedText,
       blocks: {
         pageBlankSpace: blockConverter,

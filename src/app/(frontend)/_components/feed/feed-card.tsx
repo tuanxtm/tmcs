@@ -27,7 +27,7 @@ export function FeedCard({ doc, locale, className, cursorPopup = 'view details' 
   const { aspectClass } = getImageAspect(doc.image)
 
   const imageContent = (
-    <div className={cn('bg-primary/4 relative w-full overflow-hidden', aspectClass)}>
+    <div className={cn('bg-primary/4 relative w-full', aspectClass)}>
       {doc.image ? (
         <CmsImage
           media={doc.image}

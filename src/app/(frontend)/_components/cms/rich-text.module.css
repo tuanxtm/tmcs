@@ -4,7 +4,7 @@
   line-height: 1.15;
 }
 
-.uniform [data-inline-image-uniform] > img {
+.uniform [data-inline-image-uniform] > [data-image-glow] {
   z-index: -1;
 }
 

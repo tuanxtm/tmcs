@@ -109,7 +109,7 @@ export function DetailHero({ title, image, priority = true }: DetailHeroProps) {
         >
           <Scales className="text-primary" />
           <div className="relative z-10 flex h-full w-full items-center justify-center p-2 md:p-3 lg:p-4">
-            <div className={cn('relative h-full w-auto max-w-full overflow-hidden', aspectClass)}>
+            <div className={cn('relative h-full w-auto max-w-full', aspectClass)}>
               <CmsImage
                 media={image}
                 sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"

@@ -2,6 +2,7 @@
 // Uniform mode paints images beyond a fixed text line height.
 import type { CSSProperties } from 'react'
 import { getInlineImageScale } from './inline-image-layout'
+import { ImageGlow } from '../media/image-glow'
 
 export type MediaLite = {
   id?: number | string
@@ -103,13 +104,8 @@ function InlineImageInlineBlock({
         verticalAlign: uniform ? 'baseline' : align,
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={media.url}
-        alt={media.alt ?? ''}
-        decoding="async"
+      <ImageGlow
         style={{
-          ...(dominantStyle ?? {}),
           // Uniform images reserve width and paint beyond the text line's height.
           position: uniform ? 'absolute' : undefined,
           top: uniform ? `var(--inline-image-top, ${initialTop})` : undefined,
@@ -118,7 +114,15 @@ function InlineImageInlineBlock({
           width: '100%',
           display: 'block',
         }}
-      />
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={media.url}
+          alt={media.alt ?? ''}
+          decoding="async"
+          style={{ ...dominantStyle, height: '100%', width: '100%', display: 'block' }}
+        />
+      </ImageGlow>
     </span>
   )
 }

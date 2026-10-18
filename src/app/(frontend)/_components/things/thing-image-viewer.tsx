@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from 'react'
 import Image from 'next/image'
+import { ImageGlow } from '@/app/(frontend)/_components/media/image-glow'
 import { IconRestore } from '@tabler/icons-react'
 import type { LocaleCode } from '@/lib/locales'
 import type { MediaView } from '@/app/(frontend)/_lib/types'
@@ -369,22 +370,24 @@ export function ThingImageViewer({ image, primaryUrl, name, locale, active, chil
                   transform: 'translate(-50%, -50%) translate3d(0px, 0px, 0) scale(1)',
                 }}
               >
-                <Image
-                  src={image.url}
-                  alt={image.alt || name}
-                  fill
-                  sizes="(min-width: 1024px) 45vw, 90vw"
-                  draggable={false}
-                  onLoad={(event) => {
-                    const img = event.currentTarget
-                    if (active && img.naturalWidth > 0 && img.naturalHeight > 0) {
-                      naturalRef.current = { x: img.naturalWidth, y: img.naturalHeight }
-                      measure()
-                    }
-                  }}
-                  onError={() => setFailed(true)}
-                  style={{ objectFit: 'contain' }}
-                />
+                <ImageGlow className="absolute inset-0">
+                  <Image
+                    src={image.url}
+                    alt={image.alt || name}
+                    fill
+                    sizes="(min-width: 1024px) 45vw, 90vw"
+                    draggable={false}
+                    onLoad={(event) => {
+                      const img = event.currentTarget
+                      if (active && img.naturalWidth > 0 && img.naturalHeight > 0) {
+                        naturalRef.current = { x: img.naturalWidth, y: img.naturalHeight }
+                        measure()
+                      }
+                    }}
+                    onError={() => setFailed(true)}
+                    style={{ objectFit: 'contain' }}
+                  />
+                </ImageGlow>
                 {primaryUrl ? (
                   <a
                     href={primaryUrl}

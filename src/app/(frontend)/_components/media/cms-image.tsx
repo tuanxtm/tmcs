@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import type { MediaView } from '@/app/(frontend)/_lib/types'
+import { ImageGlow } from './image-glow'
 
 type CmsImageProps = {
   media: MediaView
@@ -12,6 +13,7 @@ type CmsImageProps = {
   sizes: string
   priority?: boolean
   fill?: boolean
+  glow?: boolean
 }
 
 export function CmsImage({
@@ -22,6 +24,7 @@ export function CmsImage({
   sizes,
   priority = false,
   fill = false,
+  glow = true,
 }: CmsImageProps) {
   const style = media.dominantColor
     ? ({ backgroundColor: media.dominantColor } as React.CSSProperties)
@@ -29,16 +32,18 @@ export function CmsImage({
 
   if (fill) {
     return (
-      <div className={cn('absolute inset-0 overflow-hidden', className)} style={style}>
-        <Image
-          src={media.url}
-          alt={media.alt}
-          fill
-          sizes={sizes}
-          priority={priority}
-          className={cn('object-cover', imgClassName)}
-        />
-      </div>
+      <ImageGlow className={cn('absolute inset-0', className)} style={style} enabled={glow}>
+        <span className="absolute inset-0 overflow-hidden">
+          <Image
+            src={media.url}
+            alt={media.alt}
+            fill
+            sizes={sizes}
+            priority={priority}
+            className={cn('object-cover', imgClassName)}
+          />
+        </span>
+      </ImageGlow>
     )
   }
 
@@ -46,7 +51,7 @@ export function CmsImage({
   const height = media.height || 900
 
   return (
-    <span className={cn('inline-block', className)} style={style}>
+    <ImageGlow className={className} style={style} enabled={glow}>
       <Image
         src={media.url}
         alt={media.alt}
@@ -57,6 +62,6 @@ export function CmsImage({
         style={imgStyle}
         className={cn('h-auto', imgClassName)}
       />
-    </span>
+    </ImageGlow>
   )
 }

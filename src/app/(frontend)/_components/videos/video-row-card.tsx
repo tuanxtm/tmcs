@@ -65,6 +65,7 @@ export function VideoRowCard({
           {doc.image ? (
             <CmsImage
               media={doc.image}
+              glow={false}
               fill
               sizes="(min-width: 1024px) 23vw, (min-width: 640px) 280px, min(80vw, 320px)"
               className={styles.rowImage}

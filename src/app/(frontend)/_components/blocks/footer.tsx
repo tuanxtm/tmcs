@@ -1,6 +1,7 @@
 import { cacheLife } from 'next/cache'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ImageGlow } from '@/app/(frontend)/_components/media/image-glow'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import type { NavChildView, PageFooterBlockView } from '@/app/(frontend)/_lib/types'
 import { trimUrlScheme } from '@/app/(frontend)/_lib/social-icons'
@@ -53,7 +54,7 @@ function FooterLinkList({ label, links, variant }: FooterLinkListProps) {
                   target={link.newTab ? '_blank' : undefined}
                   rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
                   className={cn(
-                    'font-mono text-sm font-medium lowercase md:text-base lg:text-lg',
+                    'font-mono text-sm font-semibold lowercase md:text-base lg:text-lg',
                     'hover:text-primary transition-colors duration-300',
                   )}
                   data-cursor-popup={''}
@@ -138,20 +139,22 @@ export async function FooterBlock({ block, siteName, locale }: FooterBlockProps)
         >
           <p
             className={cn(
-              'text-foreground pt-0.5 font-mono leading-none font-medium',
+              'text-foreground pt-0.5 font-mono leading-none font-semibold',
               'text-xs md:text-sm',
             )}
           >
             {copyright}
           </p>
           <Link href={homeHref(locale)}>
-            <Image
-              src="/logo.svg"
-              alt={siteName}
-              width={100}
-              height={100}
-              className="size-4 lg:size-5"
-            />
+            <ImageGlow className="block">
+              <Image
+                src="/logo.svg"
+                alt={siteName}
+                width={100}
+                height={100}
+                className="size-4 lg:size-5"
+              />
+            </ImageGlow>
           </Link>
         </div>
       </div>

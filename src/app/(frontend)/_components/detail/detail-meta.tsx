@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { ImageGlow } from '@/app/(frontend)/_components/media/image-glow'
 
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { FieldRow } from '@/app/(frontend)/_components/layout/field-row'
@@ -96,15 +97,15 @@ function AuthorFieldRow({
     <FieldRow label="author">
       <div className="flex items-center gap-3">
         {author.avatar ? (
-          <span className="relative inline-block size-8 overflow-hidden rounded-full md:size-10">
+          <ImageGlow className="size-8 rounded-full md:size-10">
             <Image
               src={author.avatar.url}
               alt={author.avatar.alt || author.name}
               fill
               sizes="40px"
-              className="object-cover"
+              className="rounded-full object-cover"
             />
-          </span>
+          </ImageGlow>
         ) : null}
         <span className="flex flex-col leading-tight">
           <span>{author.name}</span>
