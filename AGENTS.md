@@ -11,7 +11,23 @@ alwaysApply: true
 
 3. IMPORTANT: ENGLISH ONLY!
 
-4. Don't use subagents.
+4. Do not use Codex subagents. External test workers are allowed as described below.
+
+## External test workers
+
+Codex may delegate test execution and failure diagnosis to the installed OMP and OpenCode 2 CLIs.
+
+- Use `omp -p --no-session --max-time 10m` for focused integration/component tests.
+- Use `opencode2 run` for focused browser/E2E tests.
+- Use each harness's configured model by default; pass `--model` when the user specifies one.
+- Give each worker exact test commands and relevant file paths. Prefer focused tests over the full suite.
+- Launch independent tasks concurrently, with at most two workers.
+- Workers must not edit source, tests, configuration, or dependencies.
+- Workers must not delegate further or weaken failing assertions.
+- Require the test command, actual test exit code, duration, log path, and a concise failure diagnosis. A successful harness exit alone does not prove that tests passed.
+- Keep database-mutating suites sequential unless their data is isolated. Concurrent browser runs must use separate output/report paths and coordinate development server startup.
+- Codex owns fixes and must ensure results cover the final code changes.
+- Preserve approval requirements. Report blocked permissions instead of bypassing them.
 
 ## Codegraph (local CLI only)
 
