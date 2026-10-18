@@ -1,10 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
 import { adminOrManager, anyone } from '@/access'
-import {
-  revalidateLinks,
-  revalidateLinksDelete,
-} from '@/hooks/revalidateFrontend'
+import { deleteLinkNavigation } from '@/hooks/deleteLinkNavigation'
+import { revalidateLinks, revalidateLinksDelete } from '@/hooks/revalidateFrontend'
 import { validateAbsoluteHttpUrl } from '@/lib/url'
 
 /**
@@ -35,6 +33,7 @@ export const Links: CollectionConfig = {
     delete: adminOrManager,
   },
   hooks: {
+    beforeDelete: [deleteLinkNavigation],
     afterChange: [revalidateLinks],
     afterDelete: [revalidateLinksDelete],
   },
