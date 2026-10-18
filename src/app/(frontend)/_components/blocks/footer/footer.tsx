@@ -2,6 +2,7 @@ import { cacheLife } from 'next/cache'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ImageGlow } from '@/app/(frontend)/_components/media/image-glow'
+import { BlueFlame } from '@/components/ui/blue-flame'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import type { NavChildView, PageFooterBlockView } from '@/app/(frontend)/_lib/types'
 import { trimUrlScheme } from '@/app/(frontend)/_lib/social-icons'
@@ -61,6 +62,9 @@ export async function FooterBlock({ block, siteName, locale }: FooterBlockProps)
   return (
     <footer data-cursor-popup={block.cursorPopup || 'footer'}>
       <div className={styles.root}>
+        <div className={styles.flame} aria-hidden="true">
+          <BlueFlame />
+        </div>
         <div className={styles.content}>
           {block.footerText ? (
             <div className={styles.tagline}>

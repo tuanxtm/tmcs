@@ -80,10 +80,18 @@
   }
   .root {
     position: relative;
+    isolation: isolate;
     display: flex;
     height: calc(var(--hero-fold-height) * 0.6);
     flex-direction: column;
     justify-content: space-between;
+  }
+  .flame {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
   }
   @media (width >= 64rem) {
     .root {
