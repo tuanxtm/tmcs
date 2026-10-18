@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { IconArrowDown } from '@tabler/icons-react'
+import { Fragment } from 'react'
+import { IconArrowDownLeft } from '@tabler/icons-react'
 import { CmsRichText } from '@/app/(frontend)/_components/cms/rich-text'
 import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
-import { trimUrlScheme } from '@/app/(frontend)/_lib/social-icons'
 import type { PageHeroBlockView, NavChildView } from '@/app/(frontend)/_lib/types'
 import type { LocaleCode } from '@/lib/locales'
 import { Scales } from '@/components/ui/scales'
@@ -16,39 +16,22 @@ type HeroProps = {
   className?: string
 }
 
-type LinkListVariant = 'social' | 'destination'
-
-function LinkList({
-  links,
-  variant,
-  label,
-}: {
-  links: NavChildView[]
-  variant: LinkListVariant
-  label: string | null
-}) {
-  if (links.length === 0) return null
-  return (
-    <div className={styles.linkGroup}>
-      {label ? <p className={styles.linkLabel}>{label}</p> : null}
-      <ul className={styles.linkList}>
-        {links.map((link) => (
-          <li key={link.id}>
-            <Link
-              href={link.href}
-              target={link.newTab ? '_blank' : undefined}
-              rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
-              className={styles.heroLink}
-              data-cursor-popup=""
-            >
-              <span aria-hidden="true" className={styles.linkMarker} />
-              <span>{variant === 'social' ? trimUrlScheme(link.href) : link.href}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
+function InlineLinks({ links, locale }: { links: NavChildView[]; locale: LocaleCode }) {
+  const conjunction = locale === 'vi' ? ' và ' : ' and '
+  return links.map((link, index) => (
+    <Fragment key={link.id}>
+      {index > 0 ? (index === links.length - 1 ? conjunction : ', ') : null}
+      <Link
+        href={link.href}
+        target={link.newTab ? '_blank' : undefined}
+        rel={link.newTab || link.external ? 'noopener noreferrer' : undefined}
+        className={styles.heroLink}
+        data-cursor-popup=""
+      >
+        {link.label}
+      </Link>
+    </Fragment>
+  ))
 }
 
 export function Hero({ hero, locale, hasFollowingContent, className }: HeroProps) {
@@ -57,7 +40,7 @@ export function Hero({ hero, locale, hasFollowingContent, className }: HeroProps
   const scrollContent = (
     <>
       <span>{scrollLabel}</span>
-      <IconArrowDown aria-hidden="true" />
+      <IconArrowDownLeft aria-hidden="true" />
     </>
   )
   return (
@@ -82,6 +65,7 @@ export function Hero({ hero, locale, hasFollowingContent, className }: HeroProps
           {hero.heroImage ? (
             <CmsImage
               media={hero.heroImage}
+              glow={false}
               fill
               sizes="(min-width: 1024px) 100dvh, 100vw"
               className="h-full w-full"
@@ -101,8 +85,26 @@ export function Hero({ hero, locale, hasFollowingContent, className }: HeroProps
         </div>
         <div className={styles.decoration} aria-hidden="true" data-hero-decoration />
         <div className={styles.links} data-hero-links>
-          <LinkList links={hero.socialLinks} variant="social" label={hero.labelSocialLinks} />
-          <LinkList links={hero.otherLinks} variant="destination" label={hero.labelOtherLinks} />
+          <p className={styles.linksParagraph}>
+            {hero.socialLinks.length > 0 ? (
+              <>
+                {locale === 'vi' ? 'Bạn có thể theo dõi mình tại ' : 'Follow me at '}
+                <InlineLinks links={hero.socialLinks} locale={locale} />.
+              </>
+            ) : null}
+            {hero.otherLinks.length > 0 ? (
+              <>
+                {hero.socialLinks.length > 0
+                  ? locale === 'vi'
+                    ? ' Hoặc khám phá thêm tại '
+                    : ' Or discover more at '
+                  : locale === 'vi'
+                    ? 'Khám phá thêm tại '
+                    : 'Discover more at '}
+                <InlineLinks links={hero.otherLinks} locale={locale} />.
+              </>
+            ) : null}
+          </p>
         </div>
         {hasFollowingContent ? (
           <a
