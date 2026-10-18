@@ -8,6 +8,39 @@ import { readFireFrame } from '../helpers/blue-flame-readback'
 let server: ViteDevServer
 let url: string
 
+test('GPU heat follows either wind direction and rises faster in stronger airflow', async ({
+  page,
+}) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await page.goto(`${url}?physics`)
+  await page.waitForFunction(() => 'flamePhysics' in window)
+  const result = await page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          flamePhysics: Awaited<
+            ReturnType<typeof import('../fixtures/blue-flame-physics').measureFlamePhysics>
+          >
+        }
+      ).flamePhysics,
+  )
+  expect(result.errors).toEqual([])
+  for (const sample of [result.left, result.right, result.slow, result.fast]) {
+    expect(sample.bounded).toBe(true)
+    expect(sample.heat, JSON.stringify(result)).toBeGreaterThan(0)
+  }
+  expect(result.right.x - result.left.x).toBeGreaterThan(5)
+  expect(result.right.x).toBeGreaterThan(64)
+  expect(result.left.x).toBeLessThan(64)
+  expect(result.right.rootWind).toBe(18)
+  expect(result.left.rootWind).toBe(-18)
+  expect(result.right.lowerWind).toBeGreaterThan(10)
+  expect(result.left.lowerWind).toBeLessThan(-10)
+  expect(result.slow.y - result.fast.y).toBeGreaterThan(1)
+  expect(errors).toEqual([])
+})
+
 test.use({
   launchOptions: {
     executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || '/usr/bin/chromium',
@@ -58,6 +91,11 @@ test('renders transparent animated fire, resizes, recolors, and remounts', async
   expect(first.opaque).toBeGreaterThan(0)
   expect(first.bottom[2]).toBeGreaterThan(first.bottom[0])
   await expect.poll(async () => (await readFireFrame(page))!.hash).not.toBe(first.hash)
+  await page.waitForTimeout(3000)
+  const evolved = (await readFireFrame(page))!
+  expect(evolved.transparent).toBeGreaterThan(0)
+  expect(evolved.opaque).toBeGreaterThan(800 * 320 * 0.1)
+  writeFileSync('/tmp/tmcs-blue-flame-wind.png', Buffer.from(evolved.image.split(',')[1], 'base64'))
   await page.locator('.fire').evaluate((node) => {
     ;(node as HTMLElement).style.marginTop = '2000px'
   })
@@ -103,8 +141,9 @@ test('renders transparent animated fire, resizes, recolors, and remounts', async
     for (let i = 0; i < pixels.length; i += 4) {
       const row = Math.floor(i / 4 / probe.width)
       if (
-        row < probe.height * 0.5 &&
+        row < probe.height * 0.85 &&
         pixels[i + 3] > 128 &&
+        pixels[i + 3] < 255 &&
         pixels[i + 1] > 100 &&
         pixels[i + 2] > 170 &&
         pixels[i + 1] > pixels[i] + 30 &&

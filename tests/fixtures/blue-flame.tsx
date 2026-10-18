@@ -12,8 +12,15 @@ function Fixture() {
   )
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <Fixture />
-  </StrictMode>,
-)
+if (new URLSearchParams(window.location.search).has('physics')) {
+  void import('./blue-flame-physics').then(async ({ measureFlamePhysics }) => {
+    const result = await measureFlamePhysics()
+    ;(window as unknown as { flamePhysics: typeof result }).flamePhysics = result
+  })
+} else {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <Fixture />
+    </StrictMode>,
+  )
+}
