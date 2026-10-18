@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BlueFlame fixture</title>
+    <style>
+      :root {
+        --accent: oklch(0.52 0.2 264);
+        --background: #fff;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+      }
+      .fire {
+        position: relative;
+        width: 100%;
+        height: 320px;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./blue-flame.tsx"></script>
+  </body>
+</html>
