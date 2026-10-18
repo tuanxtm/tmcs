@@ -1,9 +1,12 @@
-import { effect, frame, init, storage, surface } from 'vgpu'
+import { compute, effect, frame, init, pingPongStorage, storage, surface } from 'vgpu'
 import shader from './blue-flame.wgsl'
+import simulationShader from './blue-flame-simulation.wgsl'
+import { createFlameWind } from './blue-flame-wind'
 
 const ROWS = 50
 const MAX_COLUMNS = 512
-const STEP_MS = 100
+const STEP_SECONDS = 1 / 60
+const SIMULATION_SPEED = 0.6
 const MAX_HEAT = 36
 
 export async function createBlueFlameRenderer(canvas: HTMLCanvasElement) {
@@ -15,33 +18,28 @@ export async function createBlueFlameRenderer(canvas: HTMLCanvasElement) {
       alphaMode: 'premultiplied',
       clearColor: [0, 0, 0, 0],
     })
-    const previous = storage(gpu, MAX_COLUMNS * ROWS * 4, 'read')
-    const current = storage(gpu, MAX_COLUMNS * ROWS * 4, 'read')
+    const state = pingPongStorage(gpu, MAX_COLUMNS * ROWS * 16)
     const palette = storage(gpu, 37 * 16, 'read')
     const fire = effect(gpu, shader, {
       label: 'blue-flame',
-      set: { previous, current, palette, params: { columns: 1, rows: ROWS, blend: 1 } },
+      set: {
+        previous: state.read,
+        current: state.read,
+        palette,
+        params: { columns: 1, rows: ROWS, blend: 1 },
+      },
     })
-    let columns = 1
-    let pixels = new Float32Array(ROWS)
-    let before = new Float32Array(ROWS)
-    let lastStep = 0
+    const simulation = compute(gpu, simulationShader, { label: 'blue-flame-simulation' })
+    const wind = createFlameWind()
+    let columns = 0
+    let lastFrame: number | undefined
+    let accumulator = 0
+    let time = Math.random() * 100
+    let initialize = true
+    let history = false
     let disposed = false
     let colorKey = ''
     const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true })
-
-    function propagate() {
-      before.set(pixels)
-      for (let x = 0; x < columns; x++) {
-        for (let y = 0; y < ROWS - 1; y++) {
-          const index = y * columns + x
-          const decay = Math.floor(Math.random() * 2.6)
-          // Wrap within the row instead of writing before the array or into another row.
-          const destination = y * columns + ((x - decay + columns) % columns)
-          pixels[destination] = Math.max(0, pixels[index + columns] - decay)
-        }
-      }
-    }
 
     function updatePalette() {
       const styles = getComputedStyle(canvas)
@@ -88,39 +86,72 @@ export async function createBlueFlameRenderer(canvas: HTMLCanvasElement) {
       const nextColumns = Math.min(MAX_COLUMNS, Math.max(3, Math.round((width / height) * ROWS)))
       if (columns === nextColumns) return
       columns = nextColumns
-      pixels = new Float32Array(columns * ROWS)
-      before = new Float32Array(pixels.length)
-      pixels.fill(MAX_HEAT, columns * (ROWS - 1))
-      for (let i = 0; i < ROWS; i++) propagate()
-      previous.write(before)
-      current.write(pixels)
-      lastStep = 0
+      initialize = true
+      history = false
+      accumulator = 0
+      lastFrame = undefined
     }
 
     function render(now: number, still = false) {
       if (disposed) return
       updatePalette()
-      if (!lastStep) lastStep = now
-      if (!still && now - lastStep >= STEP_MS) {
-        propagate()
-        previous.write(before)
-        current.write(pixels)
-        lastStep = now - ((now - lastStep) % STEP_MS)
-      }
-      fire.set({ params: { columns, rows: ROWS, blend: still ? 1 : (now - lastStep) / STEP_MS } })
-      frame(gpu, (pass) => pass.pass(screen, fire))
+      const elapsed =
+        lastFrame === undefined ? 0 : Math.min(0.1, Math.max(0, (now - lastFrame) / 1000))
+      lastFrame = now
+      if (!still) accumulator += elapsed * SIMULATION_SPEED
+      frame(gpu, (encoding) => {
+        if (initialize || (!still && accumulator >= STEP_SECONDS)) {
+          encoding.computePass((pass) => {
+            do {
+              const weather = wind.advance(initialize ? 0 : STEP_SECONDS)
+              if (!initialize) {
+                history = true
+                accumulator -= STEP_SECONDS
+                time += STEP_SECONDS
+              }
+              simulation.set({
+                src: state.read,
+                dst: state.write,
+                sim: {
+                  columns,
+                  rows: ROWS,
+                  dt: STEP_SECONDS,
+                  time,
+                  wind: weather.velocity,
+                  power: weather.power,
+                  initialize: initialize ? 1 : 0,
+                },
+              })
+              pass.dispatch(simulation, Math.ceil(columns / 8), Math.ceil(ROWS / 8))
+              state.swap()
+              initialize = false
+            } while (!still && accumulator >= STEP_SECONDS)
+          })
+        }
+        fire.set({
+          previous: still || !history ? state.read : state.write,
+          current: state.read,
+          params: { columns, rows: ROWS, blend: still ? 1 : accumulator / STEP_SECONDS },
+        })
+        encoding.pass(screen, fire)
+      })
+    }
+
+    function pause() {
+      lastFrame = undefined
     }
 
     function dispose() {
       if (disposed) return
       disposed = true
       fire.dispose()
+      simulation.dispose()
       screen.dispose()
       gpu.dispose()
     }
 
-    await fire.compile(screen)
-    return { resize, render, dispose, lost: gpu.lost, onError: gpu.onError.bind(gpu) }
+    await Promise.all([fire.compile(screen), simulation.compile()])
+    return { resize, render, pause, dispose, lost: gpu.lost, onError: gpu.onError.bind(gpu) }
   } catch (error) {
     gpu.dispose()
     throw error

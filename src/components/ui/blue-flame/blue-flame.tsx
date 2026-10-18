@@ -31,6 +31,7 @@ export function BlueFlame({ className, style }: BlueFlameProps) {
     function stop() {
       cancelAnimationFrame(raf)
       raf = 0
+      renderer?.pause()
     }
 
     function fail() {
