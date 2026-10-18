@@ -1,0 +1,50 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .content {
+    display: flex;
+    width: max-content;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .text {
+    font-weight: 500;
+    white-space: pre;
+    color: color-mix(in oklab, var(--foreground) 90%, transparent);
+    text-transform: lowercase;
+  }
+  .root {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background);
+    pointer-events: auto;
+  }
+  .line {
+    overflow: hidden;
+  }
+  @keyframes boot-splash-noscript-reveal {
+    0%,
+    70% {
+      transform: translateY(0);
+      visibility: visible;
+    }
+    100% {
+      transform: translateY(-100%);
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+  @media (scripting: none) {
+    .root {
+      animation: boot-splash-noscript-reveal 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+  }
+}
+/* Keep the Typewriter primitive from restoring its wrapping default. */
+.text {
+  white-space: pre;
+}

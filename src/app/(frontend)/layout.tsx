@@ -68,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <LocaleMeta />
         </Suspense>
       </head>
-      <body className="text-foreground relative isolate min-h-dvh">
+      <body>
         <Background />
         <MotionProvider>
           <LenisProvider>

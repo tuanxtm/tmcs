@@ -1,0 +1,16 @@
+@layer theme, base, components, utilities;
+
+@layer components {
+  .imageSlot {
+    display: inline-block;
+  }
+  .imageLayer {
+    width: 100%;
+    display: block;
+  }
+  .image {
+    height: 100%;
+    width: 100%;
+    display: block;
+  }
+}

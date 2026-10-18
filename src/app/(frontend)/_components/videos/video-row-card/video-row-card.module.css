@@ -1,0 +1,24 @@
+@layer theme, base, components, utilities;
+@layer components {
+  @media (hover: hover) {
+    .imageInteractive:is(:where(:global(.group)):hover *) {
+      scale: 1.01;
+    }
+  }
+  .imageInteractive:is(:where(:global(.group)):focus-visible *) {
+    scale: 1.01;
+  }
+  .placeholderIcon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .playIcon {
+    width: 1rem;
+    height: 1rem;
+    translate: 1px 0;
+  }
+  .externalIcon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+}

@@ -1,0 +1,27 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .root {
+    display: flex;
+    flex-direction: column;
+  }
+  .label {
+    font-weight: 500;
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    word-spacing: -0.15em;
+    font-size: 0.625rem;
+    color: color-mix(in oklab, var(--primary) 90%, transparent);
+    text-transform: uppercase;
+  }
+  @media (width >= 48rem) {
+    .label {
+      font-size: 0.75rem;
+      line-height: 1.333333;
+    }
+  }
+  .value {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--foreground);
+    text-transform: lowercase;
+  }
+}

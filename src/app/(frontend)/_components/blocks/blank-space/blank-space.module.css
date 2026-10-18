@@ -1,0 +1,6 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .root {
+    position: relative;
+  }
+}

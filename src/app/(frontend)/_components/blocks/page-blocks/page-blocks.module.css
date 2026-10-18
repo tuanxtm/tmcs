@@ -1,0 +1,51 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .placeholder {
+    margin-inline: auto;
+    margin-block: 2rem;
+    max-width: var(--container-3xl);
+    border-radius: 0.25rem;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: var(--border);
+    background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
+    padding-inline: 1rem;
+    padding-block: 1.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    line-height: 1.333333;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+  }
+  .placeholderLabel {
+    margin-left: 0.5rem;
+    color: color-mix(in oklab, var(--foreground) 60%, transparent);
+  }
+  .root {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--section-gap-y);
+  }
+  .content {
+    padding-inline: 1rem;
+    padding-block: 2rem;
+  }
+  .paragraph {
+    margin-inline: auto;
+    max-width: var(--container-3xl);
+    font-size: 0.875rem;
+    line-height: 1.625;
+    color: var(--foreground);
+  }
+  .root > header + :global(#hero) {
+    margin-top: calc(-1 * var(--section-gap-y));
+  }
+  .root > [data-feed-type='posts'],
+  .root > [data-feed-type='projects'],
+  .root > [data-feed-type='things'] {
+    margin-top: calc(-1 * var(--section-gap-y));
+  }
+  .root > :not(header) {
+    box-shadow: inset 0 calc(-1 * var(--outer-line-weight)) var(--site-rule-color);
+  }
+}

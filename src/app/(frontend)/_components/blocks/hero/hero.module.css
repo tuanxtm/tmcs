@@ -1,0 +1,259 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    color: var(--secondary);
+    box-shadow: inset 0 calc(-1 * var(--outer-line-weight)) var(--site-rule-color);
+  }
+  .stage {
+    position: relative;
+    display: grid;
+    grid-template-areas: 'image' 'text';
+    min-width: 0;
+    padding: var(--site-cell-padding);
+    row-gap: var(--site-cell-padding);
+    border-bottom: var(--inner-line-weight) solid var(--site-rule-color);
+  }
+  .richText {
+    grid-area: text;
+    min-width: 0;
+    padding: 0;
+    letter-spacing: -0.05em;
+  }
+  .image {
+    position: relative;
+    grid-area: image;
+    min-width: 0;
+    aspect-ratio: 1;
+    margin: 0;
+  }
+  .bottom {
+    display: grid;
+    min-width: 0;
+  }
+  .decoration,
+  .decorationScales,
+  .scales {
+    display: none;
+  }
+  .links {
+    min-width: 0;
+    padding: var(--site-cell-padding);
+    border-bottom: var(--inner-line-weight) solid var(--site-rule-color);
+  }
+  .linksParagraph,
+  .scroll {
+    font-size: var(--site-nav-font-size);
+    line-height: 1.6;
+  }
+  .linksParagraph {
+    margin: 0;
+    font-family: var(--font-sans);
+    overflow-wrap: anywhere;
+  }
+  .heroLink {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    word-spacing: -0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    text-decoration: none;
+    text-underline-offset: 0.15em;
+  }
+  .heroLink:hover {
+    text-decoration: underline;
+  }
+  .scroll {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    word-spacing: -0.15em;
+    position: relative;
+    display: block;
+    min-width: 0;
+    min-height: 96px;
+    padding: var(--site-cell-padding);
+    color: var(--accent);
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  .scroll svg {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: clamp(16px, 1.5em, 18px);
+    height: clamp(16px, 1.5em, 18px);
+    color: inherit;
+    opacity: 0.65;
+  }
+  .hero a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -3px;
+  }
+  .scrollTarget {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 0;
+    height: 0;
+    scroll-margin-top: calc(var(--site-frame-top) - var(--section-gap-y));
+  }
+  .hero:has(+ [data-feed-type='posts'], + [data-feed-type='projects'], + [data-feed-type='things'])
+    .scrollTarget {
+    scroll-margin-top: var(--site-frame-top);
+  }
+  @media (max-width: 639.98px) {
+    .image {
+      mask-image: linear-gradient(to bottom, #000 35%, transparent 75%);
+    }
+
+    .stage:has(.image img) .richText {
+      position: relative;
+      z-index: 1;
+      margin-top: calc(-25% - var(--site-cell-padding));
+    }
+
+    .bottom {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
+      grid-template-rows: auto calc(
+          var(--site-header-height, 56px) - var(--outer-line-weight, 1.5px)
+        );
+      padding-bottom: var(--outer-line-weight, 1.5px);
+    }
+
+    .links {
+      grid-column: 1 / -1;
+      grid-row: 1;
+    }
+
+    .decorationScales {
+      position: relative;
+      display: block;
+      grid-column: 1;
+      grid-row: 2;
+      overflow: hidden;
+    }
+
+    .scroll {
+      grid-column: 2;
+      grid-row: 2;
+      min-height: 0;
+      padding: 8px var(--site-cell-padding, 12px) 28px;
+      border-left: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
+      color: var(--secondary);
+      line-height: 1.25;
+      text-decoration: none;
+    }
+
+    .scroll svg {
+      bottom: 8px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .hero {
+      flex-shrink: 0;
+      height: calc(
+        100vh - var(--site-frame-top) - var(--site-frame-bottom) - var(--site-header-height)
+      );
+      height: calc(
+        100dvh - var(--site-frame-top) - var(--site-frame-bottom) - var(--site-header-height)
+      );
+    }
+    .stage {
+      flex: 1;
+      grid-template-areas: 'text image';
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-rows: minmax(0, 1fr);
+      min-height: 0;
+      padding: 0;
+      row-gap: 0;
+      border-bottom: 0;
+    }
+    .richText {
+      min-height: 0;
+      padding: var(--site-cell-padding);
+      overflow-wrap: anywhere;
+    }
+    .image {
+      height: 100%;
+      min-height: 0;
+      margin: 0;
+    }
+    .bottom {
+      flex-shrink: 0;
+      /* Blank space / (links + scroll) = golden ratio. */
+      grid-template-columns: minmax(0, 61.803398875%) minmax(0, 1fr) var(--site-action-tile-width);
+      grid-template-rows: var(--site-scales-height) minmax(8rem, auto) var(--site-scales-height);
+    }
+    .decoration {
+      display: block;
+      grid-column: 1;
+      grid-row: 2;
+      border-top: var(--inner-line-weight) solid var(--site-rule-color);
+    }
+    .bottom::before {
+      content: '';
+      grid-column: 2 / 4;
+      grid-row: 1;
+      border-left: var(--inner-line-weight) solid var(--site-rule-color);
+      pointer-events: none;
+    }
+    .links {
+      grid-column: 2;
+      grid-row: 2;
+      border-top: var(--inner-line-weight) solid var(--site-rule-color);
+      border-left: var(--inner-line-weight) solid var(--site-rule-color);
+    }
+    .scroll {
+      grid-column: 3;
+      grid-row: 2;
+      min-height: 0;
+      border-top: var(--inner-line-weight) solid var(--site-rule-color);
+      border-bottom: var(--inner-line-weight) solid var(--site-rule-color);
+      border-left: var(--inner-line-weight) solid var(--site-rule-color);
+    }
+    .decorationScales,
+    .scales {
+      position: relative;
+      display: block;
+      overflow: hidden;
+    }
+    .decorationScales {
+      grid-column: 1;
+      grid-row: 1;
+      height: var(--site-scales-height);
+      border-top: var(--inner-line-weight) solid var(--site-rule-color);
+    }
+    .scales {
+      grid-column: 2 / 4;
+      grid-row: 3;
+      border-left: var(--inner-line-weight) solid var(--site-rule-color);
+    }
+  }
+  .paragraph {
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--secondary);
+  }
+  @media (width >= 48rem) {
+    .paragraph {
+      font-size: 1.5rem;
+      line-height: 1.333333;
+    }
+  }
+  @media (width >= 64rem) {
+    .paragraph {
+      font-size: 3rem;
+      line-height: 1;
+    }
+  }
+  .imageFrame {
+    height: 100%;
+    width: 100%;
+  }
+  .heroImage {
+    object-fit: cover;
+  }
+}

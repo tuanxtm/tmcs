@@ -1,0 +1,46 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .root {
+    background-color: var(--background);
+  }
+  .layout {
+    position: relative;
+    display: grid;
+    height: var(--header-height);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    align-items: center;
+    column-gap: 0.25rem;
+    background-color: transparent;
+  }
+  @media (width >= 64rem) {
+    .layout {
+      column-gap: 0.5rem;
+    }
+  }
+  .decoration {
+    position: absolute;
+    align-items: flex-start;
+    font-size: 10em;
+    font-weight: 700;
+    opacity: 5%;
+  }
+  .heading {
+    font-size: 0.875rem;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--foreground);
+    text-transform: lowercase;
+  }
+  @media (width >= 48rem) {
+    .heading {
+      font-size: 1rem;
+      line-height: 1;
+    }
+  }
+  @media (width >= 64rem) {
+    .heading {
+      font-size: 1.125rem;
+      line-height: 1;
+    }
+  }
+}

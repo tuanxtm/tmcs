@@ -1,0 +1,194 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .root {
+    position: relative;
+    display: flex;
+    min-height: auto;
+    background-color: var(--background);
+    padding-top: 0.5rem;
+  }
+  @media (width >= 48rem) {
+    .root {
+      height: calc(var(--hero-fold-height) * 0.6);
+      padding-top: 0.25rem;
+      padding-bottom: 0.375rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .root {
+      height: calc(var(--hero-fold-height) * 0.7);
+    }
+  }
+  .layout {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+  @media (width >= 48rem) {
+    .layout {
+      flex-direction: row;
+    }
+  }
+  .textFrame {
+    position: relative;
+    isolation: isolate;
+    min-height: 0px;
+    flex: 1;
+    overflow: hidden;
+  }
+  .scroller {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    overflow-y: auto;
+    padding-inline: 0.5rem;
+    padding-block: 1rem;
+  }
+  @media (width >= 48rem) {
+    .scroller {
+      padding: 0.75rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .scroller {
+      padding: 1rem;
+    }
+  }
+  .textGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 4rem;
+    row-gap: 1rem;
+  }
+  @media (width >= 48rem) {
+    .textGrid {
+      row-gap: 2rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .textGrid {
+      column-gap: 2rem;
+      row-gap: 4rem;
+    }
+  }
+  .heading {
+    font-size: 0.875rem;
+    line-height: 1.428571;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+  @media (width >= 48rem) {
+    .heading {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+  @media (width >= 64rem) {
+    .heading {
+      font-size: 1.125rem;
+      line-height: 1.555556;
+    }
+  }
+  .splitImageColumn {
+    position: relative;
+    height: 10rem;
+    width: 100%;
+    overflow: hidden;
+  }
+  @media (width < 40rem) {
+    .splitImageColumn {
+      padding-left: 0.5rem;
+    }
+  }
+  @media (width >= 48rem) {
+    .splitImageColumn {
+      height: 100%;
+      width: calc((100% - 20px) / 3);
+    }
+  }
+  @media (width >= 64rem) {
+    .splitImageColumn {
+      width: calc((100% - 40px) / 4);
+    }
+  }
+  .overlayImage {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+  .overlayCaption {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+  }
+  .overlayHeading {
+    font-size: 0.875rem;
+    line-height: 1.428571;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+  @media (width >= 48rem) {
+    .overlayHeading {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+  @media (width >= 64rem) {
+    .overlayHeading {
+      font-size: 1.875rem;
+      line-height: 1.2;
+    }
+  }
+  .overlayImageColumn {
+    position: relative;
+    height: 10rem;
+    width: 100%;
+    overflow: hidden;
+  }
+  @media (width < 40rem) {
+    .overlayImageColumn {
+      padding-left: 0.5rem;
+    }
+  }
+  @media (width >= 48rem) {
+    .overlayImageColumn {
+      height: 100%;
+      width: calc(1 / 2 * 100%);
+    }
+  }
+  .scales {
+    color: var(--primary);
+  }
+  .imageFrame {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+  }
+  @media (width >= 48rem) {
+    .imageFrame {
+      padding: 0.75rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .imageFrame {
+      padding: 1rem;
+    }
+  }
+  .imageContainer {
+    position: relative;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .image {
+    object-fit: cover;
+  }
+}

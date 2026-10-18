@@ -1,0 +1,97 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .media {
+    position: relative;
+    width: 100%;
+    background-color: color-mix(in oklab, var(--primary) 4%, transparent);
+  }
+  .imageFrame {
+    height: 100%;
+    width: 100%;
+  }
+  .image {
+    object-fit: cover;
+    transition-property: transform, translate, scale, rotate;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 500ms;
+  }
+  @media (hover: hover) {
+    .imageInteractive:is(:where(:global(.group)):hover *) {
+      scale: 1.01;
+    }
+  }
+  .imageInteractive:is(:where(:global(.group)):focus-visible *) {
+    scale: 1.01;
+  }
+  .placeholder {
+    display: flex;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: color-mix(in oklab, #fff 80%, transparent);
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+  }
+  .content {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  @media (width >= 48rem) {
+    .content {
+      gap: 0.375rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .content {
+      gap: 0.5rem;
+    }
+  }
+  .imageContainer {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+  .heading {
+    font-size: 0.75rem;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--foreground);
+    text-transform: lowercase;
+  }
+  @media (width >= 48rem) {
+    .heading {
+      font-size: 0.875rem;
+      line-height: 1;
+    }
+  }
+  @media (width >= 64rem) {
+    .heading {
+      font-size: 1rem;
+      line-height: 1;
+    }
+  }
+  .card {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    background-color: transparent;
+    outline-style: none;
+  }
+  .card:focus-visible {
+    outline-style: none;
+    outline-width: 2px;
+    outline-offset: 2px;
+    outline-color: var(--ring);
+  }
+  .link {
+    display: block;
+  }
+  .link:focus {
+    outline-style: none;
+  }
+}

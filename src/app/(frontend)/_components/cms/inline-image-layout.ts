@@ -1,5 +1,5 @@
 import type { InlineImageFields } from './inline-blocks'
-import styles from './rich-text.module.css'
+import styles from './rich-text/rich-text.module.css'
 
 export function getInlineImageScale(scale: InlineImageFields['scale']): number {
   return typeof scale === 'number' && Number.isFinite(scale) && scale > 0 ? scale : 1

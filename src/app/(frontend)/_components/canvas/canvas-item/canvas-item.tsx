@@ -1,0 +1,134 @@
+import type { CSSProperties } from 'react'
+import { CmsImage } from '@/app/(frontend)/_components/media/cms-image'
+import type { MediaView } from '@/app/(frontend)/_lib/types'
+import { IMAGE_SCALE, OFFSET_X, OFFSET_Y } from '../canvas-layout'
+import type { CanvasItemProps } from '../draggable-canvas'
+import styles from '../_styles/canvas.module.css'
+import localStyles from './canvas-item.module.css'
+export function canvasNumber(index: number) {
+  return `${String(index + 1).padStart(2, '0')}.`
+}
+export function canvasItemStyle(
+  index: number,
+  manual?: {
+    x: number
+    y: number
+  } | null,
+  zIndex?: number | null,
+  image?: MediaView | null,
+): CSSProperties {
+  return {
+    '--column-mobile': index % 2,
+    '--row-mobile': Math.floor(index / 2),
+    '--column-tablet': index % 2,
+    '--row-tablet': Math.floor(index / 2),
+    '--column-desktop': index % 3,
+    '--row-desktop': Math.floor(index / 3),
+    '--column-wide': index % 4,
+    '--row-wide': Math.floor(index / 4),
+    '--offset-x': OFFSET_X[index % OFFSET_X.length],
+    '--offset-y': OFFSET_Y[index % OFFSET_Y.length],
+    '--image-scale': IMAGE_SCALE[index % IMAGE_SCALE.length],
+    ...(manual
+      ? {
+          '--manual-x': `${manual.x}px`,
+          '--manual-y': `${manual.y}px`,
+          '--manual-bottom': 'auto',
+          '--manual-right': 'auto',
+        }
+      : {}),
+    ...(image?.width && image.height && image.width > 0 && image.height > 0
+      ? {
+          '--media-width': `calc(var(--image-max-height) * ${image.width / image.height})`,
+          '--media-height': `calc(var(--image-max-width) / ${image.width / image.height})`,
+        }
+      : {}),
+    ...(zIndex != null ? { '--item-z': zIndex } : {}),
+  } as CSSProperties
+}
+export function CanvasImage({
+  image,
+  kind,
+}: {
+  image: MediaView | null
+  kind: 'project' | 'thing'
+}) {
+  return (
+    <span
+      className={styles.imageFit}
+      {...{ [`data-${kind}-image`]: '' }}
+      onDragStart={(e) => e.preventDefault()}
+    >
+      {image ? (
+        <CmsImage
+          media={image}
+          fill
+          sizes={
+            kind === 'project'
+              ? '(min-width: 640px) 288px, 45vw'
+              : '(min-width: 1024px) 400px, (min-width: 640px) 280px, 45vw'
+          }
+          className={localStyles.transparentImage}
+          imgClassName={localStyles.image}
+        />
+      ) : (
+        <span className={styles.placeholder} aria-hidden="true" />
+      )}
+    </span>
+  )
+}
+export function CanvasHandle<
+  T extends {
+    id: number
+  },
+>({
+  item,
+  interactive = true,
+  movementOpen,
+  registerHandleRef,
+  onHandlePointerDown,
+  onHandleKeyDown,
+  onHandleClick,
+  kind,
+  name,
+}: {
+  kind: 'project' | 'thing'
+  name: string
+} & Pick<CanvasItemProps<T>, 'item'> &
+  Partial<
+    Pick<
+      CanvasItemProps<T>,
+      | 'interactive'
+      | 'movementOpen'
+      | 'registerHandleRef'
+      | 'onHandlePointerDown'
+      | 'onHandleKeyDown'
+      | 'onHandleClick'
+    >
+  >) {
+  return (
+    <button
+      ref={registerHandleRef}
+      type="button"
+      disabled={!interactive}
+      {...{ [`data-${kind}-drag-handle`]: item.id }}
+      data-movement-open={movementOpen ? 'true' : undefined}
+      aria-label={`Move ${kind}: ${name}`}
+      aria-expanded={movementOpen}
+      className={styles.dragHandle}
+      onPointerDown={onHandlePointerDown}
+      onKeyDown={onHandleKeyDown}
+      onClick={onHandleClick}
+    >
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+        <path
+          d="M8 1v14M1 8h14M8 1 6 3M8 1l2 2M8 15l-2-2M8 15l2-2M1 8l2-2M1 8l2 2M15 8l-2-2M15 8l-2 2"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  )
+}

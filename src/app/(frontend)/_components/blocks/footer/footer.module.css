@@ -1,0 +1,210 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .linkGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .groupTitle {
+    font-weight: 500;
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    word-spacing: -0.15em;
+    font-size: 0.625rem;
+    color: color-mix(in oklab, var(--muted-foreground) 80%, transparent);
+    text-transform: uppercase;
+  }
+  @media (width >= 48rem) {
+    .groupTitle {
+      font-size: 0.75rem;
+      line-height: 1.333333;
+    }
+  }
+  .links {
+    display: flex;
+    flex-direction: column;
+    column-gap: 1rem;
+    row-gap: 0.25rem;
+  }
+  .linkRow {
+    display: flex;
+    align-items: center;
+    column-gap: 0.25rem;
+  }
+  .linkPrefix {
+    font-weight: 500;
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    word-spacing: -0.15em;
+    font-size: 0.75rem;
+    line-height: 1.333333;
+    color: var(--primary);
+  }
+  @media (hover: hover) {
+    .linkPrefix:hover {
+      color: var(--foreground);
+    }
+  }
+  @media (width >= 48rem) {
+    .linkPrefix {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+  .link {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    word-spacing: -0.15em;
+    font-size: 0.875rem;
+    line-height: 1.428571;
+    font-weight: 600;
+    text-transform: lowercase;
+    transition-property:
+      color, background-color, border-color, outline-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+  @media (hover: hover) {
+    .link:hover {
+      color: var(--primary);
+    }
+  }
+  @media (width >= 48rem) {
+    .link {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+  @media (width >= 64rem) {
+    .link {
+      font-size: 1.125rem;
+      line-height: 1.555556;
+    }
+  }
+  .root {
+    position: relative;
+    display: flex;
+    height: calc(var(--hero-fold-height) * 0.6);
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  @media (width >= 64rem) {
+    .root {
+      height: calc(var(--hero-fold-height) * 0.7);
+    }
+  }
+  .content {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex: 1;
+    flex-direction: column;
+    padding-inline: 0.5rem;
+    padding-top: 0.5rem;
+  }
+  @media (width >= 48rem) {
+    .content {
+      padding-inline: 0.75rem;
+      padding-top: 0.75rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .content {
+      padding-inline: 1rem;
+      padding-top: 1rem;
+    }
+  }
+  .tagline {
+    min-height: var(--header-height);
+    font-size: 0.875rem;
+    line-height: 1.428571;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+  @media (width >= 48rem) {
+    .tagline {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+  @media (width >= 64rem) {
+    .tagline {
+      font-size: 1.125rem;
+      line-height: 1.555556;
+    }
+  }
+  .groupsFrame {
+    position: relative;
+    display: flex;
+    height: 100%;
+  }
+  @media (width >= 48rem) {
+    .groupsFrame {
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+  }
+  .groups {
+    display: flex;
+    transform-origin: 100% 100%;
+    flex-direction: column;
+    gap: 2rem;
+    padding-bottom: 0.5rem;
+  }
+  @media (width >= 48rem) {
+    .groups {
+      flex-direction: row;
+      gap: 3rem;
+      padding-bottom: 0.75rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .groups {
+      gap: 4rem;
+      padding-bottom: 1rem;
+    }
+  }
+  .bottom {
+    display: flex;
+    height: var(--header-height);
+    min-height: var(--header-height);
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 0.5rem;
+  }
+  @media (width >= 48rem) {
+    .bottom {
+      padding-inline: 0.75rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .bottom {
+      padding-inline: 1rem;
+    }
+  }
+  .copyright {
+    padding-top: 0.125rem;
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    word-spacing: -0.15em;
+    font-size: 0.75rem;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  @media (width >= 48rem) {
+    .copyright {
+      font-size: 0.875rem;
+      line-height: 1;
+    }
+  }
+  .logo {
+    display: block;
+  }
+  .icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  @media (width >= 64rem) {
+    .icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+}

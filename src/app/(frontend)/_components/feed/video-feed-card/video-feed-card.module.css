@@ -1,0 +1,187 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .landscape {
+    aspect-ratio: 16 / 9;
+  }
+  .portrait {
+    aspect-ratio: 3/4;
+  }
+  .media {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
+  }
+  .iframe {
+    position: absolute;
+    inset: 0px;
+    height: 100%;
+    width: 100%;
+    border-style: solid;
+    border-width: 0px;
+  }
+  .imageFrame {
+    position: absolute;
+    inset: 0px;
+    height: 100%;
+    width: 100%;
+  }
+  .image {
+    transition-property: transform, translate, scale, rotate;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 500ms;
+  }
+  @media (hover: hover) {
+    .imageInteractive:is(:where(:global(.group)):hover *) {
+      scale: 1.01;
+    }
+  }
+  .imageInteractive:is(:where(:global(.group)):focus-visible *) {
+    scale: 1.01;
+  }
+  .placeholder {
+    position: absolute;
+    inset: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .placeholderIcon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--muted-foreground);
+  }
+  .playBadge {
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .playBadgeInner {
+    display: flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(infinity * 1px);
+    background-color: color-mix(in oklab, var(--background) 85%, transparent);
+    color: var(--foreground);
+    box-shadow:
+      0 0 #0000,
+      0 0 #0000,
+      0 0 #0000,
+      0 0 #0000,
+      0 1px 3px 0 rgb(0 0 0 / 0.1),
+      0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+  .playIcon {
+    width: 1.25rem;
+    height: 1.25rem;
+    translate: 1px 0;
+  }
+  .metadata {
+    font-weight: 500;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: var(--background);
+    padding-right: 0.125rem;
+    padding-bottom: 0.125rem;
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    word-spacing: -0.15em;
+    font-size: 0.5rem;
+    line-height: 1;
+    color: var(--primary);
+    text-transform: uppercase;
+  }
+  @media (width >= 48rem) {
+    .metadata {
+      font-size: 0.625rem;
+    }
+  }
+  .heading {
+    font-size: 0.75rem;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--foreground);
+    text-transform: lowercase;
+  }
+  @media (width >= 48rem) {
+    .heading {
+      font-size: 0.875rem;
+      line-height: 1;
+    }
+  }
+  @media (width >= 64rem) {
+    .heading {
+      font-size: 1rem;
+      line-height: 1;
+    }
+  }
+  .card {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    background-color: transparent;
+    outline-style: none;
+  }
+  .card:focus-visible {
+    outline-style: none;
+    outline-width: 2px;
+    outline-offset: 2px;
+    outline-color: var(--ring);
+  }
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  @media (width >= 48rem) {
+    .content {
+      gap: 0.375rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .content {
+      gap: 0.5rem;
+    }
+  }
+  .playButton {
+    position: relative;
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+  .playButton:focus {
+    outline-style: none;
+  }
+  .externalLink {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    line-height: 1.428571;
+    font-weight: 500;
+    color: var(--primary);
+    text-transform: lowercase;
+    text-underline-offset: 2px;
+  }
+  @media (hover: hover) {
+    .externalLink:hover {
+      text-decoration-line: underline;
+    }
+  }
+  .externalIcon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--primary);
+  }
+  .link {
+    display: block;
+  }
+  .link:focus {
+    outline-style: none;
+  }
+}

@@ -1,0 +1,29 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .bar {
+    display: block;
+    transform-origin: bottom;
+    rotate: 30deg;
+    border-radius: 0.5px;
+    background-color: color-mix(in oklab, var(--accent) 15%, transparent);
+  }
+  .fill {
+    display: block;
+    height: 100%;
+    width: 100%;
+    transform-origin: bottom;
+    border-radius: 0.5px;
+    background-color: var(--accent);
+  }
+  .root {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bars {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.1875rem;
+  }
+}

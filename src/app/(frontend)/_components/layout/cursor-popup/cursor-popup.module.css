@@ -1,0 +1,87 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .layer {
+    z-index: 2147483647;
+  }
+  .overlay {
+    pointer-events: none;
+    position: fixed;
+    inset: 0px;
+    display: none;
+  }
+  @media (width >= 48rem) {
+    .overlay {
+      display: block;
+    }
+  }
+  .horizontal {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 1px;
+    width: 100%;
+    background-color: color-mix(in oklab, var(--foreground) 20%, transparent);
+    will-change: transform;
+  }
+  .vertical {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 1px;
+    background-color: color-mix(in oklab, var(--foreground) 20%, transparent);
+    will-change: transform;
+  }
+  .anchor {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    will-change: transform;
+  }
+  .offset {
+    translate: -100% 0;
+    will-change: transform;
+  }
+  .bubble {
+    overflow: hidden;
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--accent);
+    background-color: color-mix(in oklab, var(--background) 50%, transparent);
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    word-spacing: -0.15em;
+    font-size: 0.625rem;
+    line-height: 1;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--accent);
+    text-transform: uppercase;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .vietnamesePadding {
+    padding-inline: 0.1875rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.1875rem;
+  }
+  .padding {
+    padding: 0.1875rem;
+  }
+  .overlay {
+    clip-path: inset(
+      calc(var(--site-frame-top) + var(--outer-line-weight))
+        calc(var(--site-frame-right) + var(--outer-line-weight))
+        calc(var(--site-frame-bottom) + var(--outer-line-weight))
+        calc(var(--site-frame-left) + var(--outer-line-weight))
+    );
+  }
+  .horizontal {
+    height: var(--inner-line-weight);
+  }
+  .vertical {
+    width: var(--inner-line-weight);
+  }
+  .bubble {
+    border-width: var(--inner-line-weight);
+  }
+}

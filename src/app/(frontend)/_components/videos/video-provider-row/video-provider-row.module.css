@@ -1,0 +1,7 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .arrowIcon {
+    width: 1rem;
+    height: 1rem;
+  }
+}

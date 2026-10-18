@@ -1,0 +1,10 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .imageFill {
+    position: absolute;
+    inset: 0px;
+  }
+  .image {
+    object-fit: contain;
+  }
+}

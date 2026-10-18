@@ -1,0 +1,13 @@
+@layer theme, base, components, utilities;@layer components {.fill {
+  position: absolute;
+  inset: 0px;
+}.clip {
+  position: absolute;
+  inset: 0px;
+  overflow: hidden;
+}:where(.cover) {
+  object-fit: cover;
+}:where(.natural) {
+  height: auto;
+}
+}

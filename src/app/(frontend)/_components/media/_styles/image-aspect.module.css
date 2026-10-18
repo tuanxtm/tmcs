@@ -1,0 +1,9 @@
+@layer theme, base, components, utilities;
+@layer components {
+.square { aspect-ratio: 1; }
+.video { aspect-ratio: 16 / 9; }
+.landscape { aspect-ratio: 4 / 3; }
+.wide { aspect-ratio: 5 / 4; }
+.portrait { aspect-ratio: 4 / 5; }
+.tall { aspect-ratio: 3 / 4; }
+.vertical { aspect-ratio: 9 / 16; } }

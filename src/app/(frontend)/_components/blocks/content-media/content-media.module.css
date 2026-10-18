@@ -1,0 +1,27 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .figure {
+    position: relative;
+    right: calc(1 / 2 * 100%);
+    left: calc(1 / 2 * 100%);
+    margin-inline: calc(50vw * -1);
+    margin-block: 3rem;
+    width: 100vw;
+  }
+  .imageFrame {
+    width: 100%;
+  }
+  .image {
+    height: auto;
+    width: 100%;
+  }
+  .caption {
+    margin-inline: auto;
+    margin-top: 0.75rem;
+    max-width: var(--container-3xl);
+    padding-inline: 1rem;
+    font-size: 0.75rem;
+    line-height: 1.333333;
+    color: var(--muted-foreground);
+  }
+}

@@ -1,0 +1,128 @@
+@layer theme, base, components, utilities;
+@layer components {
+  /* Viewport for the FlexCarousel. Reserved height so the engine has a real
+   container before WebGL mounts; the engine itself sizes to fill h-full. */
+  .viewport {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    height: clamp(24rem, 70svh, 48rem);
+    color: var(--secondary);
+    box-shadow: inset 0 calc(-1 * var(--outer-line-weight, 1.5px))
+      var(--site-rule-color, var(--accent));
+  }
+  .loading {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    word-spacing: -0.15em;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .header {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(8rem, 2fr) minmax(4rem, 1fr);
+    box-shadow: inset 0 calc(-1 * var(--outer-line-weight, 1.5px))
+      var(--site-rule-color, var(--accent));
+  }
+  .heading {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    margin: 0;
+    padding: 1rem;
+    border-right: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
+    color: var(--secondary);
+    font-size: clamp(2.25rem, 6vw, 6rem);
+    font-weight: 400;
+    line-height: 1.05;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .headingText {
+    display: block;
+  }
+  .description {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 1rem;
+    border-top: var(--inner-line-weight, 1px) solid var(--site-rule-color, var(--accent));
+    color: var(--secondary);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  .fallbackCaption {
+    position: absolute;
+    inset-inline: 1rem;
+    bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    text-align: center;
+  }
+  .title {
+    display: -webkit-box;
+    max-width: 100%;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .metadata {
+    font-family: var(--font-mono);
+    word-spacing: -0.15em;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 24px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .date {
+    opacity: 0.6;
+  }
+  .openPostLink {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    word-spacing: -0.15em;
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    color: var(--accent);
+    font-size: 0.75rem;
+    text-decoration: none;
+    text-underline-offset: 4px;
+    pointer-events: auto;
+    cursor: pointer;
+    outline: none;
+  }
+  .openPostLink:hover {
+    text-decoration: underline;
+  }
+  .openPostLink:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 4px;
+  }
+}

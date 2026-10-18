@@ -1,0 +1,27 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .root {
+    pointer-events: none;
+    position: fixed;
+    inset: 0px;
+    z-index: -10;
+    background-color: var(--background);
+  }
+  @keyframes boot-bg-fade-in {
+    from {
+      opacity: 0;
+      filter: blur(40px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+  .fadeIn {
+    animation: boot-bg-fade-in 2s ease-out both;
+  }
+  .root {
+    background-size: 256px 256px;
+    background-blend-mode: soft-light;
+  }
+}

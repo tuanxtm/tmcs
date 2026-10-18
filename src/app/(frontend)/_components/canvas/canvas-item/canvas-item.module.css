@@ -1,0 +1,10 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .transparentImage {
+    background-color: transparent !important;
+  }
+  .image {
+    object-fit: contain;
+    object-position: bottom;
+  }
+}

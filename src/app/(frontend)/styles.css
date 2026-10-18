@@ -1,5 +1,7 @@
+@layer theme, base, components, utilities;
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import 'lenis/dist/lenis.css' layer(base);
 
 @custom-variant dark (&:is(.dark *));
 
@@ -83,6 +85,12 @@
 }
 
 @layer base {
+  a,
+  button,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -97,6 +105,9 @@
     background: transparent;
     font-optical-sizing: auto;
     font-variation-settings: 'opsz' var(--cal-optical-size);
+    position: relative;
+    isolation: isolate;
+    min-height: 100dvh;
   }
 
   .font-mono {
@@ -165,103 +176,8 @@ body::-webkit-scrollbar {
     --site-header-height: 72px;
   }
 }
-[data-cursor-cross-root],
-[data-cursor-popup-root] {
-  clip-path: inset(
-    calc(var(--site-frame-top) + var(--outer-line-weight))
-      calc(var(--site-frame-right) + var(--outer-line-weight))
-      calc(var(--site-frame-bottom) + var(--outer-line-weight))
-      calc(var(--site-frame-left) + var(--outer-line-weight))
-  );
-}
-[data-cursor-cross-root] > :first-child {
-  height: var(--inner-line-weight);
-}
-[data-cursor-cross-root] > :last-child {
-  width: var(--inner-line-weight);
-}
-[data-cursor-popup-bubble] {
-  border-width: var(--inner-line-weight);
-}
-.site-cell-hover {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  transition: color 260ms ease;
-}
-.site-cell-hover::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: var(--accent);
-  content: '';
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 260ms ease;
-  pointer-events: none;
-}
-.site-cell-hover:is(:hover, :focus-visible, [data-expanded='true']):not(:disabled) {
-  color: var(--accent-foreground);
-}
-.site-cell-hover:is(:hover, :focus-visible, [data-expanded='true']):not(:disabled)::before {
-  transform: scaleY(1);
-}
-.site-cell-hover:is(:hover, :focus-visible):not(:disabled) > svg {
-  opacity: 1;
-}
-.site-shell {
-  overflow-x: clip;
-  padding: var(--site-frame-top) var(--site-frame-right) var(--site-frame-bottom)
-    var(--site-frame-left);
-}
-.site-frame {
-  position: fixed;
-  z-index: 60;
-  top: var(--site-frame-top);
-  right: var(--site-frame-right);
-  bottom: var(--site-frame-bottom);
-  left: var(--site-frame-left);
-  box-shadow:
-    inset 0 0 0 var(--outer-line-weight) var(--site-rule-color),
-    0 0 0 100vmax var(--background);
-  pointer-events: none;
-}
-.page-blocks > header + #hero {
-  margin-top: calc(-1 * var(--section-gap-y));
-}
-.page-blocks > [data-feed-type='posts'],
-.page-blocks > [data-feed-type='projects'],
-.page-blocks > [data-feed-type='things'] {
-  margin-top: calc(-1 * var(--section-gap-y));
-}
-.page-blocks > :not(header) {
-  box-shadow: inset 0 calc(-1 * var(--outer-line-weight)) var(--site-rule-color);
-}
 
 @layer utilities {
-  a,
-  button,
-  [role='button'] {
-    touch-action: manipulation;
-  }
-
-  /* Boot splash - first visit / hard reload only (layout-mounted client overlay). */
-  .boot-splash {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--background);
-    pointer-events: auto;
-  }
-
-  /* Clip roll-up / intro to each text line’s box. */
-  .boot-splash-line {
-    overflow: hidden;
-  }
-
   html.boot-splash-active {
     overflow: hidden;
   }
@@ -269,45 +185,6 @@ body::-webkit-scrollbar {
   /* Keep the existing splash and Lenis document locks consistent. */
   html.lenis:not(.lenis-autoToggle).lenis-stopped {
     overflow: hidden;
-  }
-
-  /* JS-driven intro is handled by Motion (initial/animate on the line elements)
-   so the entry mirrors the exit: text rises up through the clip wrapper. */
-
-  /* No-JS: scroll up to reveal the site without hydration. */
-  @keyframes boot-splash-noscript-reveal {
-    0%,
-    70% {
-      transform: translateY(0);
-      visibility: visible;
-    }
-    100% {
-      transform: translateY(-100%);
-      visibility: hidden;
-      pointer-events: none;
-    }
-  }
-
-  @media (scripting: none) {
-    .boot-splash {
-      animation: boot-splash-noscript-reveal 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-  }
-
-  /* Atmospheric background - fades + sharpens in once on mount. */
-  @keyframes boot-bg-fade-in {
-    from {
-      opacity: 0;
-      filter: blur(40px);
-    }
-    to {
-      opacity: 1;
-      filter: blur(0);
-    }
-  }
-
-  .boot-bg-fade-in {
-    animation: boot-bg-fade-in 2s ease-out both;
   }
 
   @media (prefers-reduced-motion: reduce) {

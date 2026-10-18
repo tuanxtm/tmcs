@@ -1,0 +1,15 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .root {
+    position: fixed;
+    z-index: 60;
+    top: var(--site-frame-top);
+    right: var(--site-frame-right);
+    bottom: var(--site-frame-bottom);
+    left: var(--site-frame-left);
+    box-shadow:
+      inset 0 0 0 var(--outer-line-weight) var(--site-rule-color),
+      0 0 0 100vmax var(--background);
+    pointer-events: none;
+  }
+}

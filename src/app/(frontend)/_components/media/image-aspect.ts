@@ -1,3 +1,4 @@
+import styles from './_styles/image-aspect.module.css'
 import type { MediaView } from '@/app/(frontend)/_lib/types'
 
 /**
@@ -28,7 +29,7 @@ export type ImageAspect = {
  */
 export function getImageAspect(image: MediaView | null | undefined): ImageAspect {
   if (!image?.width || !image.height) {
-    return { ratio: 1 / 1, variant: 'overlay', aspectClass: 'aspect-square' }
+    return { ratio: 1 / 1, variant: 'overlay', aspectClass: styles.square }
   }
 
   const ratio = image.width / image.height
@@ -36,18 +37,18 @@ export function getImageAspect(image: MediaView | null | undefined): ImageAspect
 
   const aspectClass =
     ratio > 1.78
-      ? 'aspect-video' // 16:9 wide landscape
+      ? styles.video // 16:9 wide landscape
       : ratio > 1.45
-        ? 'aspect-[4/3]' // 4:3 landscape
+        ? styles.landscape // 4:3 landscape
         : ratio > 1.2
-          ? 'aspect-[5/4]' // 5:4 mild landscape
+          ? styles.wide // 5:4 mild landscape
           : ratio > 0.95
-            ? 'aspect-square' // 1:1
+            ? styles.square // 1:1
             : ratio > 0.7
-              ? 'aspect-[4/5]' // 4:5 portrait
+              ? styles.portrait // 4:5 portrait
               : ratio > 0.55
-                ? 'aspect-[3/4]' // 3:4 portrait
-                : 'aspect-[9/16]' // 9:16 tall portrait
+                ? styles.tall // 3:4 portrait
+                : styles.vertical // 9:16 tall portrait
 
   return { ratio, variant, aspectClass }
 }

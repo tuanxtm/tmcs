@@ -1,0 +1,7 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .sentinel {
+    height: 0.25rem;
+    width: 100%;
+  }
+}

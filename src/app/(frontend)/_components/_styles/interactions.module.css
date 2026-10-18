@@ -1,0 +1,29 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .cellHover {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    transition: color 260ms ease;
+  }
+  .cellHover::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: var(--accent);
+    content: '';
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 260ms ease;
+    pointer-events: none;
+  }
+  .cellHover:is(:hover, :focus-visible, [data-expanded='true']):not(:disabled) {
+    color: var(--accent-foreground);
+  }
+  .cellHover:is(:hover, :focus-visible, [data-expanded='true']):not(:disabled)::before {
+    transform: scaleY(1);
+  }
+  .cellHover:is(:hover, :focus-visible):not(:disabled) > svg {
+    opacity: 1;
+  }
+}
