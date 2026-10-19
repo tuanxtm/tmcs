@@ -1,16 +1,9 @@
 import type { Block } from 'payload'
 
 import { linkPickerField } from '@/fields/common'
-import { richTextWithoutBlock } from '@/fields/richText/richText'
+import { heroRichText } from '@/fields/richText/heroRichText'
 
-/**
- * Page block rendered at the bottom of a page.
- *
- * Uses `richTextWithoutBlock` to opt out of `BlocksFeature`. Without this
- * opt-out, `PageFooterBlock.footerText` would inherit the global editor,
- * which includes `BlocksFeature`, and create the same recursive schema that
- * `PageRichTextBlock.content` already guards against.
- */
+// Share Hero's inline-image editor without importing recursive page blocks.
 export const PageFooterBlock: Block = {
   slug: 'pageFooter',
   labels: {
@@ -22,7 +15,7 @@ export const PageFooterBlock: Block = {
       name: 'footerText',
       type: 'richText',
       localized: true,
-      editor: richTextWithoutBlock,
+      editor: heroRichText,
       label: 'Text',
     },
     {
