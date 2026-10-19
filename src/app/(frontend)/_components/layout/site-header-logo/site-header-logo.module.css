@@ -2,6 +2,8 @@
 @layer components {
   .bar {
     display: block;
+    width: 5px;
+    height: 15px;
     transform-origin: bottom;
     rotate: 30deg;
     border-radius: 0.5px;
@@ -15,6 +17,14 @@
     border-radius: 0.5px;
     background-color: var(--accent);
     transform: scaleY(0);
+    will-change: transform;
+    animation: logo-first 14.4s ease-out infinite;
+  }
+  .bar:nth-child(2) .fill {
+    animation-name: logo-second;
+  }
+  .bar:nth-child(3) .fill {
+    animation-name: logo-third;
   }
   .root {
     display: flex;
@@ -27,8 +37,76 @@
     align-items: center;
     gap: 0.1875rem;
   }
+  /* Six letters, one 600ms beat per frame, available before hydration. */
+  @keyframes logo-first {
+    0%,
+    4.16667%,
+    16.6667%,
+    37.5%,
+    54.1667%,
+    70.8333%,
+    83.3333%,
+    100% {
+      transform: scaleY(0);
+    }
+    8.33333%,
+    12.5%,
+    58.3333%,
+    66.6667%,
+    75%,
+    79.1667%,
+    87.5%,
+    95.8333% {
+      transform: scaleY(1);
+    }
+    20.8333%,
+    33.3333%,
+    41.6667%,
+    50% {
+      transform: scaleY(0.5);
+    }
+  }
+  @keyframes logo-second {
+    0%,
+    20.8333%,
+    37.5%,
+    41.6667%,
+    54.1667%,
+    58.3333%,
+    70.8333%,
+    87.5%,
+    100% {
+      transform: scaleY(0);
+    }
+    25%,
+    33.3333%,
+    62.5%,
+    66.6667% {
+      transform: scaleY(0.5);
+    }
+    45.8333%,
+    50%,
+    91.6667%,
+    95.8333% {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes logo-third {
+    0%,
+    25%,
+    37.5%,
+    100% {
+      transform: scaleY(0);
+    }
+    29.1667%,
+    33.3333% {
+      transform: scaleY(1);
+    }
+  }
   @media (prefers-reduced-motion: reduce), (scripting: none) {
     .fill {
+      animation: none;
+      will-change: auto;
       transform: scaleY(1);
     }
   }
