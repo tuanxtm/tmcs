@@ -36,7 +36,6 @@ export const ContactSubmissions: CollectionConfig = {
     {
       name: 'name',
       type: 'text',
-      required: true,
     },
     {
       name: 'email',

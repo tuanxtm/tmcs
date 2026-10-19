@@ -1,4 +1,4 @@
-import { describe, it, beforeAll, expect } from 'vitest'
+import { describe, it, beforeAll, expect, vi } from 'vitest'
 import type { Payload } from 'payload'
 
 import { ensureTestUsers, initPayload, type TestUsers } from '../helpers/payload'
@@ -84,6 +84,88 @@ describe('Contact and cron routes', () => {
       }),
     )
     expect(res.status).toBe(200)
+  })
+
+  const callbackRequest = (body: unknown) =>
+    new Request('http://localhost:3000/api/contact', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'user-agent': 'footer-test' },
+      body: JSON.stringify(body),
+    })
+
+  it('saves an email-only callback with system metadata and deduplicates retries', async () => {
+    const email = `footer-${Date.now()}@example.com`
+    const body = {
+      intent: 'footer-callback',
+      email: ` ${email.toUpperCase()} `,
+      consent: true,
+      locale: 'vi',
+      openedAt: Date.now() - 5000,
+      sourcePage: 'http://localhost:3000/vi',
+      name: 'Injected name',
+      message: 'Injected message',
+      category: 'spam',
+    }
+    expect((await contactPOST(callbackRequest(body))).status).toBe(200)
+    expect((await contactPOST(callbackRequest(body))).status).toBe(200)
+    const found = await payload.find({
+      collection: 'contact-submissions',
+      where: { email: { equals: email } },
+      locale: 'vi',
+      user: users.admin,
+      overrideAccess: false,
+    })
+    expect(found.totalDocs).toBe(1)
+    expect(found.docs[0]).toMatchObject({
+      email,
+      name: 'Footer callback request',
+      subject: 'Footer callback request',
+      message: 'Visitor requested an email reply through the footer.',
+      category: 'general',
+      locale: 'vi',
+      status: 'new',
+      consent: true,
+      sourcePage: 'http://localhost:3000/vi',
+    })
+    expect(found.docs[0].abuse?.ipHash).toBeTruthy()
+    expect(found.docs[0].abuse?.userAgentHash).toBeTruthy()
+  })
+
+  it.each([
+    null,
+    [],
+    { intent: 'unknown', email: 'visitor@example.com', consent: true },
+    { intent: 'footer-callback', email: 'invalid', consent: true },
+    { intent: 'footer-callback', email: 'visitor@example.com', consent: false },
+    {
+      intent: 'footer-callback',
+      email: 'visitor@example.com',
+      consent: true,
+      sourcePage: 'https://other.example/',
+    },
+    { email: 'visitor@example.com', message: 'Missing name', consent: true },
+    { name: 'Visitor', email: 'visitor@example.com', consent: true },
+  ])('rejects invalid callback input and preserves full-contact requirements: %j', async (body) => {
+    expect((await contactPOST(callbackRequest(body))).status).toBe(400)
+  })
+
+  it('reports a generic failure when callback persistence fails', async () => {
+    const create = vi
+      .spyOn(payload, 'create')
+      .mockRejectedValueOnce(new Error('Storage unavailable'))
+    try {
+      const response = await contactPOST(
+        callbackRequest({
+          intent: 'footer-callback',
+          email: `failed-${Date.now()}@example.com`,
+          consent: true,
+        }),
+      )
+      expect(response.status).toBe(500)
+      expect(await response.json()).toEqual({ ok: false, error: 'Could not save submission' })
+    } finally {
+      create.mockRestore()
+    }
   })
 
   it('rejects unauthorized cron job runs', async () => {

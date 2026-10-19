@@ -1406,7 +1406,7 @@ export interface Video {
  */
 export interface ContactSubmission {
   id: number;
-  name: string;
+  name?: string | null;
   email: string;
   subject?: string | null;
   category?: ('general' | 'project' | 'speaking' | 'other') | null;

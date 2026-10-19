@@ -11,6 +11,7 @@ const MIN_SUBMIT_MS = 1500
 const DEDUPE_WINDOW_MS = 60_000
 
 type ContactBody = {
+  intent?: unknown
   name?: unknown
   email?: unknown
   subject?: unknown
@@ -67,6 +68,13 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ ok: false, error: 'Invalid JSON' }, { status: 400 })
   }
 
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return Response.json({ ok: false, error: 'Invalid body' }, { status: 400 })
+  }
+  if (body.intent !== undefined && body.intent !== 'footer-callback') {
+    return Response.json({ ok: false, error: 'Invalid intent' }, { status: 400 })
+  }
+
   // Honeypot
   if (typeof body.website === 'string' && body.website.trim() !== '') {
     // Pretend success to avoid tipping off bots
@@ -80,13 +88,17 @@ export async function POST(request: Request): Promise<Response> {
     }
   }
 
-  if (!isNonEmptyString(body.name, 120)) {
+  const callback = body.intent === 'footer-callback'
+  const name = callback ? 'Footer callback request' : body.name
+  const message = callback ? 'Visitor requested an email reply through the footer.' : body.message
+
+  if (!isNonEmptyString(name, 120)) {
     return Response.json({ ok: false, error: 'Invalid name' }, { status: 400 })
   }
   if (!isNonEmptyString(body.email, 254) || !isValidEmail(body.email.trim())) {
     return Response.json({ ok: false, error: 'Invalid email' }, { status: 400 })
   }
-  if (!isNonEmptyString(body.message, 5000)) {
+  if (!isNonEmptyString(message, 5000)) {
     return Response.json({ ok: false, error: 'Invalid message' }, { status: 400 })
   }
   if (body.consent !== true) {
@@ -95,6 +107,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const locale = isLocaleCode(body.locale) ? body.locale : 'en'
   const category =
+    !callback &&
     typeof body.category === 'string' &&
     (CONTACT_CATEGORY_VALUES as readonly string[]).includes(body.category)
       ? (body.category as ContactCategory)
@@ -128,51 +141,60 @@ export async function POST(request: Request): Promise<Response> {
   const ipHash = hashWithSecret(ip, hashSecret)
   const userAgentHash = hashWithSecret(userAgent, hashSecret)
 
-  const payload = await getPayload({ config })
+  try {
+    const payload = await getPayload({ config })
 
-  // Deduplicate bursts from same email+ip hash within a short window
-  const since = new Date(Date.now() - DEDUPE_WINDOW_MS).toISOString()
-  const recent = await payload.find({
-    collection: 'contact-submissions',
-    where: {
-      and: [
-        { email: { equals: body.email.trim().toLowerCase() } },
-        { 'abuse.ipHash': { equals: ipHash } },
-        { createdAt: { greater_than_equal: since } },
-      ],
-    },
-    limit: 1,
-    depth: 0,
-    overrideAccess: true,
-  })
-
-  if (recent.totalDocs > 0) {
-    // Generic success - do not aid enumeration
-    return Response.json({ ok: true })
-  }
-
-  await payload.create({
-    collection: 'contact-submissions',
-    data: {
-      name: body.name.trim(),
-      email: body.email.trim().toLowerCase(),
-      subject: typeof body.subject === 'string' ? body.subject.trim().slice(0, 200) : undefined,
-      category,
-      message: body.message.trim(),
-      locale,
-      status: 'new',
-      sourcePage,
-      consent: true,
-      abuse: {
-        ipHash,
-        userAgentHash,
-        honeypotTriggered: false,
+    // Deduplicate bursts from same email+ip hash within a short window
+    const since = new Date(Date.now() - DEDUPE_WINDOW_MS).toISOString()
+    const recent = await payload.find({
+      collection: 'contact-submissions',
+      where: {
+        and: [
+          { email: { equals: body.email.trim().toLowerCase() } },
+          { 'abuse.ipHash': { equals: ipHash } },
+          { createdAt: { greater_than_equal: since } },
+        ],
       },
-    },
-    overrideAccess: true,
-  })
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
 
-  // Extension point: enqueue email notification job here later.
+    if (recent.totalDocs > 0) {
+      // Generic success - do not aid enumeration
+      return Response.json({ ok: true })
+    }
 
-  return Response.json({ ok: true })
+    await payload.create({
+      collection: 'contact-submissions',
+      data: {
+        name: name.trim(),
+        email: body.email.trim().toLowerCase(),
+        subject: callback
+          ? 'Footer callback request'
+          : typeof body.subject === 'string'
+            ? body.subject.trim().slice(0, 200)
+            : undefined,
+        category,
+        message: message.trim(),
+        locale,
+        status: 'new',
+        sourcePage,
+        consent: true,
+        abuse: {
+          ipHash,
+          userAgentHash,
+          honeypotTriggered: false,
+        },
+      },
+      overrideAccess: true,
+      locale,
+    })
+
+    // Extension point: enqueue email notification job here later.
+
+    return Response.json({ ok: true })
+  } catch {
+    return Response.json({ ok: false, error: 'Could not save submission' }, { status: 500 })
+  }
 }
