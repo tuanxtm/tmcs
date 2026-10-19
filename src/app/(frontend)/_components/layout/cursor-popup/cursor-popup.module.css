@@ -9,6 +9,9 @@
     inset: 0px;
     display: none;
   }
+  :global(body:has([data-cursor-effects='off']:hover)) .overlay {
+    visibility: hidden;
+  }
   @media (width >= 48rem) {
     .overlay {
       display: block;
