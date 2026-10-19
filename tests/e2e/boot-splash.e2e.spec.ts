@@ -95,3 +95,41 @@ test('typing follows elapsed animation time across a busy main thread', async ({
   finishLoading()
   await expect(page.locator('.boot-splash')).toHaveCount(0)
 })
+
+test('greeting paints intermediate frames while the main thread is blocked', async ({ page }) => {
+  const { finishLoading } = await openFixture(page)
+  await page.addStyleTag({ content: '.boot-splash [role="img"] { visibility: hidden; }' })
+  const session = await page.context().newCDPSession(page)
+  const frames: { time: number; image: string }[] = []
+  session.on('Page.screencastFrame', (frame) => {
+    void session.send('Page.screencastFrameAck', { sessionId: frame.sessionId })
+    if (frame.metadata.timestamp === undefined) return
+    frames.push({ time: frame.metadata.timestamp * 1000, image: frame.data })
+  })
+  try {
+    await session.send('Page.startScreencast', { format: 'png', everyNthFrame: 1 })
+    await page.locator('.boot-splash').evaluate(async (element) => {
+      for (const animation of element.getAnimations({ subtree: true })) animation.currentTime = 0
+      await new Promise(requestAnimationFrame)
+      await new Promise(requestAnimationFrame)
+    })
+    const interval = await page.evaluate(() => {
+      const start = performance.timeOrigin + performance.now()
+      const end = performance.now() + 1300
+      while (performance.now() < end) {
+        /* Simulate uninterrupted startup work. */
+      }
+      return { start, end: performance.timeOrigin + performance.now() }
+    })
+    await session.send('Page.stopScreencast')
+    const during = frames.filter(
+      ({ time }) => time > interval.start + 100 && time < interval.end - 100,
+    )
+    // The logo is hidden, so distinct frames must come from the typing and cursor.
+    expect(new Set(during.map(({ image }) => image)).size).toBeGreaterThan(8)
+  } finally {
+    finishLoading()
+    await session.detach()
+  }
+  await expect(page.locator('.boot-splash')).toHaveCount(0)
+})

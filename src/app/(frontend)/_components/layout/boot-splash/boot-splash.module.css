@@ -21,31 +21,54 @@
   .character {
     position: relative;
   }
+  /* Start every timeline immediately so reveals keep painting during startup work. */
   .ink {
     display: inline-block;
     opacity: 0;
-    animation: boot-typewriter-ink 1ms linear forwards;
+    will-change: opacity;
+    animation: boot-typewriter-ink 60ms linear both;
   }
   .cursor,
-  .finalCursor,
   .initialCursor {
     position: absolute;
     left: 100%;
     margin-left: 0.25rem;
     opacity: 0;
-    animation: boot-typewriter-ink 60ms linear;
+    will-change: opacity;
+    animation: boot-typewriter-ink 60ms linear both;
+  }
+  .cursorInk {
+    display: block;
+    will-change: opacity;
+    animation: boot-typewriter-out 60ms linear both;
   }
   .initialCursor {
     left: 0;
     margin-left: 0;
+    animation-name: boot-typewriter-out;
   }
   .finalCursor {
+    display: block;
     animation: boot-typewriter-blink 800ms step-end infinite;
   }
   @keyframes boot-typewriter-ink {
-    from,
+    0%,
+    99.8% {
+      opacity: 0;
+    }
+    99.9%,
     to {
       opacity: 1;
+    }
+  }
+  @keyframes boot-typewriter-out {
+    0%,
+    99.8% {
+      opacity: 1;
+    }
+    99.9%,
+    to {
+      opacity: 0;
     }
   }
   @keyframes boot-typewriter-blink {

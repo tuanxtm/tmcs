@@ -48,15 +48,26 @@ function BootGreeting({ text, onComplete }: { text: string; onComplete: () => vo
           <span
             ref={index === characters.length - 1 ? lastCharacter : undefined}
             className={styles.ink}
-            style={{ animationDelay: `${(index + 1) * TYPEWRITER_SPEED_MS}ms` }}
+            style={{ animationDuration: `${(index + 1) * TYPEWRITER_SPEED_MS}ms` }}
           >
             {character}
           </span>
           <span
-            className={index === characters.length - 1 ? styles.finalCursor : styles.cursor}
-            style={{ animationDelay: `${(index + 1) * TYPEWRITER_SPEED_MS}ms` }}
+            className={styles.cursor}
+            style={{ animationDuration: `${(index + 1) * TYPEWRITER_SPEED_MS}ms` }}
           >
-            _
+            <span
+              className={index === characters.length - 1 ? styles.finalCursor : styles.cursorInk}
+              style={
+                index === characters.length - 1
+                  ? undefined
+                  : {
+                      animationDuration: `${(index + 2) * TYPEWRITER_SPEED_MS}ms`,
+                    }
+              }
+            >
+              _
+            </span>
           </span>
         </span>
       ))}
